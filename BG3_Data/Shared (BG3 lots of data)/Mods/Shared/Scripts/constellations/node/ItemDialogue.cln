@@ -1,0 +1,49 @@
+game.states.ItemDialogue = State{
+    function()
+
+        -- parameters
+        params.itemDialogue = {type = EParamType.String, required = true, help = [[
+            Dialog resource (format: name_GUID) to start
+        ]]}
+
+        -- locals
+        local dialog = nil
+        local lookedUpDialog = false
+        local setInteractiveDialog = false
+
+        -- functions
+        -- Attempts to look up the dialog.
+        helpers.getDialog = function()
+            if not lookedUpDialog then
+                dialog = Dialog(params.itemDialogue)
+                lookedUpDialog = true
+            end
+            return dialog
+        end
+
+        -- events
+        events.UseFinished = function(e)
+            if not e.Success then
+                return
+            end
+
+            if IsInDialog(e.User) then
+                return
+            end
+            local myDialog = helpers.getDialog()
+            -- Dialog will return nil for interactive dialogs -> if
+            -- myDialog is nil, assume it's an interactive one (if it simply did
+            -- did not exist, Osiris will throw an assert when trying to start it)
+            if myDialog ~= nil then
+                StartAutomatedDialogImmediate(helpers.getDialog(), e.User)
+            else
+                if not setInteractiveDialog then
+                    me.Blackboard.SetFact("Cnst.ItemDialogue.ItemDialog", params.itemDialogue)
+                    setInteractiveDialog = true
+                end
+                SetEntityEvent(e.User, "GEN_StartItemDialog", me)
+            end
+        end
+
+    end
+}

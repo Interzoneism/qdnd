@@ -1,0 +1,126 @@
+game.states.JustSit = State{function ()
+
+    params.seat = {type = EParamType.String, required=false, help=[[
+        Item to sit or lie on, if not set then sit on ground
+    ]]}
+    params.seatTrigger = {type = EParamType.String, required=false, help=[[
+        If set, will only sit or lie on item if it's inside this trigger
+    ]]}
+    params.sitAnimationOverride = {type = EParamType.String, required=false, help=[[
+        If set, play this animation while seated or lying down
+    ]]}
+    params.reactToDangerousSurface = {type = EParamType.Bool, required=false, default=true, help=[[
+        When the seat is in a dangerous surface, flee/don't sit or lie on it
+    ]]}
+    params.sitIdle = {type = EParamType.State, required = false, default = StateRef{game.states.SitDefaultIdle},
+        help = [[
+            Behaviour to perform while sitting or lying down. By default, does nothing.
+        ]]
+    }
+
+    -- locals
+    local seat_Internal = nil
+    local seatTrigger_Internal = nil
+    local sitAnimationOverride_Internal = nil
+
+    self.OnInit = function()
+        --DebugLog("OnInit: " .. tostring(params.seat))
+        if params.seat ~= nil then
+            seat_Internal = FindEntity(params.seat)
+            --DebugLog(tostring(seat_Internal))
+            if seat_Internal ~= nil then
+                if seat_Internal.Item.IsDestroyed then
+                    seat_Internal = nil
+                end
+            end
+        end
+        if params.seatTrigger ~= nil then
+            seatTrigger_Internal = FindEntity(params.seatTrigger)
+        end
+        if params.sitAnimationOverride ~= nil then
+            sitAnimationOverride_Internal = Animation(params.sitAnimationOverride)
+        end
+    end
+
+    self.CanEnter = function()
+        --DebugLog("CanEnter: " .. tostring(seat_Internal))
+        if seat_Internal ~= nil then
+            --DebugLog(tostring(CanReposeOn(me, seat_Internal)))
+            --DebugLog(tostring(IsInTrigger(seat_Internal, seatTrigger_Internal.Trigger)))
+        end
+        return
+            (seat_Internal ~= nil) and
+            CanReposeOn(me, seat_Internal) and
+            IsInTrigger(seat_Internal, seatTrigger_Internal.Trigger) and
+            (not params.reactToDangerousSurface or not IsInDangerousSurfaceFor(seat_Internal, me.Character))
+    end
+
+    self.Valid = function()
+        --DebugLog(tostring(seat_Internal.Item.IsDestroyed))
+        return (seat_Internal ~= nil) and not seat_Internal.Item.IsDestroyed
+    end
+
+
+    nodes.SitFleeFromSurface = Action
+    {
+        Valid = function()
+            return (params.reactToDangerousSurface == true) and IsInDangerousSurfaceFor(seat_Internal)
+        end,
+
+        function()
+            if me.IsReposed then
+                EndRepose(me)
+            end
+            FleeFromDangerousSurface()
+        end
+    }
+
+    nodes.Sit = Action
+    {
+        CanEnter = function()
+            return not me.IsReposed
+        end,
+
+        function()
+            local failedToUseSeat = false
+            try
+                UseItem(seat_Internal.Item)
+            catch e if ls.CheckType(e, error.UseItemFailed) then
+                failedToUseSeat = true
+            end
+            if not failedToUseSeat then
+                if sitAnimationOverride_Internal then
+                    try
+                        PlayAnimation(sitAnimationOverride_Internal)
+                    catch e if ls.CheckType(e, error.PlayAnimationFailed) then
+                        DebugText(me, "Animation Override Failed")
+                    end
+                end
+            else
+                Sleep(3.0)
+            end
+        end,
+
+        OnLeave = function()
+            if sitAnimationOverride_Internal then
+                StopAnimation(me)
+            end
+        end
+    }
+
+    nodes.SitIdle = Proxy{
+        params.sitIdle,
+
+        Valid = function()
+            return me.IsReposed
+        end
+    }
+
+    -- events
+
+    events.Destroyed = function(e)
+        if e.Entity == seat_Internal then
+            Interrupt()
+        end
+    end
+end}

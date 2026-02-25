@@ -1,0 +1,18 @@
+game.configs.Sit = Config{
+    params={
+        seat = {
+            type = EParamType.String,
+            help = [[Seat to use]],
+            required = false,
+            default = [[ITEMGUID_S_Chair_f4cd3749-3880-4e8e-a4df-7f3493e4c444]]
+        }
+    },
+    root = StateRef{game.roots.DefaultCharacter,
+        genericBehaviours = StateRef{game.states.CrimesHumanoid},
+        idle = StateRef{game.states.Sit,
+            seat = params.seat,
+            maxSeatDist = 6.0
+        }
+    }
+}
+

@@ -1,0 +1,86 @@
+game.states.StatusHelper = State{
+    function()
+        params.Status = {type = EParamType.String, help = [[Status to apply]]}
+    
+        inputs.TurnOn = {help = [[Input socket that's triggered when we want to apply status]]}
+        inputs.TurnOff = {help = [[Input socket that's triggered when we want to remove status]]}
+        inputs.Toggle = {help = [[Toggle the given status from the entity]]}
+
+        outputs.On = { help = [[Triggered when the status has been applied]] }
+        outputs.Off = { help = [[Triggered when the status has been removed]] }
+
+        params.TargetEntity = {
+            type = EParamType.String,
+            required = false,
+            default = "me",
+            help = "Object that gets the status"
+        }
+        
+        local init = false
+
+        helpers.Init = function()
+            if not init then
+                local entity
+                if me.Blackboard.GetFact("TargetEntity") == nil then
+                    if params.TargetEntity == "me" then
+                        entity = me
+                        me.Blackboard.SetFact("TargetEntity", entity)
+                    else
+                        entity = FindEntity(params.TargetEntity)
+                        me.Blackboard.SetFact("TargetEntity", entity)
+                    end
+                else
+                    entity = me.Blackboard.GetFact("TargetEntity")
+                end
+                RegisterForEvents(entity)
+                init = true
+            end
+        end
+
+        self.OnInit = function()
+            helpers.Init()
+        end
+
+        helpers.HasStatus = function()
+            helpers.Init()
+            return HasAppliedStatus(me.Blackboard.GetFact("TargetEntity"), params.Status)
+        end
+
+        helpers.SwitchStatus = function(on, cause)
+            helpers.Init()
+            local hasStatus = helpers.HasStatus()
+            if on and not hasStatus then               
+                ApplyStatus(me.Blackboard.GetFact("TargetEntity"), params.Status, true, -1.0, cause)
+            elseif not on and hasStatus then
+                RemoveStatus(me.Blackboard.GetFact("TargetEntity"), params.Status, cause)
+            end
+        end
+
+        socketEvents.TurnOn = function(ev)
+            helpers.SwitchStatus(true, Entity(ev.Object))
+        end
+
+        socketEvents.TurnOff = function(ev)
+            helpers.SwitchStatus(false, Entity(ev.Object))
+        end
+
+        socketEvents.Toggle = function(ev)
+            helpers.SwitchStatus(not helpers.HasStatus(), Entity(ev.Object))
+        end
+
+        forwardedEvents.StatusApplied = function(ev, source)
+            if ev.Status.StatusID == params.Status then
+                local cause = ev.CauseEntity and ev.CauseEntity.EntityRef or nil
+                TriggerOutput(outputs.On, cause, nil)
+            end
+        end
+
+        forwardedEvents.StatusRemoved = function(ev, source)
+            if ev.Status.StatusID == params.Status and not helpers.HasStatus() then
+                local cause = ev.CauseEntity and ev.CauseEntity.EntityRef or nil
+                TriggerOutput(outputs.Off, cause, nil)
+            end
+        end
+
+    end
+}

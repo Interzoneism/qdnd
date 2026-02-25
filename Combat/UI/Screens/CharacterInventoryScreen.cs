@@ -989,6 +989,7 @@ namespace QDND.Combat.UI.Screens
             {
                 var row = new HBoxContainer();
                 row.AddThemeConstantOverride("separation", 4);
+                row.SizeFlagsHorizontal = SizeFlags.ExpandFill;
                 _featuresContainer.AddChild(row);
 
                 // Feature icon (texture or placeholder)
@@ -1017,6 +1018,7 @@ namespace QDND.Combat.UI.Screens
 
                 var label = new Label();
                 label.Text = feat.Name ?? "???";
+                label.SizeFlagsHorizontal = SizeFlags.ExpandFill;
                 label.AutowrapMode = TextServer.AutowrapMode.WordSmart;
                 HudTheme.StyleLabel(label, HudTheme.FontTiny, HudTheme.WarmWhite);
                 row.AddChild(label);

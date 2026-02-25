@@ -92,6 +92,7 @@ namespace QDND.Combat.UI
         private Dictionary<string, HudPanel> _panels;
 
         private bool _disposed;
+        private Combatant _trackedSpellSlotCombatant;
 
         public override void _Ready()
         {
@@ -563,6 +564,7 @@ namespace QDND.Combat.UI
 
         private void UnsubscribeAll()
         {
+            UnsubscribeSpellSlotTracking();
             if (_stateMachine != null) _stateMachine.OnStateChanged -= OnStateChanged;
             if (_turnQueue != null) _turnQueue.OnTurnChanged -= OnTurnChanged;
             if (_combatLog != null) _combatLog.OnEntryAdded -= OnLogEntryAdded;
@@ -696,6 +698,13 @@ namespace QDND.Combat.UI
             SyncResources();
             SyncCharacterSheetForCurrentTurn();
             UpdatePortraitHp();
+
+            // Subscribe to spell slot tracking for active combatant
+            var initialCombatant = Arena?.ActiveCombatantId != null
+                ? Arena.Context?.GetCombatant(Arena.ActiveCombatantId)
+                : null;
+            if (initialCombatant != null && initialCombatant.IsPlayerControlled)
+                SubscribeSpellSlotTracking(initialCombatant);
         }
 
         private void SyncPartyPanel()
@@ -762,6 +771,73 @@ namespace QDND.Combat.UI
                 if (r != null)
                     _resourceBarPanel.SetResource(id, r.Current, r.Maximum);
             }
+
+            SyncSpellSlots();
+        }
+
+        private void SyncSpellSlots()
+        {
+            if (_resourceBarPanel == null) return;
+
+            var combatant = GetActivePlayerCombatant();
+            if (combatant?.ActionResources == null) return;
+
+            // Standard spell slots (levels 1-9)
+            if (combatant.ActionResources.HasResource("SpellSlot"))
+            {
+                for (int level = 1; level <= 9; level++)
+                {
+                    int current = combatant.ActionResources.GetCurrent("SpellSlot", level);
+                    int max = combatant.ActionResources.GetMax("SpellSlot", level);
+                    _resourceBarPanel.SetSpellSlots(level, current, max);
+                }
+            }
+
+            // Warlock pact magic slots
+            if (combatant.ActionResources.HasResource("WarlockSpellSlot"))
+            {
+                // Find the active warlock slot level (highest level with max > 0)
+                int warlockLevel = 0;
+                int warlockCurrent = 0;
+                int warlockMax = 0;
+                for (int level = 9; level >= 1; level--)
+                {
+                    int max = combatant.ActionResources.GetMax("WarlockSpellSlot", level);
+                    if (max > 0)
+                    {
+                        warlockLevel = level;
+                        warlockCurrent = combatant.ActionResources.GetCurrent("WarlockSpellSlot", level);
+                        warlockMax = max;
+                        break;
+                    }
+                }
+                if (warlockMax > 0)
+                {
+                    _resourceBarPanel.SetWarlockSlots(warlockCurrent, warlockMax, warlockLevel);
+                }
+            }
+        }
+
+        private void SubscribeSpellSlotTracking(Combatant combatant)
+        {
+            UnsubscribeSpellSlotTracking();
+            if (combatant?.ActionResources == null) return;
+            _trackedSpellSlotCombatant = combatant;
+            combatant.ActionResources.OnResourcesChanged += OnActionResourcesChanged;
+        }
+
+        private void UnsubscribeSpellSlotTracking()
+        {
+            if (_trackedSpellSlotCombatant?.ActionResources != null)
+                _trackedSpellSlotCombatant.ActionResources.OnResourcesChanged -= OnActionResourcesChanged;
+            _trackedSpellSlotCombatant = null;
+        }
+
+        private void OnActionResourcesChanged()
+        {
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree()) return;
+            // Defer to avoid redundant syncs when multiple resources change in one frame
+            CallDeferred(nameof(SyncSpellSlots));
         }
 
         private void SyncCharacterSheetForCurrentTurn()
@@ -845,6 +921,13 @@ namespace QDND.Combat.UI
             // Update resources for new combatant
             SyncResources();
             SyncCharacterSheetForCurrentTurn();
+
+            // Track spell slot changes for the active combatant
+            var activeCombatant = evt.CurrentCombatant;
+            if (activeCombatant != null && activeCombatant.IsPlayerControlled)
+                SubscribeSpellSlotTracking(activeCombatant);
+            else
+                UnsubscribeSpellSlotTracking();
 
             // Update party highlight
             if (evt.CurrentCombatant != null)
@@ -1525,24 +1608,6 @@ namespace QDND.Combat.UI
         {
             if (_hitChancePanel != null && IsInstanceValid(_hitChancePanel))
                 _hitChancePanel.Visible = false;
-        }
-
-        // ── Spell Slots ────────────────────────────────────────────
-
-        /// <summary>
-        /// Update spell slot display for a given level.
-        /// </summary>
-        public void UpdateSpellSlots(int level, int current, int max)
-        {
-            _resourceBarPanel?.SetSpellSlots(level, current, max);
-        }
-
-        /// <summary>
-        /// Update warlock pact slot display.
-        /// </summary>
-        public void UpdateWarlockSlots(int current, int max, int level)
-        {
-            _resourceBarPanel?.SetWarlockSlots(current, max, level);
         }
 
         // ── Inventory ──────────────────────────────────────────────

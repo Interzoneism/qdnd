@@ -1,0 +1,25 @@
+local m = AnubisModule()
+
+m.ParamArrayToEntityList = function(entityGuidsArray)
+    local entityList = {}
+    if entityGuidsArray == nil then
+        return entityList
+    end
+    for _, entity in ipairs(entityGuidsArray) do
+        table.insert(entityList, FindEntity(entity))
+    end
+    return entityList
+end
+
+m.ParamArrayToAnimationsList = function(animsGuidsArray)
+    local animsList = {}
+    if animsGuidsArray == nil then
+        return animsList
+    end
+    for _, anim in ipairs(animsGuidsArray) do
+        table.insert(animsList, Animation(anim))
+    end
+    return animsList
+end
+
+return m

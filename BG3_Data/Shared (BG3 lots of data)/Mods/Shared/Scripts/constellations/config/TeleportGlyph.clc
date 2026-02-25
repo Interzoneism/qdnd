@@ -1,0 +1,182 @@
+game.configs.TeleportGlyph = Config{
+    params={
+        VFXOff = {
+            type = EParamType.String,
+            help = [[VFX while the glyph is disabled and has been spotted.]],
+            required = false,
+            default = [[]]
+        },
+        MinDistance = {
+            type = EParamType.Number,
+            help = [[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]],
+            required = false,
+            default = 6
+        },
+        VFXOffBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOff' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        LeaveCombat = {
+            type = EParamType.Bool,
+            help = [[Teleported characters should leave any combat they are currently in]],
+            required = false,
+            default = true
+        },
+        TeleportSummons = {
+            type = EParamType.Bool,
+            help = [[Teleport summons of the source or of teleported characters linked to the source]],
+            required = false,
+            default = true
+        },
+        Sound = {
+            type = EParamType.String,
+            help = [[Sound to play when teleporting]],
+            required = false,
+        },
+        OneShot = {
+            type = EParamType.Bool,
+            help = [[The glyph activates only the first time on entry]],
+            required = false,
+            default = false
+        },
+        SourceVFX = {
+            type = EParamType.String,
+            help = [[VFX to play at the source location when teleporting]],
+            required = false,
+        },
+        EntityFilter = {
+            type = EParamType.String,
+            help = [[Types of Entities to check for. Options:
+            All - check for any kind of entities on the glyph
+            Characters - only check for characters on the glyph
+            Items - only check for items on the glyp]],
+            required = false,
+            default = [[All]]
+        },
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the glyph start on?]],
+            required = false,
+            default = true
+        },
+        VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOn' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        TargetVFX = {
+            type = EParamType.String,
+            help = [[VFX to play at the target location when teleporting]],
+            required = false,
+        },
+        DestroyOnDisarm = {
+            type = EParamType.Bool,
+            help = [[Does the item break on Disarm?]],
+            required = false,
+            default = true
+        },
+        VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while the glyph is enabled and has been spotted.]],
+            required = false,
+            default = [[VFX_Script_Trap_Overlay_Red_01_a7361f25-e942-e071-7ce3-7a8182f4e0ef]]
+        },
+        PerceptionSkill = {
+            type = EParamType.String,
+            help = [[The skill checked for perception.]],
+            required = false,
+            default = [[Investigation]]
+        },
+        GlyphRadius = {
+            type = EParamType.Number,
+            help = [[Circular radius of the glyph (limited by standing bounds), -1.0 to disable and use standing bounds without limit.]],
+            required = false,
+            default = 4
+        },
+        TeleportPartyFollowers = {
+            type = EParamType.Bool,
+            help = [[Teleport party followers of the source or of teleported characters linked to the source]],
+            required = false,
+            default = true
+        },
+        SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when trap is turned off]],
+            required = false,
+            default = [[PUZ_Trap_Magical_Off]]
+        },
+        DC = {
+            type = EParamType.String,
+            help = [[Perception check DC.]],
+            required = false,
+            default = [[DC_Legacy_15_bddbb9b8-a242-4c3e-a2eb-3fd274c0c539]]
+        },
+        PerceptionType = {
+            type = EParamType.String,
+            help = [[Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[Invisible]]
+        },
+        TeleportTarget = {
+            type = EParamType.String,
+            help = [[The target to which to teleport the source]],
+            required = true,
+        },
+        TeleportLinkedCharacters = {
+            type = EParamType.Bool,
+            help = [[Teleport player characters linked to the source]],
+            required = false,
+            default = true
+        },
+        SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when glyph is enabled]],
+            required = false,
+            default = [[PUZ_Trap_Magical_On]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.TeleportGlyph,
+            DC = params.DC,
+            DestroyOnDisarm = params.DestroyOnDisarm,
+            EntityFilter = params.EntityFilter,
+            LeaveCombat = params.LeaveCombat,
+            MinDistance = params.MinDistance,
+            OneShot = params.OneShot,
+            PerceptionSkill = params.PerceptionSkill,
+            PerceptionType = params.PerceptionType,
+            Sound = params.Sound,
+            SoundOff = params.SoundOff,
+            SoundOn = params.SoundOn,
+            SourceVFX = params.SourceVFX,
+            StartEnabled = params.StartEnabled,
+            TargetVFX = params.TargetVFX,
+            TeleportLinkedCharacters = params.TeleportLinkedCharacters,
+            TeleportPartyFollowers = params.TeleportPartyFollowers,
+            TeleportSummons = params.TeleportSummons,
+            TeleportTarget = params.TeleportTarget,
+            VFXOff = params.VFXOff,
+            VFXOffBone = params.VFXOffBone,
+            VFXOn = params.VFXOn,
+            VFXOnBone = params.VFXOnBone,
+        },
+    },
+    inputs={
+        Enable=ExtSocket{description=[[Enable the glyph (will send Activate output when stepped on/item arrives on it and item events are enabled)]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+        Reveal=ExtSocket{description=[[Reveal the glyph]],{SocketRef{[[root.logic.inputs.Reveal]]}}},
+        Disable=ExtSocket{description=[[Disable the glyph (won't send Activate outputs)]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+    },
+    outputs={
+        DisarmFailed=ExtSocket{description=[[A player tried and failed to disarm the glyph]],{SocketRef{[[root.logic.outputs.DisarmFailed]]}}},
+        TeleportingEntity=ExtSocket{description=[[Entity is getting teleported by the glyph]],{SocketRef{[[root.logic.outputs.TeleportingEntity]]}}},
+    }
+}

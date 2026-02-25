@@ -1,0 +1,51 @@
+game.configs.Helper_PlayBeamVFX = Config{
+    params={
+        VFXTarget2 = {
+            type = EParamType.String,
+            help = [[Entity on which to play the VFX end.]],
+            required = true,
+        },
+        VFX = {
+            type = EParamType.String,
+            help = [[VFX to play.]],
+            required = false,
+        },
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the VFX play initially?]],
+            required = false,
+            default = false
+        },
+        VFXTarget1 = {
+            type = EParamType.String,
+            help = [[Entity on which to play the VFX start.]],
+            required = true,
+        },
+        VFXBone1 = {
+            type = EParamType.String,
+            help = [[Bone on which to play the VFX for object 1.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        VFXBone2 = {
+            type = EParamType.String,
+            help = [[Bone on which to play the VFX for object 2.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.PlayBeamVFX,
+            StartEnabled = params.StartEnabled,
+            VFX = params.VFX,
+            VFXTarget1 = params.VFXTarget1,
+            VFXTarget2 = params.VFXTarget2,
+            VFXBone1 = params.VFXBone1,
+            VFXBone2 = params.VFXBone2,
+        },
+    },
+    inputs={
+        StartVFX=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.PlayVFX]]}}},
+        StopVFX=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.StopVFX]]}}},
+    }
+}

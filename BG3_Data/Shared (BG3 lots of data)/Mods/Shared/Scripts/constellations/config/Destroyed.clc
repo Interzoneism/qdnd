@@ -1,0 +1,8 @@
+game.configs.Destroyed = Config{
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.Destroyed},
+    },
+    outputs={
+        Destroyed=ExtSocket{description=[[Object has been destroyed. ev.Object is the Destroyer, the parameter is the DestroyerOwner.]],{SocketRef{[[root.logic.outputs.Destroyed]]}}},
+    }
+}

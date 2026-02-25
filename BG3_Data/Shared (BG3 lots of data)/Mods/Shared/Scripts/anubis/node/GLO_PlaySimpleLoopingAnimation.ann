@@ -1,0 +1,38 @@
+game.states.GLO_PlaySimpleLoopingAnimation = State { function ()
+    description = [[NPCs plays a looping animation without variantions.]]
+
+    modules = {"shared.util" }
+
+    params.startAnim = {type=EParamType.String, required = true, help=[[start animation.]]}
+    params.loopAnim = {type=EParamType.String, required = true, help=[[mid loop animation.]]}
+    params.endAnim = {type=EParamType.String, required = true, help=[[end animation.]]}
+    params.startLength = {type=EParamType.Number, required = true, help=[[How long is the startAnimation? (for hack around the lack of animation events)]]}
+    params.loopLength = {type=EParamType.Number, required = true, help=[[How long is the loopAnimation? (for hack around the lack of animation events)]]}
+    params.endLength = {type=EParamType.Number, required = true, help=[[How long is the endAnimation? (for hack around the lack of animation events)]]}
+    params.loopRepetitions  = {type=EParamType.Number, default = -1, help=[[How many times should the loop play? -1 = infinite loop.]]}
+
+    local startAnim = Animation(params.startAnim)
+    local loopAnim = Animation(params.loopAnim)
+    local endAnim = Animation(params.endAnim)
+
+    nodes.PlayLoopingAnimation = Action{function()
+        local loopCountdown = params.loopRepetitions
+        PlayLoopingAnimation(startAnim,{loopAnim},endAnim, false)
+        if params.loopRepetitions ~= -1 then
+            Sleep(params.startLength)
+            while loopCountdown ~= 0 do
+                Sleep(params.loopLength)
+                loopCountdown = loopCountdown -1
+            end
+            StopAnimation(me, false)
+            Sleep(params.endLength)
+            Sleep(2.0) --safe sleep to cover any accrued imperfetion in timing over the number of loops
+        else
+            WaitForInterrupt()
+        end
+    end,
+    OnLeave = function()
+        StopAnimation(me, true)
+    end,
+    }
+end}

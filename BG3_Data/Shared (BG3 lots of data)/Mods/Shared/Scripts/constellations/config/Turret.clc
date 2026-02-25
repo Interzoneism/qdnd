@@ -1,0 +1,75 @@
+game.configs.ProjectileTurret = Config{
+    params={
+        BeamEffect = {
+            type = EParamType.String,
+            help = [[Beam effect to connect to the target.]],
+            required = false,
+        },
+        BeamEffectBone = {
+            type = EParamType.String,
+            help = [[Bone where the beam connects.]],
+            required = false,
+        },
+        BeamVFXStartOn = {
+            type = EParamType.Bool,
+            help = [[Does the beam VFX start on (when a target is shown)]],
+            required = false,
+            default = false
+        },
+        Offset = {
+            type = EParamType.Vector3,
+            help = [[Offset from which the projectile will fire (world coordinates by default, set OffsetIsLocal to true for local coordinates).]],
+            required = false,
+            default = math.Vector3(0, 0, 0)
+        },
+        OffsetIsLocal = {
+            type = EParamType.Bool,
+            help = [[Interpret the Offset as relative to the forward direction of the turret]],
+            required = false,
+            default = false
+        },
+        Rotation = {
+            type = EParamType.Vector3,
+            help = [[Rotation relative to forward direction in which the projectile will fire.]],
+            required = false,
+            default = math.Vector3(0, 0, 0)
+        },
+        Spell = {
+            type = EParamType.String,
+            help = [[Spell cast.]],
+            required = true,
+            default_value_provider = [[spell_projectile]],
+        },
+        TriggerDelay = {
+            type = EParamType.Number,
+            help = [[Delay before the socket is fired.]],
+            required = false,
+            default = 0
+        },
+        VFX = {
+            type = EParamType.String,
+            help = [[VFX played when spell is cast.]],
+            required = false,
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.ProjectileTurret,
+            BeamEffect = params.BeamEffect,
+            BeamEffectBone = params.BeamEffectBone,
+            BeamVFXStartOn = params.BeamVFXStartOn,
+            Offset = params.Offset,
+            OffsetIsLocal = params.OffsetIsLocal,
+            Rotation = params.Rotation,
+            Spell = params.Spell,
+            VFX = params.VFX,
+            TriggerDelay = params.TriggerDelay,
+        },
+    },
+    inputs={
+        Trigger=ExtSocket{description=[[Fires the turret]],{SocketRef{[[root.logic.inputs.Trigger]]}}},
+        BeamVFXOff=ExtSocket{description=[[Do not turn on Beam VFX while the turret has a target.]],{SocketRef{[[root.logic.inputs.BeamVFXOff]]}}},
+        ClearTarget=ExtSocket{description=[[Clears the override target of the spell.]],{SocketRef{[[root.logic.inputs.ClearTarget]]}}},
+        BeamVFXOn=ExtSocket{description=[[Turn on Beam VFX while the turret has a target.]],{SocketRef{[[root.logic.inputs.BeamVFXOn]]}}},
+        SetTarget=ExtSocket{description=[[Set the override target of the spell using an output socket's Object parameter.]],{SocketRef{[[root.logic.inputs.SetTarget]]}}},
+    }
+}

@@ -1,0 +1,477 @@
+-- crime actions, see about moving these in another file
+
+
+
+-- our default human crime actions
+
+game.states.CrimesHumanoid = State{function ()
+    params.InvestigateAD = {type = EParamType.String, required = false, default="GEB_AD_Investigation_366afda8-e646-a6cb-1b6d-99d65927ece9", help=[[
+        Default dialog to play while investigating
+    ]]}
+
+    local stateCowering = Flag("GLO_State_Cowering_cf16110e-3767-4585-8028-83cb9857adcd")
+
+    -- DisturbanceID to which the cached information (like actionToPerform etc) belongs
+    local investigating = false
+    local handlingDisturbanceID = nil
+    local actionToPerform = nil
+    local isLead = false
+
+    -- Next Disturbance to handle
+    local nextInvestigating = false
+    local nextHandlingDisturbanceID = nil
+    local nextActionToPerform = nil
+    local nextIsLead = false
+    local updateDisturbanceParameters = false
+
+    local interruptCrimeReaction = false
+    local startNewCrimeReaction = false
+    -- Only resolve after receiving a signal intdicating the temporary hostile relation change has been handled
+    local waitForTemporaryHostileRelationChange = false
+
+-- api
+
+    api.CrimeSetTemporaryHostileRelation = function(criminal)
+        -- for Osiris
+        SetUnicastEntityEvent(me, "CRIME_AnubisTemporaryHostile", criminal)
+        SetTemporaryHostileRelation(me, criminal)
+        waitForTemporaryHostileRelationChange= true
+    end
+
+    api.IsLead = function()
+        return isLead
+    end
+
+    api.CallGuardsToArrest = function(eventName)
+        me.Blackboard.SetFact("CRIME_ArrestCrime", me.HandlingDisturbanceID)
+        SetUnicastEntityEvent(me, eventName)
+    end
+
+-- helpers
+
+    helpers.OnDisturbanceResolved = function()
+        -- keep investigating guys, investigating. Otherwise it would look unnatural if they all break at the same time.
+        -- these guys will time out eventually anyway
+        if not investigating then
+            actionToPerform = nil
+            handlingDisturbanceID = nil
+        end
+    end
+
+    helpers.CancelNextDisturbance = function()
+        nextInvestigating = false
+        nextActionToPerform = nil
+        nextHandlingDisturbanceID = nil
+        --[[
+            we interrupt the current crime reaction in two cases:
+               1) when we want to switch to a different crime reaction while handling the current crime
+               2) when we need to start reacting to a different crime
+            When the next disturbance gets cancelled before we coudl react to it, we still also need to
+            interrupt in case 1), because the fact that we were selected to react to a new disturbance
+            also means that code switched us away from reacting to the old disturbance
+        ]]
+        interruptCrimeReaction = false
+        --[[
+            Keep updateDisturbanceParameters to true, because due to the above reason we do want to
+            replace the current crime parameters with the nil'ed ones
+        ]]
+    end
+
+    helpers.TransferBlackboardCrimeInfoTo = function(newLead)
+        if newLead then
+            DebugText(newLead,"I will adress the crime!")
+
+            local facts = { "ArrestDialog", "Criminal1", "Criminal2", "Criminal3", "Criminal4" }
+
+            for _, v in pairs(facts) do
+                local fact = me.Blackboard.GetFact(v)
+                if fact then
+                    newLead.Blackboard.SetFact(v, fact)
+                else
+                    newLead.Blackboard.ClearFact(v)
+                end
+            end
+
+            SetUnicastEntityEvent(newLead,"ArrestOnRequest") -- Handled now in Story
+        end
+    end
+
+    helpers.FillBlackboard = function(sourceEvent)
+        local actionDialog = sourceEvent.DialogResourceID
+        local criminals = sourceEvent.Criminals
+
+        if actionDialog ~= nil then
+            me.Blackboard.SetFact("ArrestDialog", Guid(actionDialog))
+        else
+            me.Blackboard.ClearFact("ArrestDialog")
+        end
+
+        me.Blackboard.ClearFact("Criminal1")
+        me.Blackboard.ClearFact("Criminal2")
+        me.Blackboard.ClearFact("Criminal3")
+        me.Blackboard.ClearFact("Criminal4")
+        if criminals ~= nil then
+            for i,v in ipairs(criminals) do
+                me.Blackboard.SetFact("Criminal"..i, v)
+            end
+        end
+    end
+
+    helpers.StartArrest = function()
+        actionToPerform = "OsirisWaitForArrest"
+--        DebugText(me, "interrupting because switched start arrest")
+        investigating = false
+        interruptCrimeReaction = true
+    end
+
+    helpers.StartCallGuards = function()
+        -- there's always a chance the NPC started reacting to a different disturbance in the mean time
+        if me.Blackboard.GetFact("CRIME_ArrestCrime") ~= handlingDisturbanceID then
+            return
+        end
+
+        local badAssTag = Tag("BADASSCIVILIAN_91f4b379-63a2-40e9-a509-7b9b2f90e4c8")
+        local notMessingTag = Tag("NOT_MESSING_AROUND_542b58f0-42ad-4157-a28e-27434e0e7b18")
+        if IsTagged(me, badAssTag) or IsTagged(me, notMessingTag) then
+            actionToPerform = "AttackCallHelp"
+        else
+            actionToPerform = "ArrestCallHelp"
+        end
+--        DebugText(me, "interrupting because start call guards")
+        investigating = false
+        interruptCrimeReaction = true
+    end
+
+    helpers.StartFleeFromDialog = function()
+        actionToPerform = "CallHelpFlee"
+--        SetEntityEvent(me, "StartFreeFromDialog while current action is " .. actionToPerform .. " for " .. (handlingDisturbanceID and tostring(handlingDisturbanceID) or "nil"))
+--        DebugText(me, "interrupting because flee from dialog")
+        investigating = false
+        interruptCrimeReaction = true
+        startNewCrimeReaction = true
+    end
+
+    helpers.StartFlee = function()
+        actionToPerform = "Flee"
+--        DebugText(me, "interrupting because switched start flee")
+        investigating = false
+        interruptCrimeReaction = true
+        startNewCrimeReaction = true
+    end
+
+    helpers.StartCallGuardsFailed = function()
+        actionToPerform = "CallGuardsFailed"
+        interruptCrimeReaction = true
+        startNewCrimeReaction = true
+    end
+
+    helpers.ReactionDone = function(checkCurrentDisturbanceMatch)
+        if startNewCrimeReaction then
+--            SetEntityEvent(me, "ReactionDone: setting startNewCrimeReaction to false for ".. (handlingDisturbanceID and tostring(handlingDisturbanceID) or "nil"))
+            startNewCrimeReaction = false
+            return
+        end
+        if waitForTemporaryHostileRelationChange then
+--            SetEntityEvent(me, "ReactionDone: waitForTemporaryHostileRelationChange for ".. (handlingDisturbanceID and tostring(handlingDisturbanceID) or "nil"))
+            return
+        end
+--        SetEntityEvent(me, "ReactionDone: handlingDisturbanceID " .. (handlingDisturbanceID and tostring(handlingDisturbanceID) or "nil") .. ", checkMatch = " .. tostring(checkCurrentDisturbanceMatch) .. ", me handling = " .. (me.HandlingDisturbanceID and tostring(me.HandlingDisturbanceID) or "nil"))
+        if (handlingDisturbanceID ~= nil) and
+           (not checkCurrentDisturbanceMatch or
+            (handlingDisturbanceID == me.HandlingDisturbanceID)) then
+            if not DisturbanceIsSuspended(handlingDisturbanceID) then
+--                SetEntityEvent(me, "ReactionDone: calling disturbancedone for " .. tostring(handlingDisturbanceID))
+                --                DebugText(me, "Calling reaction done for [1]", handlingDisturbanceID)
+                DisturbanceReactionDone(handlingDisturbanceID, me)
+--            else
+--                SetEntityEvent(me, "ReactionDone: not calling disturbancedone because suspended " .. tostring(handlingDisturbanceID))
+            end
+--            DebugText(me, "Clearing Action to perform", handlingDisturbanceID)
+            actionToPerform = nil
+            handlingDisturbanceID = nil
+        end
+    end
+
+    helpers.ArrestOnRequest = function()
+        -- if we were already reacting to the same crime, avoid calling ConfrontationDone for
+        -- it when our current reaction gets interrupted (ArrestOnRequest event results in
+        -- CharacterMoveToAndTalk Osiris task)
+        if (handlingDisturbanceID ~= nil) and
+           (handlingDisturbanceID == me.HandlingDisturbanceID) then
+            startNewCrimeReaction = true
+        end
+    end
+
+    self.Valid = function()
+        return
+          ((handlingDisturbanceID ~= nil) or (nextHandlingDisturbanceID ~= nil)) and
+          -- This is for when you reload story: it clears all crimes in code, but
+          -- saves/restores the Anubis state (and since no events get sent about
+          -- the ended crimes after story reloads, the Anubis script is not aware
+          -- that the NPC is no longer handling a crime)
+          (me.HandlingDisturbanceID ~= nil)
+    end
+
+    -- behaviours
+
+    -- Higher priority than nodes.Reacting -> will briefly interrupt
+    -- Reacting or OsirisReaction if interruptCrimeReaction is set to true
+    -- We also use this one to update all of the disturbance settings, so that
+    -- the Reacting node's OnLeave (which will be triggered before this node
+    -- becomes active) can still safely use the ond ones to resolve/clean up
+    -- the previous disturbance when we're switching to a new one.
+    nodes.CrimeReactionInterrupter = Action {
+        function()
+--            SetEntityEvent(me, "interruptCrimeReaction_" .. (actionToPerform or "nil") .. " for " .. (handlingDisturbanceID and tostring(handlingDisturbanceID) or "nil"))
+            interruptCrimeReaction = false
+
+            if (updateDisturbanceParameters) then
+                handlingDisturbanceID = nextHandlingDisturbanceID
+                investigating = nextInvestigating
+                actionToPerform = nextActionToPerform
+                isLead = nextIsLead
+
+                nextHandlingDisturbanceID = nil
+                nextInvestigating = false
+                nextActionToPerform = nil
+                nextIsLead = false
+
+                updateDisturbanceParameters = false
+            end
+        end
+        ,
+        CanEnter = function()
+            return interruptCrimeReaction
+        end
+    }
+
+    nodes.Investigate = Proxy{
+        game.states.Investigate,
+
+        params = { InvestigateAD = params.InvestigateAD },
+
+        Valid = function()
+            return investigating and not interruptCrimeReaction
+        end
+    }
+
+    -- In case a reaction is handled by Osiris, its name must start with "Osiris" In this case, there's no
+    -- resolve OnFinished, as that is also handled by Osiris
+    nodes.OsirisReaction = Action {
+        function()
+            DebugText(me,"Crime sensible action " .. actionToPerform .. "handled in story")
+            WaitForInterrupt()
+        end,
+
+        CanEnter = function()
+            return
+                (actionToPerform ~= nil) and
+                (string.sub(actionToPerform, 1, string.len("Osiris"))=="Osiris")
+        end,
+
+        Valid = function()
+            return not interruptCrimeReaction and not investigating
+        end,
+
+        OnInterrupt = function()
+            -- nodes.Reacting (below) calls helpers.ReactionDone(true) on finished/interrupted, which normally
+            -- calls ConfrontationDone. When switching to a different reaction, we don't want that, so the switching
+            -- helpers set startNewCrimeReaction = true. In case the original action was an OsirisReaction, we
+            -- intercept it here already (so nodes.Reacting -> helpers.ReactionDone(true) never gets called) and
+            -- hence we have to set startNewCrimeReaction to false here to avoid it from taking effect after the
+            -- reaction to which we are switching finishes/gets interrupted.
+            startNewCrimeReaction = false
+        end
+    }
+
+    nodes.WaitForTemporaryHostileRelationChange = Action{
+        function()
+            WaitForInterrupt()
+        end,
+        CanEnter = function()
+            return waitForTemporaryHostileRelationChange
+        end
+    }
+
+    -- startNewCrimeReaction means "don't call ConfrontationDone from helpers.ReactionDone(true) after the ongoing crime reaction
+    -- finishes (if any), because we're switching to a new one". The problem is that this one sometimes gets set even when no
+    -- reaction is currently executing (e.g. when the reaction triggered an interactive dialog -> will be in TEMP_InactiveBehaviour
+    -- instead). In that case, it would block ConfrontationDone after the _next_ reaction finishes executing, which is not what
+    -- we want. In general: whenever we start selecting a new reaction (next node), it means that the previous action has been
+    -- interrupted already -> set startNewCrimeReaction to false.
+    nodes.ResetStartNewCrimeReaction = Action{
+        function()
+            startNewCrimeReaction = false
+        end,
+        CanEnter = function()
+            return startNewCrimeReaction
+        end
+    }
+
+    nodes.Reacting = Selector {
+        function(nodes)
+            local node = nodes[actionToPerform]
+--            SetEntityEvent(me, "Reactiong with " .. actionToPerform .. " for " .. (handlingDisturbanceID and tostring(handlingDisturbanceID) or "nil"))
+            if node ~= nil then
+                return node
+            else
+                return nodes["Fallback"]
+            end
+        end,
+
+        game.actions.generics,
+
+        CanEnter = function()
+            return actionToPerform ~= nil
+        end,
+
+        Valid = function()
+            return not interruptCrimeReaction and not investigating
+        end,
+
+        OnFinished = function()
+--            DebugText(me, "Calling reactiondone from onfinished")
+--            SetEntityEvent(me, "Calling ReactionDone(true) from OnFinished for " .. (handlingDisturbanceID and tostring(handlingDisturbanceID) or "nil"))
+            helpers.ReactionDone(true)
+        end,
+
+        OnInterrupt = function()
+--            DebugText(me, "Calling reactiondone from oninterrupt")
+--            SetEntityEvent(me, "Calling ReactionDone(true) from OnInterrupt for " .. (handlingDisturbanceID and tostring(handlingDisturbanceID) or "nil"))
+            helpers.ReactionDone(true)
+        end
+        }
+
+    nodes.Reacting.Fallback = function()
+        DebugText(me, "something went wrong and I'm not doing anything")
+        Sleep(0.5)
+    end
+
+    -- events
+    events.OnStageChanged = function(e)
+        if not e.OnStage then
+            handlingDisturbanceID = nil
+        end
+    end
+
+    events.EntityEvent = function(e)
+        if e.TargetEntity == me then
+            if e.Event == "SetNewLead" then
+                local newLead = e.Params[1]
+                helpers.TransferBlackboardCrimeInfoTo(newLead)
+            elseif e.Event == "CRIME_Perform_Arrest" then
+                helpers.StartArrest()
+            elseif e.Event == "CRIME_CallGuardsFromDialog" then
+                helpers.StartCallGuards()
+            elseif e.Event == "CRIME_FleeHelpFromDialog" then
+                helpers.StartFleeFromDialog()
+            elseif e.Event == "CRIME_Flee" then
+                helpers.StartFlee()
+            elseif e.Event == "ArrestOnRequest" then
+                helpers.ArrestOnRequest()
+            elseif e.Event == "CRIME_CallGuardsFailed" then
+                helpers.StartCallGuardsFailed()
+            end
+        end
+    end
+
+    events.DisturbanceInvestigationRequest = function(e)
+        nextInvestigating = true
+        nextHandlingDisturbanceID = e.CrimeID
+        nextActionToPerform = nil
+        nextIsLead = false
+        interruptCrimeReaction = true
+        updateDisturbanceParameters = true
+
+        waitForTemporaryHostileRelationChange = false
+    end
+
+    events.DisturbanceInvestigatorSwitchedState = function(e)
+        if (e.ToState == ECrimeInvestigationState.Idle) then
+            if (e.CrimeID == handlingDisturbanceID) then
+                investigating = false
+                waitForTemporaryHostileRelationChange = false
+                actionToPerform = nil
+                handlingDisturbanceID = nil
+            elseif (e.CrimeID == nextHandlingDisturbanceID) then
+                helpers.CancelNextDisturbance()
+            end
+        end
+    end
+
+    events.DisturbanceResolved = function(e)
+        if e.CrimeID == handlingDisturbanceID then
+            helpers.OnDisturbanceResolved()
+        elseif e.CrimeID == nextHandlingDisturbanceID then
+            helpers.CancelNextDisturbance()
+        end
+    end
+
+    events.DisturbanceCanceled  = function(e)
+        if e.CrimeID == handlingDisturbanceID then
+            helpers.OnDisturbanceResolved()
+        elseif e.CrimeID == nextHandlingDisturbanceID then
+            helpers.CancelNextDisturbance()
+        end
+    end
+
+    events.DisturbanceReactionRequest = function(ev)
+        -- shortcut DoNothing reactions so we don't interrupt regular behaviours
+        -- (otherwise we switch one frame to DoNothing)
+        if ((ev.ReactionName ~= nil) and
+            string.match(ev.ReactionName, "[cC][rR][iI][mM][eE]_DoNothing.*")) or
+            (GetFlag(stateCowering, me) and
+             DisturbanceHasProperty(ev.CrimeID, Guid("BackgroundReaction_db918cfb-a484-437c-93bb-8bc36fe98a9c"))) then
+            --[[
+                This check is to handle the following case:
+                  - 2 disturbances get registered in the same frame
+                  - NPC gets selected as secondary investigator for the first disturbance
+                      -> first DisturbanceReactionRequest event gets sent
+                  - NPC gets selected as fallback lead for second disturbance
+                      -> second DisturbanceReactionRequest gets sent
+                  - at this point, me.HandlingDisturbanceID will be second disturbance's ID
+                  - we don't want to perform a DisturbanceConfrontationDone if the first one's
+                    reaction was a CRIME_DoNothing*, because we are no longer reacting to that
+                    disturbance at this point
+            ]]
+            if ev.CrimeID == me.HandlingDisturbanceID then
+                DisturbanceReactionDone(me.HandlingDisturbanceID, me)
+            end
+        else
+            helpers.FillBlackboard(ev)
+            startNewCrimeReaction = false
+
+            nextInvestigating = false
+            nextHandlingDisturbanceID = ev.CrimeID
+            nextActionToPerform = ev.ReactionName
+            nextIsLead = ev.IsLeadInvestigator
+            interruptCrimeReaction = true
+            updateDisturbanceParameters = true
+            if nextActionToPerform ~= nil then
+                nextActionToPerform = string.gsub(nextActionToPerform, "[cC][rR][iI][mM][eE]_(.*)", "%1")
+            end
+
+            waitForTemporaryHostileRelationChange = false
+        end
+    end
+
+    events.EnteredCombat = function(ev)
+        if waitForTemporaryHostileRelationChange and
+          (ev.Entity == me) then
+            waitForTemporaryHostileRelationChange = false
+            -- to ensure the confrontationdone goes through in any case
+            startNewCrimeReaction = false
+            helpers.ReactionDone(true)
+        end
+    end
+
+    events.EnterCombatFailed = function(ev)
+        if waitForTemporaryHostileRelationChange then
+            waitForTemporaryHostileRelationChange = false
+            -- to ensure the confrontationdone goes through in any case
+            startNewCrimeReaction = false
+            helpers.ReactionDone(true)
+        end
+    end
+
+end}

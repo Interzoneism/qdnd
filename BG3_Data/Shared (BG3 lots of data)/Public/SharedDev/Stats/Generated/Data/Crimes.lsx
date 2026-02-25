@@ -1,0 +1,847 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<save>
+    <version major="4" minor="0" revision="9" build="330"/>
+    <region id="Crime">
+        <node id="root">
+            <children>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="Murder_WithInvestigation"/>
+                    <attribute id="Parent" type="FixedString" value="Murder_WithInvestigation"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="Priority" type="int32" value="1300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="SecondarySensibleAction" type="FixedString" value="CRIME_CrowdFleeFromParty"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="Priority" type="int32" value="11300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="SecondarySensibleAction" type="FixedString" value="CRIME_CrowdFleeFromParty"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="0"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="Murder_Beast_HighPrio_WithInvestigation"/>
+                    <attribute id="Parent" type="FixedString" value="Murder_Beast_HighPrio_WithInvestigation"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="Priority" type="int32" value="1300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="SecondarySensibleAction" type="FixedString" value="CRIME_CrowdFleeFromParty"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="Assault_SourceInvestigation_NotDiscovered_WithCrimeScene"/>
+                    <attribute id="Parent" type="FixedString" value="Assault_SourceInvestigation_NotDiscovered_WithCrimeScene"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="Priority" type="int32" value="1300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="Assault_SourceInvestigation_NotDiscovered"/>
+                    <attribute id="Parent" type="FixedString" value="Assault_SourceInvestigation_NotDiscovered"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Priority" type="int32" value="1300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="SecondarySensibleAction" type="FixedString" value="CRIME_CrowdFleeFromParty"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="WaitingForCalledGuard"/>
+                    <attribute id="Parent" type="FixedString" value="WaitingForCalledGuard"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="Priority" type="int32" value="1300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="Steal"/>
+                    <attribute id="Parent" type="FixedString" value="Steal"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="Priority" type="int32" value="1300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="Priority" type="int32" value="11300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="0"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="ItemDestroy"/>
+                    <attribute id="Parent" type="FixedString" value="ItemDestroy"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="PrimarySensibleAction" type="FixedString" value="CRIME_CrowdFleeFromParty"/>
+                            <attribute id="Priority" type="int32" value="1300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="SecondarySensibleAction" type="FixedString" value="CRIME_CrowdFleeFromParty"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="Trespassing"/>
+                    <attribute id="Parent" type="FixedString" value="Trespassing"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="Priority" type="int32" value="1300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="KnockSpell"/>
+                    <attribute id="Parent" type="FixedString" value="KnockSpell"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="Priority" type="int32" value="1300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="SecondarySensibleAction" type="FixedString" value="CRIME_CrowdFleeFromParty"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="Charmed"/>
+                    <attribute id="Parent" type="FixedString" value="Charmed"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="Priority" type="int32" value="1300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="Polymorphed"/>
+                    <attribute id="Parent" type="FixedString" value="Polymorphed"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="Priority" type="int32" value="1300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="Paralyzed"/>
+                    <attribute id="Parent" type="FixedString" value="Paralyzed"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="Priority" type="int32" value="1300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="Charmed_SelfReactOnEnd"/>
+                    <attribute id="Parent" type="FixedString" value="Charmed_SelfReactOnEnd"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="Priority" type="int32" value="1300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="Polymorphed_SelfReactOnEnd"/>
+                    <attribute id="Parent" type="FixedString" value="Polymorphed_SelfReactOnEnd"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="Priority" type="int32" value="1300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="Paralyzed_SelfReactOnEnd"/>
+                    <attribute id="Parent" type="FixedString" value="Paralyzed_SelfReactOnEnd"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="Priority" type="int32" value="1300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="IncapacitatedAssault_WithInvestigation"/>
+                    <attribute id="Parent" type="FixedString" value="IncapacitatedAssault_WithInvestigation"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="Dialog" type="LSString" value="GEB_AD_CallForHelp_86d42165-a621-b656-e97d-fc68b6240de9"/>
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="PrimarySensibleAction" type="FixedString" value="CRIME_ArrestCallHelp"/>
+                            <attribute id="Priority" type="int32" value="11300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="SecondarySensibleAction" type="FixedString" value="CRIME_CrowdFleeFromParty"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="Distraction"/>
+                    <attribute id="Parent" type="FixedString" value="Distraction"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="6"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="Priority" type="int32" value="1300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="Enthralled"/>
+                    <attribute id="Parent" type="FixedString" value="Enthralled"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="Priority" type="int32" value="1300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="DangerousMonsterReaction"/>
+                    <attribute id="Parent" type="FixedString" value="DangerousMonsterReaction"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="PrimarySensibleAction" type="FixedString" value="CRIME_CrowdFleeFromParty"/>
+                            <attribute id="Priority" type="int32" value="50"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="SecondarySensibleAction" type="FixedString" value="CRIME_CrowdFleeFromParty"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="DangerousMonsterReaction_Beast"/>
+                    <attribute id="Parent" type="FixedString" value="DangerousMonsterReaction_Beast"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="PrimarySensibleAction" type="FixedString" value="CRIME_CrowdFleeFromParty"/>
+                            <attribute id="Priority" type="int32" value="50"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="SecondarySensibleAction" type="FixedString" value="CRIME_CrowdFleeFromParty"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="DangerousMonsterReaction_Beast_Spider"/>
+                    <attribute id="Parent" type="FixedString" value="DangerousMonsterReaction_Beast_Spider"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="PrimarySensibleAction" type="FixedString" value="CRIME_CrowdFleeFromParty"/>
+                            <attribute id="Priority" type="int32" value="50"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="SecondarySensibleAction" type="FixedString" value="CRIME_CrowdFleeFromParty"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="DangerousMonsterReactionFallback"/>
+                    <attribute id="Parent" type="FixedString" value="DangerousMonsterReactionFallback"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="PrimarySensibleAction" type="FixedString" value="CRIME_CrowdFleeFromParty"/>
+                            <attribute id="Priority" type="int32" value="50"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="SecondarySensibleAction" type="FixedString" value="CRIME_CrowdFleeFromParty"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="DangerousMonsterReactionFallback_Beast"/>
+                    <attribute id="Parent" type="FixedString" value="DangerousMonsterReactionFallback_Beast"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="PrimarySensibleAction" type="FixedString" value="CRIME_CrowdFleeFromParty"/>
+                            <attribute id="Priority" type="int32" value="50"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="SecondarySensibleAction" type="FixedString" value="CRIME_CrowdFleeFromParty"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="DangerousMonsterReactionFallback_Beast_Spider"/>
+                    <attribute id="Parent" type="FixedString" value="DangerousMonsterReactionFallback_Beast_Spider"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="PrimarySensibleAction" type="FixedString" value="CRIME_CrowdFleeFromParty"/>
+                            <attribute id="Priority" type="int32" value="50"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="SecondarySensibleAction" type="FixedString" value="CRIME_CrowdFleeFromParty"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="HostileChild"/>
+                    <attribute id="Parent" type="FixedString" value="HostileChild"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="5"/>
+                            <attribute id="Parent" type="FixedString" value="KID"/>
+                            <attribute id="Priority" type="int32" value="1300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="SpellTrapPlaced"/>
+                    <attribute id="Parent" type="FixedString" value="SpellTrapPlaced"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="6"/>
+                            <attribute id="Parent" type="FixedString" value="CIVILIAN"/>
+                            <attribute id="Priority" type="int32" value="1300"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="Dominated"/>
+                    <attribute id="Parent" type="FixedString" value="Charmed"/>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="Dominated_SelfReactOnEnd"/>
+                    <attribute id="Parent" type="FixedString" value="Charmed_SelfReactOnEnd"/>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="MusicalPerformance_Good"/>
+                    <attribute id="Parent" type="FixedString" value="MusicalPerformance_Good"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="6"/>
+                            <attribute id="Parent" type="FixedString" value="HUMANOID"/>
+                            <attribute id="Priority" type="int32" value="350"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="Crime">
+                    <attribute id="CrimeType" type="LSString" value="MusicalPerformance_Bad_OneShot"/>
+                    <attribute id="Parent" type="FixedString" value="MusicalPerformance_Bad_OneShot"/>
+                    <children>
+                        <node id="CrimeAction">
+                            <attribute id="InvestigationKind" type="uint8" value="6"/>
+                            <attribute id="Parent" type="FixedString" value="HUMANOID"/>
+                            <attribute id="Priority" type="int32" value="250"/>
+                            <attribute id="ReactionCategory_Tag" type="FixedString" value="CROWDSYS_NPC"/>
+                            <attribute id="Tension" type="uint8" value="0"/>
+                            <children>
+                                <node id="TargetDialogueFlags">
+                                    <children>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="1"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="2"/>
+                                        </node>
+                                        <node id="DisturbanceDialogueCapability">
+                                            <attribute id="DisturbanceDialogueCapabilityObject" type="uint8" value="3"/>
+                                        </node>
+                                    </children>
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+            </children>
+        </node>
+    </region>
+</save>

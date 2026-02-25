@@ -1,0 +1,573 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="5" revision="0" build="0" lslib_meta="v1,bswap_guids,lsf_keys_adjacency" />
+	<region id="TimelineContent">
+		<node id="TimelineContent">
+			<attribute id="CompilationTimeStamp" type="int64" value="1700742700" />
+			<children>
+				<node id="Effect">
+					<attribute id="Duration" type="float" value="21.760542" />
+					<children>
+						<node id="Phases">
+							<children>
+								<node id="Phase">
+									<attribute id="Duration" type="float" value="1.7605417" />
+									<attribute id="PlayCount" type="int32" value="1" />
+									<attribute id="DialogNodeId" type="guid" value="0e094ee5-7533-0acb-e9f3-f538a952e240" />
+									<children>
+										<node id="QuestionHoldAutomation" />
+									</children>
+								</node>
+								<node id="Phase">
+									<attribute id="Duration" type="float" value="5" />
+									<attribute id="PlayCount" type="int32" value="1" />
+									<attribute id="DialogNodeId" type="guid" value="005b22e9-9fb9-b049-a8a9-4f723f0265db" />
+									<children>
+										<node id="QuestionHoldAutomation" />
+									</children>
+								</node>
+								<node id="Phase">
+									<attribute id="Duration" type="float" value="5" />
+									<attribute id="PlayCount" type="int32" value="1" />
+									<attribute id="DialogNodeId" type="guid" value="26e4863d-f130-fe51-9b82-80eb556e32a4" />
+									<children>
+										<node id="QuestionHoldAutomation" />
+									</children>
+								</node>
+								<node id="Phase">
+									<attribute id="Duration" type="float" value="5" />
+									<attribute id="PlayCount" type="int32" value="1" />
+									<attribute id="DialogNodeId" type="guid" value="36b95c3a-4377-df9e-6f06-324c6a554533" />
+									<children>
+										<node id="QuestionHoldAutomation" />
+									</children>
+								</node>
+								<node id="Phase">
+									<attribute id="Duration" type="float" value="5" />
+									<attribute id="PlayCount" type="int32" value="1" />
+									<attribute id="DialogNodeId" type="guid" value="eea4b1b6-ad80-a81a-97ed-b2c5ab39f43c" />
+									<children>
+										<node id="QuestionHoldAutomation" />
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Inputs" />
+						<node id="EffectComponents">
+							<children>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLVoice" />
+									<attribute id="ID" type="guid" value="1f7b8ea9-f784-4025-bff8-d1971ae07ad3" />
+									<attribute id="EndTime" type="float" value="1.7605417" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<attribute id="DialogNodeId" type="guid" value="0e094ee5-7533-0acb-e9f3-f538a952e240" />
+									<attribute id="ReferenceId" type="guid" value="0e094ee5-7533-0acb-e9f3-f538a952e240" />
+									<attribute id="IsAliased" type="bool" value="True" />
+									<attribute id="PerformanceFade" type="double" value="1" />
+									<attribute id="FadeIn" type="double" value="0.9" />
+									<attribute id="FadeOut" type="double" value="0" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="714f82cf-c959-6cad-8764-53627f5d2f8a" />
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLAttitudeEvent" />
+									<attribute id="ID" type="guid" value="50bb91f0-11a7-4d86-ab0d-1bda045f7a1b" />
+									<attribute id="EndTime" type="float" value="1.7605417" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="714f82cf-c959-6cad-8764-53627f5d2f8a" />
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLEmotionEvent" />
+									<attribute id="ID" type="guid" value="6f30d6b5-ccf5-4702-b69b-3bd6ae150223" />
+									<attribute id="EndTime" type="float" value="1.7605417" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="714f82cf-c959-6cad-8764-53627f5d2f8a" />
+										</node>
+										<node id="Keys">
+											<children>
+												<node id="Key">
+													<attribute id="InterpolationType" type="uint8" value="3" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLLookAtEvent" />
+									<attribute id="ID" type="guid" value="8db63188-692e-4f88-bc39-e6b65515dfcc" />
+									<attribute id="EndTime" type="float" value="1.7605417" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="714f82cf-c959-6cad-8764-53627f5d2f8a" />
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLVoice" />
+									<attribute id="ID" type="guid" value="252e000a-8d33-4f20-b068-c8f47190b7f6" />
+									<attribute id="StartTime" type="float" value="1.7605419" />
+									<attribute id="EndTime" type="float" value="6.760542" />
+									<attribute id="PhaseIndex" type="int64" value="1" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<attribute id="DialogNodeId" type="guid" value="005b22e9-9fb9-b049-a8a9-4f723f0265db" />
+									<attribute id="ReferenceId" type="guid" value="005b22e9-9fb9-b049-a8a9-4f723f0265db" />
+									<attribute id="IsAliased" type="bool" value="True" />
+									<attribute id="PerformanceFade" type="double" value="1" />
+									<attribute id="FadeIn" type="double" value="0.9" />
+									<attribute id="FadeOut" type="double" value="0" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="a346318f-15b3-49ad-ab97-ddf8283dc339" />
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLAttitudeEvent" />
+									<attribute id="ID" type="guid" value="386f7b3e-4569-4478-a077-329bb7709945" />
+									<attribute id="StartTime" type="float" value="1.7605419" />
+									<attribute id="EndTime" type="float" value="6.760542" />
+									<attribute id="PhaseIndex" type="int64" value="1" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="714f82cf-c959-6cad-8764-53627f5d2f8a" />
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLLookAtEvent" />
+									<attribute id="ID" type="guid" value="697e3f24-b02f-4474-94d0-4420d2adc981" />
+									<attribute id="StartTime" type="float" value="1.7605419" />
+									<attribute id="EndTime" type="float" value="6.760542" />
+									<attribute id="PhaseIndex" type="int64" value="1" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="714f82cf-c959-6cad-8764-53627f5d2f8a" />
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLVoice" />
+									<attribute id="ID" type="guid" value="0511c373-e7b0-4459-82bc-8cf4580b8404" />
+									<attribute id="StartTime" type="float" value="6.760542" />
+									<attribute id="EndTime" type="float" value="11.760542" />
+									<attribute id="PhaseIndex" type="int64" value="2" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<attribute id="DialogNodeId" type="guid" value="26e4863d-f130-fe51-9b82-80eb556e32a4" />
+									<attribute id="ReferenceId" type="guid" value="26e4863d-f130-fe51-9b82-80eb556e32a4" />
+									<attribute id="IsAliased" type="bool" value="True" />
+									<attribute id="PerformanceFade" type="double" value="1" />
+									<attribute id="FadeIn" type="double" value="0.9" />
+									<attribute id="FadeOut" type="double" value="0" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="a346318f-15b3-49ad-ab97-ddf8283dc339" />
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLAttitudeEvent" />
+									<attribute id="ID" type="guid" value="09573e09-8037-4ed7-a062-a2b479bbee57" />
+									<attribute id="StartTime" type="float" value="6.760542" />
+									<attribute id="EndTime" type="float" value="11.760542" />
+									<attribute id="PhaseIndex" type="int64" value="2" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="714f82cf-c959-6cad-8764-53627f5d2f8a" />
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLLookAtEvent" />
+									<attribute id="ID" type="guid" value="7e59d946-5c41-4c2f-9a99-f36919b1d925" />
+									<attribute id="StartTime" type="float" value="6.760542" />
+									<attribute id="EndTime" type="float" value="11.760542" />
+									<attribute id="PhaseIndex" type="int64" value="2" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="714f82cf-c959-6cad-8764-53627f5d2f8a" />
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLVoice" />
+									<attribute id="ID" type="guid" value="3e5c0667-9067-4b5f-ba65-6927514837b1" />
+									<attribute id="StartTime" type="float" value="11.760542" />
+									<attribute id="EndTime" type="float" value="16.760542" />
+									<attribute id="PhaseIndex" type="int64" value="3" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<attribute id="DialogNodeId" type="guid" value="36b95c3a-4377-df9e-6f06-324c6a554533" />
+									<attribute id="ReferenceId" type="guid" value="36b95c3a-4377-df9e-6f06-324c6a554533" />
+									<attribute id="IsAliased" type="bool" value="True" />
+									<attribute id="PerformanceFade" type="double" value="1" />
+									<attribute id="FadeIn" type="double" value="0.9" />
+									<attribute id="FadeOut" type="double" value="0" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="a346318f-15b3-49ad-ab97-ddf8283dc339" />
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLAttitudeEvent" />
+									<attribute id="ID" type="guid" value="4734fa50-07ff-4c1c-a52f-51f12f351ab4" />
+									<attribute id="StartTime" type="float" value="11.760542" />
+									<attribute id="EndTime" type="float" value="16.760542" />
+									<attribute id="PhaseIndex" type="int64" value="3" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="714f82cf-c959-6cad-8764-53627f5d2f8a" />
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLLookAtEvent" />
+									<attribute id="ID" type="guid" value="41b54c4d-e9da-46e4-b0c0-6ca2d4b8a57f" />
+									<attribute id="StartTime" type="float" value="11.760542" />
+									<attribute id="EndTime" type="float" value="16.760542" />
+									<attribute id="PhaseIndex" type="int64" value="3" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="714f82cf-c959-6cad-8764-53627f5d2f8a" />
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLVoice" />
+									<attribute id="ID" type="guid" value="abb43f30-f91f-431a-9020-ab7a641b6ca9" />
+									<attribute id="StartTime" type="float" value="16.760542" />
+									<attribute id="EndTime" type="float" value="21.760542" />
+									<attribute id="PhaseIndex" type="int64" value="4" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<attribute id="DialogNodeId" type="guid" value="eea4b1b6-ad80-a81a-97ed-b2c5ab39f43c" />
+									<attribute id="ReferenceId" type="guid" value="eea4b1b6-ad80-a81a-97ed-b2c5ab39f43c" />
+									<attribute id="IsAliased" type="bool" value="True" />
+									<attribute id="PerformanceFade" type="double" value="1" />
+									<attribute id="FadeIn" type="double" value="0.9" />
+									<attribute id="FadeOut" type="double" value="0" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="a346318f-15b3-49ad-ab97-ddf8283dc339" />
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLAttitudeEvent" />
+									<attribute id="ID" type="guid" value="5ff3d694-62ec-4e08-b85d-8e566a681699" />
+									<attribute id="StartTime" type="float" value="16.760542" />
+									<attribute id="EndTime" type="float" value="21.760542" />
+									<attribute id="PhaseIndex" type="int64" value="4" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="714f82cf-c959-6cad-8764-53627f5d2f8a" />
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLLookAtEvent" />
+									<attribute id="ID" type="guid" value="424e5a55-4001-4343-84d3-2400251bf9c2" />
+									<attribute id="StartTime" type="float" value="16.760542" />
+									<attribute id="EndTime" type="float" value="21.760542" />
+									<attribute id="PhaseIndex" type="int64" value="4" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="714f82cf-c959-6cad-8764-53627f5d2f8a" />
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="TimelineSpeakers">
+					<children>
+						<node id="Object" key="MapKey">
+							<attribute id="MapKey" type="int32" value="0" />
+							<attribute id="MapValue" type="guid" value="714f82cf-c959-6cad-8764-53627f5d2f8a" />
+						</node>
+					</children>
+				</node>
+				<node id="TimelineActorData">
+					<children>
+						<node id="TimelineActorData">
+							<children>
+								<node id="Object" key="MapKey">
+									<attribute id="MapKey" type="guid" value="714f82cf-c959-6cad-8764-53627f5d2f8a" />
+									<children>
+										<node id="Value">
+											<attribute id="Speaker" type="int32" value="0" />
+											<attribute id="ActorTypeId" type="FixedString" value="character" />
+											<attribute id="ActorType" type="uint8" value="0" />
+											<attribute id="DefaultStepOutDelay" type="float" value="0.3638539" />
+											<attribute id="AudienceSlot" type="uint8" value="16" />
+											<attribute id="SceneActorType" type="uint8" value="2" />
+											<attribute id="SceneActorIndex" type="int32" value="0" />
+											<children>
+												<node id="CompiledNodeSnapshots">
+													<children>
+														<node id="ComponentMap">
+															<children>
+																<node id="Object" key="MapKey">
+																	<attribute id="MapKey" type="uint64" value="0" />
+																	<children>
+																		<node id="ComponentMap">
+																			<children>
+																				<node id="Cache">
+																					<children>
+																						<node id="Object" key="MapKey">
+																							<attribute id="MapKey" type="uint32" value="3" />
+																							<children>
+																								<node id="Cache">
+																									<children>
+																										<node id="ComponentIndex">
+																											<attribute id="Object" type="int64" value="2" />
+																										</node>
+																									</children>
+																								</node>
+																							</children>
+																						</node>
+																					</children>
+																				</node>
+																			</children>
+																		</node>
+																	</children>
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+								<node id="Object" key="MapKey">
+									<attribute id="MapKey" type="guid" value="a346318f-15b3-49ad-ab97-ddf8283dc339" />
+									<children>
+										<node id="Value">
+											<attribute id="Speaker" type="int32" value="-666" />
+											<attribute id="ActorTypeId" type="FixedString" value="narrator" />
+											<attribute id="ActorType" type="uint8" value="0" />
+											<attribute id="DefaultStepOutDelay" type="float" value="0.04458144" />
+											<attribute id="AudienceSlot" type="uint8" value="16" />
+											<attribute id="SceneActorIndex" type="int32" value="0" />
+											<children>
+												<node id="CompiledNodeSnapshots">
+													<children>
+														<node id="ComponentMap" />
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+								<node id="Object" key="MapKey">
+									<attribute id="MapKey" type="guid" value="c5797ebc-84d7-4f74-ae5d-3ea993b81fb4" />
+									<children>
+										<node id="Value">
+											<attribute id="ActorTypeId" type="FixedString" value="peanut" />
+											<attribute id="ActorType" type="uint8" value="0" />
+											<attribute id="DefaultStepOutDelay" type="float" value="0.14746545" />
+											<attribute id="AudienceSlot" type="uint8" value="8" />
+											<attribute id="SceneActorType" type="uint8" value="4" />
+											<children>
+												<node id="CompiledNodeSnapshots">
+													<children>
+														<node id="ComponentMap" />
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+								<node id="Object" key="MapKey">
+									<attribute id="MapKey" type="guid" value="aabd8f8d-50e7-407f-b829-7ae92ffcb84d" />
+									<children>
+										<node id="Value">
+											<attribute id="ActorTypeId" type="FixedString" value="peanut" />
+											<attribute id="ActorType" type="uint8" value="0" />
+											<attribute id="DefaultStepOutDelay" type="float" value="0.68449354" />
+											<attribute id="AudienceSlot" type="uint8" value="8" />
+											<attribute id="SceneActorType" type="uint8" value="4" />
+											<children>
+												<node id="CompiledNodeSnapshots">
+													<children>
+														<node id="ComponentMap" />
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+								<node id="Object" key="MapKey">
+									<attribute id="MapKey" type="guid" value="2ff5ec5b-b95c-4272-aca1-19be935cab4f" />
+									<children>
+										<node id="Value">
+											<attribute id="ActorTypeId" type="FixedString" value="peanut" />
+											<attribute id="ActorType" type="uint8" value="0" />
+											<attribute id="DefaultStepOutDelay" type="float" value="0.49400923" />
+											<attribute id="AudienceSlot" type="uint8" value="8" />
+											<attribute id="SceneActorType" type="uint8" value="4" />
+											<children>
+												<node id="CompiledNodeSnapshots">
+													<children>
+														<node id="ComponentMap" />
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="TimelinePhases">
+					<children>
+						<node id="Object">
+							<children>
+								<node id="Object" key="MapKey">
+									<attribute id="MapKey" type="guid" value="eea4b1b6-ad80-a81a-97ed-b2c5ab39f43c" />
+									<attribute id="MapValue" type="uint64" value="4" />
+								</node>
+								<node id="Object" key="MapKey">
+									<attribute id="MapKey" type="guid" value="36b95c3a-4377-df9e-6f06-324c6a554533" />
+									<attribute id="MapValue" type="uint64" value="3" />
+								</node>
+								<node id="Object" key="MapKey">
+									<attribute id="MapKey" type="guid" value="26e4863d-f130-fe51-9b82-80eb556e32a4" />
+									<attribute id="MapValue" type="uint64" value="2" />
+								</node>
+								<node id="Object" key="MapKey">
+									<attribute id="MapKey" type="guid" value="0e094ee5-7533-0acb-e9f3-f538a952e240" />
+									<attribute id="MapValue" type="uint64" value="0" />
+								</node>
+								<node id="Object" key="MapKey">
+									<attribute id="MapKey" type="guid" value="005b22e9-9fb9-b049-a8a9-4f723f0265db" />
+									<attribute id="MapValue" type="uint64" value="1" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="PeanutSlotIdMap">
+					<children>
+						<node id="Object">
+							<children>
+								<node id="Object" key="MapKey">
+									<attribute id="MapKey" type="guid" value="c5797ebc-84d7-4f74-ae5d-3ea993b81fb4" />
+									<attribute id="MapValue" type="int32" value="0" />
+								</node>
+								<node id="Object" key="MapKey">
+									<attribute id="MapKey" type="guid" value="aabd8f8d-50e7-407f-b829-7ae92ffcb84d" />
+									<attribute id="MapValue" type="int32" value="1" />
+								</node>
+								<node id="Object" key="MapKey">
+									<attribute id="MapKey" type="guid" value="2ff5ec5b-b95c-4272-aca1-19be935cab4f" />
+									<attribute id="MapValue" type="int32" value="2" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="TimelineSettings">
+					<attribute id="BodyPartForMocap" type="int32" value="1" />
+					<children>
+						<node id="FoleySettings" />
+						<node id="ExposureSettings" />
+						<node id="QuestionHoldAutomation">
+							<attribute id="IsEnabled" type="bool" value="False" />
+							<attribute id="CycleSpeed" type="float" value="0" />
+						</node>
+					</children>
+				</node>
+				<node id="AdditionalLocations" />
+				<node id="RequiredCinematicLevelTemplateIds" />
+				<node id="MaterialGroupLookup">
+					<children>
+						<node id="Object" />
+					</children>
+				</node>
+				<node id="CombatTimelineHandlers">
+					<children>
+						<node id="CombatTimelineHandler">
+							<attribute id="Priority" type="int32" value="0" />
+						</node>
+						<node id="CombatTimelineHandler">
+							<attribute id="Priority" type="int32" value="0" />
+						</node>
+						<node id="CombatTimelineHandler">
+							<attribute id="Priority" type="int32" value="0" />
+						</node>
+						<node id="CombatTimelineHandler">
+							<attribute id="Priority" type="int32" value="0" />
+						</node>
+						<node id="CombatTimelineHandler">
+							<attribute id="Priority" type="int32" value="0" />
+						</node>
+					</children>
+				</node>
+				<node id="WorldTimeline">
+					<children>
+						<node id="ActorEndStates">
+							<children>
+								<node id="ActorEndState" />
+							</children>
+						</node>
+						<node id="ActorIdleOverrides">
+							<children>
+								<node id="ActorIdleOverride" />
+							</children>
+						</node>
+						<node id="BehaviourActorStartConditions">
+							<children>
+								<node id="BehaviourActorStartCondition" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="RootCompiledNodeSnapshots">
+					<children>
+						<node id="ComponentMap" />
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="EnterPhaseSoundEvents">
+		<node id="EnterPhaseSoundEvents">
+			<children>
+				<node id="SoundEventMap" />
+			</children>
+		</node>
+	</region>
+	<region id="ExitPhaseSoundEvents">
+		<node id="ExitPhaseSoundEvents">
+			<children>
+				<node id="SoundEventMap" />
+			</children>
+		</node>
+	</region>
+	<region id="EnterSoundEvents">
+		<node id="EnterSoundEvents" />
+	</region>
+	<region id="ExitSoundEvents">
+		<node id="ExitSoundEvents" />
+	</region>
+</save>

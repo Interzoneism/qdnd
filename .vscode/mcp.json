@@ -2,9 +2,10 @@
   "servers": {
     "vision-bridge": {
       "type": "stdio",
-      "command": "${workspaceFolder}/.mcp/vision-bridge/.venv/bin/python",
-      "args": ["${workspaceFolder}/.mcp/vision-bridge/server.py"],
+      "command": "python3",
+      "args": ["${workspaceFolder}/.mcp/vision-bridge/launcher.py"],
       "env": {
+        "PATH": "${workspaceFolder}/.mcp/vision-bridge/shims;${env:PATH}",
         "WORKSPACE_ROOT": "${workspaceFolder}",
         "OLLAMA_HOST": "http://localhost:11434",
         "OLLAMA_MODEL": "qwen2.5vl:7b",

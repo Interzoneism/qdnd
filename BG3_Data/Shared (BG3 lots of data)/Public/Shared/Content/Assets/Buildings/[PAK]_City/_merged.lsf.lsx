@@ -1,0 +1,589 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="PhysicsBank">
+		<node id="PhysicsBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="2da5bcca-587e-dd4f-5fc3-9276d840d36a" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="BLD_City_Road_Paving_Rubble_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Tilesets/City/Road/BLD_City_Road_Paving_Rubble_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Tilesets/City/Road/BLD_City_Road_Paving_Rubble_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665791066" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="aeb0bdd3-8168-f213-f6a7-ba32bafd030b" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="BLD_City_Road_Paving_Rubble_B" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Tilesets/City/Road/BLD_City_Road_Paving_Rubble_B.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Tilesets/City/Road/BLD_City_Road_Paving_Rubble_B" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790670" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="c03eb457-b8e9-768b-4775-951b87d0f5f7" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="BLD_City_Road_Paving_Rubble_E" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Tilesets/City/Road/BLD_City_Road_Paving_Rubble_E.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Tilesets/City/Road/BLD_City_Road_Paving_Rubble_E" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790673" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="f5f1f9ef-0698-d4b7-55a1-35d0fbe8714d" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="BLD_City_Road_Paving_Rubble_D" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Tilesets/City/Road/BLD_City_Road_Paving_Rubble_D.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Tilesets/City/Road/BLD_City_Road_Paving_Rubble_D" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790670" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="fef11df7-c67a-8522-f5b3-5ddfc99d7fca" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="BLD_City_Road_Paving_Rubble_C" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Tilesets/City/Road/BLD_City_Road_Paving_Rubble_C.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Tilesets/City/Road/BLD_City_Road_Paving_Rubble_C" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790670" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="MaterialBank">
+		<node id="MaterialBank">
+			<children>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="9cd26032-057b-ad21-8198-e7f356e8ad51" />
+					<attribute id="MaterialType" type="uint8" value="6" />
+					<attribute id="Name" type="LSString" value="BLD_City_Road_Paving_Rubble_Tile_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Environment/ENV_DetailMap_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="DetailNormalStrength" />
+							<attribute id="Value" type="float" value="1.5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="2" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="MicroDetailMap" />
+							<attribute id="ParameterName" type="FixedString" value="MicroDetailTiling" />
+							<attribute id="Value" type="float" value="3" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="DetailAOStrength" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.05" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="DetailRoughnessStrength" />
+							<attribute id="Value" type="float" value="0.05" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="MicroDetailMap" />
+							<attribute id="ID" type="FixedString" value="cf0be391-2866-4e8c-9ce8-197bba64eb30" />
+							<attribute id="ParameterName" type="FixedString" value="MicroDetailNormalMap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="MicroDetailMap" />
+							<attribute id="ID" type="FixedString" value="1fdcfb0d-6866-4723-bade-a6039a34cdad" />
+							<attribute id="ParameterName" type="FixedString" value="MicroDetailMap" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="56a37c0b-30b5-f703-d738-d6546dad79c8" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="e3a93728-99a7-05f7-838f-c9bf681cb314" />
+					<attribute id="MaterialType" type="uint8" value="6" />
+					<attribute id="Name" type="LSString" value="BLD_City_Road_Paving_Rubble_Trim_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Environment/ENV_DetailMap_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="DetailNormalStrength" />
+							<attribute id="Value" type="float" value="0.75" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="2" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="MicroDetailMap" />
+							<attribute id="ParameterName" type="FixedString" value="MicroDetailTiling" />
+							<attribute id="Value" type="float" value="10" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="DetailAOStrength" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.05" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="DetailRoughnessStrength" />
+							<attribute id="Value" type="float" value="0.05" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="MicroDetailMap" />
+							<attribute id="ID" type="FixedString" value="cf0be391-2866-4e8c-9ce8-197bba64eb30" />
+							<attribute id="ParameterName" type="FixedString" value="MicroDetailNormalMap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="MicroDetailMap" />
+							<attribute id="ID" type="FixedString" value="1fdcfb0d-6866-4723-bade-a6039a34cdad" />
+							<attribute id="ParameterName" type="FixedString" value="MicroDetailMap" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="cc4fa7f8-800e-b0f1-ba44-f82b9abd4dc2" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="3.2099557 0.11209002 2.7832634" />
+					<attribute id="BoundsMin" type="fvec3" value="-3.3134658 -1.4548018 -2.454016" />
+					<attribute id="Center" type="fvec3" value="-0.05175507 -0.6713559 0.16462374" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="446d7a6e-9294-3c04-91a6-2069ef5aa515" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="BLD_City_Road_Paving_Rubble_B" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="4.2555633" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Tilesets/City/Road/Resources/BLD_City_Road_Paving_Rubble_B.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Tilesets/City/Road/Resources/BLD_City_Road_Paving_Rubble_B.Dummy_BLD_City_Road_Paving_Rubble_B.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665791066" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="9cd26032-057b-ad21-8198-e7f356e8ad51" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Road_Paving_Rubble_B.BLD_City_Road_Paving_Rubble_B_Tile_mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="e3a93728-99a7-05f7-838f-c9bf681cb314" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Road_Paving_Rubble_B.BLD_City_Road_Paving_Rubble_B_Trim_mesh.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="9cd26032-057b-ad21-8198-e7f356e8ad51" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Road_Paving_Rubble_B.BLD_City_Road_Paving_Rubble_B_Tile_mesh_LOD1.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="e3a93728-99a7-05f7-838f-c9bf681cb314" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Road_Paving_Rubble_B.BLD_City_Road_Paving_Rubble_B_Trim_mesh_LOD1.3" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="37ed9608-cc9c-c56f-925b-9530d897ff46" />
+					<attribute id="BoundsMax" type="fvec3" value="7.5585656 14.523051 5.9033103" />
+					<attribute id="BoundsMin" type="fvec3" value="-13.3431835 -0.5526951 -5.8005943" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="688a283b-b163-be40-8f81-a2d6c1928148" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="BLD_City_Drawbridge_Wood_Bridge_D_Dynamic" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="20865e48-73e5-5d12-016b-d86a4b32b34e" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Buildings/City/BLD_City_Castle_Drawbridge_Wood_ABC/Resources/BLD_City_Drawbridge_Wood_Bridge_D_Dynamic.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Buildings/City/BLD_City_Castle_Drawbridge_Wood_ABC/Resources/BLD_City_Drawbridge_Wood_Bridge_D_Dynamic.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209034" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="99d576e9-07bd-bb75-9346-be52df0180bc" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="7715f156-cc6d-0e7e-8632-3c7fe3958af3" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Drawbridge_Wood_Bridge_D_Dynamic.BLD_City_Castle_Drawbridge_Chains_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="7715f156-cc6d-0e7e-8632-3c7fe3958af3" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Drawbridge_Wood_Bridge_D_Dynamic.BLD_City_Castle_Drawbridge_Metal_Mesh.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="98ca9cb8-53a1-a2b5-777c-7fc08fc6501a" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Drawbridge_Wood_Bridge_D_Dynamic.BLD_City_Castle_Drawbridge_Bridge_Mesh.2" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="9b13fa4d-72fc-1b80-9142-9425124f9224" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Drawbridge_Wood_Bridge_D_Dynamic.BLD_City_Castle_Drawbridge_Ornaments_Mesh.3" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="2.3213315 0.143965 1.55701" />
+					<attribute id="BoundsMin" type="fvec3" value="-2.1632538 -0.7475403 -1.5750983" />
+					<attribute id="Center" type="fvec3" value="0.07903886 -0.30178764 -0.009044111" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="8cf2cef4-4232-009d-672a-05588cce964c" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="BLD_City_Road_Paving_Rubble_C" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="2.7711184" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Tilesets/City/Road/Resources/BLD_City_Road_Paving_Rubble_C.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Tilesets/City/Road/Resources/BLD_City_Road_Paving_Rubble_C.Dummy_BLD_City_Road_Paving_Rubble_C.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665791066" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="9cd26032-057b-ad21-8198-e7f356e8ad51" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Road_Paving_Rubble_C.BLD_City_Road_Paving_Rubble_C_Tile_mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="e3a93728-99a7-05f7-838f-c9bf681cb314" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Road_Paving_Rubble_C.BLD_City_Road_Paving_Rubble_C_Trim_mesh.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="9cd26032-057b-ad21-8198-e7f356e8ad51" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Road_Paving_Rubble_C.BLD_City_Road_Paving_Rubble_C_Tile_mesh_LOD1.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="e3a93728-99a7-05f7-838f-c9bf681cb314" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Road_Paving_Rubble_C.BLD_City_Road_Paving_Rubble_C_Trim_mesh_LOD1.3" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="3.3670092 0.15124461 2.3650758" />
+					<attribute id="BoundsMin" type="fvec3" value="-3.4958541 -1.3220646 -2.5050113" />
+					<attribute id="Center" type="fvec3" value="-0.06442249 -0.58541 -0.06996775" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="93392e2c-3c1b-0855-8729-2e7be47734c4" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="BLD_City_Road_Paving_Rubble_D" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="4.27163" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Tilesets/City/Road/Resources/BLD_City_Road_Paving_Rubble_D.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Tilesets/City/Road/Resources/BLD_City_Road_Paving_Rubble_D.Dummy_BLD_City_Road_Paving_Rubble_D.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665791066" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="9cd26032-057b-ad21-8198-e7f356e8ad51" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Road_Paving_Rubble_D.BLD_City_Road_Paving_Rubble_D_Tile_mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="e3a93728-99a7-05f7-838f-c9bf681cb314" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Road_Paving_Rubble_D.BLD_City_Road_Paving_Rubble_D_Trim_mesh.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="9cd26032-057b-ad21-8198-e7f356e8ad51" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Road_Paving_Rubble_D.BLD_City_Road_Paving_Rubble_D_Tile_mesh_LOD1.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="e3a93728-99a7-05f7-838f-c9bf681cb314" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Road_Paving_Rubble_D.BLD_City_Road_Paving_Rubble_D_Trim_mesh_LOD1.3" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="4.4958277 0.5726942 1.7331365" />
+					<attribute id="BoundsMin" type="fvec3" value="-4.541671 -1.0281535 -3.39271" />
+					<attribute id="Center" type="fvec3" value="-0.022921562 -0.22772968 -0.8297867" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="957e9bab-de51-3075-933b-d7b3d6796187" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="BLD_City_Road_Paving_Rubble_E" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="5.2562675" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Tilesets/City/Road/Resources/BLD_City_Road_Paving_Rubble_E.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Tilesets/City/Road/Resources/BLD_City_Road_Paving_Rubble_E.Dummy_BLD_City_Road_Paving_Rubble_E.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665791066" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="9cd26032-057b-ad21-8198-e7f356e8ad51" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Road_Paving_Rubble_E.BLD_City_Road_Paving_Rubble_E_Tile_mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="e3a93728-99a7-05f7-838f-c9bf681cb314" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Road_Paving_Rubble_E.BLD_City_Road_Paving_Rubble_E_Trim_mesh.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="9cd26032-057b-ad21-8198-e7f356e8ad51" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Road_Paving_Rubble_E.BLD_City_Road_Paving_Rubble_E_Tile_mesh_LOD1.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="e3a93728-99a7-05f7-838f-c9bf681cb314" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Road_Paving_Rubble_E.BLD_City_Road_Paving_Rubble_E_Trim_mesh_LOD1.3" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="1.8089038 0.1344154 1.5423602" />
+					<attribute id="BoundsMin" type="fvec3" value="-1.9434482 -0.7458812 -1.4377664" />
+					<attribute id="Center" type="fvec3" value="-0.06727219 -0.3057329 0.052296877" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="a6b7d670-72dc-7b0c-c43b-66483f2b531d" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="BLD_City_Road_Paving_Rubble_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="2.4359918" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Tilesets/City/Road/Resources/BLD_City_Road_Paving_Rubble_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Tilesets/City/Road/Resources/BLD_City_Road_Paving_Rubble_A.Dummy_BLD_City_Road_Paving_Rubble_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665791066" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="9cd26032-057b-ad21-8198-e7f356e8ad51" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Road_Paving_Rubble_A.BLD_City_Road_Paving_Rubble_A_Tile_mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="e3a93728-99a7-05f7-838f-c9bf681cb314" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Road_Paving_Rubble_A.BLD_City_Road_Paving_Rubble_A_Trim_mesh.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="9cd26032-057b-ad21-8198-e7f356e8ad51" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Road_Paving_Rubble_A.BLD_City_Road_Paving_Rubble_A_Tile_mesh_LOD1.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="e3a93728-99a7-05f7-838f-c9bf681cb314" />
+							<attribute id="ObjectID" type="FixedString" value="BLD_City_Road_Paving_Rubble_A.BLD_City_Road_Paving_Rubble_A_Trim_mesh_LOD1.3" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

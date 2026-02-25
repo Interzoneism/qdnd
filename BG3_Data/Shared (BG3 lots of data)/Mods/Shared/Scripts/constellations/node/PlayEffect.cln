@@ -1,0 +1,99 @@
+game.states.PlayVFX = State{
+    function()
+        description = "Play a VFX"
+
+        params.VFXTarget = {type = EParamType.String, required=false, default = "me", help = [[Entity on which to play the VFX.]]}
+        params.VFX = {type = EParamType.String, required=true, help = [[VFX to play.]]}
+        params.VFXBone = {type = EParamType.String, required=false, default = "Dummy_FX", help = [[Bone on which to play the VFX.]]}
+
+        inputs.PlayVFX = {help = "Play the VFX"}
+        inputs.StopVFX = {help = "Stop the VFX (if it was a looping one)"}
+
+        local preparedVFX
+        local vfxTarget
+
+        self.OnLoaded = function()
+            if preparedVFX == nil then
+                preparedVFX = PrepareEffect(params.VFX)
+            end
+        end
+
+        self.OnEditorChanges = function()
+            local vfxHandle = me.Blackboard.GetFact("Cnst.PlayVFX.vfxHandle")
+            if vfxHandle ~= nil then
+                StopEffect(PlayingEffect(vfxHandle))
+                -- don't clear blackboard, so that self.OnInit will start playing the
+                -- (potentially different) effect again
+            end
+        end
+
+        self.OnInit = function()
+            if params.VFXTarget == "me" then
+                vfxTarget = me
+            else
+                vfxTarget = FindEntity(params.VFXTarget)
+            end
+
+            local vfxHandle = me.Blackboard.GetFact("Cnst.PlayVFX.vfxHandle")
+            if vfxHandle ~= nil then
+                local playingEffect = PlayEffectAt(preparedVFX, vfxTarget, params.VFXBone)
+                me.Blackboard.SetFact("Cnst.PlayVFX.vfxHandle", playingEffect.Handle)
+            end
+        end
+
+        socketEvents.PlayVFX = function()
+            -- don't start playing a effect again if it's already playing
+            if not preparedVFX.IsLooping or
+               (me.Blackboard.GetFact("Cnst.PlayVFX.vfxHandle") == nil) then
+                local playingEffect = PlayEffectAt(preparedVFX, vfxTarget, params.VFXBone)
+                if preparedVFX.IsLooping then
+                    me.Blackboard.SetFact("Cnst.PlayVFX.vfxHandle", playingEffect.Handle)
+                end
+            end
+        end
+
+        socketEvents.StopVFX = function()
+            local vfxHandle = me.Blackboard.GetFact("Cnst.PlayVFX.vfxHandle")
+            if vfxHandle ~= nil then
+                StopEffect(PlayingEffect(vfxHandle))
+                me.Blackboard.ClearFact("Cnst.PlayVFX.vfxHandle")
+            end
+        end
+
+    end
+}
+
+
+game.states.PlaySFX = State{
+    function()
+        description = "Play an SFX"
+
+        params.SFXTarget = {type = EParamType.String, required=false, default = "me", help = [[Entity on which to play the SFX.]]}
+        params.SFX = {type = EParamType.String, required=true, help = [[SFX to play.]]}
+        params.StopSFX = {type = EParamType.String, required=false, help = [[SFX to "play" to stop the first effect.]]}
+
+        inputs.PlaySFX = {help = "Play the SFX"}
+        inputs.StopSFX = {help = "Play the 'stop' SFX"}
+
+        local sfxTarget
+
+        self.OnInit = function()
+            if params.SFXTarget == "me" then
+                sfxTarget = me
+            else
+                sfxTarget = FindEntity(params.SFXTarget)
+            end
+        end
+
+        socketEvents.PlaySFX = function()
+            PlaySound(sfxTarget, params.SFX)
+        end
+
+        socketEvents.StopSFX = function()
+            if (params.StopSFX ~= nil) and
+               (params.StopSFX ~= "") then
+                PlaySound(sfxTarget, params.StopSFX)
+            end
+        end
+    end
+}

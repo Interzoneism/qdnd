@@ -1,0 +1,95 @@
+game.states.ScryingEye = State{function()
+    description = [[Default state for scrying eyes: patrol spline, follow player if nearby]]
+
+    params.Route = { type = EParamType.String, required = false, default = nil,
+        help = [[Spline to follow along]]}
+
+    params.FollowDistance = { type = EParamType.Number, required = false, default = 20.0,
+        help = [[While closer then this distance to the eye, player will be followed by it]]}
+
+    local spl_Route = Spline(params.Route)
+    local ch_PlayerDetected = nil
+    local s_InterrupFollowTimer = "ScryingEye.InterruptFollow"
+    local b_InterruptedFollow = false
+
+    local States = { None = 0, Look = 1, Follow = 2 }
+    local i_State = States.None
+
+    events.EntityEvent = function(ev)
+        if ev.Event == "GLO_ScryingEye_Event_SpottedChar" then
+            i_State = States.Look
+            ch_PlayerDetected = ev.Params[1]
+        elseif ev.Event == "GLO_ScryingEye_Event_Follow" then
+            i_State = States.Follow
+            ch_PlayerDetected = ev.Params[1]
+        elseif ev.Event == "GLO_ScryingEye_Event_StopFollow" then
+            i_State = States.None
+            ch_PlayerDetected = nil
+        end
+    end
+
+    events.TimerFinished = function(ev)
+        if ev.TimerName == s_InterrupFollowTimer then
+            b_InterruptedFollow = true
+        end
+    end
+
+    nodes.PlayerDetected = Selector{
+        function(nodes)
+            return GetFirstCanEnter(nodes)
+        end,
+
+        Valid = function()
+            return ch_PlayerDetected ~= nil and not ch_PlayerDetected.Character.IsDead and CanSee(me, ch_PlayerDetected)
+                and GetDistance2DTo(me, ch_PlayerDetected) < params.FollowDistance
+        end
+    }
+
+    nodes.PlayerDetected.FollowPlayer = Action{
+        function()
+            if GetDistance2DTo(me, ch_PlayerDetected) < 4.0 then
+                LookAtEntity(ch_PlayerDetected)
+            else
+                try
+                    MoveTo(ch_PlayerDetected, MovementSpeed.Run)
+                catch ex if ls.CheckType(ex, error.MovementFailed) then
+                    DebugText(me, "Failed MoveTo(ch_PlayerDetected)")
+                end
+            end
+            Sleep(0.1)
+        end,
+
+        OnEnter = function()
+            -- workaround for missing Follow(timeout) call
+            StartTimer(me, s_InterrupFollowTimer, 2.0, 0)
+        end,
+
+        Valid = function()
+            return i_State == States.Follow and not b_InterruptedFollow
+        end
+    }
+
+    nodes.PlayerDetected.LookAtPlayer = Action{
+        function()
+            LookAtEntity(ch_PlayerDetected)
+            Sleep(0.5)
+            b_InterruptedFollow = false
+        end
+    }
+
+    nodes.Patrol = Action{
+        function()
+            DoPatrol(spl_Route, false, MovementSpeed.Walk)
+        end,
+
+        Valid = function()
+            return spl_Route ~= nil
+        end
+    }
+
+    nodes.Default = Action{
+        function()
+            WaitForInterrupt()
+        end
+    }
+end}

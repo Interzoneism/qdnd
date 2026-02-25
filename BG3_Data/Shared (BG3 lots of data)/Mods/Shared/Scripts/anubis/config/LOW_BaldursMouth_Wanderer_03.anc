@@ -1,0 +1,15 @@
+game.configs.LOW_BaldursMouth_Wanderer_03 = Config{
+    root=StateRef{game.roots.DefaultCharacter,
+        genericBehaviours = StateRef{game.states.CrimesHumanoid},
+        idle = StateRef{game.states.GEN_Patrol,
+            patrolActions = StateRef{game.states.GEN_PatrolSpecificPauses,
+                sleepChance = 100,
+                sleepCooldown = 0,
+                sleepTimeMax = 12,
+                sleepTimeMin = 9,
+                steerToTarget = [[ S_LOW_BaldursMouth_Wanderer_03_LookAtBoard_Trigger_2d75e329-0a2e-440d-bc88-d593bd87cc54]],
+            },
+            patrolSpline = [[S_LOW_BaldursMouth_Wanderer_03_PatrolSpline_Patched_309e8eb0-89a3-4baa-9929-81e8be3c244c]],
+        },
+    }
+}

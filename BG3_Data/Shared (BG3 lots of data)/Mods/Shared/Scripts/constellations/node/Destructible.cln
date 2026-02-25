@@ -1,0 +1,118 @@
+game.states.Destroyed = State{
+    function()
+        description = [[Sends an output signal when the item gets destroye]]
+
+        outputs.Destroyed = {help = [[Object has been destroyed. ev.Object is the Destroyer, the parameter is the DestroyerOwner]]}
+
+        events.Destroyed = function(ev)
+            if ev.Entity == me then
+                if ev.Destroyer ~= nil then
+                    TriggerOutput(outputs.Destroyed, ev.Destroyer.EntityRef, ev.DestroyerOwner.EntityRef)
+                else
+                    TriggerOutput(outputs.Destroyed, nil, nil)
+                end
+            end
+        end
+
+    end
+}
+
+game.states.Destroy = State{
+    function()
+        description = [[Allows destroying an item on input]]
+
+        modules = {"shared.items"}
+
+        inputs.Destroy = {help = [[Destroy item. ev.Object is assumed to be the Destroyer]]}
+
+        params.DestroyType = {
+            type = EParamType.String,
+            help = [[When destroying the item using this node, use this death type.]],
+            required = false,
+            default_value_provider = [[deathtype]],
+        }
+
+        params.GenerateTreasure = {
+            type = EParamType.Bool,
+            help = [[Generate treasure when the item gets destroyed]],
+            required = false,
+            default = true
+        }
+
+        params.DestroyVFX = {
+            type = EParamType.String,
+            help = [[Custom VFX to play on destruction]],
+            required = false
+        }
+
+        inputs.Destroy = {help = [[Destroy item. ev.Object is assumed to be the Destroyer]]}
+
+        socketEvents.Destroy = function(ev)
+            if not mod.items.SafeIsDestroyed(me) then
+                local destroyer = ev.Object and Entity(ev.Object) or nil
+                if (params.DestroyVFX ~= nil) and
+                   (params.DestroyVFX ~= "") then
+                    -- Use position so it works even if there is no destruct visual
+                    PlayEffectAt(PrepareEffect(params.DestroyVFX), me.Position)
+                end
+                local deathType = params.DestroyType and DeathType[params.DestroyType] or DeathType.NONE
+                Die(me, deathType, destroyer, params.GenerateTreasure)
+            end
+        end
+
+    end
+}
+
+game.states.Destructible = State{
+    function()
+        description = [[Allows destroying an item, and also sends an output signal when the item gets destroyed (by this state, or in another way)]]
+
+        params.DestroyType = {
+            type = EParamType.String,
+            help = [[When destroying the item using this node, use this death type.]],
+            required = false,
+            default_value_provider = [[deathtype]],
+        }
+
+        params.GenerateTreasure = {
+            type = EParamType.Bool,
+            help = [[Generate treasure when the item gets destroyed]],
+            required = false,
+            default = true
+        }
+
+        params.DestroyVFX = {
+            type = EParamType.String,
+            help = [[Custom VFX to play on destruction]],
+            required = false
+        }
+
+        inputs.Destroy = {help = [[Destroy item. ev.Object is assumed to be the Destroyer]]}
+        outputs.Destroy = {internal = true}
+
+        inputs.Destroyed = {internal = true}
+        outputs.Destroyed = {help = [[Object has been destroyed. ev.Object is the Destroyer, the parameter is the DestroyerOwner]]}
+
+        nodes.Destroy = Proxy{
+            game.states.Destroy,
+            params = {DestroyType = params.DestroyType,
+                      GenerateTreasure = params.GenerateTreasure,
+                      DestroyVFX = params.DestroyVFX},
+            inputs = {Destroy = {outputs.Destroy}}
+        }
+
+        nodes.Destroyed = Proxy{
+            game.states.Destroyed,
+            outputs = {Destroyed = {inputs.Destroyed}}
+        }
+
+        socketEvents.Destroy = function(ev)
+            TriggerOutput(outputs.Destroy, ev.Object, ev.Param)
+        end
+
+        socketEvents.Destroyed = function(ev)
+            TriggerOutput(outputs.Destroyed, ev.Object, ev.Param)
+        end
+
+    end
+}

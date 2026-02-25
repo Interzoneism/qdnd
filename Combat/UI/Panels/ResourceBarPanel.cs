@@ -35,6 +35,7 @@ namespace QDND.Combat.UI.Panels
         private (int current, int max, int level) _warlockSlotValue;
         private int _moveCurrent;
         private int _moveMax = 30;
+        private bool _rebuildPending;
 
         // Icon path mapping
         private static readonly Dictionary<string, string> ResourceIconPaths = new()
@@ -67,6 +68,15 @@ namespace QDND.Combat.UI.Panels
             transparentStyle.BgColor = Colors.Transparent;
             transparentStyle.SetBorderWidthAll(0);
             AddThemeStyleboxOverride("panel", transparentStyle);
+        }
+
+        public override void _Process(double delta)
+        {
+            if (_rebuildPending)
+            {
+                _rebuildPending = false;
+                RebuildIconRow();
+            }
         }
 
         protected override void BuildContent(Control parent)
@@ -136,8 +146,8 @@ namespace QDND.Combat.UI.Panels
             }
             else
             {
-                // New resource appeared - rebuild the row
-                RebuildIconRow();
+                // New resource appeared - rebuild next frame
+                _rebuildPending = true;
             }
         }
 
@@ -154,37 +164,15 @@ namespace QDND.Combat.UI.Panels
                 _spellSlotValues[level] = (current, max);
             }
 
-            if (_spellSlotIcons.TryGetValue(level, out var widget))
-            {
-                if (max <= 0)
-                {
-                    // Remove it
-                    _spellSlotIcons.Remove(level);
-                    RebuildIconRow();
-                }
-                else
-                {
-                    UpdateIconWidget(widget, current, max);
-                }
-            }
-            else if (max > 0)
-            {
-                RebuildIconRow();
-            }
+            // Always mark rebuild pending - icon texture depends on current slot count
+            _rebuildPending = true;
         }
 
         public void SetWarlockSlots(int current, int max, int level)
         {
             _warlockSlotValue = (current, max, level);
-            if (_warlockSlotIcon != null && max > 0)
-            {
-                _warlockSlotIcon.LevelLabel.Text = ToRoman(level);
-                UpdateIconWidget(_warlockSlotIcon, current, max);
-            }
-            else
-            {
-                RebuildIconRow();
-            }
+            // Always mark rebuild pending - icon texture depends on current slot count
+            _rebuildPending = true;
         }
 
         public void InitializeDefaults(int maxMove)
@@ -201,9 +189,12 @@ namespace QDND.Combat.UI.Panels
         {
             if (_iconRow == null) return;
 
-            // Clear existing
+            // Clear existing — RemoveChild detaches immediately so new children aren't doubled
             foreach (var child in _iconRow.GetChildren())
+            {
+                _iconRow.RemoveChild(child);
                 child.QueueFree();
+            }
             _resourceIcons.Clear();
             _spellSlotIcons.Clear();
             _warlockSlotIcon = null;
@@ -224,9 +215,14 @@ namespace QDND.Combat.UI.Panels
             {
                 var (current, max) = _spellSlotValues[level];
                 if (max <= 0) continue;
-                var widget = CreateIconWidget(
-                    "res://assets/Images/Icons Resources Hotbar/Spell_Slot_Bar_Icon.png",
-                    current, max, ToRoman(level));
+                var iconPath = ResolveSpellSlotIconPath(current, level);
+                var widget = CreateIconWidget(iconPath, current, max, ToRoman(level));
+                // Hide redundant count label when per-level pip icon is loaded
+                bool isGeneric = iconPath.EndsWith("Spell_Slot_Bar_Icon.png");
+                if (!isGeneric)
+                {
+                    widget.CountLabel.Visible = false;
+                }
                 _iconRow.AddChild(widget.Container);
                 _spellSlotIcons[level] = widget;
             }
@@ -234,10 +230,17 @@ namespace QDND.Combat.UI.Panels
             // Warlock slots
             if (_warlockSlotValue.max > 0)
             {
+                var warlockIconPath = ResolveSpellSlotIconPath(_warlockSlotValue.current, _warlockSlotValue.level, true);
                 _warlockSlotIcon = CreateIconWidget(
-                    "res://assets/Images/Icons Resources Hotbar/Warlock_Spell_Slot_Bar_Icon.png",
+                    warlockIconPath,
                     _warlockSlotValue.current, _warlockSlotValue.max,
                     ToRoman(_warlockSlotValue.level));
+                // Hide redundant count label when per-level pip icon is loaded
+                bool isGenericWarlock = warlockIconPath.EndsWith("Spell_Slot_Bar_Icon.png");
+                if (!isGenericWarlock)
+                {
+                    _warlockSlotIcon.CountLabel.Visible = false;
+                }
                 _iconRow.AddChild(_warlockSlotIcon.Container);
             }
 
@@ -377,6 +380,31 @@ namespace QDND.Combat.UI.Panels
             _moveMax = 30;
             RebuildIconRow();
             UpdateMovementBar();
+        }
+
+        /// <summary>
+        /// Resolves the spell slot icon path based on current available slots and spell level.
+        /// Uses specific icons from Spell Slots/ directory that visually show slot pips.
+        /// Falls back to generic icon if specific one doesn't exist.
+        /// </summary>
+        private static string ResolveSpellSlotIconPath(int currentSlots, int level, bool isWarlock = false)
+        {
+            if (currentSlots <= 0) currentSlots = 1; // Show at least 1-slot icon even when depleted
+            string warlockSuffix = isWarlock ? "Warlock_" : "";
+            string path = $"res://assets/Images/Icons Resources Hotbar/Spell Slots/{currentSlots}_Level_{level}_{warlockSuffix}Spell_Slots.png";
+            if (ResourceLoader.Exists(path)) return path;
+
+            // Fallback: try without warlock suffix
+            if (isWarlock)
+            {
+                path = $"res://assets/Images/Icons Resources Hotbar/Spell Slots/{currentSlots}_Level_{level}_Spell_Slots.png";
+                if (ResourceLoader.Exists(path)) return path;
+            }
+
+            // Final fallback: generic icon
+            return isWarlock
+                ? "res://assets/Images/Icons Resources Hotbar/Warlock_Spell_Slot_Bar_Icon.png"
+                : "res://assets/Images/Icons Resources Hotbar/Spell_Slot_Bar_Icon.png";
         }
 
         private static string ToRoman(int number) => number switch

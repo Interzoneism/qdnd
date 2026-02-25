@@ -1,0 +1,1273 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="314" lslib_meta="v1,bswap_guids" />
+	<region id="TLScene">
+		<node id="TLScene">
+			<attribute id="Identifier" type="guid" value="e73defa7-769b-6c6d-6a10-184bb904d1ee" />
+			<attribute id="SceneBounds" type="fvec3" value="0.663 0 0.479" />
+			<children>
+				<node id="LightingSetups">
+					<children>
+						<node id="LightingSetup">
+							<attribute id="Id" type="guid" value="00000000-0000-0000-0000-000000000000" />
+							<attribute id="Name" type="LSString" value="Default" />
+							<children>
+								<node id="Lights">
+									<children>
+										<node id="Light">
+											<attribute id="CastShadow" type="bool" value="True" />
+											<attribute id="Color" type="fvec3" value="1 0.9764706 0.8980392" />
+											<attribute id="Id" type="guid" value="d3ff4672-e030-463f-b021-3b33b2b046a8" />
+											<attribute id="Intensity" type="float" value="10" />
+											<attribute id="LightChannelFlags" type="uint8" value="2" />
+											<attribute id="LightCookieTexture" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+											<attribute id="Name" type="LSString" value="Key" />
+											<attribute id="Position" type="fvec3" value="-0.8 0.3 -0.5" />
+											<attribute id="PreExpose" type="bool" value="False" />
+											<attribute id="Radius" type="float" value="3" />
+											<attribute id="SpotLightAngles" type="fvec2" value="75 90" />
+											<attribute id="Type" type="uint8" value="1" />
+										</node>
+										<node id="Light">
+											<attribute id="Color" type="fvec3" value="0.5294118 0.8627451 1" />
+											<attribute id="FillLight" type="bool" value="True" />
+											<attribute id="Id" type="guid" value="3c3f7348-ed3d-4832-a648-72b566832495" />
+											<attribute id="Intensity" type="float" value="2.5" />
+											<attribute id="LightChannelFlags" type="uint8" value="2" />
+											<attribute id="LightCookieTexture" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+											<attribute id="Name" type="LSString" value="Fill" />
+											<attribute id="Position" type="fvec3" value="0.6 -0.55 -0.75" />
+											<attribute id="PreExpose" type="bool" value="False" />
+											<attribute id="Radius" type="float" value="3" />
+											<attribute id="SpotLightAngles" type="fvec2" value="75 90" />
+											<attribute id="Type" type="uint8" value="1" />
+										</node>
+										<node id="Light">
+											<attribute id="CastShadow" type="bool" value="True" />
+											<attribute id="Color" type="fvec3" value="0.79607844 1 0.78039217" />
+											<attribute id="Id" type="guid" value="da58d5f1-361b-44a3-aea8-01fb1555b773" />
+											<attribute id="Intensity" type="float" value="15" />
+											<attribute id="LightChannelFlags" type="uint8" value="2" />
+											<attribute id="LightCookieTexture" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+											<attribute id="Name" type="LSString" value="Rim" />
+											<attribute id="Position" type="fvec3" value="0.7 0.8 1" />
+											<attribute id="PreExpose" type="bool" value="False" />
+											<attribute id="Radius" type="float" value="4" />
+											<attribute id="SpotLightAngles" type="fvec2" value="75 90" />
+											<attribute id="Type" type="uint8" value="1" />
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Lights">
+					<children>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="79143e66-ff4e-4bce-abfe-6272133906b6" />
+							<children>
+								<node id="Lights">
+									<attribute id="AttachTo" type="int32" value="6" />
+									<attribute id="Id" type="guid" value="79143e66-ff4e-4bce-abfe-6272133906b6" />
+									<attribute id="Name" type="LSString" value="Add2_Rim2" />
+									<attribute id="TemplateId" type="guid" value="2ded2ca9-0b25-4bfe-96e4-cae58a8609e6" />
+									<attribute id="Type" type="uint8" value="3" />
+									<children>
+										<node id="Desc">
+											<children>
+												<node id="LightChannelFlags">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="uint8" value="16" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value="-0.80  0.15  0.59 -1.64 &#xD;&#xA; 0.00  0.97 -0.25  2.72 &#xD;&#xA;-0.61 -0.20 -0.77  2.51 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="234a40d3-228b-4014-a318-ba22f0b91b98" />
+							<children>
+								<node id="Lights">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="Id" type="guid" value="234a40d3-228b-4014-a318-ba22f0b91b98" />
+									<attribute id="Name" type="LSString" value="Add1_Key1" />
+									<attribute id="TemplateId" type="guid" value="4ce0ec4b-5e2d-4e4c-90d8-646feddc9cb5" />
+									<attribute id="Type" type="uint8" value="1" />
+									<children>
+										<node id="Desc" />
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value=" 0.96  0.10  0.27 -1.04 &#xD;&#xA; 0.00  0.94 -0.35  2.80 &#xD;&#xA;-0.29  0.33  0.90 -3.64 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="35db7fe2-92ca-4d61-aea9-85c50bee2064" />
+							<children>
+								<node id="Lights">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="Id" type="guid" value="35db7fe2-92ca-4d61-aea9-85c50bee2064" />
+									<attribute id="Name" type="LSString" value="Addn_Fill1" />
+									<attribute id="TemplateId" type="guid" value="74e806cf-622e-43d7-bfd3-f0cc69e9ce68" />
+									<attribute id="Type" type="uint8" value="2" />
+									<children>
+										<node id="Desc">
+											<children>
+												<node id="LightChannelFlags">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="uint8" value="24" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value="-0.30 -0.40 -0.87  4.04 &#xD;&#xA;-0.00  0.91 -0.42  3.68 &#xD;&#xA; 0.95 -0.13 -0.27  0.69 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="811f2bf7-8028-4b5a-b5a2-d8a52eb2213f" />
+							<children>
+								<node id="Lights">
+									<attribute id="AttachTo" type="int32" value="6" />
+									<attribute id="Id" type="guid" value="811f2bf7-8028-4b5a-b5a2-d8a52eb2213f" />
+									<attribute id="Name" type="LSString" value="Add2_Fill1" />
+									<attribute id="TemplateId" type="guid" value="74e806cf-622e-43d7-bfd3-f0cc69e9ce68" />
+									<attribute id="Type" type="uint8" value="2" />
+									<children>
+										<node id="Desc">
+											<children>
+												<node id="LightChannelFlags">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="uint8" value="16" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value=" 0.90 -0.18 -0.40  2.23 &#xD;&#xA; 0.00  0.91 -0.42  3.39 &#xD;&#xA; 0.44  0.37  0.82 -3.65 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="4ab42fdd-3adc-496a-be15-57348a772353" />
+							<children>
+								<node id="Lights">
+									<attribute id="AttachTo" type="int32" value="1" />
+									<attribute id="Id" type="guid" value="4ab42fdd-3adc-496a-be15-57348a772353" />
+									<attribute id="Name" type="LSString" value="Init_Rim2" />
+									<attribute id="TemplateId" type="guid" value="2ded2ca9-0b25-4bfe-96e4-cae58a8609e6" />
+									<attribute id="Type" type="uint8" value="3" />
+									<children>
+										<node id="Desc" />
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value="-0.53 -0.21 -0.82  2.71 &#xD;&#xA; 0.00  0.97 -0.25  2.47 &#xD;&#xA; 0.85 -0.13 -0.51  2.05 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="9a06a4f6-c977-4753-961d-121c13502f34" />
+							<children>
+								<node id="Lights">
+									<attribute id="AttachTo" type="int32" value="6" />
+									<attribute id="Id" type="guid" value="9a06a4f6-c977-4753-961d-121c13502f34" />
+									<attribute id="Name" type="LSString" value="Add2_Key1" />
+									<attribute id="TemplateId" type="guid" value="4ce0ec4b-5e2d-4e4c-90d8-646feddc9cb5" />
+									<attribute id="Type" type="uint8" value="1" />
+									<children>
+										<node id="Desc">
+											<children>
+												<node id="LightChannelFlags">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="uint8" value="16" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value=" 0.37  0.32  0.87 -3.11 &#xD;&#xA; 0.00  0.94 -0.35  3.05 &#xD;&#xA;-0.93  0.13  0.35 -1.54 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="670dc8d2-c3b7-44b9-b88b-dd9d8c8a2f4b" />
+							<children>
+								<node id="Lights">
+									<attribute id="AttachTo" type="int32" value="3" />
+									<attribute id="Id" type="guid" value="670dc8d2-c3b7-44b9-b88b-dd9d8c8a2f4b" />
+									<attribute id="Name" type="LSString" value="Pnt2_Rim1" />
+									<attribute id="TemplateId" type="guid" value="b70e0b8a-0b75-49b7-89f7-96c6908f79c8" />
+									<attribute id="Type" type="uint8" value="3" />
+									<children>
+										<node id="Desc" />
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value="-0.90 -0.11 -0.41  0.71 &#xD;&#xA; 0.05  0.94 -0.35  2.83 &#xD;&#xA; 0.42 -0.33 -0.84  3.38 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="f4cd882f-265e-4287-ad1f-34953ac05987" />
+							<children>
+								<node id="Lights">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="Id" type="guid" value="f4cd882f-265e-4287-ad1f-34953ac05987" />
+									<attribute id="Name" type="LSString" value="Add1_Rim2" />
+									<attribute id="TemplateId" type="guid" value="2ded2ca9-0b25-4bfe-96e4-cae58a8609e6" />
+									<attribute id="Type" type="uint8" value="3" />
+									<children>
+										<node id="Desc" />
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value="-0.25  0.24  0.94 -3.15 &#xD;&#xA; 0.00  0.97 -0.25  2.44 &#xD;&#xA;-0.97 -0.06 -0.24  0.76 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="43704713-aa7f-495a-ac83-8f16a5ba59bc" />
+							<children>
+								<node id="Lights">
+									<attribute id="AttachTo" type="int32" value="3" />
+									<attribute id="Id" type="guid" value="43704713-aa7f-495a-ac83-8f16a5ba59bc" />
+									<attribute id="Name" type="LSString" value="Pnt2_Rim2" />
+									<attribute id="TemplateId" type="guid" value="2ded2ca9-0b25-4bfe-96e4-cae58a8609e6" />
+									<attribute id="Type" type="uint8" value="3" />
+									<children>
+										<node id="Desc" />
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value="-0.28 -0.24 -0.93  2.77 &#xD;&#xA; 0.00  0.97 -0.25  2.47 &#xD;&#xA; 0.96 -0.07 -0.27  1.52 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="4920d324-c3be-4912-ac04-eb08f8d35c46" />
+							<children>
+								<node id="Lights">
+									<attribute id="AttachTo" type="int32" value="6" />
+									<attribute id="Id" type="guid" value="4920d324-c3be-4912-ac04-eb08f8d35c46" />
+									<attribute id="Name" type="LSString" value="Add2_Rim1" />
+									<attribute id="TemplateId" type="guid" value="b70e0b8a-0b75-49b7-89f7-96c6908f79c8" />
+									<attribute id="Type" type="uint8" value="3" />
+									<children>
+										<node id="Desc">
+											<children>
+												<node id="LightChannelFlags">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="uint8" value="16" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value="-1.00  0.02 -0.09  0.44 &#xD;&#xA; 0.05  0.94 -0.35  2.75 &#xD;&#xA; 0.08 -0.35 -0.93  3.28 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="9c46da32-73e5-42b2-a02d-e01c2b876fda" />
+							<children>
+								<node id="Lights">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="Id" type="guid" value="9c46da32-73e5-42b2-a02d-e01c2b876fda" />
+									<attribute id="Name" type="LSString" value="Addn_Rim1" />
+									<attribute id="TemplateId" type="guid" value="b70e0b8a-0b75-49b7-89f7-96c6908f79c8" />
+									<attribute id="Type" type="uint8" value="3" />
+									<children>
+										<node id="Desc">
+											<children>
+												<node id="LightChannelFlags">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="uint8" value="24" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value="-0.70  0.28  0.66 -2.43 &#xD;&#xA; 0.05  0.94 -0.35  2.68 &#xD;&#xA;-0.72 -0.21 -0.67  1.76 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="3319e6ec-09ad-4291-8008-92e440427131" />
+							<children>
+								<node id="Lights">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="Id" type="guid" value="3319e6ec-09ad-4291-8008-92e440427131" />
+									<attribute id="Name" type="LSString" value="Addn_Rim2" />
+									<attribute id="TemplateId" type="guid" value="2ded2ca9-0b25-4bfe-96e4-cae58a8609e6" />
+									<attribute id="Type" type="uint8" value="3" />
+									<children>
+										<node id="Desc">
+											<children>
+												<node id="LightChannelFlags">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="uint8" value="24" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value="-0.01  0.25  0.97 -3.26 &#xD;&#xA; 0.00  0.97 -0.25  2.46 &#xD;&#xA;-1.00 -0.00 -0.01 -0.83 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="31d8ee45-93fc-4508-a3f2-9fd3978578eb" />
+							<children>
+								<node id="Lights">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="Id" type="guid" value="31d8ee45-93fc-4508-a3f2-9fd3978578eb" />
+									<attribute id="Name" type="LSString" value="Addn_Key1" />
+									<attribute id="TemplateId" type="guid" value="4ce0ec4b-5e2d-4e4c-90d8-646feddc9cb5" />
+									<attribute id="Type" type="uint8" value="1" />
+									<children>
+										<node id="Desc">
+											<children>
+												<node id="LightChannelFlags">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="uint8" value="24" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value=" 0.99  0.04  0.10 -0.54 &#xD;&#xA; 0.00  0.94 -0.35  3.31 &#xD;&#xA;-0.11  0.35  0.93 -4.69 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="b85a389d-1fa6-4ba9-926c-90cfd8f179af" />
+							<children>
+								<node id="Lights">
+									<attribute id="AttachTo" type="int32" value="3" />
+									<attribute id="Id" type="guid" value="b85a389d-1fa6-4ba9-926c-90cfd8f179af" />
+									<attribute id="Name" type="LSString" value="Pnt2_Fill1" />
+									<attribute id="TemplateId" type="guid" value="74e806cf-622e-43d7-bfd3-f0cc69e9ce68" />
+									<attribute id="Type" type="uint8" value="2" />
+									<children>
+										<node id="Desc" />
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value=" 0.28 -0.15  0.95 -5.25 &#xD;&#xA; 0.03  0.99  0.14  0.73 &#xD;&#xA;-0.96 -0.01  0.29 -0.29 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="3c48d3da-9a5b-48f7-b60d-6154dd539c86" />
+							<children>
+								<node id="Lights">
+									<attribute id="AttachTo" type="int32" value="3" />
+									<attribute id="Id" type="guid" value="3c48d3da-9a5b-48f7-b60d-6154dd539c86" />
+									<attribute id="Name" type="LSString" value="Pnt2_Key1" />
+									<attribute id="TemplateId" type="guid" value="4ce0ec4b-5e2d-4e4c-90d8-646feddc9cb5" />
+									<attribute id="Type" type="uint8" value="1" />
+									<children>
+										<node id="Desc" />
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value=" 0.87 -0.18 -0.47  1.31 &#xD;&#xA; 0.00  0.93 -0.36  2.82 &#xD;&#xA; 0.50  0.31  0.81 -2.17 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="7e8ea78e-b4a9-4b3c-9e3e-402a14bbbff3" />
+							<children>
+								<node id="Lights">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="Id" type="guid" value="7e8ea78e-b4a9-4b3c-9e3e-402a14bbbff3" />
+									<attribute id="Name" type="LSString" value="Add1_Rim1" />
+									<attribute id="TemplateId" type="guid" value="b70e0b8a-0b75-49b7-89f7-96c6908f79c8" />
+									<attribute id="Type" type="uint8" value="3" />
+									<children>
+										<node id="Desc" />
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value="-0.77  0.25  0.58 -1.77 &#xD;&#xA; 0.05  0.94 -0.35  2.74 &#xD;&#xA;-0.63 -0.24 -0.74  2.33 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="d07f9004-8cfb-4c3e-a219-46bac0a8f6d2" />
+							<children>
+								<node id="Lights">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="Id" type="guid" value="d07f9004-8cfb-4c3e-a219-46bac0a8f6d2" />
+									<attribute id="Name" type="LSString" value="Addn_OTS_Rim2" />
+									<attribute id="TemplateId" type="guid" value="2ded2ca9-0b25-4bfe-96e4-cae58a8609e6" />
+									<attribute id="Type" type="uint8" value="3" />
+									<children>
+										<node id="Desc" />
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value=" 0.64  0.19  0.75 -2.95 &#xD;&#xA; 0.00  0.97 -0.25  2.75 &#xD;&#xA;-0.77  0.16  0.62 -2.80 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="TLActors">
+					<children>
+						<node id="TLActor">
+							<attribute id="ActorType" type="uint8" value="1" />
+							<attribute id="LookAtMode" type="uint8" value="4" />
+							<attribute id="LookAtSpeaker" type="int32" value="-267535682" />
+						</node>
+						<node id="TLActor">
+							<attribute id="ActorType" type="uint8" value="2" />
+							<attribute id="LookAtMode" type="uint8" value="4" />
+							<attribute id="LookAtSpeaker" type="int32" value="5" />
+							<attribute id="Pose" type="guid" value="7f6ccd67-aa7d-4803-ad7f-629c7783e83f" />
+							<attribute id="TargetBone" type="FixedString" value="Head_M" />
+							<attribute id="TemplateId" type="guid" value="ad9af97d-75da-406a-ae13-7071c563f604" />
+						</node>
+						<node id="TLActor">
+							<attribute id="ActorType" type="uint8" value="4" />
+							<attribute id="LightingChannel" type="uint8" value="2" />
+							<attribute id="LookAtMode" type="uint8" value="4" />
+							<attribute id="LookAtSpeaker" type="int32" value="-267535682" />
+							<attribute id="TemplateId" type="guid" value="c774d764-4a17-48dc-b470-32ace9ce447d" />
+							<children>
+								<node id="Transforms">
+									<children>
+										<node id="Object">
+											<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+											<attribute id="MapValue" type="mat4x4" value=" 0.99  0.00  0.14  0.69 &#xD;&#xA; 0.00  1.00  0.00  0.00 &#xD;&#xA;-0.14  0.00  0.99  1.56 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="TLActor">
+							<attribute id="ActorType" type="uint8" value="4" />
+							<attribute id="LightingChannel" type="uint8" value="2" />
+							<attribute id="LookAtMode" type="uint8" value="4" />
+							<attribute id="LookAtSpeaker" type="int32" value="5" />
+							<attribute id="TargetBone" type="FixedString" value="Head_M" />
+							<attribute id="TemplateId" type="guid" value="491a7686-3081-405b-983c-289ec8781e0a" />
+							<children>
+								<node id="Transforms">
+									<children>
+										<node id="Object">
+											<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+											<attribute id="MapValue" type="mat4x4" value=" 0.95  0.00  0.31  1.05 &#xD;&#xA; 0.00  1.00  0.00  0.00 &#xD;&#xA;-0.31  0.00  0.95  0.69 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="TLActor">
+							<attribute id="ActorType" type="uint8" value="4" />
+							<attribute id="LightingChannel" type="uint8" value="2" />
+							<attribute id="LookAtMode" type="uint8" value="4" />
+							<attribute id="LookAtSpeaker" type="int32" value="5" />
+							<attribute id="TargetBone" type="FixedString" value="Head_M" />
+							<attribute id="TemplateId" type="guid" value="c7c13742-bacd-460a-8f65-f864fe41f255" />
+							<children>
+								<node id="Transforms">
+									<children>
+										<node id="Object">
+											<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+											<attribute id="MapValue" type="mat4x4" value=" 0.99 -0.00 -0.15 -0.28 &#xD;&#xA; 0.00  1.00 -0.00  0.00 &#xD;&#xA; 0.15  0.00  0.99  1.65 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="TLActor">
+							<attribute id="ActorType" type="uint8" value="8" />
+							<attribute id="LightingChannel" type="uint8" value="3" />
+							<attribute id="LookAtMode" type="uint8" value="3" />
+							<attribute id="LookAtSpeaker" type="int32" value="1" />
+							<attribute id="Pose" type="guid" value="88f49c59-3a8c-49d7-b3e8-ed731abaafeb" />
+							<attribute id="TargetBone" type="FixedString" value="Head_M" />
+							<attribute id="TemplateId" type="guid" value="ad9af97d-75da-406a-ae13-7071c563f604" />
+						</node>
+						<node id="TLActor">
+							<attribute id="ActorType" type="uint8" value="8" />
+							<attribute id="LightingChannel" type="uint8" value="4" />
+							<attribute id="LookAtMode" type="uint8" value="3" />
+							<attribute id="LookAtSpeaker" type="int32" value="1" />
+							<attribute id="Pose" type="guid" value="88f49c59-3a8c-49d7-b3e8-ed731abaafeb" />
+							<attribute id="TargetBone" type="FixedString" value="Head_M" />
+							<attribute id="TemplateId" type="guid" value="4a405fba-3000-4c63-97e5-a8001ebb883c" />
+						</node>
+					</children>
+				</node>
+				<node id="TLCameras">
+					<children>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="47427c12-3322-468c-af7b-4d14904325ad" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="6" />
+									<attribute id="CameraType" type="uint8" value="2" />
+									<attribute id="Identifier" type="guid" value="47427c12-3322-468c-af7b-4d14904325ad" />
+									<attribute id="LookAt" type="int32" value="-2" />
+									<attribute id="Name" type="LSString" value="cam_subject2_MCU" />
+									<children>
+										<node id="LinkedLights">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="811f2bf7-8028-4b5a-b5a2-d8a52eb2213f" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="9a06a4f6-c977-4753-961d-121c13502f34" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="4920d324-c3be-4912-ac04-eb08f8d35c46" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="79143e66-ff4e-4bce-abfe-6272133906b6" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="8fc02530-77b1-40ea-9d28-13f21aab35db" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="1" />
+									<attribute id="CameraType" type="uint8" value="1" />
+									<attribute id="Identifier" type="guid" value="8fc02530-77b1-40ea-9d28-13f21aab35db" />
+									<attribute id="LookAt" type="int32" value="5" />
+									<attribute id="Name" type="LSString" value="cam_subject1_OTS_player" />
+									<children>
+										<node id="LinkedLights">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="2d85928c-0c89-4057-9d25-add163326de2" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="234a40d3-228b-4014-a318-ba22f0b91b98" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="7e8ea78e-b4a9-4b3c-9e3e-402a14bbbff3" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="f4cd882f-265e-4287-ad1f-34953ac05987" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="e8a1c81a-169f-46bc-ba24-0ffabdffab1a" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="d336de52-4168-4508-8e94-1d20221610aa" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="713afdfe-b48a-426d-af88-fe1d56b3e10a" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="91f8a6c2-bb2e-42c9-b57a-f5ac60e2f78b" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="cf234778-3373-48c9-8270-e52c00183a33" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="6" />
+									<attribute id="CameraType" type="uint8" value="1" />
+									<attribute id="Identifier" type="guid" value="cf234778-3373-48c9-8270-e52c00183a33" />
+									<attribute id="LookAt" type="int32" value="5" />
+									<attribute id="Name" type="LSString" value="cam_subject1_OTS_subject2" />
+									<children>
+										<node id="LinkedLights">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="dc27b0e5-09ed-434f-83ab-26093c7e86af" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="f152c6b8-71cc-42e4-ad14-aadc372efa29" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="aa775a34-6308-4207-a084-64a306a93090" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="234a40d3-228b-4014-a318-ba22f0b91b98" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="2d85928c-0c89-4057-9d25-add163326de2" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="7e8ea78e-b4a9-4b3c-9e3e-402a14bbbff3" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="f4cd882f-265e-4287-ad1f-34953ac05987" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="9a06a4f6-c977-4753-961d-121c13502f34" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="811f2bf7-8028-4b5a-b5a2-d8a52eb2213f" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="4920d324-c3be-4912-ac04-eb08f8d35c46" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="79143e66-ff4e-4bce-abfe-6272133906b6" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="b3a907cb-7bce-4218-b375-7bd557c341bf" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="1" />
+									<attribute id="Identifier" type="guid" value="b3a907cb-7bce-4218-b375-7bd557c341bf" />
+									<attribute id="LookAt" type="int32" value="5" />
+									<attribute id="Name" type="LSString" value="Q_cam_subject1_WIDEOTS_player" />
+									<children>
+										<node id="LinkedLights">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="e8a1c81a-169f-46bc-ba24-0ffabdffab1a" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="d336de52-4168-4508-8e94-1d20221610aa" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="713afdfe-b48a-426d-af88-fe1d56b3e10a" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="31d8ee45-93fc-4508-a3f2-9fd3978578eb" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="35db7fe2-92ca-4d61-aea9-85c50bee2064" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="9c46da32-73e5-42b2-a02d-e01c2b876fda" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="3319e6ec-09ad-4291-8008-92e440427131" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="91f8a6c2-bb2e-42c9-b57a-f5ac60e2f78b" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+										<node id="Tags">
+											<attribute id="Object" type="FixedString" value="Question Shot" />
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="66104bae-69df-4eae-9969-357a88f95e67" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="CameraType" type="uint8" value="1" />
+									<attribute id="Identifier" type="guid" value="66104bae-69df-4eae-9969-357a88f95e67" />
+									<attribute id="LookAt" type="int32" value="6" />
+									<attribute id="Name" type="LSString" value="cam_subject2_OTS_subject1" />
+									<children>
+										<node id="LinkedLights">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="dc27b0e5-09ed-434f-83ab-26093c7e86af" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="f152c6b8-71cc-42e4-ad14-aadc372efa29" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="1f90589f-23f7-4375-af4d-d11354da9c52" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="aa775a34-6308-4207-a084-64a306a93090" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="31d8ee45-93fc-4508-a3f2-9fd3978578eb" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="35db7fe2-92ca-4d61-aea9-85c50bee2064" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="9c46da32-73e5-42b2-a02d-e01c2b876fda" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="3319e6ec-09ad-4291-8008-92e440427131" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="79aefc5a-42e2-45ca-9617-798b77e9601d" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="1" />
+									<attribute id="Identifier" type="guid" value="79aefc5a-42e2-45ca-9617-798b77e9601d" />
+									<attribute id="LookAt" type="int32" value="5" />
+									<attribute id="Name" type="LSString" value="cam_subject1_OTSMID_player" />
+									<children>
+										<node id="LinkedLights">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="e8a1c81a-169f-46bc-ba24-0ffabdffab1a" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="d336de52-4168-4508-8e94-1d20221610aa" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="91f8a6c2-bb2e-42c9-b57a-f5ac60e2f78b" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="713afdfe-b48a-426d-af88-fe1d56b3e10a" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="31d8ee45-93fc-4508-a3f2-9fd3978578eb" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="35db7fe2-92ca-4d61-aea9-85c50bee2064" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="9c46da32-73e5-42b2-a02d-e01c2b876fda" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="3319e6ec-09ad-4291-8008-92e440427131" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="888d8727-7be8-41a1-b69b-fb51503c6b4e" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="CameraType" type="uint8" value="4" />
+									<attribute id="Identifier" type="guid" value="888d8727-7be8-41a1-b69b-fb51503c6b4e" />
+									<attribute id="LookAt" type="int32" value="-2" />
+									<attribute id="Name" type="LSString" value="cam_subject1_CUALT" />
+									<children>
+										<node id="LinkedLights">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="dc27b0e5-09ed-434f-83ab-26093c7e86af" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="f152c6b8-71cc-42e4-ad14-aadc372efa29" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="aa775a34-6308-4207-a084-64a306a93090" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="234a40d3-228b-4014-a318-ba22f0b91b98" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="2d85928c-0c89-4057-9d25-add163326de2" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="7e8ea78e-b4a9-4b3c-9e3e-402a14bbbff3" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="f4cd882f-265e-4287-ad1f-34953ac05987" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="190185b2-1b46-402d-9039-15d89b636d84" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="CameraType" type="uint8" value="4" />
+									<attribute id="Identifier" type="guid" value="190185b2-1b46-402d-9039-15d89b636d84" />
+									<attribute id="LookAt" type="int32" value="-2" />
+									<attribute id="Name" type="LSString" value="cam_subject1_CU" />
+									<children>
+										<node id="LinkedLights">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="1f90589f-23f7-4375-af4d-d11354da9c52" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="aa775a34-6308-4207-a084-64a306a93090" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="f152c6b8-71cc-42e4-ad14-aadc372efa29" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="dc27b0e5-09ed-434f-83ab-26093c7e86af" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="234a40d3-228b-4014-a318-ba22f0b91b98" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="2d85928c-0c89-4057-9d25-add163326de2" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="7e8ea78e-b4a9-4b3c-9e3e-402a14bbbff3" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="f4cd882f-265e-4287-ad1f-34953ac05987" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="80da8f9c-f837-4ed5-a68c-766158f96dc8" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="1" />
+									<attribute id="Identifier" type="guid" value="80da8f9c-f837-4ed5-a68c-766158f96dc8" />
+									<attribute id="IsDisabled" type="bool" value="True" />
+									<attribute id="Name" type="LSString" value="Camera 0" />
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="bbd7de87-d9dd-4861-a169-9658d8497173" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="6" />
+									<attribute id="CameraType" type="uint8" value="4" />
+									<attribute id="Identifier" type="guid" value="bbd7de87-d9dd-4861-a169-9658d8497173" />
+									<attribute id="LookAt" type="int32" value="-2" />
+									<attribute id="Name" type="LSString" value="cam_subject2_CU" />
+									<children>
+										<node id="LinkedLights">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="811f2bf7-8028-4b5a-b5a2-d8a52eb2213f" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="79143e66-ff4e-4bce-abfe-6272133906b6" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="9a06a4f6-c977-4753-961d-121c13502f34" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="4920d324-c3be-4912-ac04-eb08f8d35c46" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="0f2d6032-e5f2-4594-ad50-d2ff5ca38e57" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="1" />
+									<attribute id="Identifier" type="guid" value="0f2d6032-e5f2-4594-ad50-d2ff5ca38e57" />
+									<attribute id="IsDisabled" type="bool" value="True" />
+									<attribute id="Name" type="LSString" value="Camera 1" />
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="62dc4211-3d45-4e20-b6bc-62e18087b085" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="CameraType" type="uint8" value="2" />
+									<attribute id="Identifier" type="guid" value="62dc4211-3d45-4e20-b6bc-62e18087b085" />
+									<attribute id="LookAt" type="int32" value="-2" />
+									<attribute id="Name" type="LSString" value="cam_subject1_MCU" />
+									<children>
+										<node id="LinkedLights">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="dc27b0e5-09ed-434f-83ab-26093c7e86af" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="f152c6b8-71cc-42e4-ad14-aadc372efa29" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="1f90589f-23f7-4375-af4d-d11354da9c52" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="aa775a34-6308-4207-a084-64a306a93090" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="234a40d3-228b-4014-a318-ba22f0b91b98" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="2d85928c-0c89-4057-9d25-add163326de2" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="7e8ea78e-b4a9-4b3c-9e3e-402a14bbbff3" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="f4cd882f-265e-4287-ad1f-34953ac05987" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="ddfb863d-2376-4882-8d26-6a7f95eed0ca" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="Identifier" type="guid" value="ddfb863d-2376-4882-8d26-6a7f95eed0ca" />
+									<attribute id="LookAt" type="int32" value="1" />
+									<attribute id="Name" type="LSString" value="Q_cam_player_WIDEOTS_subject1" />
+									<children>
+										<node id="LinkedLights">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="84e3bee8-d80a-43d4-a57c-0e163ff01b46" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="e11d9edc-cd86-4e99-9803-25ac3ddac7bf" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="f507f78c-a6e4-4aba-a2b6-b99a2f648c20" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="02bfef0e-efe7-47ec-8d5b-87dbb929dc63" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="1ab6a64d-9700-4ac3-a2a6-45068851ef6a" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="7a8f5148-36d2-47e0-a544-ac5f287f74d2" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="d07f9004-8cfb-4c3e-a219-46bac0a8f6d2" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="774d3887-cdf8-4b56-b803-1ccbc388c306" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="8fba4a64-261f-4d3d-acbe-2b517bf4aeea" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="0991db42-4283-487a-8016-5f5ffdad00fa" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="d0a9f1db-b9e1-43dd-936d-3d51d7568bf3" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="e6c61ebc-1889-4533-b370-7fa1ea69d2a7" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+										<node id="Tags">
+											<attribute id="Object" type="FixedString" value="Question Shot" />
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="152f3698-5755-4edf-8155-d9e9abf3e568" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="Identifier" type="guid" value="152f3698-5755-4edf-8155-d9e9abf3e568" />
+									<attribute id="LookAt" type="int32" value="6" />
+									<attribute id="Name" type="LSString" value="Q_cam_subjectsALL_OTS_subject1" />
+									<children>
+										<node id="LinkedLights">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="dc27b0e5-09ed-434f-83ab-26093c7e86af" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="f152c6b8-71cc-42e4-ad14-aadc372efa29" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="1f90589f-23f7-4375-af4d-d11354da9c52" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="aa775a34-6308-4207-a084-64a306a93090" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="31d8ee45-93fc-4508-a3f2-9fd3978578eb" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="35db7fe2-92ca-4d61-aea9-85c50bee2064" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="9c46da32-73e5-42b2-a02d-e01c2b876fda" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="3319e6ec-09ad-4291-8008-92e440427131" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+										<node id="Tags">
+											<attribute id="Object" type="FixedString" value="Question Shot" />
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="2e3a173a-44b8-453c-9be4-60e2502ae831" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="6" />
+									<attribute id="CameraType" type="uint8" value="4" />
+									<attribute id="Identifier" type="guid" value="2e3a173a-44b8-453c-9be4-60e2502ae831" />
+									<attribute id="LookAt" type="int32" value="-2" />
+									<attribute id="Name" type="LSString" value="cam_subject2_CUALT" />
+									<children>
+										<node id="LinkedLights">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="811f2bf7-8028-4b5a-b5a2-d8a52eb2213f" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="9a06a4f6-c977-4753-961d-121c13502f34" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="4920d324-c3be-4912-ac04-eb08f8d35c46" />
+														</node>
+														<node id="MapValue">
+															<attribute id="Object" type="guid" value="79143e66-ff4e-4bce-abfe-6272133906b6" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="TLInheritedScenes">
+					<children>
+						<node id="TLScene">
+							<attribute id="Object" type="string" value="Public/Shared/Timeline/Scenes/Default/bnz_standing_Px2_Shipping.lsx" />
+						</node>
+						<node id="TLScene">
+							<attribute id="Object" type="string" value="Public/Shared/Timeline/Scenes/Default/LightingSetup/EXT_NOON_VALIDATE/_Base_EXT_NOON_VALIDATE_Px1_Shipping.lsx" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

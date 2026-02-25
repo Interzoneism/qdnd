@@ -1,0 +1,2074 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="AnimationBlueprintBank">
+		<node id="AnimationBlueprintBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="8c545f8d-09a6-4279-cc7a-bbd4048cd0c9" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="f06ea22c-3d9e-be4a-9795-8521f54455a6" />
+					<attribute id="SourceFile" type="LSString" value="Editor/Mods/Shared/Assets/Blueprints/Characters_Creatures_NoIK.lsabp" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725668" />
+					<children>
+						<node id="Params" />
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="CharacterVisualBank">
+		<node id="CharacterVisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="BaseVisual" type="FixedString" value="9baeaa37-5177-b447-eee9-840bc4feb475" />
+					<attribute id="BodySetVisual" type="FixedString" value="dd87046b-0266-397b-af43-68fe691b3eb2" />
+					<attribute id="ID" type="FixedString" value="71251d39-8e28-2b2a-d86b-156efaff9dae" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Body_A" />
+					<attribute id="ShowEquipmentVisuals" type="bool" value="False" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725668" />
+					<children>
+						<node id="MaterialOverrides">
+							<attribute id="MaterialResource" type="FixedString" value="" />
+							<children>
+								<node id="ColorPreset">
+									<attribute id="ForcePresetValues" type="bool" value="False" />
+									<attribute id="GroupName" type="FixedString" value="" />
+									<attribute id="MaterialPresetResource" type="FixedString" value="" />
+								</node>
+								<node id="MaterialPresets" />
+								<node id="ScalarParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="SphereMask_Radius" />
+									<attribute id="Value" type="float" value="1" />
+								</node>
+								<node id="ScalarParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="SphereMask_Intensity" />
+									<attribute id="Value" type="float" value="1.5" />
+								</node>
+								<node id="ScalarParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="FresnelScroll_Speed" />
+									<attribute id="Value" type="float" value="-0.5" />
+								</node>
+								<node id="ScalarParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="FresnelBorder_Power" />
+									<attribute id="Value" type="float" value="1" />
+								</node>
+								<node id="ScalarParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="FresnelBorder_Mult" />
+									<attribute id="Value" type="float" value="1" />
+								</node>
+								<node id="ScalarParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="OpacityMult" />
+									<attribute id="Value" type="float" value="5" />
+								</node>
+								<node id="ScalarParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="Fade_Distance" />
+									<attribute id="Value" type="float" value="1" />
+								</node>
+								<node id="ScalarParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="GradientMap_Contrast" />
+									<attribute id="Value" type="float" value="1" />
+								</node>
+								<node id="ScalarParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="EmissiveMult" />
+									<attribute id="Value" type="float" value="5" />
+								</node>
+								<node id="Vector3Parameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="BonePosition_Offset" />
+									<attribute id="Value" type="fvec3" value="0 2 0" />
+								</node>
+								<node id="Vector3Parameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="BonePosition" />
+									<attribute id="Value" type="fvec3" value="0 0 0" />
+								</node>
+								<node id="VectorParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="DynamicParameter" />
+									<attribute id="Value" type="fvec4" value="1 1 1 1" />
+								</node>
+								<node id="VectorParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="Color" />
+									<attribute id="Value" type="fvec4" value="1 1 1 1" />
+								</node>
+							</children>
+						</node>
+						<node id="RealMaterialOverrides" />
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="SkeletonBank">
+		<node id="SkeletonBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="DynamicPhysicsResourceID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="ID" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="IKRigResourceID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Base" />
+					<attribute id="PreviewAnimationResource" type="FixedString" value="" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RagdollResourceID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Base.GR2" />
+					<attribute id="SpringResourceID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Base.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209015" />
+					<children>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_StatusFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_HeadFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Blade_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+									<attribute id="SoundObjectIndex" type="uint8" value="4" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_WingFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_ChestFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_R_Foot_01" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Handle6_M_Endjoint" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Handle5_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Handle4_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Handle3_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Handle2_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_BodyFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="3" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Handle1_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Root_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+									<attribute id="SoundObjectIndex" type="uint8" value="0" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_CastFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Custom_Anim" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_FollowPhysics" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_HitImpactFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Playerlight" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_OverheadFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Root" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_Playerlight" />
+							<attribute id="BoneConstraint" type="FixedString" value="Root_M" />
+							<attribute id="ConstraintsPos" type="uint16" value="7" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_Light_NPC_1" />
+							<attribute id="Transform" type="mat4x4" value=" 1.00  0.00  0.00  0.00 &#xD;&#xA; 0.00  0.91 -0.42 -0.72 &#xD;&#xA; 0.00  0.42  0.91 -0.60 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_Playerlight" />
+							<attribute id="BoneConstraint" type="FixedString" value="Root_M" />
+							<attribute id="ConstraintsPos" type="uint16" value="7" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_Light_NPC_2" />
+							<attribute id="Transform" type="mat4x4" value=" 0.87  0.17 -0.47  0.50 &#xD;&#xA; 0.00 -0.94 -0.34 -0.92 &#xD;&#xA;-0.50  0.30 -0.81  0.60 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_Playerlight" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="7" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_Light_Player" />
+							<attribute id="Transform" type="mat4x4" value="-1.00  0.00 -0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 -0.70 &#xD;&#xA; 0.00  0.00 -1.00  0.00 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_Playerlight" />
+							<attribute id="BoneConstraint" type="FixedString" value="Root_M" />
+							<attribute id="ConstraintsPos" type="uint16" value="7" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_Light_NPC_3" />
+							<attribute id="Transform" type="mat4x4" value=" 0.87 -0.17  0.47 -0.50 &#xD;&#xA; 0.00 -0.94 -0.34 -0.92 &#xD;&#xA; 0.50  0.30 -0.81  0.60 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_HeadFX" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_CombatLookAt" />
+							<attribute id="Transform" type="mat4x4" value="-0.00  0.00 -1.00 -0.00 &#xD;&#xA; 1.00 -0.01 -0.00 -0.24 &#xD;&#xA;-0.01 -1.00 -0.00 -0.15 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_HeadFX" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_HeadFX" />
+							<attribute id="Transform" type="mat4x4" value=" 1.00 -0.00 -0.00 -0.00 &#xD;&#xA; 0.00  1.00 -0.00 -0.25 &#xD;&#xA; 0.00  0.00  1.00 -0.04 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_HeadFX" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_CinematicLookAt" />
+							<attribute id="Transform" type="mat4x4" value="-0.00  0.00 -1.00 -0.00 &#xD;&#xA; 1.00 -0.01 -0.00 -0.26 &#xD;&#xA;-0.01 -1.00 -0.00 -0.02 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Root_M" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_Light_Root" />
+							<attribute id="Transform" type="mat4x4" value="-0.00  0.00 -1.00  0.00 &#xD;&#xA;-1.00 -0.03  0.00 -0.83 &#xD;&#xA;-0.03  1.00  0.00  0.00 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_Root" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_DIAG_Camera" />
+							<attribute id="Transform" type="mat4x4" value=" 1.00  0.00  0.00 -0.28 &#xD;&#xA; 0.00  1.00  0.00  2.01 &#xD;&#xA; 0.00  0.00  1.00  0.08 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_Root" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_COMBAT_Camera" />
+							<attribute id="Transform" type="mat4x4" value=" 1.00  0.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00  0.90 &#xD;&#xA; 0.00  0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationSetBank">
+		<node id="AnimationSetBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="18b9235c-1a11-376a-8a3c-9f8342e80a8d" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144959613005988540" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets">
+											<children>
+												<node id="Object">
+													<attribute id="FallBackSubSet" type="FixedString" value="" />
+													<attribute id="MapKey" type="FixedString" value="" />
+													<children>
+														<node id="Animation">
+															<children>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9a754fd-af9f-0d95-3357-721e8fa35689" />
+																	<attribute id="MapKey" type="FixedString" value="b5cb923d-0c08-4c20-89a9-44b9bf98c6cb" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9d050efc-28c7-35d6-42dc-fa343a74793b" />
+																	<attribute id="MapKey" type="FixedString" value="0449ace0-eb64-4a23-942e-591130a0424c" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="8aa64dee-f47e-2a6d-102d-e31066f9e996" />
+																	<attribute id="MapKey" type="FixedString" value="f8fe2e89-2313-48f7-963c-0907b6306fd1" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c1ca1a02-d0d2-ddc5-f4b6-1bbb24388a2b" />
+																	<attribute id="MapKey" type="FixedString" value="ac61dc44-d236-4d19-920c-31ab9dd5a993" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="299cddcd-4045-679a-a54c-48ada4258d73" />
+																	<attribute id="MapKey" type="FixedString" value="8dccb0f6-24e3-44b7-a60b-1f217b7db523" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5d4caa6a-1439-0a63-9b7c-65d96dfb566c" />
+																	<attribute id="MapKey" type="FixedString" value="a55420a8-13f4-4a95-a94a-45e14322064f" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="fab3e1f4-f614-dc19-f022-467f5cc263b1" />
+																	<attribute id="MapKey" type="FixedString" value="6495ac74-6183-41a4-8d3c-add157dd97a2" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f49bd700-ad6e-76e7-2cf1-71fac115bb66" />
+																	<attribute id="MapKey" type="FixedString" value="2b81c18b-9698-4262-a623-932c2bb1296d" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="ac82ffa0-e57a-bb82-7f5a-ad417c220c30" />
+																	<attribute id="MapKey" type="FixedString" value="9f2d32b9-529a-4b75-b3df-6e1ae1395280" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9d050efc-28c7-35d6-42dc-fa343a74793b" />
+																	<attribute id="MapKey" type="FixedString" value="27ec0fe8-6400-4429-b378-465c487ffbf7" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="282a238b-910a-cff3-7374-ce09a1b40443" />
+																	<attribute id="MapKey" type="FixedString" value="50398f4e-dd82-4d6a-ad43-aedd578543d9" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="32f28062-2b7f-b67b-48f1-9f60927c98be" />
+																	<attribute id="MapKey" type="FixedString" value="8ee67630-f1c7-441d-aaf6-fa4633c890da" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9d050efc-28c7-35d6-42dc-fa343a74793b" />
+																	<attribute id="MapKey" type="FixedString" value="79261934-8627-4c47-947d-446ac04bca3d" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="3db2270b-516b-9caf-9d24-faa8325fe7ce" />
+																	<attribute id="MapKey" type="FixedString" value="ba86edb7-a943-4463-97c8-dd06064845cb" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="189efc8e-7dde-a7ef-c4af-c9925769594b" />
+																	<attribute id="MapKey" type="FixedString" value="510ff37e-0618-40e4-8ce0-236e3dc9c291" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9a754fd-af9f-0d95-3357-721e8fa35689" />
+																	<attribute id="MapKey" type="FixedString" value="e8a5c57f-855b-4227-acaa-11e8ce8d7d64" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="b42a9cde-0e9a-f2a8-f7eb-2079e7cee45c" />
+																	<attribute id="MapKey" type="FixedString" value="b5d99946-0646-4bdd-88a0-9604872a0dd9" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="0ae872a0-7193-178b-c606-14e1a6531d7f" />
+																	<attribute id="MapKey" type="FixedString" value="06a9866d-0206-4016-a7ee-f124a623d73c" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9d050efc-28c7-35d6-42dc-fa343a74793b" />
+																	<attribute id="MapKey" type="FixedString" value="e312459b-34d3-4612-8dee-fc41901caa04" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="bee8b203-d5fe-d6db-9db4-76b9e14c1790" />
+																	<attribute id="MapKey" type="FixedString" value="a2e3711c-1115-4971-9dbf-b657f09e9d47" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="ba7f9a0a-d4ec-a4c2-26be-2d2b409abfba" />
+																	<attribute id="MapKey" type="FixedString" value="0036dd28-0484-47fd-87bd-efa6af2b9f85" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5d4caa6a-1439-0a63-9b7c-65d96dfb566c" />
+																	<attribute id="MapKey" type="FixedString" value="1c8a18b6-75a5-45b2-b48c-3bf6467bc5a3" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="e6d5a799-ed12-bb98-fa16-3747dd1ef228" />
+																	<attribute id="MapKey" type="FixedString" value="f4ac302b-1569-404f-bd52-1fe443e265df" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="4f1ec82d-cc3e-a4b5-e35d-3f9fad88de00" />
+																	<attribute id="MapKey" type="FixedString" value="e22702f5-04d5-41a1-97ac-9b9f6b317d98" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="6e35cdaf-0281-ec55-aecd-4ad084189800" />
+																	<attribute id="MapKey" type="FixedString" value="c2da4fe4-0870-4c0a-b7af-3a51e9b8dc91" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="b0c7c522-70f3-4c82-8773-f131ce33c703" />
+																	<attribute id="MapKey" type="FixedString" value="5f127742-79d4-4590-839f-6eb5ae45930d" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="ac82ffa0-e57a-bb82-7f5a-ad417c220c30" />
+																	<attribute id="MapKey" type="FixedString" value="366693ee-d97f-4294-a4dd-a2145ddc4e6a" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9d050efc-28c7-35d6-42dc-fa343a74793b" />
+																	<attribute id="MapKey" type="FixedString" value="395fc3ee-59ab-4114-9b91-ad536473acfd" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="17d8aedd-9f07-e1d1-ccda-d0ccad51d62e" />
+																	<attribute id="MapKey" type="FixedString" value="a508bef8-6767-4560-ac3a-6c04132c825e" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5d4caa6a-1439-0a63-9b7c-65d96dfb566c" />
+																	<attribute id="MapKey" type="FixedString" value="9c46b703-a5fa-4c4b-af27-1d5bb6f075f1" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="047d8843-b971-c505-0503-9890455ca6c9" />
+																	<attribute id="MapKey" type="FixedString" value="925779e7-8bf6-4d56-8c4d-42c3bc01c60c" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="3e2a769c-a841-0aac-2abf-f790323db8b6" />
+																	<attribute id="MapKey" type="FixedString" value="15c8c8f4-b6a2-40bd-99b5-1360bdb0f74a" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9d050efc-28c7-35d6-42dc-fa343a74793b" />
+																	<attribute id="MapKey" type="FixedString" value="a443a68d-5c8a-4ce2-8c41-0270fedcf946" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="3db2270b-516b-9caf-9d24-faa8325fe7ce" />
+																	<attribute id="MapKey" type="FixedString" value="b47955ba-760c-4e20-a1f0-db25ab1c54c3" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="776a9b27-baac-fb31-7da8-600b3cbe09a6" />
+																	<attribute id="MapKey" type="FixedString" value="9acc8342-26ac-48ac-b569-18c07296456b" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="8c579c33-9ed9-a7b5-a4ef-d0573ae24b43" />
+																	<attribute id="MapKey" type="FixedString" value="50696db7-d931-4734-915d-32d038ba99a5" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="a578504c-b644-8a58-43bd-011d18bd8e4c" />
+																	<attribute id="MapKey" type="FixedString" value="0b07883a-08b8-43b6-ac18-84dc9e84ff50" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5d4caa6a-1439-0a63-9b7c-65d96dfb566c" />
+																	<attribute id="MapKey" type="FixedString" value="aac72f3d-a308-40cb-97d9-7fc8116e1456" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5d4caa6a-1439-0a63-9b7c-65d96dfb566c" />
+																	<attribute id="MapKey" type="FixedString" value="a7323180-3349-4387-81f6-6eaac3f2a86f" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9d050efc-28c7-35d6-42dc-fa343a74793b" />
+																	<attribute id="MapKey" type="FixedString" value="a1d88cbd-58a1-40ba-b13e-6dd4d78d18ba" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="523e633e-5e86-81dd-8902-1d89f92d2615" />
+																	<attribute id="MapKey" type="FixedString" value="78eb825c-cf79-46c9-bb59-11a3df7b29f9" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5d4caa6a-1439-0a63-9b7c-65d96dfb566c" />
+																	<attribute id="MapKey" type="FixedString" value="8b71666d-a69a-4c54-ae41-20ce3fa0e003" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="51dc3cb2-8644-e201-b84c-d24afc3cc9f5" />
+																	<attribute id="MapKey" type="FixedString" value="de006e3f-70fb-4eb7-a98d-d845d15b20e8" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="ac82ffa0-e57a-bb82-7f5a-ad417c220c30" />
+																	<attribute id="MapKey" type="FixedString" value="6606c30b-be1c-4f17-ae6b-1a591c80b18c" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5d4caa6a-1439-0a63-9b7c-65d96dfb566c" />
+																	<attribute id="MapKey" type="FixedString" value="b7af239e-87fe-4ef6-8e6c-f124350fab58" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9d050efc-28c7-35d6-42dc-fa343a74793b" />
+																	<attribute id="MapKey" type="FixedString" value="91dc33c9-0871-4529-ac01-a068f4cd51f3" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="3bef2283-e212-37c7-d02f-8bbd6df8f396" />
+																	<attribute id="MapKey" type="FixedString" value="5df11e35-f081-44f7-bd6f-7049d0e533cd" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="056630ab-6bd8-5fd8-3421-79439c398b41" />
+																	<attribute id="MapKey" type="FixedString" value="7def448c-ee51-48da-a683-e8f8992efb82" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9d050efc-28c7-35d6-42dc-fa343a74793b" />
+																	<attribute id="MapKey" type="FixedString" value="0e5e02b3-a4ca-4d5b-bb42-71b097887a18" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f7327787-a726-14a0-e0a0-2e1d037fe8ae" />
+																	<attribute id="MapKey" type="FixedString" value="f49c1788-7819-481f-9b83-2344d708e682" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="ff51f6c3-58b3-a906-83ec-b1597e9f6cab" />
+																	<attribute id="MapKey" type="FixedString" value="4ae452d5-4a2e-471a-bc98-907c9ca6c523" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5d4caa6a-1439-0a63-9b7c-65d96dfb566c" />
+																	<attribute id="MapKey" type="FixedString" value="117941c9-1d06-46d2-8d77-941b13aaacf2" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9d050efc-28c7-35d6-42dc-fa343a74793b" />
+																	<attribute id="MapKey" type="FixedString" value="d326ed36-d633-4414-a1ff-68227e9d3c5c" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="0243f41e-c363-eb39-6ca4-7137862f50e5" />
+																	<attribute id="MapKey" type="FixedString" value="5abe3725-c152-42de-98c8-0dbf872e1ff2" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="731ae151-70c7-49c3-8f36-a99b0b2f0d11" />
+																	<attribute id="MapKey" type="FixedString" value="cf3f0e09-1a9e-430d-8be2-7a4c0c8a875e" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c6a13aec-c0cb-898a-3f08-ea71d6227bd5" />
+																	<attribute id="MapKey" type="FixedString" value="b4960ceb-1b52-40e4-9253-5bc673d8ec21" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="1d94a5d1-2796-afe7-7662-92cf4a59e67c" />
+																	<attribute id="MapKey" type="FixedString" value="8b8bb757-21ce-4e02-a2f3-97d55cf2f90b" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5d4caa6a-1439-0a63-9b7c-65d96dfb566c" />
+																	<attribute id="MapKey" type="FixedString" value="718dd26b-d222-4e81-940e-7f2092957b36" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="97a77a02-69cb-6504-4b8f-d419cdb7c6e8" />
+																	<attribute id="MapKey" type="FixedString" value="07e81afc-95c4-452b-ac68-5cbb74710cca" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f61e1544-ae11-8d12-cb45-4d54802d3aa9" />
+																	<attribute id="MapKey" type="FixedString" value="5dcdcc4c-3744-451f-b5cf-ed96664481cc" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="e6d5a799-ed12-bb98-fa16-3747dd1ef228" />
+																	<attribute id="MapKey" type="FixedString" value="79323098-edb3-4993-ba50-9b5f705e9878" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9d050efc-28c7-35d6-42dc-fa343a74793b" />
+																	<attribute id="MapKey" type="FixedString" value="8145f891-e1f3-4510-b166-d974ef1c3896" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="76d75042-badd-fd9b-b12a-d91255abfe6f" />
+																	<attribute id="MapKey" type="FixedString" value="499dcaab-6c66-4f32-8e42-a4f9b6cf9f87" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="a9597791-6d7e-a1a0-4f4a-0210415bfe30" />
+																	<attribute id="MapKey" type="FixedString" value="ff165c3d-2b23-4f79-a592-3b7799574494" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="dad2244a-df89-f68e-c25c-8b8790a4ed27" />
+																	<attribute id="MapKey" type="FixedString" value="1c343e00-7e6c-4f53-b588-074a3cdb9c7d" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="7c9c87cd-dd19-bce4-9c9e-f3b51d19f45f" />
+																	<attribute id="MapKey" type="FixedString" value="9583ecee-cf6c-4735-86db-7ebf1df15eae" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="ff51f6c3-58b3-a906-83ec-b1597e9f6cab" />
+																	<attribute id="MapKey" type="FixedString" value="c36a9627-a348-4cca-abcf-206b29c791b9" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9d050efc-28c7-35d6-42dc-fa343a74793b" />
+																	<attribute id="MapKey" type="FixedString" value="ac3b79de-641b-4f12-8e79-a2cc6e6a79e9" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="731ae151-70c7-49c3-8f36-a99b0b2f0d11" />
+																	<attribute id="MapKey" type="FixedString" value="6e1041c4-7e59-45c4-8ad9-e47480b95020" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="cff4b467-6d4a-8039-56c3-813dd11bb42f" />
+																	<attribute id="MapKey" type="FixedString" value="821aed88-e17b-4b85-b37a-533f90fbba84" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5d4caa6a-1439-0a63-9b7c-65d96dfb566c" />
+																	<attribute id="MapKey" type="FixedString" value="3c246fb9-66c9-48ab-b2e8-a04388bd29ac" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9d050efc-28c7-35d6-42dc-fa343a74793b" />
+																	<attribute id="MapKey" type="FixedString" value="cf27f269-3d43-4bfa-b370-e48d27ab2d0e" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9a754fd-af9f-0d95-3357-721e8fa35689" />
+																	<attribute id="MapKey" type="FixedString" value="6282d127-0c06-4365-9d53-6f32ef350127" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9d050efc-28c7-35d6-42dc-fa343a74793b" />
+																	<attribute id="MapKey" type="FixedString" value="187e51d5-edd6-431f-84fe-eff84ecf1750" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="6d139aae-ba4a-3701-7405-583547f3fb1c" />
+																	<attribute id="MapKey" type="FixedString" value="b6bebde2-ecff-4df6-9d24-cd9fabb9fe79" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="0c84181e-cb4d-7670-f04c-b5a4131901c7" />
+																	<attribute id="MapKey" type="FixedString" value="af84b904-33ad-49fb-8693-8e62917ffe19" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="fb5414e1-d9e9-9658-c62b-f24da3825f67" />
+																	<attribute id="MapKey" type="FixedString" value="7bb52cd4-0b1c-4926-9165-fa92b75876a3" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5d4caa6a-1439-0a63-9b7c-65d96dfb566c" />
+																	<attribute id="MapKey" type="FixedString" value="577bcf78-3d3d-4bc3-a064-fc59b2280153" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="315691f7-9c1a-ba9f-94c1-717263ed3941" />
+																	<attribute id="MapKey" type="FixedString" value="6dd3d472-9e11-47bf-8f7a-04e75ffe6c26" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="3bc3c8ac-2103-d25d-6ec4-5008a86b897f" />
+																	<attribute id="MapKey" type="FixedString" value="881e6512-732b-48d1-9606-e235bcf97e50" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="e6d5a799-ed12-bb98-fa16-3747dd1ef228" />
+																	<attribute id="MapKey" type="FixedString" value="479ee5da-2967-41e1-b7d1-a94e864a5f25" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9d050efc-28c7-35d6-42dc-fa343a74793b" />
+																	<attribute id="MapKey" type="FixedString" value="9214185e-c1ae-4e4b-838d-977b8588bd7a" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="2f89030f-0b67-de33-aa98-75e867ae2a05" />
+																	<attribute id="MapKey" type="FixedString" value="5001386e-fe1f-4546-b27c-6afac88eeb0b" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="ff51f6c3-58b3-a906-83ec-b1597e9f6cab" />
+																	<attribute id="MapKey" type="FixedString" value="851b5331-cdf5-4888-97e3-a9c45988eac4" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="4c5fb52c-f0b7-e756-b032-207fc89ebdfa" />
+																	<attribute id="MapKey" type="FixedString" value="8074af60-e984-4622-b824-aafc26f283e9" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9d050efc-28c7-35d6-42dc-fa343a74793b" />
+																	<attribute id="MapKey" type="FixedString" value="6f188c33-cc0e-4515-804e-8c6cf5e97f26" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="3db2270b-516b-9caf-9d24-faa8325fe7ce" />
+																	<attribute id="MapKey" type="FixedString" value="89c858e3-da44-45cd-9197-0fa1698f2ca1" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c8bb9a65-414d-e29b-a0fa-d1eba4b71cfc" />
+																	<attribute id="MapKey" type="FixedString" value="0532ad73-988e-4b70-bb96-434bb2532bad" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationBank">
+		<node id="AnimationBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.23333335" />
+					<attribute id="ID" type="FixedString" value="0243f41e-c363-eb39-6ca4-7137862f50e5" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Cancel" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Cancel.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Cancel.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.13333334" />
+					<attribute id="ID" type="FixedString" value="047d8843-b971-c505-0503-9890455ca6c9" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_Dash_01_Antic" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Dash_01_Antic.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Dash_01_Antic.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="8.3" />
+					<attribute id="ID" type="FixedString" value="056630ab-6bd8-5fd8-3421-79439c398b41" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_IDLE_Still_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_IDLE_Still_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_IDLE_Still_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.9333334" />
+					<attribute id="ID" type="FixedString" value="0ae872a0-7193-178b-c606-14e1a6531d7f" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_REAC_Hit_B_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_REAC_Hit_B_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_REAC_Hit_B_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.2" />
+					<attribute id="ID" type="FixedString" value="0c84181e-cb4d-7670-f04c-b5a4131901c7" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_Peace_01_Landing" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_Peace_01_Landing.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_Peace_01_Landing.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.26666668" />
+					<attribute id="ID" type="FixedString" value="17d8aedd-9f07-e1d1-ccda-d0ccad51d62e" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_TakeOff" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_TakeOff.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_TakeOff.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.4" />
+					<attribute id="ID" type="FixedString" value="189efc8e-7dde-a7ef-c4af-c9925769594b" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_UTIL_Spawn_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_UTIL_Spawn_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_UTIL_Spawn_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.3" />
+					<attribute id="ID" type="FixedString" value="1d94a5d1-2796-afe7-7662-92cf4a59e67c" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Prepare" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Prepare.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Prepare.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.06666667" />
+					<attribute id="ID" type="FixedString" value="282a238b-910a-cff3-7374-ce09a1b40443" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_Dash_01_Attack" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Dash_01_Attack.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Dash_01_Attack.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209029" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Cast" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="8" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="React" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="15" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.86666673" />
+					<attribute id="ID" type="FixedString" value="299cddcd-4045-679a-a54c-48ada4258d73" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_Combat_01_Landing" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_Combat_01_Landing.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_Combat_01_Landing.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.6666667" />
+					<attribute id="ID" type="FixedString" value="2f89030f-0b67-de33-aa98-75e867ae2a05" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_PitchU" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_PitchU.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_PitchU.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.966667" />
+					<attribute id="ID" type="FixedString" value="315691f7-9c1a-ba9f-94c1-717263ed3941" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_IDLE_Random_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_IDLE_Random_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_IDLE_Random_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.53333336" />
+					<attribute id="ID" type="FixedString" value="32f28062-2b7f-b67b-48f1-9f60927c98be" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Ascend" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Ascend.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Ascend.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.90000004" />
+					<attribute id="ID" type="FixedString" value="3bc3c8ac-2103-d25d-6ec4-5008a86b897f" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_REAC_Dodge_F_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_REAC_Dodge_F_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_REAC_Dodge_F_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.40000004" />
+					<attribute id="ID" type="FixedString" value="3bef2283-e212-37c7-d02f-8bbd6df8f396" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_Cast" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_Cast.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_Cast.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209031" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="React" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="15" />
+							<attribute id="Time" type="float" value="0.14113379" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Cast" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="8" />
+							<attribute id="Time" type="float" value="0.30113384" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.73333335" />
+					<attribute id="ID" type="FixedString" value="3db2270b-516b-9caf-9d24-faa8325fe7ce" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_Peace_01_Recover" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_Peace_01_Recover.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_Peace_01_Recover.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.3" />
+					<attribute id="ID" type="FixedString" value="3e2a769c-a841-0aac-2abf-f790323db8b6" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Victory_End" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Victory_End.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Victory_End.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Sheathed_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="0" />
+							<attribute id="Time" type="float" value="0.18829933" />
+							<attribute id="Track" type="uint8" value="0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.26666668" />
+					<attribute id="ID" type="FixedString" value="4c5fb52c-f0b7-e756-b032-207fc89ebdfa" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Victory_Start" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Victory_Start.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Victory_Start.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.6666667" />
+					<attribute id="ID" type="FixedString" value="4f1ec82d-cc3e-a4b5-e35d-3f9fad88de00" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_Loop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_Loop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_Loop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.1666667" />
+					<attribute id="ID" type="FixedString" value="51dc3cb2-8644-e201-b84c-d24afc3cc9f5" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_Precision_01_Attack" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Precision_01_Attack.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Precision_01_Attack.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="React" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="15" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Cast" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="8" />
+							<attribute id="Time" type="float" value="0.134966" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.6666667" />
+					<attribute id="ID" type="FixedString" value="523e633e-5e86-81dd-8902-1d89f92d2615" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_YawL" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_YawL.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_YawL.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="8.466667" />
+					<attribute id="ID" type="FixedString" value="5d4caa6a-1439-0a63-9b7c-65d96dfb566c" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_LOCO_Stroll_F_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_LOCO_Stroll_F_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_LOCO_Stroll_F_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.20000002" />
+					<attribute id="ID" type="FixedString" value="6d139aae-ba4a-3701-7405-583547f3fb1c" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Prepare" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Prepare.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Prepare.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.7666667" />
+					<attribute id="ID" type="FixedString" value="6e35cdaf-0281-ec55-aecd-4ad084189800" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_REAC_Hit_F_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_REAC_Hit_F_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_REAC_Hit_F_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.966667" />
+					<attribute id="ID" type="FixedString" value="731ae151-70c7-49c3-8f36-a99b0b2f0d11" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_LOCO_Sprint_F_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_LOCO_Sprint_F_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_LOCO_Sprint_F_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.70000005" />
+					<attribute id="ID" type="FixedString" value="76d75042-badd-fd9b-b12a-d91255abfe6f" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Initiative_End" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Initiative_End.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Initiative_End.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Unsheathed_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="0" />
+							<attribute id="Time" type="float" value="0.31927437" />
+							<attribute id="Track" type="uint8" value="0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.033333335" />
+					<attribute id="ID" type="FixedString" value="776a9b27-baac-fb31-7da8-600b3cbe09a6" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CC_Portrait_Still_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CC_Portrait_Still_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CC_Portrait_Still_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209025" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.6333334" />
+					<attribute id="ID" type="FixedString" value="7c9c87cd-dd19-bce4-9c9e-f3b51d19f45f" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_Precision_01_Antic" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Precision_01_Antic.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Precision_01_Antic.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1" />
+					<attribute id="ID" type="FixedString" value="8aa64dee-f47e-2a6d-102d-e31066f9e996" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Loop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Loop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Loop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.0333334" />
+					<attribute id="ID" type="FixedString" value="8c579c33-9ed9-a7b5-a4ef-d0573ae24b43" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_Precision_01_Recover" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Precision_01_Recover.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Precision_01_Recover.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="9.966667" />
+					<attribute id="ID" type="FixedString" value="97a77a02-69cb-6504-4b8f-d419cdb7c6e8" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_IDLE_Still_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_IDLE_Still_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_IDLE_Still_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.1333334" />
+					<attribute id="ID" type="FixedString" value="9d050efc-28c7-35d6-42dc-fa343a74793b" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_DIE_Generic_LifeTime_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_DIE_Generic_LifeTime_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_DIE_Generic_LifeTime_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.6666667" />
+					<attribute id="ID" type="FixedString" value="a578504c-b644-8a58-43bd-011d18bd8e4c" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Cancel" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Cancel.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Cancel.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.6666667" />
+					<attribute id="ID" type="FixedString" value="a9597791-6d7e-a1a0-4f4a-0210415bfe30" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_PitchD" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_PitchD.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_PitchD.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.6" />
+					<attribute id="ID" type="FixedString" value="ac82ffa0-e57a-bb82-7f5a-ad417c220c30" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Antic" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Antic.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Antic.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.2" />
+					<attribute id="ID" type="FixedString" value="b0c7c522-70f3-4c82-8773-f131ce33c703" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_REAC_Magic_External_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_REAC_Magic_External_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_REAC_Magic_External_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4.866667" />
+					<attribute id="ID" type="FixedString" value="b42a9cde-0e9a-f2a8-f7eb-2079e7cee45c" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_IDLE_Random_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_IDLE_Random_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_IDLE_Random_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.6666667" />
+					<attribute id="ID" type="FixedString" value="ba7f9a0a-d4ec-a4c2-26be-2d2b409abfba" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_YawR" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_YawR.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Fly_01_YawR.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1" />
+					<attribute id="ID" type="FixedString" value="bee8b203-d5fe-d6db-9db4-76b9e14c1790" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Falling" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Falling.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Falling.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.4666667" />
+					<attribute id="ID" type="FixedString" value="c1ca1a02-d0d2-ddc5-f4b6-1bbb24388a2b" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Descend" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Descend.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Descend.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="6.6333337" />
+					<attribute id="ID" type="FixedString" value="c8bb9a65-414d-e29b-a0fa-d1eba4b71cfc" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_LOCO_Walk_F_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_LOCO_Walk_F_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_LOCO_Walk_F_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.4666667" />
+					<attribute id="ID" type="FixedString" value="c9a754fd-af9f-0d95-3357-721e8fa35689" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Recover" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Recover.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Recover.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="5.166667" />
+					<attribute id="ID" type="FixedString" value="cff4b467-6d4a-8039-56c3-813dd11bb42f" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_LOCO_Run_F_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_LOCO_Run_F_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_LOCO_Run_F_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.20000002" />
+					<attribute id="ID" type="FixedString" value="dad2244a-df89-f68e-c25c-8b8790a4ed27" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_Dash_01_Recover" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Dash_01_Recover.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_Dash_01_Recover.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.73333335" />
+					<attribute id="ID" type="FixedString" value="e6d5a799-ed12-bb98-fa16-3747dd1ef228" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Attack" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Attack.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Attack.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="React" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="15" />
+							<attribute id="Time" type="float" value="0.1015873" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Cast" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="8" />
+							<attribute id="Time" type="float" value="0.120453514" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.3" />
+					<attribute id="ID" type="FixedString" value="f49bd700-ad6e-76e7-2cf1-71fac115bb66" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Dash" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Dash.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Dash.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.0333334" />
+					<attribute id="ID" type="FixedString" value="f61e1544-ae11-8d12-cb45-4d54802d3aa9" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_REAC_Dodge_B_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_REAC_Dodge_B_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_REAC_Dodge_B_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.40000004" />
+					<attribute id="ID" type="FixedString" value="f7327787-a726-14a0-e0a0-2e1d037fe8ae" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Cast" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Cast.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_01_Cast.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="React" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="15" />
+							<attribute id="Time" type="float" value="0.05950114" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Cast" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="8" />
+							<attribute id="Time" type="float" value="0.25904763" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.73333335" />
+					<attribute id="ID" type="FixedString" value="fab3e1f4-f614-dc19-f022-467f5cc263b1" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_Combat_01_Recover" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_Combat_01_Recover.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Skill_JumpFlight_Combat_01_Recover.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.6666667" />
+					<attribute id="ID" type="FixedString" value="fb5414e1-d9e9-9658-c62b-f24da3825f67" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Loop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Loop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_CMBT_Melee_RHand_01_Loop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.6666667" />
+					<attribute id="ID" type="FixedString" value="ff51f6c3-58b3-a906-83ec-b1597e9f6cab" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Rig_DFLT_LOCO_Passive_F_Peace" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_LOCO_Passive_F_Peace.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Trident_Rig/SPRW_Trident_Rig_DFLT_LOCO_Passive_F_Peace.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="8c545f8d-09a6-4279-cc7a-bbd4048cd0c9" />
+					<attribute id="BoundsMax" type="fvec3" value="0 0 0" />
+					<attribute id="BoundsMin" type="fvec3" value="0 0 0" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="9baeaa37-5177-b447-eee9-840bc4feb475" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident_Base" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0ffa3b0e-41a3-07e4-fd35-8bf75957e817" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="EMPTY_VISUAL_TEMPLATE" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725668" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="18b9235c-1a11-376a-8a3c-9f8342e80a8d" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="db35bc81-facd-76c2-f355-92dd6fdad0dd" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="931accb8-da31-f3a8-403b-67c1359ac69d" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.113035046 2.300207 0.027667884" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.11304201 1.1920927E-08 -0.030304426" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="dd87046b-0266-397b-af43-68fe691b3eb2" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="SPRW_Trident" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Characters/_Models/_Creatures/SpiritualWeapons/Resources/SPRW_Trident.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Characters/_Models/_Creatures/SpiritualWeapons/Resources/SPRW_Trident.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725669" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="7cbb802b-8c0a-777c-6a61-21ca72207e70" />
+							<attribute id="ObjectID" type="FixedString" value="SPRW_Trident.SPRW_Trident_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="7cbb802b-8c0a-777c-6a61-21ca72207e70" />
+							<attribute id="ObjectID" type="FixedString" value="SPRW_Trident.SPRW_Trident_Mesh_LOD1.1" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.10190769 2.259776 0.023672942" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.10190767 -0.00024526299 -0.023672942" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="fd7547aa-d47a-c2e4-7769-0e324805778d" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Proxy_SPRW_Trident" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/Resources/Proxy_SPRW_Trident.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/Resources/Proxy_SPRW_Trident.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725669" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="9e2966c7-b61c-4bc1-bef1-a79cb5fde067" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_SPRW_Trident.Proxy_SPRWPN_Trident_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="9e2966c7-b61c-4bc1-bef1-a79cb5fde067" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_SPRW_Trident.Proxy_SPRWPN_Trident_Mesh_LOD1.1" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

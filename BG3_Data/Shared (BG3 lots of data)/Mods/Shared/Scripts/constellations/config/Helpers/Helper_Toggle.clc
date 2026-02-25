@@ -1,0 +1,20 @@
+game.configs.Helper_Toggle = Config{
+    params={
+        StartValue = {
+            type = EParamType.Bool,
+            help = [[Starting value of this toggle.]],
+            default = false,
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+    logic = StateRef{game.states.Helper_Toggle,
+         StartValue = params.StartValue},
+    },
+    inputs={
+        Toggle=ExtSocket{description=[[toggle the value held within]],{SocketRef{[[root.logic.inputs.Toggle]]}}},
+    },
+    outputs={
+        On=ExtSocket{description=[[Triggers if this is toggled on]],{SocketRef{[[root.logic.outputs.On]]}}},
+        Off=ExtSocket{description=[[Triggers if this is toggled off]],{SocketRef{[[root.logic.outputs.Off]]}}},
+    }
+}

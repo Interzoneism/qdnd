@@ -1,0 +1,866 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="VirtualTextureBank">
+		<node id="VirtualTextureBank">
+			<children>
+				<node id="Resource">
+					<attribute id="GTexFileName" type="FixedString" value="b47e11af2b3a166338b89172c422ccf4" />
+					<attribute id="ID" type="FixedString" value="22b61c1b-ec4d-d591-b0f7-e5ce9f04a0f5" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Sapper_Barrel_A_Ropes_A" />
+					<attribute id="Prefetch" type="bool" value="False" />
+					<attribute id="PrefetchMipLevel" type="int8" value="-1" />
+					<attribute id="ReferencedColorSpaces" type="uint32" value="6" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="VirtualTextureLayerConfig" type="uint32" value="3" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115198813274313" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="SkeletonBank">
+		<node id="SkeletonBank">
+			<children>
+				<node id="Resource">
+					<attribute id="DynamicPhysicsResourceID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="45a3ba3d-4165-acf1-5be5-092109d9cd47" />
+					<attribute id="IKRigResourceID" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Floor_Breakable_A_Explode_Base" />
+					<attribute id="PreviewAnimationResource" type="FixedString" value="" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RagdollResourceID" type="FixedString" value="" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Floor_Breakable_ABC/PUZ_GOB_Floor_Breakable_A_Explode_Base.GR2" />
+					<attribute id="SpringResourceID" type="FixedString" value="" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Floor_Breakable_ABC/PUZ_GOB_Floor_Breakable_A_Explode_Base.Dummy_PUZ_GOB_Floor_Breakable_A_Explode_Base.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855919" />
+					<children>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_R_HandFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_L_HandFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="2" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_MouthFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="4" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_BodyFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="3" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="PhysicsBank">
+		<node id="PhysicsBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="0749c99a-ef2e-ab24-31da-e4e4c56f44c5" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Firebowl_A_Rope_15H_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Firebowl_A_Rope_15H_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Firebowl_A_Rope_15H_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855891" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="177edaf9-3cfd-13bb-2c86-fea45244692b" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Floor_Breakable_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Floor_Breakable_ABC/PUZ_GOB_Floor_Breakable_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Floor_Breakable_ABC/PUZ_GOB_Floor_Breakable_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855914" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="39bcc378-429d-d202-8cf1-aac58407c6a1" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Firebowl_A_Rope_12H_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Firebowl_A_Rope_12H_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Firebowl_A_Rope_12H_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855891" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="3f65989c-7951-05a1-4298-2b48ccbba6e7" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Sapper_Barrel_A_" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Sapper_Barrel_A_.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Sapper_Barrel_A_" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855891" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="725d7527-5ccc-b8d6-2110-ed4b1cc2ac36" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Firebowl_A_Rope_9H_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Firebowl_A_Rope_9H_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Firebowl_A_Rope_9H_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855891" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="951e3249-5ce5-7ea3-2068-bd5135fc392c" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Firebowl_A_Rope_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Firebowl_A_Rope_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Firebowl_A_Rope_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855891" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="9e9d7fde-179b-3912-e069-c8c123aee3fd" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Floor_Breakable_A_Destruct" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Floor_Breakable_ABC/PUZ_GOB_Floor_Breakable_A_Destruct.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Floor_Breakable_ABC/PUZ_GOB_Floor_Breakable_A_Destruct" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855919" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="a7df35b9-d3f6-3e6d-a6b9-be199672c8ad" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Firebowl_A_Rope_6H_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Firebowl_A_Rope_6H_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Firebowl_A_Rope_6H_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855891" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="a7df594f-b169-00d5-8604-a9a382591ce3" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Firebowl_A_Hinge_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Firebowl_A_Hinge_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Firebowl_A_Hinge_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855891" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="b11bdbf4-8960-6a02-dccc-43051bd9a675" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Firebowl_A_Rope_3H_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Firebowl_A_Rope_3H_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Firebowl_A_Rope_3H_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855891" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="b4dab407-8ec8-7ffc-575b-3625cc3584de" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Firebowl_A_Bowl_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Firebowl_A_Bowl_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Firebowl_A_Bowl_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855891" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="MaterialBank">
+		<node id="MaterialBank">
+			<children>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="9589adc6-1973-4cfa-b94e-7fc598e73a91" />
+					<attribute id="MaterialType" type="uint8" value="6" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Sapper_Barrel_A_Ropes_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Base/Base_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="22b61c1b-ec4d-d591-b0f7-e5ce9f04a0f5" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationSetBank">
+		<node id="AnimationSetBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="a2461f6b-95fc-447a-0f3b-95212f3df775" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Floor_Breakable_A_Explode" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855919" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="FallBackAnimation" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets">
+											<children>
+												<node id="Object">
+													<attribute id="FallBackSubSet" type="FixedString" value="" />
+													<attribute id="MapKey" type="FixedString" value="" />
+													<children>
+														<node id="Animation">
+															<children>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="e1363aa6-e6f5-7c00-ae9f-9be022e36948" />
+																	<attribute id="MapKey" type="FixedString" value="2661e8dd-aedf-4ea1-af13-e888ed8966af" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationBank">
+		<node id="AnimationBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4.9666667" />
+					<attribute id="ID" type="FixedString" value="e1363aa6-e6f5-7c00-ae9f-9be022e36948" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Floor_Breakable_ABC_Explode" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="596faa99-e3f8-5780-0b3c-4a2ddf10c97a" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Floor_Breakable_ABC/PUZ_GOB_Floor_Breakable_ABC_Explode/PUZ_GOB_Floor_Breakable_ABC_Explode.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Floor_Breakable_ABC/PUZ_GOB_Floor_Breakable_ABC_Explode/PUZ_GOB_Floor_Breakable_ABC_Explode.Anim.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855926" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Sound" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0.0054633333" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="68783f40-89cd-8957-5172-300bae01d674" />
+									<attribute id="SoundObjectIndex" type="uint8" value="0" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.0431781 8.436451 0.037042215" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.04237865 2.4264972 -0.03704277" />
+					<attribute id="Center" type="fvec3" value="0.0003997255 5.431474 -2.7753413E-07" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="01e5b04b-b4b2-421f-9e2a-51c7c694c19b" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Firebowl_A_Rope_6H_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="3.0055096" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/Resources/PUZ_GOB_Firebowl_A_Rope_6H_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/Resources/PUZ_GOB_Firebowl_A_Rope_6H_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790676" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="54625a2f-e7f0-472b-ad11-b40cbded49aa" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Firebowl_A_Rope_6H_A.PUZ_GOB_Firebowl_A_Rope_6H_A_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.0431781 14.437196 0.037042215" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.042378638 2.4264972 -0.037042778" />
+					<attribute id="Center" type="fvec3" value="0.0003997311 8.431847 -2.8125942E-07" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="04997a72-e37c-5b8d-bcaf-0e6a8c5b9d10" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Firebowl_A_Rope_12H_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="6.005616" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/Resources/PUZ_GOB_Firebowl_A_Rope_12H_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/Resources/PUZ_GOB_Firebowl_A_Rope_12H_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790676" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="54625a2f-e7f0-472b-ad11-b40cbded49aa" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Firebowl_A_Rope_12H_A.PUZ_GOB_Firebowl_A_Rope_12H_A_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="4.0334473 0.700027 5.3214493" />
+					<attribute id="BoundsMin" type="fvec3" value="-4.0634546 -0.5985436 -5.339858" />
+					<attribute id="Center" type="fvec3" value="-0.015003681 0.050741702 -0.009204388" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="2786353c-bc9f-c4cc-8d3b-169ff65cf755" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Floor_Breakable_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="6.7251315" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Floor_Breakable_ABC/Resources/PUZ_GOB_Floor_Breakable_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Floor_Breakable_ABC/Resources/PUZ_GOB_Floor_Breakable_A.Dummy_PUZ_GOB_Floor_Breakable_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241710" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="d92cd1d7-56a6-f2c4-0f1e-cb97cfeb02b2" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Floor_Breakable_A.PUZ_GOB_Floor_Breakable_A_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="d92cd1d7-56a6-f2c4-0f1e-cb97cfeb02b2" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Floor_Breakable_A.PUZ_GOB_Floor_Breakable_A_Mesh_LOD1.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="d92cd1d7-56a6-f2c4-0f1e-cb97cfeb02b2" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Floor_Breakable_A.PUZ_GOB_Floor_Breakable_A_Mesh_LOD2.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="8.338984 0.7280966 6.114496" />
+					<attribute id="BoundsMin" type="fvec3" value="-4.1807895 -9.256734 -7.7367973" />
+					<attribute id="Center" type="fvec3" value="2.079097 -4.2643185 -0.81115055" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="33bb1b7f-b88a-cb4d-ae94-09282b4b2864" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Floor_Breakable_A_Destruct" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="10.586547" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Floor_Breakable_ABC/Resources/PUZ_GOB_Floor_Breakable_A_Destruct.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Floor_Breakable_ABC/Resources/PUZ_GOB_Floor_Breakable_A_Destruct.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855920" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="d92cd1d7-56a6-f2c4-0f1e-cb97cfeb02b2" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Floor_Breakable_A_Destruct.PUZ_GOB_Floor_Breakable_A_Destruct_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="d92cd1d7-56a6-f2c4-0f1e-cb97cfeb02b2" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Floor_Breakable_A_Destruct.PUZ_GOB_Floor_Breakable_A_Destruct_Mesh_LOD1.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.0431781 11.399804 0.037042215" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.04237865 2.4264972 -0.03704277" />
+					<attribute id="Center" type="fvec3" value="0.0003997255 6.913151 -2.7753413E-07" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="48c43400-80e4-7849-9ba3-0ebcc05eb53c" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Firebowl_A_Rope_9H_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="4.48701" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/Resources/PUZ_GOB_Firebowl_A_Rope_9H_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/Resources/PUZ_GOB_Firebowl_A_Rope_9H_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790676" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="54625a2f-e7f0-472b-ad11-b40cbded49aa" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Firebowl_A_Rope_9H_A.PUZ_GOB_Firebowl_A_Rope_9H_A_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="22ac46b9-feb5-7e38-a35b-8dcc27d7133f" />
+					<attribute id="BoundsMax" type="fvec3" value="4.029876 0.76210713 5.321449" />
+					<attribute id="BoundsMin" type="fvec3" value="-4.117697 -1.9111751 -5.27049" />
+					<attribute id="Center" type="fvec3" value="-0.015003681 0.050741702 -0.009204388" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="596faa99-e3f8-5780-0b3c-4a2ddf10c97a" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Floor_Breakable_A_Explode" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="6.725131" />
+					<attribute id="SkeletonResource" type="FixedString" value="45a3ba3d-4165-acf1-5be5-092109d9cd47" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Floor_Breakable_ABC/Resources/PUZ_GOB_Floor_Breakable_A_Explode.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/PUZ_GOB_Floor_Breakable_ABC/Resources/PUZ_GOB_Floor_Breakable_A_Explode.Dummy_PUZ_GOB_Floor_Breakable_A_Explode_Base.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855932" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="a2461f6b-95fc-447a-0f3b-95212f3df775" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="d92cd1d7-56a6-f2c4-0f1e-cb97cfeb02b2" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Floor_Breakable_A_Explode.PUZ_GOB_Floor_Breakable_A_Explode_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.50549227 2.5768716 0.14943624" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.48451668 2.3129804 -0.16109979" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="6d3c2c66-7933-706f-07bc-d941c290376d" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Firebowl_A_Hinge_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/Resources/PUZ_GOB_Firebowl_A_Hinge_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/Resources/PUZ_GOB_Firebowl_A_Hinge_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144537400540922158" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="54625a2f-e7f0-472b-ad11-b40cbded49aa" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Firebowl_A_Hinge_A.PUZ_GOB_Firebowl_A_Hinge_A_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="54625a2f-e7f0-472b-ad11-b40cbded49aa" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Firebowl_A_Hinge_A.PUZ_GOB_Firebowl_A_Hinge_A_Mesh_LOD1.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="54625a2f-e7f0-472b-ad11-b40cbded49aa" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Firebowl_A_Hinge_A.PUZ_GOB_Firebowl_A_Hinge_A_Mesh_LOD2.2" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.0431781 5.3994946 0.037042215" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.042378597 2.4264972 -0.03704277" />
+					<attribute id="Center" type="fvec3" value="0.0003997516 3.9129958 -2.7753413E-07" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="6f759134-647f-4583-0aca-105b90d9af5f" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Firebowl_A_Rope_3H_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="1.4875754" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/Resources/PUZ_GOB_Firebowl_A_Rope_3H_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/Resources/PUZ_GOB_Firebowl_A_Rope_3H_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790676" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="54625a2f-e7f0-472b-ad11-b40cbded49aa" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Firebowl_A_Rope_3H_A.PUZ_GOB_Firebowl_A_Rope_3H_A_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.33213037 1.072635 0.507907" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.33301532 -0.03489711 -0.35306624" />
+					<attribute id="Center" type="fvec3" value="-0.00044247508 0.518869 0.07742037" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="7a3b9ebb-de45-67e0-12f4-683afdc4fcb6" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Sapper_Barrel_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.77626044" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/Resources/PUZ_GOB_Sapper_Barrel_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/Resources/PUZ_GOB_Sapper_Barrel_A.Dummy_PUZ_GOB_Sapper_Barrel_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790676" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="dbe3bc05-3304-ccea-9676-cc6783363ec0" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Sapper_Barrel_A.PUZ_GOB_Sapper_Barrel_A_Barrel_SmokePowder_A_mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="9589adc6-1973-4cfa-b94e-7fc598e73a91" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Sapper_Barrel_A.PUZ_GOB_Sapper_Barrel_A_Ropes_A.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="dbe3bc05-3304-ccea-9676-cc6783363ec0" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Sapper_Barrel_A.PUZ_GOB_Sapper_Barrel_A_Barrel_SmokePowder_A_mesh_LOD1.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="9589adc6-1973-4cfa-b94e-7fc598e73a91" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Sapper_Barrel_A.PUZ_GOB_Sapper_Barrel_A_Ropes_A_LOD1.3" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="dbe3bc05-3304-ccea-9676-cc6783363ec0" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Sapper_Barrel_A.PUZ_GOB_Sapper_Barrel_A_Barrel_SmokePowder_A_mesh_LOD2.4" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="9589adc6-1973-4cfa-b94e-7fc598e73a91" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Sapper_Barrel_A.PUZ_GOB_Sapper_Barrel_A_Ropes_A_LOD2.5" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="3" />
+							<attribute id="MaterialID" type="FixedString" value="dbe3bc05-3304-ccea-9676-cc6783363ec0" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Sapper_Barrel_A.PUZ_GOB_Sapper_Barrel_A_Barrel_SmokePowder_A_mesh_LOD3.6" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="3" />
+							<attribute id="MaterialID" type="FixedString" value="9589adc6-1973-4cfa-b94e-7fc598e73a91" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Sapper_Barrel_A.PUZ_GOB_Sapper_Barrel_A_Ropes_A_LOD3.7" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.0431781 10.201786 0.037042215" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.04237865 2.4264972 -0.03704277" />
+					<attribute id="Center" type="fvec3" value="0.0003997255 6.3141418 -2.7753413E-07" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="aa793481-b186-87b7-0cb6-83ab438be378" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Firebowl_A_Rope_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="3.888056" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/Resources/PUZ_GOB_Firebowl_A_Rope_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/Resources/PUZ_GOB_Firebowl_A_Rope_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790676" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="54625a2f-e7f0-472b-ad11-b40cbded49aa" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Firebowl_A_Rope_A.PUZ_GOB_Firebowl_A_Rope_A_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.0431781 17.436367 0.037042215" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.042378627 2.4264972 -0.03704278" />
+					<attribute id="Center" type="fvec3" value="0.0003997367 9.931432 -2.8312206E-07" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="c43212c5-19f3-c40e-1ca4-81963b78ddb9" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Firebowl_A_Rope_15H_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="7.5051484" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/Resources/PUZ_GOB_Firebowl_A_Rope_15H_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/Resources/PUZ_GOB_Firebowl_A_Rope_15H_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790676" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="54625a2f-e7f0-472b-ad11-b40cbded49aa" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Firebowl_A_Rope_15H_A.PUZ_GOB_Firebowl_A_Rope_15H_A_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="1.0950497 2.5070202 1.0012665" />
+					<attribute id="BoundsMin" type="fvec3" value="-1.0011398 0 -1.0012665" />
+					<attribute id="Center" type="fvec3" value="0.04695499 1.2535101 0" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="c9299922-83b4-bd6c-fa17-d5e120a88146" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="PUZ_GOB_Firebowl_A_Bowl_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="1.916331" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/Resources/PUZ_GOB_Firebowl_A_Bowl_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Puzzle/Goblins/Resources/PUZ_GOB_Firebowl_A_Bowl_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790676" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="54625a2f-e7f0-472b-ad11-b40cbded49aa" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Firebowl_A_Bowl_A.PUZ_GOB_Firebowl_A_Bowl_A_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="54625a2f-e7f0-472b-ad11-b40cbded49aa" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_GOB_Firebowl_A_Bowl_A.PUZ_GOB_Firebowl_A_Bowl_A_Mesh_LOD1.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

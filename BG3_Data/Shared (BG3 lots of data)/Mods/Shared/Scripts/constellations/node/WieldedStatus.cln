@@ -1,0 +1,28 @@
+game.states.WieldedOrDroppedStatus = State{
+    function()      
+        params.Status = {type = EParamType.String, required=true, help = [[Status that's applied.]]}
+
+        events.Equipped = function(ev)
+            ApplyStatus(me, params.Status)
+        end
+
+        events.Unequipped = function(ev)
+            if me.Item.IsInInventory and not me.Item.IsEquipped then --extra check is needed in case we drop an equipped item
+                                          -- in that case InventoryOwnerChanged arrives first
+                RemoveStatus(me, params.Status)
+            end
+        end
+
+        events.InventoryOwnerChanged = function(ev)
+            if not me.Item.IsInInventory then 
+                if not HasAppliedStatus(me, params.Status) then
+                    ApplyStatus(me, params.Status)
+                end
+            elseif HasAppliedStatus(me, params.Status) then 
+                if not me.Item.IsEquipped then  --extra check for equipping directly from another character
+                    RemoveStatus(me, params.Status)
+                end
+            end
+        end
+    end
+}

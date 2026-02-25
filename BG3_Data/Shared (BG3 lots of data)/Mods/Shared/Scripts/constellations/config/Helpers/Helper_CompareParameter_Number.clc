@@ -1,0 +1,21 @@
+game.configs.Helper_CompareParameter_Number = Config{
+    params={
+        Value = {
+            type = EParamType.Number,
+            help = [[Value with which the param is compared.]],
+            required = true,
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+    logic = StateRef{game.states.Helper_CompareParameter_Number,
+                     Value = params.Value},
+    },
+    inputs={
+        In=ExtSocket{description=[[Input signal]],{SocketRef{[[root.logic.inputs.In]]}}},
+    },
+    outputs={
+        Equal=ExtSocket{description=[[Triggers if the parameter of the input signal equals the specified Value]],{SocketRef{[[root.logic.outputs.Equal]]}}},
+        LessThan=ExtSocket{description=[[Triggers if the parameter of the input signal is smaller than the specified Value]],{SocketRef{[[root.logic.outputs.LessThan]]}}},
+        GreaterThan=ExtSocket{description=[[Triggers if the parameter of the input signal is greater than the specified Value]],{SocketRef{[[root.logic.outputs.GreaterThan]]}}},
+    }
+}

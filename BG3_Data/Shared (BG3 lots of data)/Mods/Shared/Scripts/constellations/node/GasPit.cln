@@ -1,0 +1,442 @@
+game.states.GasPit = State{
+    function()
+
+
+        params.DC = {
+            type = EParamType.String,
+            default="DC_Legacy_15_bddbb9b8-a242-4c3e-a2eb-3fd274c0c539",
+            help=[[Perception check DC.]]
+        }
+
+        params.WeightLimit = {
+            type = EParamType.Number,
+            help = [[Max Weight before the gaspit is blocked]],
+            default = 50.0,
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = "Does the gaspit start enabled?"
+        }
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            required=false,
+            default=6,
+            help=[[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]]
+        }
+
+        params.PerceptionSkill = {
+            type = EParamType.String,
+            default="Perception",
+            help=[[The skill checked for perception.]]
+        }
+
+        params.PerceptionType = {
+            type = EParamType.String,
+            default="Invisible",
+            help=[[Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]]
+        }
+
+        params.SurfaceType = {
+            type = EParamType.String,
+            required = true,
+            help = [[Surface type]],
+            default_value_provider = [[surfacetype]]
+        }
+
+        params.MinRadius = {
+            type = EParamType.Number,
+            required=false,
+            default=0.0,
+            help=[[Minimum radius of the gas pit]]
+        }
+
+        params.MaxRadius = {
+            type = EParamType.Number,
+            required=false,
+            default=3.0,
+            help=[[Maximum radius of the gas pit]]
+        }
+
+        params.RadiusStep = {
+            type = EParamType.Number,
+            required=false,
+            default=0.5,
+            help=[[Step by which the surface increases every step.]]
+        }
+
+        params.TimeStep = {
+            type = EParamType.Number,
+            required=false,
+            default=0.5,
+            help=[[Time, in seconds, between every step]]
+        }
+
+        params.TargetEntity = {
+            type = EParamType.String,
+            help = "Object which behaves as a gaspit",
+            default = "me"
+        }
+
+        params.StepsPerTurn = {
+            type = EParamType.Number,
+            default=1,
+            help=[[How many Radius Steps per turn the surface grows]]
+        }
+
+
+        params.SoundOn = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_On",
+            help = "Sound when trap is turned on"
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_Off",
+            help = "Sound when trap is turned off"
+        }
+
+        params.VFXOn = {type = EParamType.String,
+        required = false,
+        default = "",
+        help = "VFX while item is on."
+        }
+
+
+        params.VFXOff = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = "VFX while item is off."
+        }
+
+        params.DestroyOnDisarm = {
+            type=EParamType.Bool,
+            default = true,
+            help = "Does the item break on Disarm?"
+        }
+
+        inputs.Enable = {help = "Turn Gaspit on"}
+        inputs.Disable = {help = "Turn Gaspit off"}
+
+        inputs.Reveal = {help = [[Reveals the gaspit. The Object will do an AD unless the Param is true.]]}
+        outputs.RevealInt = {internal = true}
+
+        inputs.Revealed = {internal = true}
+
+        outputs.StartSurface = {internal = true}
+        outputs.StopSurface = {internal = true}
+
+        outputs.EnableInt = {internal = true}
+        outputs.DisableInt = {internal = true}
+
+        inputs.Underweight = {internal = true}
+        inputs.Overweight = {internal = true}
+
+        inputs.Disarm = {help = "Disarm the gaspit"}
+        outputs.Disarm = {internal = true}
+
+        inputs.Enabled = {internal = true}
+        inputs.Disabled = {internal = true}
+        outputs.Enabled = {internal = true}
+        outputs.Disabled = {internal = true}
+
+        inputs.Disarmed = {internal = true}
+
+        inputs.DisarmFailed = {internal = true}
+
+        outputs.DrawSurface = {internal = true}
+
+        nodes.WeightTrigger = Proxy{
+            game.states.WeightTrigger,
+            params = {WeightLimit = params.WeightLimit,
+                      TargetEntity = params.TargetEntity},
+            outputs = {Overweight = {inputs.Overweight},
+                       Underweight = {inputs.Underweight}}
+        }
+
+
+        nodes.PerceptionDisarmOnOff = Proxy{
+            game.states.PerceptionDisarmOnOff,
+            params = {StartEnabled = params.StartEnabled,
+                      Type = params.PerceptionType,
+                      Skill = params.PerceptionSkill,
+                      MinDistance = params.MinDistance,
+                      TargetEntity = params.TargetEntity,
+                      SoundOn = params.SoundOn,
+                      SoundOff = params.SoundOff,
+                      VFXOn = params.VFXOn,
+                      VFXOff = params.VFXOff,
+                      DestroyOnDisarm = params.DestroyOnDisarm},
+            inputs = {Enable = {outputs.EnableInt},
+                      Disable = {outputs.DisableInt},
+                      Reveal = {outputs.RevealInt},
+                      Disarm = {outputs.Disarm}
+                    },
+            outputs = {DisarmFailed = {inputs.DisarmFailed},
+                       Enabled = {inputs.Enabled},
+                       Disabled = {inputs.Disabled},
+                       Disarmed = {inputs.Disarmed},
+                       Revealed = {inputs.Revealed}
+                    }
+        }
+
+        nodes.MakeSurface = Proxy{
+            game.states.MakeSurface,
+            params = {MinRadius = params.MinRadius,
+                      MaxRadius = params.MaxRadius,
+                      RadiusStep = params.RadiusStep,
+                      SurfaceType = params.SurfaceType,
+                      TimeStep = params.TimeStep,
+                      StartEnabled = params.StartEnabled,
+                      TargetEntity = params.TargetEntity,
+                      StepsPerTurn = params.StepsPerTurn},
+            inputs = {Enable = {outputs.StartSurface},
+                      Disable = {outputs.StopSurface},
+                      DrawSurface = {outputs.DrawSurface},
+                     },
+        }
+
+        helpers.SetTutorialAura = function()
+            if me.Blackboard.GetFact("Cnst.WeightTrigger.Overweight") ~= 1 and
+                me.Blackboard.GetFact("Cnst.Perception.Discovered") == 1 and
+                me.Blackboard.GetFact("On") == 1 and
+                me.Blackboard.GetFact("Cnst.Disarm.WasDisarmed") ~= 1 then
+                ApplyStatus(me, "CONST_TUTORIAL_GASPIT_AURA_TECHNICAL", true, -1, nil)
+            else
+                RemoveStatus(me, "CONST_TUTORIAL_GASPIT_AURA_TECHNICAL")
+            end
+        end
+
+        self.OnInit = function()
+            helpers.SetTutorialAura()
+        end
+
+        socketEvents.Reveal = function(ev)
+            TriggerOutput(outputs.RevealInt, ev.Object, ev.Param) 
+        end
+
+        socketEvents.Revealed = function(ev)
+            helpers.SetTutorialAura()
+        end
+
+        socketEvents.DisarmFailed = function(ev)
+            TriggerOutput(outputs.DrawSurface, ev.Object, ev.Param)
+        end
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.EnableInt, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.DisableInt, ev.Object, ev.Param)
+        end
+
+        socketEvents.Enabled = function(ev)
+            if me.Blackboard.GetFact("Cnst.WeightTrigger.Overweight") == 0 or
+               me.Blackboard.GetFact("Cnst.WeightTrigger.Overweight") == nil then
+                TriggerOutput(outputs.StartSurface, ev.Object, ev.Param)
+            end
+            helpers.SetTutorialAura()
+        end
+
+        socketEvents.Disabled = function(ev)
+            if me.Blackboard.GetFact("Cnst.WeightTrigger.Overweight") == 0 or
+               me.Blackboard.GetFact("Cnst.WeightTrigger.Overweight") == nil then
+                TriggerOutput(outputs.StopSurface, ev.Object, ev.Param)
+            end
+            helpers.SetTutorialAura()
+        end
+
+        socketEvents.Disarm = function(ev)
+            TriggerOutput(outputs.Disarm, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disarmed = function(ev)
+            if me.Blackboard.GetFact("On") == 1 then
+                TriggerOutput(outputs.StopSurface, ev.Object, ev.Param)
+            end
+            helpers.SetTutorialAura()
+        end
+
+        socketEvents.Overweight = function(ev)
+            if me.Blackboard.GetFact("On") == 1 and
+               me.Blackboard.GetFact("Cnst.Disarm.WasDisarmed") == 0 then
+                TriggerOutput(outputs.StopSurface, ev.Object, ev.Param)
+            end
+            helpers.SetTutorialAura()
+        end
+
+        socketEvents.Underweight = function(ev)
+            if me.Blackboard.GetFact("On") == 1 and
+               me.Blackboard.GetFact("Cnst.Disarm.WasDisarmed") == 0 then
+                TriggerOutput(outputs.StartSurface, ev.Object, ev.Param)
+            end
+            helpers.SetTutorialAura()
+        end
+
+    end
+}
+
+game.states.MakeSurface = State{
+    function()
+
+
+        params.MinRadius = {
+            type = EParamType.Number,
+            required=false,
+            default=0.0,
+            help=[[Minimum radius of the surface]]
+        }
+
+        params.MaxRadius = {
+            type = EParamType.Number,
+            required=false,
+            default=3.0,
+            help=[[Maximum radius of the surface]]
+        }
+
+        params.RadiusStep = {
+            type = EParamType.Number,
+            required=false,
+            default=0.5,
+            help=[[Step by which the surface increases every step.]]
+        }
+
+        params.StepsPerTurn = {
+            type = EParamType.Number,
+            default=1,
+            help=[[How many Radius Steps per turn the surface grows]]
+        }
+
+        params.SurfaceType = {
+            type = EParamType.String,
+            required = true,
+            help = [[Surface type]],
+            default_value_provider = [[surfacetype]]
+        }
+
+        params.TimeStep = {
+            type = EParamType.Number,
+            required=false,
+            default=0.5,
+            help=[[Time, in seconds, between every step]]
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = "Does the gaspit start on?"
+        }
+
+        params.TargetEntity = {
+            type = EParamType.String,
+            help = "Object which behaves as a gaspit",
+            default = "me"
+        }
+
+        inputs.Enable = {help = "Start creating surface"}
+        inputs.Disable = {help = "Stop creating surface"}
+
+        inputs.DrawSurface = {help = "Draws the surface once"}
+
+        outputs.StartTimer = {internal = true}
+        outputs.StopTimer = {internal = true}
+
+        nodes.Timer = Proxy{
+            game.states.Timer,
+            params = {TickLength = params.TimeStep,
+                      StartActive = params.StartEnabled,
+                      Repeats = -1,
+                      TargetEntity = params.TargetEntity},
+            inputs = {Start = {outputs.StartTimer},
+                      Stop = {outputs.StopTimer}},
+            outputs = {Tick = {inputs.DrawSurface}}
+        }
+
+        helpers.doDrawSurface = function(surfaceDrawSize)
+            local surface = SurfaceType[string.upper(params.SurfaceType)]
+            if not FindInteractingSurface(me, 0.0, surfaceDrawSize + params.RadiusStep, surface) then
+                surfaceDrawSize = math.max(math.min(surfaceDrawSize + params.RadiusStep, params.MaxRadius), 0.0)
+                me.Blackboard.SetFact("Cnst.MakeSurface.SurfaceDrawSize", surfaceDrawSize)
+                CreateSurfaceAt(me.Blackboard.GetFact("TargetEntity"), surface, surfaceDrawSize, -1.0)
+                return true
+            else
+                return false
+            end
+        end
+
+        helpers.DrawSurface = function()
+            local surfaceDrawSize = me.Blackboard.GetFact("Cnst.MakeSurface.SurfaceDrawSize")
+            if not helpers.doDrawSurface(math.max(math.min(surfaceDrawSize + params.RadiusStep, params.MaxRadius), 0.0)) then --Try to make draw the surface at the new, larger size.
+                if not helpers.doDrawSurface(me.Blackboard.GetFact("Cnst.MakeSurface.SurfaceDrawSize")) then --Failing that, try the old size.
+                    helpers.doDrawSurface(params.MinRadius) -- Failing that, go back to the smallest range
+                end
+            end
+        end
+
+        helpers.ClearSurface = function()
+            local surfaceDrawSize = me.Blackboard.GetFact("Cnst.MakeSurface.SurfaceDrawSize")
+            if (surfaceDrawSize ~= nil) and
+               (surfaceDrawSize > 0) then
+                RemoveSurfaceOfTypeAt(SurfaceType[string.upper(params.SurfaceType)], me, surfaceDrawSize, 100.0, 20.0, 0.1)
+            end
+        end
+
+        helpers.InitSurfaceDrawSize = function()
+            if  me.Blackboard.GetFact("Cnst.MakeSurface.SurfaceDrawSize") == nil then
+                me.Blackboard.SetFact("Cnst.MakeSurface.SurfaceDrawSize", (params.MinRadius + 0.0001))
+            end
+        end
+
+        helpers.InitTargetEntity = function()
+            if me.Blackboard.GetFact("TargetEntity") == nil then
+                if params.TargetEntity == "me" then
+                    me.Blackboard.SetFact("TargetEntity", me)
+                else
+                    me.Blackboard.SetFact("TargetEntity", FindEntity(params.TargetEntity))
+                end
+            end
+        end
+
+        self.OnInit = function()
+            helpers.InitSurfaceDrawSize()
+            helpers.InitTargetEntity()
+        end
+
+        self.OnEditorChanges = function()
+            -- clear old surface in case surface type got changed
+            helpers.ClearSurface()
+            helpers.InitSurfaceDrawSize()
+            helpers.InitTargetEntity()
+        end
+
+        socketEvents.Enable = function(ev)
+            helpers.InitSurfaceDrawSize()
+            helpers.InitTargetEntity()
+            helpers.DrawSurface()
+            TriggerOutput(outputs.StartTimer, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disable = function(ev)
+            helpers.InitSurfaceDrawSize()
+            helpers.InitTargetEntity()
+            helpers.ClearSurface()
+            me.Blackboard.SetFact("Cnst.MakeSurface.SurfaceDrawSize", (params.MinRadius + 0.0001))
+            TriggerOutput(outputs.StopTimer, ev.Object, ev.Param)
+        end
+
+        socketEvents.DrawSurface = function(ev)
+            helpers.DrawSurface()
+        end
+
+    end
+}

@@ -1,0 +1,155 @@
+game.states.SurfaceTrailSpawner = State { function ()
+    description = [[
+        Spawns surface trail on a timer.
+    ]]
+
+    params.TrailRadius = { type = EParamType.Number, required = false, default = 0.5, help = [[
+        Radius of the surface trail.
+    ]]}
+
+    params.SurfaceLifetime = { type = EParamType.Number, required = false, default = 12, help = [[
+        Lifetime of the surface trail. If creature will keep adding to the same surface,
+        it will never go away, unless the creature stops. And then WHOLE surface clears itself.
+    ]]}
+
+    params.SurfaceType = { type = EParamType.String, default = "ACID", help = [[
+        The type of the surface to spawn.
+    ]]}
+
+    params.ControlStatus = { type = EParamType.String, default = "", help = [[
+        If the trail spawn is also controlled by a status.
+    ]]}
+
+    modules = { "shared.math" }
+
+    local prevDropPos
+    local spawnsTrail = false
+    local needMoveFromPuddle = false
+
+    local trailSpawnCooldown_Combat = 0.25
+    local trailSpawnCooldown_NonCombat = 0.5
+    local trailThresholdPos_Combat = 0.02
+    local trailThresholdPos_NonCombat = 0.1
+
+    -- Helpers
+    helpers.CanSpawnTrail = function()
+        if params.ControlStatus ~= "" then
+            return HasActiveStatus(me, params.ControlStatus)
+        else
+            return true
+        end
+    end
+
+    helpers.GetTimerName = function()
+        if params.ControlStatus ~= "" then
+            return "SurfaceTrailSpawner_Timer_" .. params.ControlStatus
+        else
+            return "SurfaceTrailSpawner_Timer"
+        end
+    end
+
+    helpers.StartSpawningTrail = function()
+        if not spawnsTrail          and
+            helpers.CanSpawnTrail() and
+            me.Active               and
+            not me.Character.IsDead and
+            not HasActiveStatus(me,"FROZEN")
+        then
+            helpers.StartTrailTimer()
+            prevDropPos = me.Position
+            spawnsTrail = true
+        end
+    end
+
+    helpers.GetDiffBetweenLastPosThreshold = function()
+        local diff = 0
+        if needMoveFromPuddle then
+            -- to avoid surface lifetime refresh and start spawning new surface a little bit further from the existing one
+            diff = params.TrailRadius*2
+        else
+            -- if in combat then diff = trailThresholdPos_Combat, otherwise diff = trailThresholdPos_NonCombat
+            diff = me.IsInCombat and trailThresholdPos_Combat or trailThresholdPos_NonCombat
+        end
+        return diff
+    end
+
+    helpers.StartTrailTimer = function()
+        -- if in combat then time = trailSpawnCooldown_Combat, otherwise time = trailSpawnCooldown_NonCombat
+        local time = me.IsInCombat and trailSpawnCooldown_Combat or trailSpawnCooldown_NonCombat
+        StartRealtimeTimer(me, helpers.GetTimerName(), time, 0)
+    end
+
+    helpers.StopSpawningTrail = function()
+        if spawnsTrail then
+            spawnsTrail = false
+            StopTimer(me, helpers.GetTimerName())
+        end
+    end
+
+    -- Nodes
+    self.CanEnter = function()
+        return false
+    end
+
+    -- Events
+    events.TimerFinished = function(e)
+        if e.TimerName == helpers.GetTimerName() and spawnsTrail then
+            if me.Active and not me.Character.IsDead then
+                if not me.IsInCombat or me.IsInActiveTeamTurn then
+                    if not HasActiveStatus(me,"FROZEN") then
+                        local distDiff = helpers.GetDiffBetweenLastPosThreshold()
+                        if GetDistance2DTo(me, prevDropPos) > distDiff then
+                            CreateSurfaceAt(me.Position, SurfaceType[params.SurfaceType], params.TrailRadius, params.SurfaceLifetime)
+                            prevDropPos = me.Position
+                            needMoveFromPuddle = false
+                        end
+                    end
+                end
+                helpers.StartTrailTimer()
+            else
+                helpers.StopSpawningTrail()
+            end
+        end
+    end
+
+    events.StatusApplied = function(e)
+        if e.Status.StatusID == "FROZEN" then
+            helpers.StopSpawningTrail()
+        elseif e.Status.StatusID == params.ControlStatus then
+            helpers.StartSpawningTrail()
+        end
+    end
+
+    events.StatusRemoved = function(e)
+        if e.Status.StatusID == "FROZEN" then
+            helpers.StartSpawningTrail()
+        elseif e.Status.StatusID == params.ControlStatus then
+            helpers.StopSpawningTrail()
+        end
+    end
+
+    events.Dying = function(e)
+        if e.Target == me then
+            helpers.StopSpawningTrail()
+        end
+    end
+
+    events.Activated = function(e)
+        helpers.StartSpawningTrail()
+    end
+
+    events.Deactivated = function(e)
+        helpers.StopSpawningTrail()
+    end
+
+    events.TurnStarted = function(e)
+        if FindSurface(me, params.TrailRadius, params.TrailRadius*2, SurfaceType[params.SurfaceType]) then
+            needMoveFromPuddle = true
+        end
+        helpers.StartSpawningTrail()
+    end
+
+    events.TurnEnded = function(e)
+        needMoveFromPuddle = false
+    end
+end}

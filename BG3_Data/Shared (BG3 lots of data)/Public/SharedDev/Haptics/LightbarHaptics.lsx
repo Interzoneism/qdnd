@@ -1,0 +1,442 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<save>
+    <version major="4" minor="6" revision="0" build="1"/>
+    <region id="LightbarHaptics">
+        <node id="root">
+            <children>
+                <node id="LightbarHaptics">
+                    <attribute id="CastSoundEvent" type="FixedString" value="Ds_Spell_Cast_Slashing"/>
+                    <attribute id="DamageType" type="uint8" value="1"/>
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFFDAD5A"/>
+                    <attribute id="LoopSoundEvent" type="FixedString" value="Ds_Spell_Loop_Slashing"/>
+                    <attribute id="Name" type="LSString" value="Spell_SlashingDamage"/>
+                    <attribute id="PriorityOrder" type="int32" value="1"/>
+                    <attribute id="UUID" type="guid" value="d36d91a8-e0a1-432b-a21d-dc8172a4d9f8"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="CastSoundEvent" type="FixedString" value="Ds_Spell_Cast_Piercing"/>
+                    <attribute id="DamageType" type="uint8" value="2"/>
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFFDAD5A"/>
+                    <attribute id="LoopSoundEvent" type="FixedString" value="Ds_Spell_Loop_Piercing"/>
+                    <attribute id="Name" type="LSString" value="Spell_PiercingDamage"/>
+                    <attribute id="PriorityOrder" type="int32" value="1"/>
+                    <attribute id="UUID" type="guid" value="45995566-6365-4617-8791-0d7309c998c6"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="CastSoundEvent" type="FixedString" value="Ds_Spell_Cast_Bludgeoning"/>
+                    <attribute id="DamageType" type="uint8" value="3"/>
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFFDAE5A"/>
+                    <attribute id="LoopSoundEvent" type="FixedString" value="Ds_Spell_Loop_Bludgeoning"/>
+                    <attribute id="Name" type="LSString" value="Spell_BludgeoningDamage"/>
+                    <attribute id="PriorityOrder" type="int32" value="1"/>
+                    <attribute id="UUID" type="guid" value="1e990510-e84f-43b0-9923-dd1072661f82"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="CastSoundEvent" type="FixedString" value="Ds_Spell_Cast_Poison"/>
+                    <attribute id="DamageType" type="uint8" value="11"/>
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFCDF727"/>
+                    <attribute id="LoopSoundEvent" type="FixedString" value="Ds_Spell_Loop_Poison"/>
+                    <attribute id="Name" type="LSString" value="Spell_PoisonDamage"/>
+                    <attribute id="PriorityOrder" type="int32" value="1"/>
+                    <attribute id="UUID" type="guid" value="1788ebdf-7d20-45f8-a9e3-56b76f22e44c"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="CastSoundEvent" type="FixedString" value="Ds_Spell_Cast_Acid"/>
+                    <attribute id="DamageType" type="uint8" value="4"/>
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFF7FF3A"/>
+                    <attribute id="LoopSoundEvent" type="FixedString" value="Ds_Spell_Loop_Acid"/>
+                    <attribute id="Name" type="LSString" value="Spell_AcidDamage"/>
+                    <attribute id="PriorityOrder" type="int32" value="1"/>
+                    <attribute id="UUID" type="guid" value="1466b5bf-eda5-4736-8906-6f089ea051a5"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="CastSoundEvent" type="FixedString" value="Ds_Spell_Cast_Fire"/>
+                    <attribute id="DamageType" type="uint8" value="7"/>
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFFE6A00"/>
+                    <attribute id="LoopSoundEvent" type="FixedString" value="Ds_Spell_Loop_Fire"/>
+                    <attribute id="Name" type="LSString" value="Spell_FireDamage"/>
+                    <attribute id="PriorityOrder" type="int32" value="1"/>
+                    <attribute id="UUID" type="guid" value="c600dd52-1241-4b00-8fcd-c1d4c018f6ce"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="CastSoundEvent" type="FixedString" value="Ds_Spell_Cast_Ice"/>
+                    <attribute id="DamageType" type="uint8" value="9"/>
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF32C2F0"/>
+                    <attribute id="LoopSoundEvent" type="FixedString" value="Ds_Spell_Loop_Ice"/>
+                    <attribute id="Name" type="LSString" value="Spell_ColdDamage"/>
+                    <attribute id="PriorityOrder" type="int32" value="1"/>
+                    <attribute id="UUID" type="guid" value="90687980-d08a-4593-b80a-522e70c249b1"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="CastSoundEvent" type="FixedString" value="Ds_Spell_Cast_Radiant"/>
+                    <attribute id="DamageType" type="uint8" value="12"/>
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFF3D565"/>
+                    <attribute id="LoopSoundEvent" type="FixedString" value="Ds_Spell_Loop_Radiant"/>
+                    <attribute id="Name" type="LSString" value="Spell_RadiantDamage"/>
+                    <attribute id="PriorityOrder" type="int32" value="1"/>
+                    <attribute id="UUID" type="guid" value="296af3e5-91ce-4c2c-9096-bfd3c7392758"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="CastSoundEvent" type="FixedString" value="Ds_Spell_Cast_Necrotic"/>
+                    <attribute id="DamageType" type="uint8" value="6"/>
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF04A89D"/>
+                    <attribute id="LoopSoundEvent" type="FixedString" value="Ds_Spell_Loop_Necrotic"/>
+                    <attribute id="Name" type="LSString" value="Spell_NecroticDamage"/>
+                    <attribute id="PriorityOrder" type="int32" value="1"/>
+                    <attribute id="UUID" type="guid" value="28208cb8-dc91-4088-a7d3-ae7aecdf9614"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="CastSoundEvent" type="FixedString" value="Ds_Spell_Cast_Lightning"/>
+                    <attribute id="DamageType" type="uint8" value="8"/>
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF299CF0"/>
+                    <attribute id="LoopSoundEvent" type="FixedString" value="Ds_Spell_Loop_Lightning"/>
+                    <attribute id="Name" type="LSString" value="Spell_LightningDamage"/>
+                    <attribute id="PriorityOrder" type="int32" value="1"/>
+                    <attribute id="UUID" type="guid" value="bf0725f8-f8aa-4c99-a410-4872b3ecc68e"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="CastSoundEvent" type="FixedString" value="Ds_Spell_Cast_Thunder"/>
+                    <attribute id="DamageType" type="uint8" value="5"/>
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF9369BD"/>
+                    <attribute id="LoopSoundEvent" type="FixedString" value="Ds_Spell_Loop_Thunder"/>
+                    <attribute id="Name" type="LSString" value="Spell_ThunderDamage"/>
+                    <attribute id="PriorityOrder" type="int32" value="1"/>
+                    <attribute id="UUID" type="guid" value="04862985-d0d4-49ed-8e09-cb6ab70c8fcd"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="CastSoundEvent" type="FixedString" value="Ds_Spell_Cast_Force"/>
+                    <attribute id="DamageType" type="uint8" value="13"/>
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFB9484A"/>
+                    <attribute id="LoopSoundEvent" type="FixedString" value="Ds_Spell_Loop_Force"/>
+                    <attribute id="Name" type="LSString" value="Spell_ForceDamage"/>
+                    <attribute id="PriorityOrder" type="int32" value="1"/>
+                    <attribute id="UUID" type="guid" value="404a8494-5033-4d0d-8f3e-87cf8c8f774f"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="CastSoundEvent" type="FixedString" value="Ds_Spell_Cast_Psychic"/>
+                    <attribute id="DamageType" type="uint8" value="10"/>
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFC35CFF"/>
+                    <attribute id="LoopSoundEvent" type="FixedString" value="Ds_Spell_Loop_Psychic"/>
+                    <attribute id="Name" type="LSString" value="Spell_PsychicDamage"/>
+                    <attribute id="PriorityOrder" type="int32" value="1"/>
+                    <attribute id="UUID" type="guid" value="54fb507c-2c3d-4acb-9c57-0d7b3c886404"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="CastSoundEvent" type="FixedString" value="Ds_Spell_Cast_Damage"/>
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFFF0000"/>
+                    <attribute id="LoopSoundEvent" type="FixedString" value="Ds_Spell_Loop_Damage"/>
+                    <attribute id="Name" type="LSString" value="Spell_DamageIntent"/>
+                    <attribute id="PriorityOrder" type="int32" value="5"/>
+                    <attribute id="SpellIntent" type="uint8" value="1"/>
+                    <attribute id="UUID" type="guid" value="633bade6-6805-4507-955a-ca9e3af9491b"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="CastSoundEvent" type="FixedString" value="Ds_Spell_Cast_Healing"/>
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF299CF0"/>
+                    <attribute id="LoopSoundEvent" type="FixedString" value="Ds_Spell_Loop_Healing"/>
+                    <attribute id="Name" type="LSString" value="Spell_HealingIntent"/>
+                    <attribute id="PriorityOrder" type="int32" value="5"/>
+                    <attribute id="SpellIntent" type="uint8" value="2"/>
+                    <attribute id="UUID" type="guid" value="faf39fa6-aa9f-4826-beb4-764da57c5675"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="CastSoundEvent" type="FixedString" value="Ds_Spell_Cast_Buff"/>
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF32C2F0"/>
+                    <attribute id="LoopSoundEvent" type="FixedString" value="Ds_Spell_Loop_Buff"/>
+                    <attribute id="Name" type="LSString" value="Spell_BuffIntent"/>
+                    <attribute id="PriorityOrder" type="int32" value="5"/>
+                    <attribute id="SpellIntent" type="uint8" value="3"/>
+                    <attribute id="UUID" type="guid" value="4551d0c9-95f6-4bff-977b-9aaf1d057697"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="CastSoundEvent" type="FixedString" value="Ds_Spell_Cast_Debuff"/>
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFD10A0A"/>
+                    <attribute id="LoopSoundEvent" type="FixedString" value="Ds_Spell_Loop_Debuff"/>
+                    <attribute id="Name" type="LSString" value="Spell_DebuffIntent"/>
+                    <attribute id="PriorityOrder" type="int32" value="5"/>
+                    <attribute id="SpellIntent" type="uint8" value="4"/>
+                    <attribute id="UUID" type="guid" value="f33cb6a0-494d-4eca-9c73-b137117f4f89"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="CastSoundEvent" type="FixedString" value="Ds_Spell_Cast_Control"/>
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFC35CFF"/>
+                    <attribute id="LoopSoundEvent" type="FixedString" value="Ds_Spell_Loop_Control"/>
+                    <attribute id="Name" type="LSString" value="Spell_ControlIntent"/>
+                    <attribute id="PriorityOrder" type="int32" value="5"/>
+                    <attribute id="SpellIntent" type="uint8" value="6"/>
+                    <attribute id="UUID" type="guid" value="a3d9bf9d-7390-4e13-b6d2-e6dfa61a5396"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="CastSoundEvent" type="FixedString" value="Ds_Spell_Cast_Summon"/>
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF04A88A"/>
+                    <attribute id="LoopSoundEvent" type="FixedString" value="Ds_Spell_Loop_Summon"/>
+                    <attribute id="Name" type="LSString" value="Spell_SummonIntent"/>
+                    <attribute id="PriorityOrder" type="int32" value="5"/>
+                    <attribute id="SpellIntent" type="uint8" value="7"/>
+                    <attribute id="UUID" type="guid" value="597c321d-d814-4ba4-91f3-8519fa0ae2ff"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="CastSoundEvent" type="FixedString" value="Ds_Spell_Cast_Utility"/>
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF948FFF"/>
+                    <attribute id="LoopSoundEvent" type="FixedString" value="Ds_Spell_Loop_Utility"/>
+                    <attribute id="Name" type="LSString" value="Spell_UtilityIntent"/>
+                    <attribute id="PriorityOrder" type="int32" value="5"/>
+                    <attribute id="SpellIntent" type="uint8" value="5"/>
+                    <attribute id="UUID" type="guid" value="36cb937c-3cb8-46b8-92ea-c5796c06873a"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFFFFFFF"/>
+                    <attribute id="Name" type="LSString" value="Status_Condition"/>
+                    <attribute id="PriorityOrder" type="int32" value="20"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Condition"/>
+                    <attribute id="UUID" type="guid" value="40f046f9-fa93-4fec-8e9d-ce41a9664b63"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF534066"/>
+                    <attribute id="Name" type="LSString" value="Status_Blinded"/>
+                    <attribute id="PriorityOrder" type="int32" value="10"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Blinded"/>
+                    <attribute id="UUID" type="guid" value="4b3fd477-af4c-4eea-980e-c37d65ae3bf0"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF8E00C0"/>
+                    <attribute id="Name" type="LSString" value="Status_Cursed"/>
+                    <attribute id="PriorityOrder" type="int32" value="10"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Cursed"/>
+                    <attribute id="UUID" type="guid" value="9897de7f-3f79-42a2-aee8-1315d2c8ec8d"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFF700E0"/>
+                    <attribute id="Name" type="LSString" value="Status_Charmed"/>
+                    <attribute id="PriorityOrder" type="int32" value="10"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Charmed"/>
+                    <attribute id="UUID" type="guid" value="655c25bc-b0ba-4540-a4ec-e940e57ee031"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF839A71"/>
+                    <attribute id="Name" type="LSString" value="Status_Disease"/>
+                    <attribute id="PriorityOrder" type="int32" value="10"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Disease"/>
+                    <attribute id="UUID" type="guid" value="b83b446e-7608-4f27-aacc-d82c0ff1921f"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFFFFFFF"/>
+                    <attribute id="Name" type="LSString" value="Status_Exausted"/>
+                    <attribute id="PriorityOrder" type="int32" value="10"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Exhausted"/>
+                    <attribute id="UUID" type="guid" value="4c339827-b5c2-4fa0-b0fe-34a378e3f4d6"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFD7004A"/>
+                    <attribute id="Name" type="LSString" value="Status_Frightened"/>
+                    <attribute id="PriorityOrder" type="int32" value="10"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Frightened"/>
+                    <attribute id="UUID" type="guid" value="8436b649-330e-420a-9888-13a570a210a9"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF880C0C"/>
+                    <attribute id="Name" type="LSString" value="Status_Incapacitated"/>
+                    <attribute id="PriorityOrder" type="int32" value="9"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Incapacitated"/>
+                    <attribute id="UUID" type="guid" value="ea3450e8-521d-46d7-a41b-f372e01e5c33"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF5D11B9"/>
+                    <attribute id="Name" type="LSString" value="Status_Invisible"/>
+                    <attribute id="PriorityOrder" type="int32" value="10"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Invisible"/>
+                    <attribute id="UUID" type="guid" value="8200c9c8-530e-43d4-abaa-147005dad069"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF71A930"/>
+                    <attribute id="Name" type="LSString" value="Status_Poisoned"/>
+                    <attribute id="PriorityOrder" type="int32" value="10"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Poisoned"/>
+                    <attribute id="UUID" type="guid" value="27b419e3-efda-4ac4-a925-aba36a906599"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF9C98A2"/>
+                    <attribute id="Name" type="LSString" value="Status_Prone"/>
+                    <attribute id="PriorityOrder" type="int32" value="9"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Prone"/>
+                    <attribute id="UUID" type="guid" value="7be8d9b4-2db7-4358-89bc-e12f22b04fdd"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFD7A918"/>
+                    <attribute id="Name" type="LSString" value="Status_Restrained"/>
+                    <attribute id="PriorityOrder" type="int32" value="9"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Restrained"/>
+                    <attribute id="UUID" type="guid" value="25fe192a-b62e-41d4-aa9d-dd75f82c64c1"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFFFFAB1"/>
+                    <attribute id="Name" type="LSString" value="Status_Stunned"/>
+                    <attribute id="PriorityOrder" type="int32" value="9"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Stunned"/>
+                    <attribute id="UUID" type="guid" value="428d8929-8c94-444b-8440-70d838d29ab9"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF515150"/>
+                    <attribute id="Name" type="LSString" value="Status_Unconscious"/>
+                    <attribute id="PriorityOrder" type="int32" value="9"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Unconscious"/>
+                    <attribute id="UUID" type="guid" value="08e05cc7-a8a6-4ac2-88d7-c9b4f8897d96"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFDFDF00"/>
+                    <attribute id="Name" type="LSString" value="Status_Paralyzed"/>
+                    <attribute id="PriorityOrder" type="int32" value="8"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Paralyzed"/>
+                    <attribute id="UUID" type="guid" value="0082e0e5-0b68-49b9-82b8-f5d9dbaaa71e"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF8639FA"/>
+                    <attribute id="Name" type="LSString" value="Status_Polymorph"/>
+                    <attribute id="PriorityOrder" type="int32" value="8"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Polymorph"/>
+                    <attribute id="UUID" type="guid" value="3cc52c30-e011-4ea4-88d1-5a8524ab6a7e"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFFCF4BE"/>
+                    <attribute id="Name" type="LSString" value="Status_Light"/>
+                    <attribute id="PriorityOrder" type="int32" value="10"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Light"/>
+                    <attribute id="UUID" type="guid" value="8c1189fd-8cfa-4bed-8989-e0753fff81cb"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF2D1E95"/>
+                    <attribute id="Name" type="LSString" value="Status_Disguise"/>
+                    <attribute id="PriorityOrder" type="int32" value="7"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Disguise"/>
+                    <attribute id="UUID" type="guid" value="957c65da-2578-4d33-9bd4-df9e854bc3e4"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF6F00DA"/>
+                    <attribute id="Name" type="LSString" value="Status_Possessed"/>
+                    <attribute id="PriorityOrder" type="int32" value="9"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Possessed"/>
+                    <attribute id="UUID" type="guid" value="9413919f-cefe-406c-9ca2-623cd8340247"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFD71F1F"/>
+                    <attribute id="Name" type="LSString" value="Status_Rage"/>
+                    <attribute id="PriorityOrder" type="int32" value="7"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Rage"/>
+                    <attribute id="UUID" type="guid" value="155dc475-f0d0-4bd7-93ff-f77d9eca5bc2"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFFF4040"/>
+                    <attribute id="Name" type="LSString" value="Status_Taunted"/>
+                    <attribute id="PriorityOrder" type="int32" value="9"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Taunted"/>
+                    <attribute id="UUID" type="guid" value="e53f68dc-cf48-4089-bd2e-1e50a47a0b55"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF6133FF"/>
+                    <attribute id="Name" type="LSString" value="Status_Dominated"/>
+                    <attribute id="PriorityOrder" type="int32" value="9"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Dominated"/>
+                    <attribute id="UUID" type="guid" value="28be0314-c819-4b6f-aa0f-f780adbeaf0b"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFFFFFFF"/>
+                    <attribute id="Name" type="LSString" value="Status_Approaching"/>
+                    <attribute id="PriorityOrder" type="int32" value="9"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Approaching"/>
+                    <attribute id="UUID" type="guid" value="1f9b8b30-6e5b-4a6e-bdf6-9dc025111a3e"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF6A01A4"/>
+                    <attribute id="Name" type="LSString" value="Status_Fleeing"/>
+                    <attribute id="PriorityOrder" type="int32" value="9"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Fleeing"/>
+                    <attribute id="UUID" type="guid" value="d39e04f9-d88b-4641-85ac-9388142c0624"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFCD0681"/>
+                    <attribute id="Name" type="LSString" value="Status_Confused"/>
+                    <attribute id="PriorityOrder" type="int32" value="10"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Confused"/>
+                    <attribute id="UUID" type="guid" value="088bf1a0-26bb-428f-877f-8c2de1cc20ec"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFFFFC5C"/>
+                    <attribute id="Name" type="LSString" value="Status_Mad"/>
+                    <attribute id="PriorityOrder" type="int32" value="10"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_Mad"/>
+                    <attribute id="UUID" type="guid" value="4702f1de-ad1a-4d72-a8af-9d50e7fcaf1e"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF73E9A8"/>
+                    <attribute id="Name" type="LSString" value="Status_DetectThoughts"/>
+                    <attribute id="PriorityOrder" type="int32" value="11"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_DetectThoughts"/>
+                    <attribute id="UUID" type="guid" value="0616f692-8a88-4c93-b8fe-7e342b16c145"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF923A02"/>
+                    <attribute id="Name" type="LSString" value="Status_DifficultTerrain"/>
+                    <attribute id="PriorityOrder" type="int32" value="10"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SG_DifficultTerrain"/>
+                    <attribute id="UUID" type="guid" value="1811eb96-a4da-4e37-a7de-ea48fefaebaa"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFCB9B00"/>
+                    <attribute id="Name" type="LSString" value="Status_Acid"/>
+                    <attribute id="PriorityOrder" type="int32" value="10"/>
+                    <attribute id="StatusGroup" type="FixedString" value="ACID"/>
+                    <attribute id="UUID" type="guid" value="52490d92-7828-4707-946f-12b15b25f31d"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFF24521"/>
+                    <attribute id="Name" type="LSString" value="Status_Burning"/>
+                    <attribute id="PriorityOrder" type="int32" value="10"/>
+                    <attribute id="StatusGroup" type="FixedString" value="BURNING;BURNING_LAVA;WILD_MAGIC_BURNING"/>
+                    <attribute id="UUID" type="guid" value="7811d402-f1fb-4239-83ff-bbcc0a7cc25d"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF98A8AE"/>
+                    <attribute id="Name" type="LSString" value="Status_CausticBrine"/>
+                    <attribute id="PriorityOrder" type="int32" value="10"/>
+                    <attribute id="StatusGroup" type="FixedString" value="CAUSTIC_BRINE"/>
+                    <attribute id="UUID" type="guid" value="81eddbc8-bc34-4786-86c4-e3ffddb01993"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF32C2F0"/>
+                    <attribute id="Name" type="LSString" value="Status_Chilled"/>
+                    <attribute id="PriorityOrder" type="int32" value="10"/>
+                    <attribute id="StatusGroup" type="FixedString" value="CHILLED"/>
+                    <attribute id="UUID" type="guid" value="1f563716-4272-401e-9595-af5b0402511a"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF71A930"/>
+                    <attribute id="Name" type="LSString" value="Status_PoisonedSurface"/>
+                    <attribute id="PriorityOrder" type="int32" value="10"/>
+                    <attribute id="StatusGroup" type="FixedString" value="POISONED;POISONED_CLOUD"/>
+                    <attribute id="UUID" type="guid" value="2488c9ba-0876-4038-be2a-b478ba5ba991"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF299CF0"/>
+                    <attribute id="Name" type="LSString" value="Status_Shocked"/>
+                    <attribute id="PriorityOrder" type="int32" value="10"/>
+                    <attribute id="StatusGroup" type="FixedString" value="SHOCKED;SHOCKED_SURFACE"/>
+                    <attribute id="UUID" type="guid" value="92fc142d-864d-4480-a99c-2f31817cb4fb"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FFC5C5AE"/>
+                    <attribute id="Name" type="LSString" value="Status_Web"/>
+                    <attribute id="PriorityOrder" type="int32" value="10"/>
+                    <attribute id="StatusGroup" type="FixedString" value="WEB"/>
+                    <attribute id="UUID" type="guid" value="6af87884-4356-466a-ba19-f6c9f556b406"/>
+                </node>
+                <node id="LightbarHaptics">
+                    <attribute id="Lightbar_Colour" type="LSString" value="#FF38BBFF"/>
+                    <attribute id="Name" type="LSString" value="Status_Wet"/>
+                    <attribute id="PriorityOrder" type="int32" value="11"/>
+                    <attribute id="StatusGroup" type="FixedString" value="WET"/>
+                    <attribute id="UUID" type="guid" value="645b6193-7591-4f44-99e1-125e091f6152"/>
+                </node>
+            </children>
+        </node>
+    </region>
+</save>

@@ -1,0 +1,156 @@
+game.roots.PlatformSplineMovement = State{
+    function()
+        description = [[Makes a platform move along a platform spline]]
+
+        params.PlatformSpline = {
+            type = EParamType.String,
+            required = true,
+            help = [[The spline the platform has to follow]]
+        }
+        params.Speed = {
+            type = EParamType.Number,
+            default = 1.0,
+            help = [[The platform movement speed along the spline]]
+        }
+        params.PauseBetweenNodes = {
+            type = EParamType.Number,
+            default = 6.0,
+            help = [[Wait X seconds at each spline point]]
+        }
+        params.StartSplinePoint = {
+            type = EParamType.Int,
+            default = 0,
+            help = [[Spline point from which to start moving (zero-based)]]
+        }
+        params.StartMovementOnActivation = {
+            type = EParamType.Bool,
+            default = false,
+            help = [[The platform moves as long as it is active]]
+        }
+        params.ReverseAtEnd = {
+            type = EParamType.Bool,
+            default = false,
+            help = [[If true, the platform starts moving backwards along the spline when reaching the end.
+                     If false, the platform moves back/along to the first splint point when reaching the end.]]
+        }
+        params.SoundOnMovementStart = {
+            type = EParamType.String,
+            required = false,
+            help = [[Sound to play when the platform starts moving]]
+        }
+        params.SoundOnMovementStop = {
+            type = EParamType.String,
+            required = false,
+            help = [[Sound to play when the platform stops moving]]
+        }
+
+        inputs.StartMoving = {help = [[Start platform movement]]}
+        inputs.StopAfterCurrentMove = {help = [[Stop platform movement (at the next spline point, if it's currently moving)]]}
+        outputs.ReachedNode = {help = [[Reached a node of the spline. Parameter is the node number (zero-based)]]}
+
+        local maxSplinePoint
+
+        helpers.Init = function()
+            local currentSplinePoint = params.StartSplinePoint
+            if currentSplinePoint > maxSplinePoint then
+                currentSplinePoint = maxSplinePoint
+            end
+            me.Blackboard.SetFact("Cnst.PlatformSplineMovement.CurrentSplinePoint", currentSplinePoint)
+            me.Blackboard.SetFact("Cnst.PlatformSplineMovement.Reversing", 0)
+
+            -- Platform is currently moving
+            me.Blackboard.SetFact("Cnst.PlatformSplineMovement.IsMoving", params.StartMovementOnActivation and 1 or 0)
+            -- Platform should keep moving once it arrives at the next spline point
+            me.Blackboard.SetFact("Cnst.PlatformSplineMovement.KeepMoving", params.StartMovementOnActivation and 1 or 0)
+
+            if params.StartMovementOnActivation then
+                helpers.MovePlatformToNextSplinePoint()
+            end
+        end
+
+        self.OnEditorChanges = function()
+            -- in case the parameters get changed before entering game mode,
+            -- or when initially assigning a constellation config
+            maxSplinePoint = Spline(params.PlatformSpline).NodeCount - 1
+            helpers.Init()
+        end
+
+        self.OnInit = function(e)
+            -- Can't do this in OnLoaded, the spline component doesn't exist yet at that point...
+            maxSplinePoint = Spline(params.PlatformSpline).NodeCount - 1
+
+            if me.Blackboard.GetFact("Cnst.PlatformSplineMovement.CurrentSplinePoint") ~= nil then
+                return
+            end
+
+            helpers.Init()
+        end
+
+        helpers.MovePlatformToNextSplinePoint = function(isStart)
+            isStart = isStart or false --If isStart is nil, it defaults to false
+            local currentSplinePoint = me.Blackboard.GetFact("Cnst.PlatformSplineMovement.CurrentSplinePoint")
+            local reversing = (me.Blackboard.GetFact("Cnst.PlatformSplineMovement.Reversing") ~= 0) and true or false
+            local targetSplinePoint = currentSplinePoint + (reversing and -1 or 1)
+            if (targetSplinePoint < 0) or
+               (targetSplinePoint > maxSplinePoint) then
+                if params.ReverseAtEnd then
+                    reversing = not reversing
+                    me.Blackboard.SetFact("Cnst.PlatformSplineMovement.Reversing", reversing and 1 or 0)
+                    targetSplinePoint = currentSplinePoint + (reversing and -1 or 1)
+                    -- edge case: the spline only has a single point
+                    if maxSplinePoint == 0 then
+                        targetSplinePoint = 0
+                    end
+                else
+                    targetSplinePoint = 0
+                end
+            end
+            if params.SoundOnMovementStart ~= nil then
+                PlaySound(me, params.SoundOnMovementStart)
+            end
+            MovePlatformOnSpline(me, Entity(params.PlatformSpline), currentSplinePoint, targetSplinePoint, params.Speed, "Cnst.PlatformSplineMovement.PlatformMoved", isStart)
+            me.Blackboard.SetFact("Cnst.PlatformSplineMovement.CurrentSplinePoint", targetSplinePoint)
+            me.Blackboard.SetFact("Cnst.PlatformSplineMovement.IsMoving", 1)
+        end
+
+        socketEvents.StartMoving = function(ev)
+            if me.Blackboard.GetFact("Cnst.PlatformSplineMovement.IsMoving") ~= 1 then
+                helpers.MovePlatformToNextSplinePoint(true)
+            end
+            me.Blackboard.SetFact("Cnst.PlatformSplineMovement.KeepMoving", 1)
+        end
+
+        socketEvents.StopAfterCurrentMove = function(ev)
+            -- We can't stop the current movement...
+            me.Blackboard.SetFact("Cnst.PlatformSplineMovement.KeepMoving", 0)
+            StopTimer(me, "Cnst.PlatformSplineMovement.WaitBeforeNextMove")
+        end
+
+        events.TimerFinished = function(ev)
+            if ev.TimerName == "Cnst.PlatformSplineMovement.WaitBeforeNextMove" then
+                helpers.MovePlatformToNextSplinePoint()
+            end
+        end
+
+        events.PlatformMoveFinished = function(ev)
+            if me == Entity(ev.Target.EntityRef) then
+                if ev.EventId == "Cnst.PlatformSplineMovement.PlatformMoved" then
+                    me.Blackboard.SetFact("Cnst.PlatformSplineMovement.IsMoving", 0)
+                    if params.SoundOnMovementStop ~= nil then
+                        PlaySound(me, params.SoundOnMovementStop)
+                    end
+                    local currentSplinePoint = me.Blackboard.GetFact("Cnst.PlatformSplineMovement.CurrentSplinePoint")
+                    TriggerOutput(outputs.ReachedNode, me.EntityRef, currentSplinePoint)
+                    if me.Blackboard.GetFact("Cnst.PlatformSplineMovement.KeepMoving") == 1 then
+                        if params.PauseBetweenNodes > 0 then
+                            StartTimer(me, "Cnst.PlatformSplineMovement.WaitBeforeNextMove", params.PauseBetweenNodes, 0)
+                        else
+                            helpers.MovePlatformToNextSplinePoint()
+                        end
+                    end
+                end
+            end
+        end
+
+    end
+}

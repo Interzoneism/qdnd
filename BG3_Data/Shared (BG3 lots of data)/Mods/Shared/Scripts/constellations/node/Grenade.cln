@@ -1,0 +1,97 @@
+game.states.Grenade = State{
+    function()
+        params.Projectile = {
+            type = EParamType.String,
+            default = "Projectile_Grenade_Bomb",
+            help = [[The projectile spell used when the grenade explodes]]
+        }
+
+        params.GrenadeType = {
+            type = EParamType.String,
+            default="ExplodeOnDamage",
+            help = [[Type of grenade. Options:
+                ExplodeOnDamage - Explodes when any kind of damage is received.
+                ExplodeOnDestroy - Explodes only when it's destroyed
+            ]],
+        }
+
+        params.TargetEntity = {type = EParamType.String, default = "me", help = "Object that should explode."}
+
+        inputs.TookDamage = {internal = true}
+
+        inputs.Explode = {help = "Makes the grenade explode"}
+
+        outputs.OnExploded = {help = "The grenade exploded"}
+
+        helpers.Init = function()
+            if me.Blackboard.GetFact("Cnst.Grenade.Initialised") ~= 1 then
+                me.Blackboard.SetFact("Cnst.Grenade.Initialised", 1)
+                SetScriptedExplosionSpell(me,params.Projectile)
+                ClearOnDamageSpells(me)
+                AddOnDamageSpell(me, params.Projectile, 0, DamageType.NONE)
+            end
+        end
+
+        self.OnLoaded = function()
+            helpers.Init()
+        end
+
+        self.OnEditorChanges = function()
+            me.Blackboard.ClearFact("Cnst.Grenade.Initialised")
+            helpers.Init()
+        end
+
+        helpers.Explode = function(sourceEntity)
+            local targetEntity = (params.TargetEntity == "me") and me or FindEntity(params.TargetEntity)
+            if targetEntity then
+                --use the explode call because this might be triggered by dying entities
+                local stackCount = targetEntity.IsItem and targetEntity.Item.StackAmount or 1
+                ExplodeProjectileAt(params.Projectile, targetEntity, sourceEntity)
+                if stackCount > 1 then
+                    -- request from system design: spawn an explosion for every item in the stack
+                    local count = stackCount - 1
+                    local baseLocation = targetEntity.Position
+                    for i = 1, count do
+                        local x = math.random() * 0.25 - 0.125
+                        local z = math.random() * 0.25 - 0.125
+                        local offset = ls.math.Vector3(x,0.0,z)
+                        local explosionLocation = baseLocation + offset
+                        --TODO: do we want to ray cast to make sure we don't go through walls?
+                        --Might not be worth the effort, since we varied our offset to be relatively small
+                        ExplodeProjectileAt(params.Projectile, explosionLocation, sourceEntity)
+                    end
+                end
+                --immediately die then as well in case you weren't dead already
+                if not targetEntity.IsDead then
+                    Die(targetEntity, DeathType.EXPLODE, sourceEntity)
+                end
+            end
+            TriggerOutput(outputs.OnExploded, sourceEntity and sourceEntity.EntityRef or nil)
+        end
+
+        nodes.DamageTrigger = Proxy{
+            game.states.DamageTrigger,
+            params = {ExcludeDamageTypes = true},
+            outputs = {TookDamage = {inputs.TookDamage}}
+        }
+
+        socketEvents.TookDamage = function(ev)
+            if params.GrenadeType == "ExplodeOnDamage" then
+                local sourceEntity = ev.Object and Entity(ev.Object) or nil
+                helpers.Explode(sourceEntity)
+            end
+        end
+
+        socketEvents.Explode = function(ev)
+            local sourceEntity = ev.Object and Entity(ev.Object) or nil
+            helpers.Explode(sourceEntity)
+        end
+
+        events.Destroyed = function(ev)
+            if ev.Entity == me and params.GrenadeType == "ExplodeOnDestroy" then
+                local sourceEntity = ev.Destroyer
+                helpers.Explode(sourceEntity)
+            end
+        end
+    end
+}

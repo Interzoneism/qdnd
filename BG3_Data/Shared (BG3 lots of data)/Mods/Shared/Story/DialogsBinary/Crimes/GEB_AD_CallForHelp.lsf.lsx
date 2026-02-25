@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="6" revision="0" build="1" lslib_meta="v1,bswap_guids,lsf_keys_adjacency" />
+	<region id="dialog">
+		<node id="dialog">
+			<attribute id="automated" type="bool" value="True" />
+			<attribute id="category" type="LSString" value="Automated NPC Dialog" />
+			<attribute id="UUID" type="FixedString" value="6332916e-c1bc-4bcb-9963-b7a5a3e09e0f" />
+			<attribute id="TimelineId" type="FixedString" value="d213aa7a-7d88-67db-adb0-8c2766b261f1" />
+			<children>
+				<node id="DefaultAddressedSpeakers" />
+				<node id="speakerlist">
+					<children>
+						<node id="speaker" key="index">
+							<attribute id="index" type="FixedString" value="0" />
+							<attribute id="list" type="LSString" value="f27c125a-da67-4e80-9456-214c63672c84;9bc90704-dda4-244a-2f89-26f7470ed54d;00efc7b5-aa56-44d2-82f2-eff30e451e1e;6fe77279-1bba-5cc0-a5e0-34beabd2501d;74890c9b-878d-4346-9ab6-704c108f4230;3650e5f8-c146-f0f9-2e89-fae58d6795b5;92cd2945-0796-4886-b15c-b76ae5c865f7;fcc5f759-3d1a-4088-99d5-a99b4838b285;3d751bf0-8a47-4855-9392-cab6aad7e89e;dedfc55f-cde9-4fa9-9566-8670b0c3e324;c5f7c2b4-d5a9-890a-673d-7eef6774ff49;93636b10-874e-a985-3c79-4ca9a5953687;f5cc68da-6a71-48f5-a2d6-a3c32f858d18;add5addb-5b80-e30a-c455-19f4a7169256;11c9e4ad-6b39-c107-8b74-263094040c33;b0b39454-2bf3-d2cd-04e2-0c5cb500e982;4bdd9996-42f7-47dc-9a2b-1d9bfa2e738f;ead76f6a-e541-affe-547b-ae6344cdfc95;c27cf770-ee6a-4206-a97f-62c9d16f6239;f29dc9dd-c36b-4ce1-8253-93db1c5d4fe1;6e51f2eb-9fdf-4f95-a66b-7043e700795b;dac0f3e5-5103-4316-aedf-5272e8f0ab96" />
+							<attribute id="SpeakerMappingId" type="guid" value="638db24d-ff6f-c22d-c0de-7db0f960a82d" />
+						</node>
+					</children>
+				</node>
+				<node id="nodes">
+					<children>
+						<node id="node" key="UUID">
+							<attribute id="constructor" type="FixedString" value="TagGreeting" />
+							<attribute id="UUID" type="FixedString" value="14c52679-2cbf-491e-ad99-2ed534d8126f" />
+							<attribute id="endnode" type="bool" value="True" />
+							<attribute id="Root" type="bool" value="True" />
+							<attribute id="waittime" type="float" value="3" />
+							<attribute id="speaker" type="int32" value="0" />
+							<children>
+								<node id="children" />
+								<node id="GameData">
+									<children>
+										<node id="AiPersonalities" key="AiPersonality" />
+										<node id="MusicInstrumentSounds" />
+										<node id="OriginSound" />
+									</children>
+								</node>
+								<node id="Tags" />
+								<node id="setflags" />
+								<node id="checkflags" />
+								<node id="TaggedTexts">
+									<children>
+										<node id="TaggedText">
+											<attribute id="HasTagRule" type="bool" value="True" />
+											<children>
+												<node id="TagTexts">
+													<children>
+														<node id="TagText">
+															<attribute id="TagText" type="TranslatedString" handle="h41dbc505g9fa4g44eag8bfag59c981f91c76" version="2" />
+															<attribute id="LineId" type="guid" value="44c86b90-39ed-6d20-d8da-aa9aefacd0dd" />
+															<attribute id="stub" type="bool" value="True" />
+														</node>
+														<node id="TagText">
+															<attribute id="TagText" type="TranslatedString" handle="hb3612830g20b8g45fdga602g0314244e09d0" version="2" />
+															<attribute id="LineId" type="guid" value="f11c6852-168b-1345-79cd-d1bec06edaaa" />
+															<attribute id="stub" type="bool" value="True" />
+														</node>
+														<node id="TagText">
+															<attribute id="TagText" type="TranslatedString" handle="h8f12e803ge605g46fag8066g66b0658b03f6" version="2" />
+															<attribute id="LineId" type="guid" value="adc8f039-4c7f-baff-ca94-050b2d4dcb49" />
+															<attribute id="stub" type="bool" value="True" />
+														</node>
+														<node id="TagText">
+															<attribute id="TagText" type="TranslatedString" handle="hd9f88af8g0075g4fbfgb2f7ge4085898470a" version="1" />
+															<attribute id="LineId" type="guid" value="9c082a6e-49a4-3df3-1cfe-357c4f7e04fc" />
+															<attribute id="stub" type="bool" value="True" />
+														</node>
+														<node id="TagText">
+															<attribute id="TagText" type="TranslatedString" handle="hc448f331g4232g4e95gb094g32e10a665216" version="1" />
+															<attribute id="LineId" type="guid" value="020b0d71-607c-e1d9-a7f1-724fa4252786" />
+															<attribute id="stub" type="bool" value="True" />
+														</node>
+														<node id="TagText">
+															<attribute id="TagText" type="TranslatedString" handle="h6d65fcbbgbdaeg43d5g8e65g2bcdf795b543" version="1" />
+															<attribute id="LineId" type="guid" value="50b7612d-fe11-13d2-d506-e2d0405154e4" />
+															<attribute id="stub" type="bool" value="True" />
+														</node>
+														<node id="TagText">
+															<attribute id="TagText" type="TranslatedString" handle="h774f9421g87b8g45eagb4a7gafa6795cf487" version="1" />
+															<attribute id="LineId" type="guid" value="9f59c45d-2bbe-ad91-7965-af2d26c3a6f2" />
+															<attribute id="stub" type="bool" value="True" />
+														</node>
+													</children>
+												</node>
+												<node id="RuleGroup">
+													<attribute id="TagCombineOp" type="uint8" value="0" />
+													<children>
+														<node id="Rules" />
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="RootNodes">
+							<attribute id="RootNodes" type="FixedString" value="14c52679-2cbf-491e-ad99-2ed534d8126f" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

@@ -1,0 +1,141 @@
+game.states.SpellCast = State{
+    function()
+
+        description = [[Cast a spell when triggered.]]
+
+        params.Caster = {
+            type = EParamType.String,
+            help = [[The entity that will cast the spell. Currently only 'me' is supported)]],
+            default = "me",
+            required = false
+        }
+
+        params.ResponsibleCaster = {
+            type = EParamType.String,
+            help = [[The entity marked as responsible for casting the spell.
+                     If empty, uses the object parameter of the Cast socket event.
+                     Can be 'me' to set to the entity to which the config is attached.]],
+            default = "",
+            required = false
+        }
+
+        params.TargetEntity = {
+            type = EParamType.String,
+            help = [[Target of the spell.
+                    If empty, the spell will be cast on the object parameter of the Cast socket event
+                    (conventionally the character that triggered the trap).
+                    Can be 'me' to set to the entity to which the config is attached.]],
+            default = "me",
+            required = false
+        }
+
+        params.TargetEntity2 = {
+            type = EParamType.String,
+            help = "Second target of the spell.",
+            default = "",
+            required = false
+        }
+
+        params.CastAtPosition = {
+            type = EParamType.Bool,
+            help = "If true, cast at TargetEntity's position instead of target itself",
+            default = true
+        }
+
+        params.Spell = {
+            type = EParamType.String,
+            help = [[The spell to cast]],
+            required = true
+        }
+
+        params.VFX = {type = EParamType.String,
+            help = [[VFX played on the caster when spell is cast.]],
+            required=false,
+            default = ""
+        }
+
+
+        inputs.Cast = {help = [[Trigger the spellcast.]]}
+        outputs.SuccessfulCast = {help = [[Successfully cast a spell.]]}
+        outputs.FailedCast = {help = [[Failed to cast a spell (was still busy casting a spell, or spell cast failed).]]}
+
+
+        local preparedVFX = nil
+
+        self.OnLoaded = function()
+            if not me.IsItem then
+                DebugLogCritical("The CastSpell config can only be assigned to items. Helpers, triggers, etc cannot cast spells. Config attached to Name (UUID): [1] ([2])", me.Name, me.UUID)
+            end
+
+            if params.Caster ~= "me" then
+                DebugLogCritical("The CastSpell config currently only supports 'me' as caster, but is using [3]. Config attached to Name (UUID): [1] ([2])", me.Name, me.UUID, params.Caster)
+            end
+        end
+
+        self.OnInit = function()
+            if params.VFX ~= "" then
+                preparedVFX = PrepareEffect(params.VFX)
+            end
+        end
+
+
+        socketEvents.Cast = function(ev)
+            local triggerEntity = ev.Object and Entity(ev.Object) or nil
+            if me.Blackboard.GetFact("Cnst.SpellCast.CastingSpell") == 1 then
+                TriggerOutput(outputs.FailedCast, triggerEntity and triggerEntity.EntityRef or nil)
+                return
+            end
+
+            local responsibleCaster
+            if params.ResponsibleCaster ~= "" then
+                responsibleCaster = (params.ResponsibleCaster == "me") and me or Entity(params.ResponsibleCaster)
+            else
+                responsibleCaster = triggerEntity
+            end
+
+            local targetEntity
+            if params.TargetEntity ~= "" then
+                targetEntity = (params.TargetEntity == "me") and me or Entity(params.TargetEntity)
+            else
+                targetEntity = triggerEntity
+            end
+
+            local targetEntity2 = nil
+            if params.TargetEntity2 ~= "" then
+                targetEntity2 = (params.TargetEntity2 == "me") and me or Entity(params.TargetEntity2)
+            end
+
+            local caster = (params.Caster == "me") and me or Entity(params.Caster)
+            local target = params.CastAtPosition and targetEntity.Position or targetEntity
+            local target2 = (params.CastAtPosition and (targetEntity2 ~= nil)) and targetEntity2.Position or targetEntity2
+
+            if preparedVFX ~= nil then
+                PlayEffectAt(preparedVFX, caster)
+            end
+            UseSpellImmediate(caster, params.Spell, target, target2, nil, nil, true, false, responsibleCaster)
+
+            me.Blackboard.SetFact("Cnst.SpellCast.CastingSpell",1)
+            if triggerEntity ~= nil then
+                me.Blackboard.SetFact("Cnst.SpellCast.TriggerEntity", triggerEntity)
+            end
+
+        end
+
+        events.SpellCastResult = function(ev)
+            if me.Blackboard.GetFact("Cnst.SpellCast.CastingSpell") == 1 then
+                me.Blackboard.ClearFact("Cnst.SpellCast.CastingSpell")
+
+                local triggerEntity = me.Blackboard.GetFact("Cnst.SpellCast.TriggerEntity")
+                triggerEntity = triggerEntity and triggerEntity.EntityRef or triggerEntity
+                if ev.Success then
+                    TriggerOutput(outputs.SuccessfulCast, triggerEntity)
+                else
+                    TriggerOutput(outputs.FailedCast, triggerEntity)
+                end
+
+                me.Blackboard.ClearFact("Cnst.SpellCast.TriggerEntity")
+            end
+        end
+
+    end
+}

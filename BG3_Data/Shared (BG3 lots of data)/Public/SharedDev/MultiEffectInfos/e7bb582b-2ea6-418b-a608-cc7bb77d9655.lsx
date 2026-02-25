@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<save>
+    <version major="4" minor="0" revision="8" build="600"/>
+    <region id="MultiEffectInfos">
+        <node id="root">
+            <attribute id="Name" type="LSString" value="Pounce_Dilophosaurus_TargetEffect"/>
+            <attribute id="UUID" type="guid" value="e7bb582b-2ea6-418b-a608-cc7bb77d9655"/>
+            <children>
+                <node id="EffectInfo">
+                    <attribute id="BindSourceTo" type="FixedString" value="SourceEntity"/>
+                    <attribute id="BindTargetTo" type="FixedString" value="TargetEntity"/>
+                    <attribute id="DamageType" type="uint32" value="0"/>
+                    <attribute id="DetachSource" type="bool" value="false"/>
+                    <attribute id="DetachTarget" type="bool" value="false"/>
+                    <attribute id="EffectResourceGuid" type="guid" value="60e6f093-da6a-ebf4-30b1-93bedcb54ae5"/>
+                    <attribute id="Enabled" type="bool" value="true"/>
+                    <attribute id="KeepRotation" type="bool" value="false"/>
+                    <attribute id="KeepScale" type="bool" value="true"/>
+                    <attribute id="MainHand" type="bool" value="false"/>
+                    <attribute id="MaxDistance" type="float" value="0"/>
+                    <attribute id="MinDistance" type="float" value="0"/>
+                    <attribute id="OffHand" type="bool" value="false"/>
+                    <attribute id="Pivot" type="FixedString" value="Target"/>
+                    <attribute id="UUID" type="guid" value="98e2e0a4-2c53-4384-8113-8c7cff47f9d2"/>
+                    <attribute id="UseDistance" type="bool" value="false"/>
+                    <attribute id="UseOrientDirection" type="bool" value="false"/>
+                    <attribute id="UseScaleOverride" type="bool" value="false"/>
+                    <attribute id="VerbalIntent" type="uint32" value="0"/>
+                    <children>
+                        <node id="TargetBone">
+                            <attribute id="Value" type="LSString" value="Dummy_Root"/>
+                        </node>
+                    </children>
+                </node>
+            </children>
+        </node>
+    </region>
+</save>

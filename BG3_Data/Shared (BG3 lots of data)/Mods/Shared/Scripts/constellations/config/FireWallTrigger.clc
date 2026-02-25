@@ -1,0 +1,28 @@
+game.configs.FirewallTrigger = Config{
+    params={
+        StartOn2 = {
+            type = EParamType.Bool,
+            help = [[Is the second ring active (or destroyed)?]],
+            required = false,
+            default = false
+        },
+        StartOn1 = {
+            type = EParamType.Bool,
+            help = [[Is the second ring active (or destroyed)?]],
+            required = false,
+            default = false
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.FirewallTrigger,
+            StartOn1 = params.StartOn1,
+            StartOn2 = params.StartOn2,
+        },
+    },
+    inputs={
+        On2=ExtSocket{description=[[Second Ring's On socket]],{SocketRef{[[root.logic.inputs.On2]]}}},
+        On1=ExtSocket{description=[[First Ring's On socket]],{SocketRef{[[root.logic.inputs.On1]]}}},
+        Off1=ExtSocket{description=[[First Ring's Off socket]],{SocketRef{[[root.logic.inputs.Off1]]}}},
+        Off2=ExtSocket{description=[[Second Ring's Off socket]],{SocketRef{[[root.logic.inputs.Off2]]}}},
+    }
+}

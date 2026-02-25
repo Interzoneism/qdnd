@@ -1,0 +1,32 @@
+local m = AnubisModule()
+
+-- return random float number in range [lowerValue, upperValue)
+m.random = function(lowerValue, upperValue)
+    return math.random() * (upperValue - lowerValue) + lowerValue
+end
+
+m.CoinToss = function(winProbability)
+    winProbability = winProbability or 0.5
+    return math.random() < winProbability
+end
+
+-- Vectors always have to be ls.math.Vector3
+m.VectorMagnitude = function(a)
+    return math.sqrt((a.X * a.X) + (a.Y * a.Y) + (a.Z * a.Z))
+end
+
+m.VectorDot = function(a, b)
+    return (a.X * b.X) + (a.Y * b.Y) + (a.Z * b.Z)
+end
+
+m.VectorAngle = function(a, b)
+    local radAngle = math.acos(this.VectorDot(a, b) / (this.VectorMagnitude(a) * this.VectorMagnitude(b)))
+    return math.deg(radAngle)
+end
+
+m.VectorNormalize = function(a)
+    local mag = this.VectorMagnitude(a)
+    return ls.math.Vector3(a.X / mag, a.Y / mag, a.Z / mag)
+end
+
+return m

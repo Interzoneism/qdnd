@@ -1,0 +1,24 @@
+game.actions.generics.SelfHealing = Action
+{
+    function()
+        if not me.Character.IsInteractionDisabled then
+            -- ignore cast checks/has spell
+            UseSpell("Shout_RegainHP_Peace_NPC", me, nil, nil, nil, true, true, false, false, true)
+        else
+            DebugText(me, "Can't heal because can't act")
+        end
+    end
+}
+
+game.actions.generics.SelfHealingStatus = Action
+{
+    function()
+        if not me.Character.IsInteractionDisabled then
+            -- ignore cast checks/has spell
+            ApplyStatus(me, "REGAINHP_PEACE_NPC", true, 0.5)
+            Sleep(1.0)
+        else
+            DebugText(me, "Can't heal because can't act")
+        end
+    end
+}

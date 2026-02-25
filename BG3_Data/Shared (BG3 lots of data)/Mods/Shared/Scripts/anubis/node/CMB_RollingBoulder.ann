@@ -1,0 +1,49 @@
+game.states.Rolling =  State{function ()
+    local boomExclude = {}
+    local attackOwner = me
+
+    self.CanEnter = function()
+        return true
+    end
+
+    nodes.IdleWait = Action{
+        function()
+            WaitForInterrupt()
+        end
+    }
+
+    helpers.CheckEntities = function()
+        local objects = GetEntitiesOn(me)
+        for _, object in ipairs(objects) do
+            local objectUUID = object.UUID.String
+            if not boomExclude[objectUUID] then
+                boomExclude[objectUUID] = true
+                ExplodeProjectileAt("Projectile_RollingBoulder", object, attackOwner or me)
+            end
+        end
+    end
+
+    events.TimerFinished  = function(e)
+        if e.TimerName == "CMB_ObjectOnMeChecker" then
+            helpers.CheckEntities()
+        end
+    end
+
+    events.EntityEvent = function(e)
+        if e.TargetEntity == me then
+            if e.Event == "CMB_BoulderDeactivate" then
+                boomExclude = {}
+            end
+            if e.TargetEntity == me and e.Params[1] then
+                if e.Event == "CMB_SetAttackOwner" then
+                    attackOwner = e.Params[1]
+                end
+            end
+        end
+
+    end
+
+
+end
+}
+

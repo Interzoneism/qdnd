@@ -1,0 +1,95 @@
+game.states.WaypointShrine = State{function ()
+    description = [[Script for Waypoint Shrines]]
+    params.UnlockDistance = {type = EParamType.Number, required=false, default=18.0, help=[[
+        Range at which the Waypoint can be unlocked
+    ]]}
+    params.IgnoreSight = {type = EParamType.Bool, required=false, default=false, help=[[
+        Whether the Waypoint must be seen to be unlocked
+    ]]}
+    params.DiscoveredEffect = {type = EParamType.String, required=false, default="", help=[[
+        Effect to play when the Waypoint is unlocked
+    ]]}
+    params.DiscoveredLoopEffect = {type = EParamType.String, required=false, default="", help=[[
+        Looping effect to play when the Waypoint is unlocked
+    ]]}
+    params.LoopEffectDelay = {type = EParamType.Number, required=false, default=0, help=[[
+        Delay before playing looping effect when the Waypoint is unlocked
+    ]]}
+    params.DiscoveredAnimation = {type = EParamType.String, required=false, default="", help=[[
+        Effect to play when the Waypoint is unlocked
+    ]]}
+    local effect,loop,delay,anim
+    local playDiscovered = false
+    local wasDiscovered = false
+
+    self.OnInit = function()
+        if (params.DiscoveredEffect ~= "") then
+            effect = PrepareEffect(params.DiscoveredEffect)
+        end
+        if (params.DiscoveredLoopEffect ~= "") then
+            if (ls.CheckType(loop,ls.anubis.game.PlayingEffect)) then
+                loop = PlayEffectAt(PrepareEffect(params.DiscoveredLoopEffect),me)
+            else
+                loop = PrepareEffect(params.DiscoveredLoopEffect)
+            end
+        end
+        if (params.DiscoveredAnimation ~= "") then
+            anim = Animation(params.DiscoveredAnimation)
+        end
+    end
+
+    events.Activated = function()
+        if not wasDiscovered then
+            StartTimer(me,"WaypointCheckForPlayers",1,-1)
+        end
+    end
+    events.Deactivated = function()
+        StopTimer(me,"WaypointCheckForPlayers")
+    end
+    events.TimerFinished = function(e)
+        if (e.TimerName == "WaypointCheckForPlayers") then
+            local near = GetActiveCharacters(me,params.UnlockDistance)
+            for _,v in ipairs(near) do
+                if (v.Character.IsPlayer and (params.IgnoreSight or CanSee(v,me))) then
+                    SetUnicastEntityEvent(v,"WaypointDiscovered",me)
+                    wasDiscovered = true
+                    StopTimer(me,"WaypointCheckForPlayers")
+                end
+            end
+        end
+    end
+    events.EntityEvent = function(e)
+        if (e.TargetEntity == me and e.Event == "WaypointDiscoveredEffect") then
+            playDiscovered = true
+            Interrupt()
+        end
+    end
+    events.OnShutdown = function()
+        if (ls.CheckType(loop,ls.anubis.game.PlayingEffect)) then
+            StopEffect(loop)
+        end
+    end
+
+    nodes.Discover = Action {
+        function()
+            if (effect) then
+                PlayEffectAt(effect,me)
+            end
+            if (anim) then
+                PlayAnimation(anim,false)
+                anim = false
+            end
+            if (ls.CheckType(loop,ls.anubis.game.PreparedEffect)) then
+                Sleep(params.LoopEffectDelay)
+                loop = PlayEffectAt(loop,me)
+            end
+            playDiscovered = false
+        end,
+        Valid = function()
+            return playDiscovered
+        end
+    }
+    nodes.Idle = Proxy {
+        game.states.Dummy
+    }
+end}

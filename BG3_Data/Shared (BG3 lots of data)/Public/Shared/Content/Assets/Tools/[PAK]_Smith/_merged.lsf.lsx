@@ -1,0 +1,794 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="AnimationBlueprintBank">
+		<node id="AnimationBlueprintBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="796975a6-411c-4711-b3f7-639f798cca23" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="INTERACT_TOOL_Smith_Whetstone_Wheel_B_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="Editor/Mods/Shared/Assets/Blueprints/Objects_Common.lsabp" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855924" />
+					<children>
+						<node id="Params" />
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VirtualTextureBank">
+		<node id="VirtualTextureBank">
+			<children>
+				<node id="Resource">
+					<attribute id="GTexFileName" type="FixedString" value="c5ad172c538a4a21c662847547ef7069" />
+					<attribute id="ID" type="FixedString" value="0f6b89df-0135-d1b0-8149-6c502c2b2039" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Whetstone_Wheel_A" />
+					<attribute id="Prefetch" type="bool" value="False" />
+					<attribute id="PrefetchMipLevel" type="int8" value="-1" />
+					<attribute id="ReferencedColorSpaces" type="uint32" value="6" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="VirtualTextureLayerConfig" type="uint32" value="3" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115198813274313" />
+				</node>
+				<node id="Resource">
+					<attribute id="GTexFileName" type="FixedString" value="db5c5bfdff4a23c291bfed260d21c52a" />
+					<attribute id="ID" type="FixedString" value="90998e8e-9285-b8a3-27a0-ded5259c7865" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Anvil_A" />
+					<attribute id="Prefetch" type="bool" value="False" />
+					<attribute id="PrefetchMipLevel" type="int8" value="-1" />
+					<attribute id="ReferencedColorSpaces" type="uint32" value="6" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="VirtualTextureLayerConfig" type="uint32" value="3" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115198813274313" />
+				</node>
+				<node id="Resource">
+					<attribute id="GTexFileName" type="FixedString" value="65f09f235d4c5f8a0bfbda1bcb0a860f" />
+					<attribute id="ID" type="FixedString" value="c8329bde-a43b-956b-d9d0-544922444f82" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Anvil_Broken_A" />
+					<attribute id="Prefetch" type="bool" value="False" />
+					<attribute id="PrefetchMipLevel" type="int8" value="-1" />
+					<attribute id="ReferencedColorSpaces" type="uint32" value="6" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="VirtualTextureLayerConfig" type="uint32" value="3" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115198813274313" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="PhysicsBank">
+		<node id="PhysicsBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="3518dec3-03ef-a888-e661-02c69ae50145" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Anvil_B" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Tools/Smith/TOOL_Smith_Anvil_ABC/TOOL_Smith_Anvil_B.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Tools/Smith/TOOL_Smith_Anvil_ABC/TOOL_Smith_Anvil_B" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855878" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="c9cd40ab-69ab-837f-5b8e-f8ddfca38181" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Anvil_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Tools/Smith/TOOL_Smith_Anvil_ABC/TOOL_Smith_Anvil_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Tools/Smith/TOOL_Smith_Anvil_ABC/TOOL_Smith_Anvil_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855878" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="efcb9cb5-bde2-2936-6d5f-d619462980e1" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Anvil_Broken_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Tools/Smith/TOOL_Smith_Anvil_ABC/TOOL_Smith_Anvil_Broken_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Tools/Smith/TOOL_Smith_Anvil_ABC/TOOL_Smith_Anvil_Broken_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855891" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="f90b36db-d1bc-1957-bee5-c5252d24d05f" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Whetstone_Wheel_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Tools/Smith/TOOL_Smith_Whetstone_Wheel_ABC/TOOL_Smith_Whetstone_Wheel_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Tools/Smith/TOOL_Smith_Whetstone_Wheel_ABC/TOOL_Smith_Whetstone_Wheel_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855887" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="MaterialBank">
+		<node id="MaterialBank">
+			<children>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="3199f267-6724-e41a-eaa9-d2041fe18e79" />
+					<attribute id="MaterialType" type="uint8" value="4" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Anvil_Broken_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Base/Base_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="c8329bde-a43b-956b-d9d0-544922444f82" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="5114b4c3-394b-0198-e6fb-eb1eedd8c0e1" />
+					<attribute id="MaterialType" type="uint8" value="4" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Anvil_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Base/Base_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="90998e8e-9285-b8a3-27a0-ded5259c7865" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="77c84de9-b82f-d399-4e77-ff785252b4aa" />
+					<attribute id="MaterialType" type="uint8" value="6" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Whetstone_Wheel_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Base/Base_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="0f6b89df-0135-d1b0-8149-6c502c2b2039" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationBank">
+		<node id="AnimationBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="13.500001" />
+					<attribute id="ID" type="FixedString" value="153f9c87-3e66-6c06-4865-4a52106e6a72" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="INTERACT_TOOL_Smith_Whetstone_Wheel_ABC_WRLD_DFLT_CUST_SharpenWeapon_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="bce17d7e-6ab2-8fa4-a4bb-d1ab2d48ee4c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/Gnomes/_Female/GNO_F_Rig/INTERACT_TOOL_Smith_Whetstone_Wheel_ABC_WRLD_DFLT_CUST_SharpenWeapon_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/Gnomes/_Female/GNO_F_Rig/INTERACT_TOOL_Smith_Whetstone_Wheel_ABC_WRLD_DFLT_CUST_SharpenWeapon_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144818875517633112" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.9333336" />
+					<attribute id="ID" type="FixedString" value="29d0f176-b0b3-f2d7-d8b1-442ccca285a7" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Whetstone_Wheel_ABC_WRLD_DFLT_CUST_GrindingWeapon_01_Start" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="bce17d7e-6ab2-8fa4-a4bb-d1ab2d48ee4c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Goblins/_Male/GOB_M_Rig/TOOL_Smith_Whetstone_Wheel_ABC_WRLD_DFLT_CUST_GrindingWeapon_01_Start.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Goblins/_Male/GOB_M_Rig/TOOL_Smith_Whetstone_Wheel_ABC_WRLD_DFLT_CUST_GrindingWeapon_01_Start.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144818875517633112" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="5.966667" />
+					<attribute id="ID" type="FixedString" value="522de62f-5371-5753-b394-dcdf168f8288" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Whetstone_Wheel_ABC_WRLD_CUST_HumanGrindingWeapon_01_End" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="bce17d7e-6ab2-8fa4-a4bb-d1ab2d48ee4c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/Humans/_Male/HUM_M_Rig/TOOL_Smith_Whetstone_Wheel_ABC_WRLD_CUST_HumanGrindingWeapon_01_End.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/Humans/_Male/HUM_M_Rig/TOOL_Smith_Whetstone_Wheel_ABC_WRLD_CUST_HumanGrindingWeapon_01_End.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144959613005987841" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="28.233335" />
+					<attribute id="ID" type="FixedString" value="5bb3d3c8-252f-7f56-70da-5791d6e165d1" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="INTERACT_TOOL_Smith_Whetstone_Wheel_ABC_WRLD_1HS_CUST_GrindingWeapon_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/Githyanki/_Female/GTY_F_Rig/INTERACT_TOOL_Smith_Whetstone_Wheel_ABC_WRLD_1HS_CUST_GrindingWeapon_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/Githyanki/_Female/GTY_F_Rig/INTERACT_TOOL_Smith_Whetstone_Wheel_ABC_WRLD_1HS_CUST_GrindingWeapon_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209032" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.7" />
+					<attribute id="ID" type="FixedString" value="868224d7-97f4-120a-5566-bd053ee8872b" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Whetstone_Wheel_ABC_WRLD_DFLT_CUST_GrindingWeapon_01_End" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="bce17d7e-6ab2-8fa4-a4bb-d1ab2d48ee4c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Goblins/_Male/GOB_M_Rig/TOOL_Smith_Whetstone_Wheel_ABC_WRLD_DFLT_CUST_GrindingWeapon_01_End.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Goblins/_Male/GOB_M_Rig/TOOL_Smith_Whetstone_Wheel_ABC_WRLD_DFLT_CUST_GrindingWeapon_01_End.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144818875517633112" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="20.166668" />
+					<attribute id="ID" type="FixedString" value="90b0ede8-5f5c-ec5d-c286-24c9e10e7562" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Whetstone_Wheel_ABC_WRLD_CUST_HumanGrindingWeapon_01_Loop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="bce17d7e-6ab2-8fa4-a4bb-d1ab2d48ee4c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/Humans/_Male/HUM_M_Rig/TOOL_Smith_Whetstone_Wheel_ABC_WRLD_CUST_HumanGrindingWeapon_01_Loop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/Humans/_Male/HUM_M_Rig/TOOL_Smith_Whetstone_Wheel_ABC_WRLD_CUST_HumanGrindingWeapon_01_Loop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144959613005987841" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="28.233335" />
+					<attribute id="ID" type="FixedString" value="b958acdc-a2f8-9888-fb2e-961d6f5690d0" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="INTERACT_TOOL_Smith_Whetstone_Wheel_ABC_WRLD_2HS_CUST_GrindingWeapon_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="bce17d7e-6ab2-8fa4-a4bb-d1ab2d48ee4c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/Githyanki/_Female/GTY_F_Rig/INTERACT_TOOL_Smith_Whetstone_Wheel_ABC_WRLD_2HS_CUST_GrindingWeapon_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/Githyanki/_Female/GTY_F_Rig/INTERACT_TOOL_Smith_Whetstone_Wheel_ABC_WRLD_2HS_CUST_GrindingWeapon_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209006" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.1333334" />
+					<attribute id="ID" type="FixedString" value="f24e00c5-0ec0-a8d7-aba3-53047fdacd8f" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Whetstone_Wheel_ABC_WRLD_CUST_HumanGrindingWeapon_01_Start" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="bce17d7e-6ab2-8fa4-a4bb-d1ab2d48ee4c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/Humans/_Male/HUM_M_Rig/TOOL_Smith_Whetstone_Wheel_ABC_WRLD_CUST_HumanGrindingWeapon_01_Start.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/Humans/_Male/HUM_M_Rig/TOOL_Smith_Whetstone_Wheel_ABC_WRLD_CUST_HumanGrindingWeapon_01_Start.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144959613005987841" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="13.500001" />
+					<attribute id="ID" type="FixedString" value="f41fa926-e3b0-e6c7-c781-84c192e445d4" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Whetstone_Wheel_ABC_WRLD_DFLT_CUST_GrindingWeapon_01_Loop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="bce17d7e-6ab2-8fa4-a4bb-d1ab2d48ee4c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Goblins/_Male/GOB_M_Rig/TOOL_Smith_Whetstone_Wheel_ABC_WRLD_DFLT_CUST_GrindingWeapon_01_Loop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Goblins/_Male/GOB_M_Rig/TOOL_Smith_Whetstone_Wheel_ABC_WRLD_DFLT_CUST_GrindingWeapon_01_Loop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144818875517633112" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.5785721 1.2023048 0.17191637" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.60265106 -1.2616917E-08 -0.28864148" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="280830fe-e9f4-1939-d3b4-a1adfb2a781d" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Whetstone_Wheel_B" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Tools/Smith/TOOL_Smith_Whetstone_Wheel_ABC/Resources/TOOL_Smith_Whetstone_Wheel_B.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Tools/Smith/TOOL_Smith_Whetstone_Wheel_ABC/Resources/TOOL_Smith_Whetstone_Wheel_B.Dummy_TOOL_Smith_Whetstone_Wheel_B.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209024" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="77c84de9-b82f-d399-4e77-ff785252b4aa" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Smith_Whetstone_Wheel_B.TOOL_Smith_Whetstone_Wheel_B_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="77c84de9-b82f-d399-4e77-ff785252b4aa" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Smith_Whetstone_Wheel_B.TOOL_Smith_Whetstone_Wheel_B_Mesh_LOD1.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="77c84de9-b82f-d399-4e77-ff785252b4aa" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Smith_Whetstone_Wheel_B.TOOL_Smith_Whetstone_Wheel_B_Mesh_LOD2.2" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.58585703 0.52377194 0.62451595" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.31373256 -0.010432656 -0.8564991" />
+					<attribute id="Center" type="fvec3" value="0.13606223 0.25666964 -0.11599156" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="6a07d71a-c2b4-aa80-006e-8003bb4a8e49" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Anvil_Broken_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.90664786" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Tools/Smith/TOOL_Smith_Anvil_ABC/Resources/TOOL_Smith_Anvil_Broken_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Tools/Smith/TOOL_Smith_Anvil_ABC/Resources/TOOL_Smith_Anvil_Broken_A.Dummy_TOOL_Smith_Anvil_Broken_CombatThrowable.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665791066" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="3199f267-6724-e41a-eaa9-d2041fe18e79" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Smith_Anvil_Broken_A.TOOL_Smith_Anvil_Broken_A_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="3199f267-6724-e41a-eaa9-d2041fe18e79" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Smith_Anvil_Broken_A.TOOL_Smith_Anvil_Broken_A_Mesh_LOD1.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="3199f267-6724-e41a-eaa9-d2041fe18e79" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Smith_Anvil_Broken_A.TOOL_Smith_Anvil_Broken_A_Mesh_LOD2.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.33486718 1.0346358 0.68482625" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.33638006 -0.0005755885 -0.7648289" />
+					<attribute id="Center" type="fvec3" value="-0.00075644255 0.5170301 -0.040001333" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="864105c1-2bc6-43c6-ebc0-11a7efb2cc20" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Anvil_B" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.9518056" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Tools/Smith/TOOL_Smith_Anvil_ABC/Resources/TOOL_Smith_Anvil_B.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Tools/Smith/TOOL_Smith_Anvil_ABC/Resources/TOOL_Smith_Anvil_B.Dummy_TOOL_Smith_Anvil_B.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665791066" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="5114b4c3-394b-0198-e6fb-eb1eedd8c0e1" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Smith_Anvil_B.TOOL_Smith_Anvil_B_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="5114b4c3-394b-0198-e6fb-eb1eedd8c0e1" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Smith_Anvil_B.TOOL_Smith_Anvil_B_Mesh_LOD1.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="5114b4c3-394b-0198-e6fb-eb1eedd8c0e1" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Smith_Anvil_B.TOOL_Smith_Anvil_B_Mesh_LOD2.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="796975a6-411c-4711-b3f7-639f798cca23" />
+					<attribute id="BoundsMax" type="fvec3" value="0.5785721 1.1949958 0.17173275" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.60265106 0 -0.28864142" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="bce17d7e-6ab2-8fa4-a4bb-d1ab2d48ee4c" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="INTERACT_TOOL_Smith_Whetstone_Wheel_B" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Tools/Smith/TOOL_Smith_Whetstone_Wheel_ABC/Resources/INTERACT_TOOL_Smith_Whetstone_Wheel_B.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Tools/Smith/TOOL_Smith_Whetstone_Wheel_ABC/Resources/INTERACT_TOOL_Smith_Whetstone_Wheel_B.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144959613005987841" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="c800e7b6-7256-3414-09bb-599aaf143d3a" />
+						</node>
+						<node id="Base" />
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_LandingPoint" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="-0.885 0 0" />
+									<attribute id="RotationQuat" type="fvec4" value="0 -0.7071069 0 0.70710665" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_Start_01" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="-0.885 0 0" />
+									<attribute id="RotationQuat" type="fvec4" value="0 -0.7071069 0 0.70710665" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_01" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="-0.885 0 0" />
+									<attribute id="RotationQuat" type="fvec4" value="0 -0.7071069 0 0.70710665" />
+								</node>
+							</children>
+						</node>
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="77c84de9-b82f-d399-4e77-ff785252b4aa" />
+							<attribute id="ObjectID" type="FixedString" value="INTERACT_TOOL_Smith_Whetstone_Wheel_B.INTERACT_TOOL_Smith_Whetstone_Wheel_B_Mesh.0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.5785721 1.1949958 0.5595028" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.60265106 0 -0.22653404" />
+					<attribute id="Center" type="fvec3" value="-0.012039483 0.5974979 0.16648437" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="bd6baa93-5f3d-ee19-3564-48392abd41a0" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Whetstone_Wheel_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.9275178" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Tools/Smith/TOOL_Smith_Whetstone_Wheel_ABC/Resources/TOOL_Smith_Whetstone_Wheel_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Tools/Smith/TOOL_Smith_Whetstone_Wheel_ABC/Resources/TOOL_Smith_Whetstone_Wheel_A.Dummy_TOOL_Smith_Whetstone_Wheel_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665791066" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="77c84de9-b82f-d399-4e77-ff785252b4aa" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Smith_Whetstone_Wheel_A.TOOL_Smith_Whetstone_Wheel_A_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="77c84de9-b82f-d399-4e77-ff785252b4aa" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Smith_Whetstone_Wheel_A.TOOL_Smith_Whetstone_Wheel_A_Mesh_LOD1.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.33486718 1.0346358 0.68482625" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.33638006 -0.0005755885 -0.7648289" />
+					<attribute id="Center" type="fvec3" value="-0.00075644255 0.5170301 -0.040001333" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="cee3145d-1e8b-4c98-f178-48cc0e02c2c9" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="INTERACT_TOOL_Smith_Anvil_B" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.9518056" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Tools/Smith/TOOL_Smith_Anvil_ABC/Resources/INTERACT_TOOL_Smith_Anvil_B.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Tools/Smith/TOOL_Smith_Anvil_ABC/Resources/INTERACT_TOOL_Smith_Anvil_B.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665791066" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_LandingPoint" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="-0.75 0 0.38" />
+									<attribute id="Rotation" type="mat3x3" value=" 0.07 -0.00 -1.00 &#xD;&#xA; 0.00  1.00 -0.00 &#xD;&#xA; 1.00  0.00  0.07 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="5114b4c3-394b-0198-e6fb-eb1eedd8c0e1" />
+							<attribute id="ObjectID" type="FixedString" value="INTERACT_TOOL_Smith_Anvil_B.INTERACT_TOOL_Smith_Anvil_B_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="5114b4c3-394b-0198-e6fb-eb1eedd8c0e1" />
+							<attribute id="ObjectID" type="FixedString" value="INTERACT_TOOL_Smith_Anvil_B.INTERACT_TOOL_Smith_Anvil_B_Mesh_LOD1.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="5114b4c3-394b-0198-e6fb-eb1eedd8c0e1" />
+							<attribute id="ObjectID" type="FixedString" value="INTERACT_TOOL_Smith_Anvil_B.INTERACT_TOOL_Smith_Anvil_B_Mesh_LOD2.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.29291627 0.60226685 0.68482625" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.29291627 -0.0064338082 -0.7674292" />
+					<attribute id="Center" type="fvec3" value="0 0.29791653 -0.04130146" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="eae9ea6b-2d2f-2312-9c85-b31ed3cdb015" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="TOOL_Smith_Anvil_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.8400539" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Tools/Smith/TOOL_Smith_Anvil_ABC/Resources/TOOL_Smith_Anvil_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Tools/Smith/TOOL_Smith_Anvil_ABC/Resources/TOOL_Smith_Anvil_A.Dummy_TOOL_Smith_Anvil_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665791066" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="5114b4c3-394b-0198-e6fb-eb1eedd8c0e1" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Smith_Anvil_A.TOOL_Smith_Anvil_A_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="5114b4c3-394b-0198-e6fb-eb1eedd8c0e1" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Smith_Anvil_A.TOOL_Smith_Anvil_A_Mesh_LOD1.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="5114b4c3-394b-0198-e6fb-eb1eedd8c0e1" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Smith_Anvil_A.TOOL_Smith_Anvil_A_Mesh_LOD2.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

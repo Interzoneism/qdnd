@@ -1,0 +1,19 @@
+game.configs.FTBTrigger = Config{
+    params={
+        OneShot = {
+            type = EParamType.Bool,
+            help = [[Does it turn on only once, or every time?]],
+            required = false,
+            default = true
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.FTBTrigger,
+            OneShot = params.OneShot,
+        },
+    },
+    inputs={
+        FTBOn=ExtSocket{description=[[Turns FTB on for all entities currently in the trigger.]],{SocketRef{[[root.logic.inputs.FTBOn]]}}},
+        FTBOff=ExtSocket{description=[[Turns FTB off for all entities currently in the trigger, if it was already turned on.]],{SocketRef{[[root.logic.inputs.FTBOff]]}}},
+    }
+}

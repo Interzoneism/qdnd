@@ -1,0 +1,1826 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="AnimationBlueprintBank">
+		<node id="AnimationBlueprintBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="94f5db48-55d7-e1e2-aa68-bf4d8df3b727" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Object_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="Editor/Mods/Shared/Assets/Blueprints/Objects_Common.lsabp" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855920" />
+					<children>
+						<node id="Params" />
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="SkeletonBank">
+		<node id="SkeletonBank">
+			<children>
+				<node id="Resource">
+					<attribute id="DynamicPhysicsResourceID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="89592799-f1b7-1070-edb1-310275b48687" />
+					<attribute id="IKRigResourceID" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Object_Base" />
+					<attribute id="PreviewAnimationResource" type="FixedString" value="" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RagdollResourceID" type="FixedString" value="" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/_CinematicProps/CINE_Generic_Object_Base.GR2" />
+					<attribute id="SpringResourceID" type="FixedString" value="" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/_CinematicProps/CINE_Generic_Object_Base.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855920" />
+					<children>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_MouthFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="4" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_BodyFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="3" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_R_HandFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_L_HandFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="2" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="MaterialBank">
+		<node id="MaterialBank">
+			<children>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="92b941dc-921d-27a1-5003-089dd532da71" />
+					<attribute id="MaterialType" type="uint8" value="36" />
+					<attribute id="Name" type="LSString" value="Helper_Invisible" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Helper/Helper_Invisible.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="HackParamNeverChange" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="36de0e22-392e-9a2f-07c1-db6190a30e55" />
+							<attribute id="ParameterName" type="FixedString" value="ID_Depth_Root_Alpha_MSKA" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="29549d6e-25c6-8ffa-157f-c03a993ce305" />
+							<attribute id="ParameterName" type="FixedString" value="basecolor" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationSetBank">
+		<node id="AnimationSetBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="8864a2e1-ba08-c2f7-e245-ad3b2da85cc6" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Object_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855920" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="FallBackAnimation" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets" />
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationBank">
+		<node id="AnimationBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4" />
+					<attribute id="ID" type="FixedString" value="05be4b42-0db6-0bc8-5cd9-c36805f75db0" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Rubble_Small_A_SCENE_CRA_Unconscious_Landing_Idle" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Rubble_Small_A_SCENE_CRA_Unconscious_Landing_Idle.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Rubble_Small_A_SCENE_CRA_Unconscious_Landing_Idle.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241811" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="13.866668" />
+					<attribute id="ID" type="FixedString" value="08bc1851-d4ef-2b55-a268-33691dca6c0f" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Nautiloid_Canon_Rig_SCENE_TUT_DragonFall_Shot_1030_JumpAndBurn_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="8237dece-65ad-2fe9-ceeb-ee88224eafa7" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="b634869d-7015-a968-ed86-4950c954f332" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1030/Nautiloid_Canon_Rig_SCENE_TUT_DragonFall_Shot_1030_JumpAndBurn_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1030/Nautiloid_Canon_Rig_SCENE_TUT_DragonFall_Shot_1030_JumpAndBurn_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790666" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="6.0000005" />
+					<attribute id="ID" type="FixedString" value="0e83a759-e2ff-26f2-0c8a-db8cce63262a" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Rig_SCENE_CRA_Debris_Pillar_A_Damaged_B" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Generic_Rig_SCENE_CRA_Debris_Pillar_A_Damaged_B.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Generic_Rig_SCENE_CRA_Debris_Pillar_A_Damaged_B.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="8.333334" />
+					<attribute id="ID" type="FixedString" value="1ad7c094-2b7c-fccb-4079-0717e0091530" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Nautiloid_Cannon_Rig_TUT_UpperDeck_DragonFall_Shot_1060_Back" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="8237dece-65ad-2fe9-ceeb-ee88224eafa7" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="b634869d-7015-a968-ed86-4950c954f332" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1060/DEC_MF_Nautiloid_Cannon_Rig_TUT_UpperDeck_DragonFall_Shot_1060_Back.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1060/DEC_MF_Nautiloid_Cannon_Rig_TUT_UpperDeck_DragonFall_Shot_1060_Back.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4.8666673" />
+					<attribute id="ID" type="FixedString" value="1b888524-81e7-dd85-7bb0-07799c350449" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Nautiloid_Canon_Rig_SCENE_TUT_DragonFall_Shot_1035_ThrowCanon" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1035/Nautiloid_Canon_Rig_SCENE_TUT_DragonFall_Shot_1035_ThrowCanon.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1035/Nautiloid_Canon_Rig_SCENE_TUT_DragonFall_Shot_1035_ThrowCanon.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.6666669" />
+					<attribute id="ID" type="FixedString" value="1e93fe82-beef-c84e-02d1-32f979485aaa" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="Gen_Rig_GOB_Orpheus_VoiceOfAbsolute_SH_HasBox_Hover_OUT" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="49496adb-fce9-56f3-0053-6c40ed8c10a2" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="6454df5c-cae6-78d9-9f58-fd82716f9770" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/GOB/GOB_Orpheus_VoiceOfAbsolute/Gen_Rig_GOB_Orpheus_VoiceOfAbsolute_SH_HasBox_Hover_OUT.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/GOB/GOB_Orpheus_VoiceOfAbsolute/Gen_Rig_GOB_Orpheus_VoiceOfAbsolute_SH_HasBox_Hover_OUT.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725668" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4.8666673" />
+					<attribute id="ID" type="FixedString" value="2025082c-75fa-0819-0076-89101b49714a" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Nautiloid_Canon_Rig_SCENE_TUT_DragonFall_Shot_1035_EnteringScene" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1035/Nautiloid_Canon_Rig_SCENE_TUT_DragonFall_Shot_1035_EnteringScene.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1035/Nautiloid_Canon_Rig_SCENE_TUT_DragonFall_Shot_1035_EnteringScene.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="24.333336" />
+					<attribute id="ID" type="FixedString" value="224fcb99-f943-e001-fdc0-f9fbb3077e39" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Object_Rig_PLA_Refugee_001_GiveSwordOfJustice" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/PLA/PLA_Refugee_001/CINE_Generic_Object_Rig_PLA_Refugee_001_GiveSwordOfJustice.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/PLA/PLA_Refugee_001/CINE_Generic_Object_Rig_PLA_Refugee_001_GiveSwordOfJustice.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115198813274112" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="5.0000005" />
+					<attribute id="ID" type="FixedString" value="261524bd-f41c-e5a7-4610-c1194e4a2325" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Nautiloid_Canon_Rig_TUT_UpperDeck_DragonFall_Shot_1065_Canon_1_Falling" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1065/DEC_MF_Nautiloid_Canon_Rig_TUT_UpperDeck_DragonFall_Shot_1065_Canon_1_Falling.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1065/DEC_MF_Nautiloid_Canon_Rig_TUT_UpperDeck_DragonFall_Shot_1065_Canon_1_Falling.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="5.6666675" />
+					<attribute id="ID" type="FixedString" value="269be9de-624a-3b97-0be1-98949bc7a52b" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="Gen_Rig_GOB_Orpheus_VoiceOfAbsolute_SH_HasBox_Hover" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/GOB/GOB_Orpheus_VoiceOfAbsolute/Gen_Rig_GOB_Orpheus_VoiceOfAbsolute_SH_HasBox_Hover.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/GOB/GOB_Orpheus_VoiceOfAbsolute/Gen_Rig_GOB_Orpheus_VoiceOfAbsolute_SH_HasBox_Hover.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725668" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="8.000001" />
+					<attribute id="ID" type="FixedString" value="2d0f44b5-6cbc-d328-01e6-345966c3d6f8" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Nautiloid_Canon_Rig_TUT_DragonFall_Shot_1040_Canon_1_Walk_To_Shoot" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="8237dece-65ad-2fe9-ceeb-ee88224eafa7" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="b634869d-7015-a968-ed86-4950c954f332" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1040/Nautiloid_Canon_Rig_TUT_DragonFall_Shot_1040_Canon_1_Walk_To_Shoot.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1040/Nautiloid_Canon_Rig_TUT_DragonFall_Shot_1040_Canon_1_Walk_To_Shoot.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.0000002" />
+					<attribute id="ID" type="FixedString" value="2dfd23e1-8881-3976-5220-e83cc09b6129" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MR_Canon_Rig_02_TUT_Dragonfall_Shot_1005_Dragon_Land" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="8237dece-65ad-2fe9-ceeb-ee88224eafa7" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="b634869d-7015-a968-ed86-4950c954f332" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1005/DEC_MR_Canon_Rig_02_TUT_Dragonfall_Shot_1005_Dragon_Land.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1005/DEC_MR_Canon_Rig_02_TUT_Dragonfall_Shot_1005_Dragon_Land.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790665" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="8.666668" />
+					<attribute id="ID" type="FixedString" value="3066c158-e552-330d-bdb5-0ee00e5e66a7" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Rig_Raft_Boat_UND_Darklake_Move_Subtle_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="8cd2d2e9-c7d0-29fe-bc5a-605a9000125b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="89592799-f1b7-1070-edb1-310275b48687" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/UND/UND_DarkLake_Boat/CINE_Generic_Rig_Raft_Boat_UND_Darklake_Move_Subtle_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/UND/UND_DarkLake_Boat/CINE_Generic_Rig_Raft_Boat_UND_Darklake_Move_Subtle_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115198813274313" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.0000002" />
+					<attribute id="ID" type="FixedString" value="376677b7-2691-f52a-7566-b5a4b9c671a6" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Rubble_Small_A_SCENE_CRA_Unconscious_Landing" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Rubble_Small_A_SCENE_CRA_Unconscious_Landing.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Rubble_Small_A_SCENE_CRA_Unconscious_Landing.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241811" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4.8666673" />
+					<attribute id="ID" type="FixedString" value="39570755-ced4-0616-fe32-9c905987fbd7" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Nautiloid_Canon_Rig_SCENE_TUT_DragonFall_Shot_1035_TailHit" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1035/DEC_MF_Nautiloid_Canon_Rig_SCENE_TUT_DragonFall_Shot_1035_TailHit.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1035/DEC_MF_Nautiloid_Canon_Rig_SCENE_TUT_DragonFall_Shot_1035_TailHit.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1" />
+					<attribute id="ID" type="FixedString" value="3f9821f4-e33e-55c0-5a5f-a046b7699127" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Object_Rig_LinearSpin_R_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="89592799-f1b7-1070-edb1-310275b48687" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/_CinematicProps/CINE_Generic_Object_Rig/CINE_Generic_Object_Rig_LinearSpin_R_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/_CinematicProps/CINE_Generic_Object_Rig/CINE_Generic_Object_Rig_LinearSpin_R_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209006" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.03333334" />
+					<attribute id="ID" type="FixedString" value="45129202-444a-77ba-c7f5-186151a83319" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="BOOK_Tome_Thayan_Necromancy_Gem_Rig_Anim" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="9addd441-e738-c6fa-36ee-c48847789dbd" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="606bda99-2a9b-fa23-fd3c-a4e6e04b41af" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/FOR/FOR_DangerousBook_Tome/BOOK_Tome_Thayan_Necromancy_Gem_Rig_Anim.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/FOR/FOR_DangerousBook_Tome/BOOK_Tome_Thayan_Necromancy_Gem_Rig_Anim.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241410" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="8.333334" />
+					<attribute id="ID" type="FixedString" value="48209d06-e85b-dfa5-95d2-ef75131a0907" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Rig_Nautiloid_Ship_Deck_DragonFall_Shot_1060_Falling" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1060/CINE_Generic_Rig_Nautiloid_Ship_Deck_DragonFall_Shot_1060_Falling.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1060/CINE_Generic_Rig_Nautiloid_Ship_Deck_DragonFall_Shot_1060_Falling.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790666" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="23.333336" />
+					<attribute id="ID" type="FixedString" value="494785aa-b9d4-705d-8a4c-8bd292ef2da6" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Rig_Jergal_Tomb_Open_Lid" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CHA/CINE_Generic_Rig_Jergal_Tomb_Open_Lid.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CHA/CINE_Generic_Rig_Jergal_Tomb_Open_Lid.Anim.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855926" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.8333337" />
+					<attribute id="ID" type="FixedString" value="4962828b-9928-9614-0222-167ac1f03be9" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Nautiloid_Canon_Rig_Nautiloid_Canon_Walk_to_Fire" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="8237dece-65ad-2fe9-ceeb-ee88224eafa7" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="b634869d-7015-a968-ed86-4950c954f332" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Base_Animations/DEC_MF_Nautiloid_Canon_Rig_Nautiloid_Canon_Walk_to_Fire.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Base_Animations/DEC_MF_Nautiloid_Canon_Rig_Nautiloid_Canon_Walk_to_Fire.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="13.866668" />
+					<attribute id="ID" type="FixedString" value="4a752f60-0e6b-e24e-d095-9840a3b408d0" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Nautiloid_Canon_Rig_TUT_UpperDeck_DragonFall_Shot_1030_Hit_With_Tail" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1030/DEC_MF_Nautiloid_Canon_Rig_TUT_UpperDeck_DragonFall_Shot_1030_Hit_With_Tail.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1030/DEC_MF_Nautiloid_Canon_Rig_TUT_UpperDeck_DragonFall_Shot_1030_Hit_With_Tail.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790666" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="6.0666676" />
+					<attribute id="ID" type="FixedString" value="4e3c688a-18b3-34b5-5aec-582bc663f415" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="Puzzlebox_Generic_Rig_GLO_InfernalBox_BoxInteraction_StowPuzzlebox_Player" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="26a245a1-3b0b-55b2-27b6-7417f9a5f854" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/GLO/GLO_InfernalBox_BoxInteraction/Puzzlebox_Generic_Rig_GLO_InfernalBox_BoxInteraction_StowPuzzlebox_Player.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/GLO/GLO_InfernalBox_BoxInteraction/Puzzlebox_Generic_Rig_GLO_InfernalBox_BoxInteraction_StowPuzzlebox_Player.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="5.0000005" />
+					<attribute id="ID" type="FixedString" value="5525b77a-1982-6c81-a6db-207c128f8ae3" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Rubble_Small_A_SCENE_CRA_Unconscious_Landing_Awaken" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Rubble_Small_A_SCENE_CRA_Unconscious_Landing_Awaken.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Rubble_Small_A_SCENE_CRA_Unconscious_Landing_Awaken.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241811" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.6666669" />
+					<attribute id="ID" type="FixedString" value="56b5c039-a314-9d30-c716-2ea7e425bbaf" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="Gen_Rig_GOB_Orpheus_VoiceOfAbsolute_SH_HasBox_Hover_IN" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="49496adb-fce9-56f3-0053-6c40ed8c10a2" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="6454df5c-cae6-78d9-9f58-fd82716f9770" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/GOB/GOB_Orpheus_VoiceOfAbsolute/Gen_Rig_GOB_Orpheus_VoiceOfAbsolute_SH_HasBox_Hover_IN.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/GOB/GOB_Orpheus_VoiceOfAbsolute/Gen_Rig_GOB_Orpheus_VoiceOfAbsolute_SH_HasBox_Hover_IN.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725668" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="18.666668" />
+					<attribute id="ID" type="FixedString" value="5b2f1615-3046-444d-b05f-dc8e615072c8" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="Puzzlebox_Generic_Rig_CAMP_Shadowheart_IVB_Box_SitGround_ExamineBox_SH" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CAMP/CAMP_Shadowheart_IVB_Box/Puzzlebox_Generic_Rig_CAMP_Shadowheart_IVB_Box_SitGround_ExamineBox_SH.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CAMP/CAMP_Shadowheart_IVB_Box/Puzzlebox_Generic_Rig_CAMP_Shadowheart_IVB_Box_SitGround_ExamineBox_SH.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="6.0000005" />
+					<attribute id="ID" type="FixedString" value="5d964e68-f905-5894-af82-85346cd31768" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Object_Rig_CameraShake_LOW" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="26a245a1-3b0b-55b2-27b6-7417f9a5f854" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="89592799-f1b7-1070-edb1-310275b48687" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/_CinematicProps/CINE_Generic_Object_Rig/CINE_Generic_Object_Rig_CameraShake_LOW.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/_CinematicProps/CINE_Generic_Object_Rig/CINE_Generic_Object_Rig_CameraShake_LOW.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403208704" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="20.000002" />
+					<attribute id="ID" type="FixedString" value="71b11868-53c8-4435-b0ab-6af610a9b8ef" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="BOOK_Tome_Thayan_Necromancy_Gem_Rig_SCENE_FOR_Book_PlaceAmethyst" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="9addd441-e738-c6fa-36ee-c48847789dbd" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="606bda99-2a9b-fa23-fd3c-a4e6e04b41af" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/FOR/FOR_DangerousBook_Tome/BOOK_Tome_Thayan_Necromancy_Gem_Rig_SCENE_FOR_Book_PlaceAmethyst.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/FOR/FOR_DangerousBook_Tome/BOOK_Tome_Thayan_Necromancy_Gem_Rig_SCENE_FOR_Book_PlaceAmethyst.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241410" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="20.000002" />
+					<attribute id="ID" type="FixedString" value="74b2647e-2706-dd73-e13e-130fa7792fbe" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="BOOK_Tome_Thayan_Necromancy_Gem_Rig_Prop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="9addd441-e738-c6fa-36ee-c48847789dbd" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="606bda99-2a9b-fa23-fd3c-a4e6e04b41af" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/FOR/FOR_DangerousBook_Tome/BOOK_Tome_Thayan_Necromancy_Gem_Rig_Prop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/FOR/FOR_DangerousBook_Tome/BOOK_Tome_Thayan_Necromancy_Gem_Rig_Prop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241410" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.2666668" />
+					<attribute id="ID" type="FixedString" value="7fd6c9a5-3c19-73b0-e5b7-375e3f29a7f6" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_CINE_SCENE_Goblins_Camp_Cage_A_Rig_Open_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="32813b8a-bf97-4d0b-9446-5768b3ae69c0" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2f846d9d-c98a-e189-3cc6-a845c88c837c" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/Decoration/Goblins/DEC_Goblins_Camp_Cage_ABC/DEC_Goblins_Camp_Cage_A_Rig/_Construction/DEC_CINE_SCENE_Goblins_Camp_Cage_A_Rig_Open_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/Decoration/Goblins/DEC_Goblins_Camp_Cage_ABC/DEC_Goblins_Camp_Cage_A_Rig/_Construction/DEC_CINE_SCENE_Goblins_Camp_Cage_A_Rig_Open_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115200960758165" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1" />
+					<attribute id="ID" type="FixedString" value="8062daf1-1f50-ce7a-3434-30c0b4c5db8d" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Object_Rig_LinearSpin_L_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="89592799-f1b7-1070-edb1-310275b48687" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/_CinematicProps/CINE_Generic_Object_Rig/CINE_Generic_Object_Rig_LinearSpin_L_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/_CinematicProps/CINE_Generic_Object_Rig/CINE_Generic_Object_Rig_LinearSpin_L_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209006" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="14.333335" />
+					<attribute id="ID" type="FixedString" value="826f97c7-6ea9-72e2-7709-ad79007f023a" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Object_Rig_DEN_BlueJay_PushCoin_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/DEN/DEN_DruidPet_003/CINE_Generic_Object_Rig_DEN_BlueJay_PushCoin_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/DEN/DEN_DruidPet_003/CINE_Generic_Object_Rig_DEN_BlueJay_PushCoin_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855932" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="6.0000005" />
+					<attribute id="ID" type="FixedString" value="82a8ebea-72e7-37bb-c412-0340ecae312a" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Rig_SCENE_CRA_Debris_Platform_Damaged_B" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Generic_Rig_SCENE_CRA_Debris_Platform_Damaged_B.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Generic_Rig_SCENE_CRA_Debris_Platform_Damaged_B.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="33.333336" />
+					<attribute id="ID" type="FixedString" value="868314c3-a814-6c6a-9183-c73c17f3dd32" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Rig_Raft_Boat_UND_Darklake_Move_Subtle_02" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="8cd2d2e9-c7d0-29fe-bc5a-605a9000125b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="89592799-f1b7-1070-edb1-310275b48687" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/UND/UND_DarkLake_Boat/CINE_Generic_Rig_Raft_Boat_UND_Darklake_Move_Subtle_02.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/UND/UND_DarkLake_Boat/CINE_Generic_Rig_Raft_Boat_UND_Darklake_Move_Subtle_02.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115198813274412" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4" />
+					<attribute id="ID" type="FixedString" value="8de0927f-f2b8-029e-3aa6-c5162861d22a" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Rubble_Medium_C_SCENE_CRA_Unconscious_Landing_Idle" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Rubble_Medium_C_SCENE_CRA_Unconscious_Landing_Idle.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Rubble_Medium_C_SCENE_CRA_Unconscious_Landing_Idle.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241811" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4.0000005" />
+					<attribute id="ID" type="FixedString" value="8dfea38b-9606-2984-d7d8-1845e0c55c96" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="Dummy_BLD_MF_A_Rubble_Small_C_SCENE_CRA_MindFlayerControl_Intro" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="8cba80c9-c5f8-38d8-3285-228280e144b3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_MindFlayerControl_Intro/Dummy_BLD_MF_A_Rubble_Small_C_SCENE_CRA_MindFlayerControl_Intro.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_MindFlayerControl_Intro/Dummy_BLD_MF_A_Rubble_Small_C_SCENE_CRA_MindFlayerControl_Intro.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241811" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="5.0000005" />
+					<attribute id="ID" type="FixedString" value="9639d565-1f75-8c7c-15c3-79da60fbe938" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Nautiloid_Canon_Rig_TUT_UpperDeck_DragonFall_Shot_1065_Canon_2_Falling" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1065/DEC_MF_Nautiloid_Canon_Rig_TUT_UpperDeck_DragonFall_Shot_1065_Canon_2_Falling.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1065/DEC_MF_Nautiloid_Canon_Rig_TUT_UpperDeck_DragonFall_Shot_1065_Canon_2_Falling.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4" />
+					<attribute id="ID" type="FixedString" value="9687b882-364a-6b6c-da4d-a36f90475bb7" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Platform_Damaged_B_SCENE_CRA_Unconscious_Landing_Idle" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Platform_Damaged_B_SCENE_CRA_Unconscious_Landing_Idle.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Platform_Damaged_B_SCENE_CRA_Unconscious_Landing_Idle.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241811" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.0000002" />
+					<attribute id="ID" type="FixedString" value="9757bb12-e241-574f-e19b-8fdebe35c51a" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MR_Canon_Rig_01_TUT_Dragonfall_Shot_1005_Dragon_Land" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="8237dece-65ad-2fe9-ceeb-ee88224eafa7" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="b634869d-7015-a968-ed86-4950c954f332" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1005/DEC_MR_Canon_Rig_01_TUT_Dragonfall_Shot_1005_Dragon_Land.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1005/DEC_MR_Canon_Rig_01_TUT_Dragonfall_Shot_1005_Dragon_Land.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790666" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="5.0000005" />
+					<attribute id="ID" type="FixedString" value="9b7e90ed-cd58-9053-645a-1b123bb7aed8" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Nautiloid_Canon_Rig_SCENE_TUT_UpperDeck_DragonFall_Shot_1055_CutDeck_Back" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="8237dece-65ad-2fe9-ceeb-ee88224eafa7" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="b634869d-7015-a968-ed86-4950c954f332" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1055/DEC_MF_Nautiloid_Canon_Rig_SCENE_TUT_UpperDeck_DragonFall_Shot_1055_CutDeck_Back.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1055/DEC_MF_Nautiloid_Canon_Rig_SCENE_TUT_UpperDeck_DragonFall_Shot_1055_CutDeck_Back.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="5.0000005" />
+					<attribute id="ID" type="FixedString" value="9d50f0aa-e0a8-568f-b934-24401e7368a9" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Rig_Nautiloid_Ship_Deck_DragonFall_Shot_1065_Falling" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1065/Nautiloid_Ship_Deck_Rig_TUT_UpperDeck_DragonFall_Shot_1065_Falling.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1065/Nautiloid_Ship_Deck_Rig_TUT_UpperDeck_DragonFall_Shot_1065_Falling.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="6.0666676" />
+					<attribute id="ID" type="FixedString" value="9fe719e9-ff4f-864b-4316-c954bd53ef8b" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="Puzzlebox_Generic_Rig_GLO_InfernalBox_BoxInteraction_StowPuzzlebox_SH" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/GLO/GLO_InfernalBox_BoxInteraction/Puzzlebox_Generic_Rig_GLO_InfernalBox_BoxInteraction_StowPuzzlebox_SH.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/GLO/GLO_InfernalBox_BoxInteraction/Puzzlebox_Generic_Rig_GLO_InfernalBox_BoxInteraction_StowPuzzlebox_SH.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="6.0000005" />
+					<attribute id="ID" type="FixedString" value="a33c1f44-4dc1-c4e1-1157-dd43db1a6e0b" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Object_Rig_CameraShake_Stable" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="26a245a1-3b0b-55b2-27b6-7417f9a5f854" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="89592799-f1b7-1070-edb1-310275b48687" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/_CinematicProps/CINE_Generic_Object_Rig/CINE_Generic_Object_Rig_CameraShake_Stable.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/_CinematicProps/CINE_Generic_Object_Rig/CINE_Generic_Object_Rig_CameraShake_Stable.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403208704" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.0000002" />
+					<attribute id="ID" type="FixedString" value="a52eaa8c-1736-c806-ec0c-d9f587453444" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Rubble_Medium_C_SCENE_CRA_Unconscious_Landing" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Rubble_Medium_C_SCENE_CRA_Unconscious_Landing.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Rubble_Medium_C_SCENE_CRA_Unconscious_Landing.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241811" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="8.666668" />
+					<attribute id="ID" type="FixedString" value="a8cd64a0-f011-ec58-f31d-32a4b521c6db" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Rig_Boat_UND_DuergarBoat_Rocking_Gently" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="6b97d255-85d8-a2ed-9c32-a55b19fe6180" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="89592799-f1b7-1070-edb1-310275b48687" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/UND/UND_DarkLake_DuergarBoatAtCamp/CINE_Generic_Rig_Boat_UND_DuergarBoat_Rocking_Gently.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/UND/UND_DarkLake_DuergarBoatAtCamp/CINE_Generic_Rig_Boat_UND_DuergarBoat_Rocking_Gently.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115198813274313" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4.3333335" />
+					<attribute id="ID" type="FixedString" value="b1ceedb7-c72a-ffc4-b7f6-d693d80d4461" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_CINE_SCENE_Ketheric_Giant_Forge_Hammer_02" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="87d8d34f-f2b3-7f70-9795-bc9dcbf3a79f" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/Decoration/Ketheric/DEC_Ketheric_Giant_Forge_ABC/DEC_Ketheric_Giant_Forge_A_Rig/_Construction/DEC_CINE_SCENE_Ketheric_Giant_Forge_Hammer_02.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/Decoration/Ketheric/DEC_Ketheric_Giant_Forge_ABC/DEC_Ketheric_Giant_Forge_A_Rig/_Construction/DEC_CINE_SCENE_Ketheric_Giant_Forge_Hammer_02.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115200960758165" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.666667" />
+					<attribute id="ID" type="FixedString" value="b4837459-5c3f-000b-c984-0be5f5c941eb" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="Dummy_BLD_MF_A_Rubble_Small_B_CRA_MindFlayerControl_Intro" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="3a740655-6cc5-21a0-6e80-3cd5d77ee48c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_MindFlayerControl_Intro/Dummy_BLD_MF_A_Rubble_Small_B_CRA_MindFlayerControl_Intro.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_MindFlayerControl_Intro/Dummy_BLD_MF_A_Rubble_Small_B_CRA_MindFlayerControl_Intro.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241811" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="16.000002" />
+					<attribute id="ID" type="FixedString" value="b4872b7b-8427-dccb-3c05-e252ca7c8d3c" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Canon_Rig_01_TUT_Upperdeck_Dragonfall_Shot_1045_Firing" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="8237dece-65ad-2fe9-ceeb-ee88224eafa7" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="b634869d-7015-a968-ed86-4950c954f332" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1045/DEC_MF_Canon_Rig_01_TUT_Upperdeck_Dragonfall_Shot_1045_Firing.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1045/DEC_MF_Canon_Rig_01_TUT_Upperdeck_Dragonfall_Shot_1045_Firing.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="13.666668" />
+					<attribute id="ID" type="FixedString" value="b7078489-043e-65d9-223a-bae50666677e" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Canon_Rig_02_TUT_Dragonfall_Shot_1000_Attack" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="8237dece-65ad-2fe9-ceeb-ee88224eafa7" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="b634869d-7015-a968-ed86-4950c954f332" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1000/DEC_MF_Canon_Rig_02_TUT_Dragonfall_Shot_1000_Attack.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1000/DEC_MF_Canon_Rig_02_TUT_Dragonfall_Shot_1000_Attack.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="10.333335" />
+					<attribute id="ID" type="FixedString" value="b80b65f4-4665-0660-6a7f-572b4a4c104b" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Nautiloid_Canon_Rig_TUT_Dragonfall_Shot_DragonTurn_01_Long" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="8237dece-65ad-2fe9-ceeb-ee88224eafa7" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="b634869d-7015-a968-ed86-4950c954f332" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1025/DEC_MF_Nautiloid_Canon_Rig_TUT_Dragonfall_Shot_DragonTurn_01_Long.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1025/DEC_MF_Nautiloid_Canon_Rig_TUT_Dragonfall_Shot_DragonTurn_01_Long.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4.333334" />
+					<attribute id="ID" type="FixedString" value="be186037-aae9-44f4-ee6c-ab18801faaf5" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="Gen_Rig_GOB_Orpheus_VoiceOfAbsolute_SH_HasBox_Hover_Idle_LOOP" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="49496adb-fce9-56f3-0053-6c40ed8c10a2" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="6454df5c-cae6-78d9-9f58-fd82716f9770" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/GOB/GOB_Orpheus_VoiceOfAbsolute/Gen_Rig_GOB_Orpheus_VoiceOfAbsolute_SH_HasBox_Hover_Idle_LOOP.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/GOB/GOB_Orpheus_VoiceOfAbsolute/Gen_Rig_GOB_Orpheus_VoiceOfAbsolute_SH_HasBox_Hover_Idle_LOOP.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725668" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.3333335" />
+					<attribute id="ID" type="FixedString" value="c063d4a4-75fa-8c9d-1bd0-e1a11079d9d8" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="Gen_Rig_GOB_Orpheus_VoiceOfAbsolute_SH_HasBox_Hover_LOOP" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="5a636390-a888-5982-9520-92f303236ed2" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="26b354e2-ccb8-f60e-008a-5cdbf02c1f3b" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/GOB/GOB_Orpheus_VoiceOfAbsolute/Gen_Rig_GOB_Orpheus_VoiceOfAbsolute_SH_HasBox_Hover_LOOP.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/GOB/GOB_Orpheus_VoiceOfAbsolute/Gen_Rig_GOB_Orpheus_VoiceOfAbsolute_SH_HasBox_Hover_LOOP.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725668" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="33.666668" />
+					<attribute id="ID" type="FixedString" value="c513f005-22ad-7a78-4561-7859d1f3ec0f" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Object_Rig_SCENE_CHA_Crypt_Jergal_Awaken_Jergal" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CHA/CHA_Crypt_jergal/CINE_Generic_Object_Rig_SCENE_CHA_Crypt_Jergal_Awaken_Jergal.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CHA/CHA_Crypt_jergal/CINE_Generic_Object_Rig_SCENE_CHA_Crypt_Jergal_Awaken_Jergal.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241811" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0" />
+					<attribute id="ID" type="FixedString" value="c67d2201-5a1b-5242-fb10-652e37e8e7ee" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="PUZ_CINE_GEN_Lever_Wheel_Gate_Wood_A_Rig_Close_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/Puzzle/PUZ_GEN_Lever_Wheel_Gate_Wood_A_Rig/_Construction/PUZ_CINE_GEN_Lever_Wheel_Gate_Wood_A_Rig_Close_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/Puzzle/PUZ_GEN_Lever_Wheel_Gate_Wood_A_Rig/_Construction/PUZ_CINE_GEN_Lever_Wheel_Gate_Wood_A_Rig_Close_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115200960758165" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="6.0000005" />
+					<attribute id="ID" type="FixedString" value="c6ed0fa5-31f0-13ee-b19c-dece057b170f" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Rig_SCENE_CRA_Debris_Rubble_Small_A" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Generic_Rig_SCENE_CRA_Debris_Rubble_Small_A.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Generic_Rig_SCENE_CRA_Debris_Rubble_Small_A.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="6.0000005" />
+					<attribute id="ID" type="FixedString" value="c84accc3-2a7b-3a15-2dad-e80ed52e2c65" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Rig_SCENE_CRA_Debris_Rubble_Medium_C" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Generic_Rig_SCENE_CRA_Debris_Rubble_Medium_C.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Generic_Rig_SCENE_CRA_Debris_Rubble_Medium_C.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="9.000001" />
+					<attribute id="ID" type="FixedString" value="c9884ace-424d-15a9-26fa-accf0a657c08" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Gen_Object_Head_SCENE_PLA_Refugee_001_TossHead" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="bd9a3e46-2cdb-7a2b-99c2-d546135c8bc0" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2892cebd-4d1f-e9f0-8261-b7a98514b9f9" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/PLA/PLA_Refugee_001/CINE_Gen_Object_Head_SCENE_PLA_Refugee_001_TossHead.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/PLA/PLA_Refugee_001/CINE_Gen_Object_Head_SCENE_PLA_Refugee_001_TossHead.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241711" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0" />
+					<attribute id="ID" type="FixedString" value="cb85d3b3-43c7-5e76-cfa4-64c986b72e7b" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="PUZ_CINE_GEN_Lever_Wheel_Gate_Wood_A_Rig_Open_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/Puzzle/PUZ_GEN_Lever_Wheel_Gate_Wood_A_Rig/_Construction/PUZ_CINE_GEN_Lever_Wheel_Gate_Wood_A_Rig_Open_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/Puzzle/PUZ_GEN_Lever_Wheel_Gate_Wood_A_Rig/_Construction/PUZ_CINE_GEN_Lever_Wheel_Gate_Wood_A_Rig_Open_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115200960758165" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="8.000001" />
+					<attribute id="ID" type="FixedString" value="d5860db5-c0a0-ba17-7337-0b183ec9d0c8" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Nautiloid_Canon_Rig_TUT_DragonFall_Shot_1040_Canon_2_Walk_To_Shoot" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="8237dece-65ad-2fe9-ceeb-ee88224eafa7" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="b634869d-7015-a968-ed86-4950c954f332" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1040/Nautiloid_Canon_Rig_TUT_DragonFall_Shot_1040_Canon_2_Walk_To_Shoot.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1040/Nautiloid_Canon_Rig_TUT_DragonFall_Shot_1040_Canon_2_Walk_To_Shoot.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="6.0000005" />
+					<attribute id="ID" type="FixedString" value="d8e4f81a-5a9e-ed0e-1655-7176d2766929" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Rig_SCENE_CRA_Debris_Rubble_Small_B" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Generic_Rig_SCENE_CRA_Debris_Rubble_Small_B.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Generic_Rig_SCENE_CRA_Debris_Rubble_Small_B.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="5.0000005" />
+					<attribute id="ID" type="FixedString" value="ddd595ed-2634-d621-f60a-aa3af82a6000" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Nautiloid_Canon_Rig_SCENE_TUT_UpperDeck_DragonFall_Shot_1055_CutDeck_Front" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="8237dece-65ad-2fe9-ceeb-ee88224eafa7" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="b634869d-7015-a968-ed86-4950c954f332" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1055/DEC_MF_Nautiloid_Canon_Rig_SCENE_TUT_UpperDeck_DragonFall_Shot_1055_CutDeck_Front.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1055/DEC_MF_Nautiloid_Canon_Rig_SCENE_TUT_UpperDeck_DragonFall_Shot_1055_CutDeck_Front.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.2000003" />
+					<attribute id="ID" type="FixedString" value="de165c17-959a-ff86-8368-e39ad9f65317" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Nautiloid_Canon_Rig_Nautiloid_Canon_Walk_Cycle" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Base_Animations/DEC_MF_Nautiloid_Canon_Rig_Nautiloid_Canon_Walk_Cycle.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Base_Animations/DEC_MF_Nautiloid_Canon_Rig_Nautiloid_Canon_Walk_Cycle.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="5.0000005" />
+					<attribute id="ID" type="FixedString" value="de5a1e1e-6f02-1d9f-750b-bae20bc6b911" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Rubble_Medium_C_SCENE_CRA_Unconscious_Landing_Awaken" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Rubble_Medium_C_SCENE_CRA_Unconscious_Landing_Awaken.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Rubble_Medium_C_SCENE_CRA_Unconscious_Landing_Awaken.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241811" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="6.0000005" />
+					<attribute id="ID" type="FixedString" value="e2d7a0d6-fb73-c44d-d135-4fc70fcd0d52" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Object_Rig_CameraShake_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="26a245a1-3b0b-55b2-27b6-7417f9a5f854" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="89592799-f1b7-1070-edb1-310275b48687" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/_CinematicProps/CINE_Generic_Object_Rig/CINE_Generic_Object_Rig_CameraShake_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/_CinematicProps/CINE_Generic_Object_Rig/CINE_Generic_Object_Rig_CameraShake_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241810" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="16.000002" />
+					<attribute id="ID" type="FixedString" value="e319059d-5c10-a501-dd41-b53bb66e2f96" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Canon_Rig_02_TUT_Upperdeck_Dragonfall_Shot_1045_Firing" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="8237dece-65ad-2fe9-ceeb-ee88224eafa7" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="b634869d-7015-a968-ed86-4950c954f332" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1045/DEC_MF_Canon_Rig_02_TUT_Upperdeck_Dragonfall_Shot_1045_Firing.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1045/DEC_MF_Canon_Rig_02_TUT_Upperdeck_Dragonfall_Shot_1045_Firing.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.0000002" />
+					<attribute id="ID" type="FixedString" value="e91eb35a-ffd8-19e5-8038-8c38f4e0747b" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Platform_Damaged_B_SCENE_CRA_Unconscious_Landing" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Platform_Damaged_B_SCENE_CRA_Unconscious_Landing.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Platform_Damaged_B_SCENE_CRA_Unconscious_Landing.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="13.666668" />
+					<attribute id="ID" type="FixedString" value="e9b384f2-bb8e-b631-8697-ab71f66aeb35" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Canon_Rig_01_TUT_Dragonfall_Shot_1000_Attack" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="8237dece-65ad-2fe9-ceeb-ee88224eafa7" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="b634869d-7015-a968-ed86-4950c954f332" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1000/DEC_MF_Canon_Rig_01_TUT_Dragonfall_Shot_1000_Attack.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1000/DEC_MF_Canon_Rig_01_TUT_Dragonfall_Shot_1000_Attack.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="12.333335" />
+					<attribute id="ID" type="FixedString" value="ee4c3f2a-29bb-4156-da95-8668ccd9d519" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Object_Rig_DEN_BlueJay_PlaceCoin_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/DEN/DEN_DruidPet_003/CINE_Generic_Object_Rig_DEN_BlueJay_PlaceCoin_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/DEN/DEN_DruidPet_003/CINE_Generic_Object_Rig_DEN_BlueJay_PlaceCoin_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790670" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.666667" />
+					<attribute id="ID" type="FixedString" value="f0f43d69-f83a-9bbe-2e57-d33b42d3b0a6" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="Dummy_BLD_MF_A_Rubble_Small_D_CRA_MindFlayerControl_Intro" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="fc4e0662-ba5a-08d9-dcea-18a634610b2c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="9cb7e9a4-97c8-4253-955d-fc3b6d66fb10" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_MindFlayerControl_Intro/Dummy_BLD_MF_A_Rubble_Small_D_CRA_MindFlayerControl_Intro.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_MindFlayerControl_Intro/Dummy_BLD_MF_A_Rubble_Small_D_CRA_MindFlayerControl_Intro.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241811" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="5.0000005" />
+					<attribute id="ID" type="FixedString" value="f1819659-f735-9302-94d2-a17fa38eb90f" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Platform_Damaged_B_SCENE_CRA_Unconscious_Landing_Awaken" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Platform_Damaged_B_SCENE_CRA_Unconscious_Landing_Awaken.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_Crash/CINE_Platform_Damaged_B_SCENE_CRA_Unconscious_Landing_Awaken.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="6.0000005" />
+					<attribute id="ID" type="FixedString" value="f7273b26-41d4-b24e-87de-251357de16df" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Object_Rig_CameraShake_MEDIUM" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="26a245a1-3b0b-55b2-27b6-7417f9a5f854" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="89592799-f1b7-1070-edb1-310275b48687" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/_CinematicProps/CINE_Generic_Object_Rig/CINE_Generic_Object_Rig_CameraShake_MEDIUM.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/_CinematicProps/CINE_Generic_Object_Rig/CINE_Generic_Object_Rig_CameraShake_MEDIUM.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403208704" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="6.0000005" />
+					<attribute id="ID" type="FixedString" value="f84e078e-0faa-e5ca-393e-2ca0a18e41f2" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Object_Rig_CameraShake_HIGH" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="26a245a1-3b0b-55b2-27b6-7417f9a5f854" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="89592799-f1b7-1070-edb1-310275b48687" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/_CinematicProps/CINE_Generic_Object_Rig/CINE_Generic_Object_Rig_CameraShake_HIGH.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/_CinematicProps/CINE_Generic_Object_Rig/CINE_Generic_Object_Rig_CameraShake_HIGH.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403208704" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="8.333334" />
+					<attribute id="ID" type="FixedString" value="fb0986d4-f39d-e602-1ee6-69895eaf19ca" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Nautiloid_Cannon_Rig_TUT_UpperDeck_DragonFall_Shot_1060_Front" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="8237dece-65ad-2fe9-ceeb-ee88224eafa7" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="b634869d-7015-a968-ed86-4950c954f332" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1060/DEC_MF_Nautiloid_Cannon_Rig_TUT_UpperDeck_DragonFall_Shot_1060_Front.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1060/DEC_MF_Nautiloid_Cannon_Rig_TUT_UpperDeck_DragonFall_Shot_1060_Front.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.1666667" />
+					<attribute id="ID" type="FixedString" value="fb53c579-772b-93aa-1c48-7c771e93588b" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_CINE_SCENE_Goblins_Camp_Cage_A_Rig_Close_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="32813b8a-bf97-4d0b-9446-5768b3ae69c0" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/Decoration/Goblins/DEC_Goblins_Camp_Cage_ABC/DEC_Goblins_Camp_Cage_A_Rig/_Construction/DEC_CINE_SCENE_Goblins_Camp_Cage_A_Rig_Close_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/_PROP_ANIM/_Anims/Decoration/Goblins/DEC_Goblins_Camp_Cage_ABC/DEC_Goblins_Camp_Cage_A_Rig/_Construction/DEC_CINE_SCENE_Goblins_Camp_Cage_A_Rig_Close_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115200960758165" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4.0000005" />
+					<attribute id="ID" type="FixedString" value="fb6ebdc6-0949-4c91-9f3a-8646875e23d3" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="Dummy_BLD_MF_A_Rubble_Small_A_SCENE_CRA_MindFlayerControl_Intro" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="5fea5369-1ebc-bf01-ee89-48fb596bb7a7" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_MindFlayerControl_Intro/Dummy_BLD_MF_A_Rubble_Small_A_SCENE_CRA_MindFlayerControl_Intro.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/CRASH/CRA_MindFlayerControl_Intro/Dummy_BLD_MF_A_Rubble_Small_A_SCENE_CRA_MindFlayerControl_Intro.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241811" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="10.333335" />
+					<attribute id="ID" type="FixedString" value="fbe88910-33fc-0c4f-a00b-549342f175b2" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_MF_Nautiloid_Canon_Rig_TUT_Dragonfall_Shot_DragonTurn_02_Long" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="8237dece-65ad-2fe9-ceeb-ee88224eafa7" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="b634869d-7015-a968-ed86-4950c954f332" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1025/DEC_MF_Nautiloid_Canon_Rig_TUT_Dragonfall_Shot_DragonTurn_02_Long.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/TUT/TUT_UpperDeck_DragonFall/Shots/Shot_1025/DEC_MF_Nautiloid_Canon_Rig_TUT_Dragonfall_Shot_DragonTurn_02_Long.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665790466" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="26.000002" />
+					<attribute id="ID" type="FixedString" value="feb3124b-66ac-0553-965e-cb94e5cf9def" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Object_Rig_UND_SwordInStone_PullSucc_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="91a755e7-f02c-19cd-8d61-3da7192a8396" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="89592799-f1b7-1070-edb1-310275b48687" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/UND/UND_SwordInStone/CINE_Generic_Object_Rig_UND_SwordInStone_PullSucc_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Cinematic/Act01/UND/UND_SwordInStone/CINE_Generic_Object_Rig_UND_SwordInStone_PullSucc_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115198813274313" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="94f5db48-55d7-e1e2-aa68-bf4d8df3b727" />
+					<attribute id="BoundsMax" type="fvec3" value="0 0 0" />
+					<attribute id="BoundsMin" type="fvec3" value="0 0 0" />
+					<attribute id="Center" type="fvec3" value="0 0 0" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="26a245a1-3b0b-55b2-27b6-7417f9a5f854" />
+					<attribute id="Initialized" type="bool" value="False" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="CINE_Generic_Object_Base" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0" />
+					<attribute id="SkeletonResource" type="FixedString" value="89592799-f1b7-1070-edb1-310275b48687" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="EMPTY_VISUAL_TEMPLATE" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855920" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="8864a2e1-ba08-c2f7-e245-ad3b2da85cc6" />
+						</node>
+						<node id="Base" />
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

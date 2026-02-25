@@ -1,0 +1,27 @@
+game.states.BehaviorTester = State{function ()
+    description = [[Dummy state that does not do anything]]
+    local startDialog = false
+    local behaviorId = Guid("baf468bd-a459-9fdd-32f0-751abe69aaa9")
+    local behaviorDialog = Dialog(behaviorId)
+    local triggerId = Guid("62352de6-9280-4129-991f-a1b11b82ee1c")
+    -- public API
+    nodes.Idling = function()
+        if startDialog then
+            DebugText(me, "STARTING DIALOG!")
+            StartBehaviorDialog(behaviorDialog, triggerId, true, me)
+            startDialog = false
+        end
+    end
+    events.EnteredTrigger = function(e)
+        if e.Target.IsCharacter and e.Target.Character.IsPartyMember then
+            DebugText(me, "ENTERED TRIGGER!")
+            startDialog = true
+        end
+    end
+    events.LeftTrigger = function(e)
+        if e.Target.IsCharacter and e.Target.Character.IsPartyMember then
+            DebugText(me, "LEFT TRIGGER!")
+            BehaviorDialogRequestGracefulStop(me, true, behaviorId)
+        end
+    end
+end}

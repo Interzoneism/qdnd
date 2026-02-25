@@ -1,0 +1,6 @@
+game.configs.DefaultItem = Config{
+    root = StateRef{game.roots.DefaultItem,
+        idle = StateRef{game.states.Dummy}
+    }
+}
+

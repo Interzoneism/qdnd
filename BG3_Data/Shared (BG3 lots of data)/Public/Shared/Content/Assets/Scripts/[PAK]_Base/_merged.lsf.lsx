@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="ScriptBank">
+		<node id="ScriptBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="05c5fa1e-b8fd-e0d7-6ebe-91d0e0844131" />
+					<attribute id="Name" type="LSString" value="DOS2_ThrowableOnThrownEvent" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Scripts/ThrowableOnDestroyEvent.itemScript" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144537400540922156" />
+					<children>
+						<node id="Parameters">
+							<children>
+								<node id="Parameter">
+									<attribute id="MapKey" type="FixedString" value="LifeTime" />
+									<attribute id="Type" type="int32" value="2" />
+									<attribute id="Value" type="LSString" value="0" />
+								</node>
+								<node id="Parameter">
+									<attribute id="MapKey" type="FixedString" value="ProjectileSpell" />
+									<attribute id="Type" type="int32" value="9" />
+									<attribute id="Value" type="LSString" value="0xbaadf00d" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="21b4f9b0-70a5-a909-e3aa-49176e1da7e3" />
+					<attribute id="Name" type="LSString" value="PUZZLE_TrappedPerception" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Scripts/PUZZLE_TrappedPerception.itemScript" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144537400540922156" />
+					<children>
+						<node id="Parameters" />
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="3250732e-6269-4ebb-b9dd-556c237f687d" />
+					<attribute id="Name" type="LSString" value="DOS2_OilBarrel" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Scripts/OilBarrel.itemScript" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144537400540922156" />
+					<children>
+						<node id="Parameters" />
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="403d19b4-b8dc-4481-b853-c010384a6411" />
+					<attribute id="Name" type="LSString" value="DOS2_GEN_NonStatic" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Scripts/GEN_NonStatic.itemScript" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144537400540922156" />
+					<children>
+						<node id="Parameters" />
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="a557ab71-77f3-4b0c-8174-f605e51c90c7" />
+					<attribute id="Name" type="LSString" value="DOS2_Grenade" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Scripts/Grenade.itemScript" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144537400540922156" />
+					<children>
+						<node id="Parameters">
+							<children>
+								<node id="Parameter">
+									<attribute id="MapKey" type="FixedString" value="LifeTime" />
+									<attribute id="Type" type="int32" value="2" />
+									<attribute id="Value" type="LSString" value="0" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="c8f5a423-8e0c-16a4-b583-cbd1cc579d2b" />
+					<attribute id="Name" type="LSString" value="Grenade_Oil" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Scripts/Grenade_Oil.itemScript" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144959613005987940" />
+					<children>
+						<node id="Parameters" />
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="d289389c-882d-4695-a8d5-dda2a1351711" />
+					<attribute id="Name" type="LSString" value="DOS2_Torch" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Scripts/Torch.itemScript" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144537400540922156" />
+					<children>
+						<node id="Parameters" />
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="EffectBank">
+		<node id="EffectBank">
+			<children>
+				<node id="Resource">
+					<attribute id="BoundsMax" type="fvec3" value="1.1547005 1.6547005 1.1547005" />
+					<attribute id="BoundsMin" type="fvec3" value="-1.1547005 -0.6547005 -1.1547005" />
+					<attribute id="CullingDistance" type="float" value="0" />
+					<attribute id="Duration" type="float" value="1" />
+					<attribute id="EffectName" type="FixedString" value="VFX_Script_Behaviour_Greataxe_A_Rusty_A_01" />
+					<attribute id="ID" type="FixedString" value="b9bf525d-08d6-726e-9d79-401e65b648a6" />
+					<attribute id="InterruptionMode" type="uint32" value="2" />
+					<attribute id="Looping" type="bool" value="True" />
+					<attribute id="Name" type="LSString" value="VFX_Script_Behaviour_Greataxe_A_Rusty_A_01" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Effects/Effects_Banks/Script/VFX_Script_Behaviour_Greataxe_A_Rusty_A_01.lsfx" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209025" />
+					<children>
+						<node id="Dependencies">
+							<children>
+								<node id="DependentResource">
+									<attribute id="Object" type="FixedString" value="68235f4f-da96-fbd9-fa4e-44488290ed64" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

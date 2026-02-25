@@ -1,0 +1,476 @@
+game.states.Explosive = State{
+    function()
+
+        params.DC = {
+            type = EParamType.String,
+            default="HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f",
+            help=[[Perception check DC.]]
+        }
+
+
+        params.DamageTypes = {
+            type = EParamType.String,
+            arrayRange="0..",
+            help = [[Types of damage that affect the explosive]],
+            default = {},
+        }
+
+        params.AbsoluteValueThreshold = {
+            type = EParamType.Bool,
+            default = false,
+            help = "If true, treat the threshold as an absolute value rather than a medium value"
+        }
+
+        params.ExcludeDamageTypes = {
+            type = EParamType.Bool,
+            default = false,
+            help = "Instead of trying to match the damage types, ignore them"
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = "Does the trap start on?"
+        }
+
+        params.Projectile = {
+            type = EParamType.String,
+            default = "Projectile_Fireball_Trap",
+            help = [[The projectile that explodes]]
+        }
+
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            required=false,
+            default=6,
+            help=[[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]]
+        }
+
+        params.Skill = {
+            type = EParamType.String,
+            default="Perception",
+            help=[[The skill checked.]]
+        }
+
+        params.Type = {
+            type = EParamType.String,
+            default="Invisible",
+            help=[[
+            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]]
+        }
+
+        params.VFXOff = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = [[VFX while explosive is disabled and has been spotted.]]
+        }
+
+        params.VFXOffBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = [[Bone on which the 'VFXOff' VFX is played.]]
+        }
+
+        params.VFXOn = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = [[VFX while explosive is enabled and has been spotted.]]
+        }
+
+        params.VFXOnBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = [[Bone on which the enabled-VFX is played.]]
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_Off",
+            help = "Sound when explosive is disabled"
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_On",
+            help = "Sound when explosive is enabled"
+        }
+
+        params.DamageThreshold = {type = EParamType.Number, default = 0.0, help = [[
+            Minimum damage that needs to be done to the the explosive for it to explode.
+            Percentage, so on a 0.0-1.0 range unless AbsoluteValueTreshold is true]]
+        }
+
+        params.DestroyOnDisarm = {
+            type=EParamType.Bool,
+            default = true,
+            help = "Does the item break on Disarm?"
+        }
+
+        params.PerceptionSuccessAD = {
+            type = EParamType.String, 
+            default="", 
+            help=[[Override AD to play on the player when the non-trapped entity is perceived. Default AD if left blank.]]
+        }
+
+        inputs.TookDamage = {internal = true}
+
+        inputs.Enable = {help = "Turn explosive on"}
+        inputs.Disable = {help = "Turn explosive off"}
+        inputs.Explode = {help = "Makes explosive explode (ignoring disarmed state, disabled state, etc)"}
+        inputs.TryExplode = {help = "Makes explosive explode if it's active."}
+
+        inputs.Reveal = {help = [[Reveals the explosive. The Object will do an AD unless the Param is true.]]}
+
+
+        inputs.Destroyed = {internal=true}
+        outputs.Destroyed = {help = [[Explosive was destroyed.]]}
+
+        outputs.On = {internal = true}
+        outputs.Off = {internal = true}
+
+        outputs.Explode = {internal=true}
+        outputs.Reveal = {internal=true}
+        outputs.TryActivate = {internal = true}
+        inputs.Activate = {internal = true}
+        inputs.DisarmFailed = {internal = true}
+        inputs.Disarmed = {internal = true}
+        outputs.DisarmFailed = {help = "Failed to disarm explosive."}
+        outputs.Disarmed = {help = "Explosive was disarmed."}
+
+        nodes.PerceptionDisarmOnOff = Proxy{
+            game.states.PerceptionDisarmOnOff,
+            params = {StartEnabled = params.StartEnabled,
+                      DC = params.DC,
+                      MinDistance = params.MinDistance,
+                      Skill = params.Skill,
+                      Type = params.Type,
+                      VFXOn= params.VFXOn,
+                      VFXOff = params.VFXOff,
+                      VFXOnBone = params.VFXOnBone,
+                      VFXOffBone = params.VFXOffBone,
+                      SoundOn = params.SoundOn,
+                      SoundOff = params.SoundOff,
+                      DestroyOnDisarm = params.DestroyOnDisarm,
+                      PerceptionSuccessAD = params.PerceptionSuccessAD},
+            inputs = {TryActivate = {outputs.TryActivate},
+                      Enable = {outputs.On},
+                      Disable = {outputs.Off},
+                      Reveal = {outputs.Reveal}},
+            outputs = {Activate = {inputs.Activate},
+                       DisarmFailed = {inputs.DisarmFailed},
+                       Disarmed = {inputs.Disarmed}}
+        }
+
+        nodes.DamageTrigger = Proxy{
+            game.states.DamageTrigger,
+            params = {DamageTypes = params.DamageTypes,
+                      AbsoluteValueThreshold = params.AbsoluteValueThreshold,
+                      ExcludeDamageTypes = params.ExcludeDamageTypes,
+                      Threshold = params.DamageThreshold},
+            outputs = {TookDamage = {inputs.TookDamage}}
+        }
+
+        nodes.Explode = Proxy{
+            game.states.Explode,
+            params = {Projectile = params.Projectile},
+            inputs = {Explode = {outputs.Explode}}
+        }
+
+        nodes.Destructible = Proxy{
+            game.states.Destructible,
+            params = {GenerateTreasure = false,
+                      DestroyVFX = ""},
+            outputs = {Destroyed = {inputs.Destroyed}}
+        }
+
+        helpers.UpdateOnDamageSpells = function()
+            ClearOnDamageSpells(me)
+            if (params.Projectile ~= nil) and
+                (params.Projectile ~= "") then
+                if #params.DamageTypes == 0 then
+                    AddOnDamageSpell(me, params.Projectile, 0, DamageType.NONE)
+                elseif params.ExcludeDamageTypes == false then
+                    for key, value in pairs(params.DamageTypes) do
+                        AddOnDamageSpell(me, params.Projectile, 0, DamageType[value])
+                    end
+                else
+                    local possibleDamageTypes = DamageType
+                    for key, value in pairs(params.DamageTypes) do
+                        possibleDamageTypes[value] = nil
+                    end
+                    possibleDamageTypes.NONE = nil
+                    for key, value in pairs(possibleDamageTypes) do
+                        if possibleDamageTypes[value] ~= nil then
+                            AddOnDamageSpell(me, params.Projectile, 0, possibleDamageTypes[value])
+                        end
+                    end
+                end
+            end
+        end
+
+        self.OnLoaded = function()
+            helpers.UpdateOnDamageSpells()
+        end
+
+        self.OnEditorChanges = function()
+            helpers.UpdateOnDamageSpells()
+        end
+
+        socketEvents.TookDamage = function(ev)
+            TriggerOutput(outputs.TryActivate, ev.Object)
+        end
+
+        socketEvents.TryExplode = function(ev)
+            TriggerOutput(outputs.TryActivate, ev.Object)
+        end
+
+        socketEvents.Activate = function(ev)
+            TriggerOutput(outputs.Explode, ev.Object)
+            TriggerOutput(outputs.Off, ev.Object)
+        end
+
+        socketEvents.DisarmFailed = function(ev)
+            TriggerOutput(outputs.Explode, ev.Object)
+            TriggerOutput(outputs.DisarmFailed, ev.Object, ev.Param)
+        end
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.On, ev.Object)
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.Off, ev.Object)
+        end
+
+        socketEvents.Explode = function(ev)
+            TriggerOutput(outputs.Reveal, ev.Object, true)
+            TriggerOutput(outputs.Explode, ev.Object)
+        end
+
+        socketEvents.Reveal = function(ev)
+            TriggerOutput(outputs.Reveal, ev.Object)
+        end
+
+        socketEvents.Disarmed = function(ev)
+            TriggerOutput(outputs.Disarmed, ev.Object, ev.Param)
+        end
+
+        socketEvents.Destroyed = function(ev)
+            TriggerOutput(outputs.Destroyed, ev.Object, ev.Param)
+        end
+
+    end
+}
+
+
+game.states.ExplosiveWithReward = State{
+    function()
+
+        params.DC = {
+            type = EParamType.String,
+            default="HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f",
+            help=[[Perception check DC.]]
+        }
+
+
+        params.DamageTypes = {
+            type = EParamType.String,
+            arrayRange="0..",
+            help = [[Types of damage that affect the explosive]],
+            default = {},
+        }
+
+        params.AbsoluteValueThreshold = {
+            type = EParamType.Bool,
+            default = false,
+            help = "If true, treat the threshold as an absolute value rather than a medium value"
+        }
+
+        params.ExcludeDamageTypes = {
+            type = EParamType.Bool,
+            default = false,
+            help = "Instead of trying to match the damage types, ignore them"
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = "Does the trap start on?"
+        }
+
+        params.Projectile = {
+            type = EParamType.String,
+            default = "Projectile_Fireball_Trap",
+            help = [[The projectile that explodes]]
+        }
+
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            required=false,
+            default=6,
+            help=[[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]]
+        }
+
+        params.Skill = {
+            type = EParamType.String,
+            default="Perception",
+            help=[[The skill checked.]]
+        }
+
+        params.Type = {
+            type = EParamType.String,
+            default="Invisible",
+            help=[[
+            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]]
+        }
+
+        params.VFXOff = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = [[VFX while explosive is disabled and has been spotted.]]
+        }
+
+        params.VFXOffBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = [[Bone on which the 'VFXOff' VFX is played.]]
+        }
+
+        params.VFXOn = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = [[VFX while explosive is enabled and has been spotted.]]
+        }
+
+        params.VFXOnBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = [[Bone on which the enabled-VFX is played.]]
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_Off",
+            help = "Sound when explosive is disabled"
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_On",
+            help = "Sound when explosive is enabled"
+        }
+
+        params.DamageThreshold = {type = EParamType.Number, default = 0.0, help = [[
+            Minimum damage that needs to be done to the the explosive for it to explode.
+            Percentage, so on a 0.0-1.0 range unless AbsoluteValueTreshold is true]]
+        }
+
+        params.Reward = {
+            type = EParamType.String,
+            required = true,
+            help = "Item that you get on disarming the trap."
+        }
+
+        inputs.Enable = {help = "Turn explosive on"}
+        inputs.Disable = {help = "Turn explosive off"}
+        inputs.Explode = {help = "Makes explosive explode (ignoring disarmed state, disabled state, etc)"}
+        inputs.TryExplode = {help = "Makes explosive explode if it's active."}
+
+        inputs.Reveal = {help = [[Reveals the explosive. The Object will do an AD unless the Param is true.]]}
+
+        outputs.On = {internal = true}
+        outputs.Off = {internal = true}
+
+        outputs.Explode = {internal=true}
+        outputs.Reveal = {internal=true}
+        outputs.TryActivate = {internal = true}
+
+        inputs.DisarmFailed = {internal = true}
+        inputs.Disarmed = {internal = true}
+
+        nodes.Explosive = Proxy{
+            game.states.Explosive,
+            params = {StartEnabled = params.StartEnabled,
+                      DC = params.DC,
+                      MinDistance = params.MinDistance,
+                      Skill = params.Skill,
+                      Type = params.Type,
+                      VFXOn= params.VFXOn,
+                      VFXOff = params.VFXOff,
+                      VFXOnBone = params.VFXOnBone,
+                      VFXOffBone = params.VFXOffBone,
+                      SoundOn = params.SoundOn,
+                      SoundOff = params.SoundOff,
+                      DamageTypes = params.DamageTypes,
+                      AbsoluteValueThreshold = params.AbsoluteValueThreshold,
+                      ExcludeDamageTypes = params.ExcludeDamageTypes,
+                      Threshold = params.DamageThreshold,
+                      Projectile = params.Projectile},
+            inputs = {Explode = {outputs.Explode},
+                      TryExplode = {outputs.TryActivate},
+                      Enable = {outputs.On},
+                      Disable = {outputs.Off},
+                      Reveal = {outputs.Reveal}},
+            outputs = {DisarmFailed = {inputs.DisarmFailed},
+                       Disarmed = {inputs.Disarmed}}
+        }
+
+
+
+        socketEvents.TryExplode = function(ev)
+            TriggerOutput(outputs.TryActivate, ev.Object)
+        end
+
+        socketEvents.Explode = function(ev)
+            TriggerOutput(outputs.Explode, ev.Object)
+        end
+
+        socketEvents.DisarmFailed = function(ev)
+            TriggerOutput(outputs.Explode, ev.Object)
+        end
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.On, ev.Object)
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.Off, ev.Object)
+        end
+
+        socketEvents.Explode = function(ev)
+            TriggerOutput(outputs.Explode, ev.Object)
+        end
+
+        socketEvents.Reveal = function(ev)
+            TriggerOutput(outputs.Reveal, ev.Object)
+        end
+
+        socketEvents.Disarmed = function(ev)
+            if ev.Object ~= nil then
+            local disarmer = Entity(ev.Object)
+                if disarmer.IsCharacter and
+                   disarmer.Character.IsPartyMember then
+                    local template = FindTemplate(params.Reward)
+                    local item = SpawnItem(template, me.Position)
+                    ToInventory(item, disarmer)
+                end
+            end
+            SetOnStage(me, false)
+        end
+
+    end
+}

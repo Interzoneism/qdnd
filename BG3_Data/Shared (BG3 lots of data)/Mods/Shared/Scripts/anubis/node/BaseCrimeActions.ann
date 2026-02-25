@@ -1,0 +1,1351 @@
+--[[
+    Stateless actions can't have upvalues, so we can't do this, but have to copy paste it
+    TODO: check if we can put this in the API of the crime state? Not mod friendly then though
+function PlayCallHelpDialog(entity)
+    local arrestDialog = entity.Blackboard.GetFact("ArrestDialog")
+    local dialogToPlay = nil
+    if not arrestDialog or (arrestDialog == Guid("NGB_Arrest_fabc5060-4331-61ef-a99e-f836fbed25bc")) then
+        dialogToPlay = Dialog("GEB_AD_CallForHelp_86d42165-a621-b656-e97d-fc68b6240de9")
+    else
+        dialogToPlay = arrestDialog
+    end
+    if dialogToPlay then
+        StartAutomatedDialog(dialogToPlay, false, entity)
+    end
+end
+--]]
+game.actions.generics.AttackCallHelp = Action
+{
+    function(state)
+        local cowerAnimation = nil
+        local disturbanceID = me.HandlingDisturbanceID
+        if me.CanFight and
+           (not IsTagged(me, Tag("CIVILIAN_71120d5d-3853-46e4-9762-33f59aa6b4ae"))
+            or IsTagged(me, Tag("BADASSCIVILIAN_91f4b379-63a2-40e9-a509-7b9b2f90e4c8"))) then
+            local criminal = me.Blackboard.GetFact("Criminal1")
+            local dialog = Dialog("GEB_AD_AttackHelp_7c77c1a5-b18a-fb58-b580-6ab2805429b0")
+            try
+                StartAutomatedDialog(dialog, false, me)
+            catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                -- nothing
+            end
+            state.CrimesHumanoid.CrimeSetTemporaryHostileRelation(criminal)
+        else
+            if DisturbanceTransferLeadership(disturbanceID, me,
+                    {Tag("GUARD_0b52f35e-fb1f-4865-bcd2-5d21ef7343cd"),
+                     Tag("NOT_MESSING_AROUND_542b58f0-42ad-4157-a28e-27434e0e7b18"),
+                     Tag("BADASSCIVILIAN_91f4b379-63a2-40e9-a509-7b9b2f90e4c8")}) then
+                local newLead = DisturbanceGetLeadInvestigator(disturbanceID)
+                if newLead ~= nil then
+                    SetUnicastEntityEvent(me, "SetNewLead", newLead)
+                end
+            else
+                DebugText(me, "Calling guard while wanting to attack")
+                me.Blackboard.SetFact("GuardSummonFailedReaction", "Attack")
+                SetUnicastEntityEvent(me, "CRIME_StoryCallGuardsAttack")
+                -- Osiris will break us out of this Sleep by either suspending this disturbance and starting a WaitingForCalledGuard reaction,
+                -- or by switching us to CallGuardsFailed if no guard is available
+                Sleep(60.0)
+                try
+                    FleeFrom(RelationType.All,10.0)
+                catch e if ls.CheckType(e, error.MovementFailed) then
+                    cowerAnimation = cowerAnimation or Animation("CUST_DebugAsset_CustomAnim_01_Loop_50635108-0b10-4232-820a-aac14df09a75")
+                    try
+                        PlayAnimation(cowerAnimation, true)
+                    catch e if ls.CheckType(e, error.PlayAnimationFailed) then
+                        Sleep(2.0)
+                    end
+                end
+            end
+	end
+    end,
+
+    OnInterrupt = function()
+        StopAnimation(me)
+    end,
+
+    OnEnter = function()
+        BlockNewDisturbanceReactions(me, true)
+    end,
+
+    OnLeave = function()
+        BlockNewDisturbanceReactions(me, false)
+    end
+}
+
+game.actions.generics.ArrestCallHelp = Action
+{
+    function(state)
+        local cowerAnimation = nil
+        local disturbanceID = me.HandlingDisturbanceID
+
+        --PlayCallHelpDialog(me)
+        local arrestDialog = me.Blackboard.GetFact("ArrestDialog")
+        local dialogToPlay
+        if not arrestDialog or (arrestDialog == Guid("NGB_Arrest_fabc5060-4331-61ef-a99e-f836fbed25bc")) then
+            dialogToPlay = Dialog("GEB_AD_CallForHelp_86d42165-a621-b656-e97d-fc68b6240de9")
+        else
+            dialogToPlay = Dialog(arrestDialog)
+        end
+        if dialogToPlay then
+            try
+                StartAutomatedDialog(dialogToPlay, false, me)
+            catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                -- nothing
+
+            end
+        end
+
+        if not DisturbanceTransferLeadership(disturbanceID, me,
+             {Tag("GUARD_0b52f35e-fb1f-4865-bcd2-5d21ef7343cd")}) then
+
+            DebugText(me, "Calling guard while wanting to arrest")
+            me.Blackboard.SetFact("GuardSummonFailedReaction", "Attack")
+            state.CrimesHumanoid.CallGuardsToArrest("CRIME_StoryCallGuardsArrest")
+
+            -- Osiris will break us out of this Sleep by either suspending this disturbance and starting a WaitingForCalledGuard reaction,
+            -- or by switching us to CallGuardsFailed if no guard is available
+            Sleep(60.0)
+        else
+            local newLead = DisturbanceGetLeadInvestigator(disturbanceID)
+            if newLead ~= nil then
+                SetUnicastEntityEvent(me, "SetNewLead", newLead)
+            end
+            try
+                FleeFrom(RelationType.All, 30.0)
+            catch e if ls.CheckType(e, error.MovementFailed) then
+                cowerAnimation = cowerAnimation or Animation("CUST_DebugAsset_CustomAnim_01_Loop_50635108-0b10-4232-820a-aac14df09a75")
+                try
+                    PlayAnimation(cowerAnimation, true)
+                catch e if ls.CheckType(e, error.PlayAnimationFailed) then
+                    Sleep(2.0)
+                end
+            end
+        end
+    end,
+
+    OnInterrupt = function()
+        StopAnimation(me)
+    end,
+    OnEnter = function()
+        BlockNewDisturbanceReactions(me, true)
+    end,
+
+    OnLeave = function()
+        BlockNewDisturbanceReactions(me, false)
+    end
+}
+
+game.actions.generics.AttackCallHelpWithReinforcements = Action
+{
+    function(state)
+        local cowerAnimation = nil
+        local disturbanceID = me.HandlingDisturbanceID
+        if me.CanFight then
+            local criminal = me.Blackboard.GetFact("Criminal1")
+            local dialog = Dialog("GEB_AD_AttackHelp_7c77c1a5-b18a-fb58-b580-6ab2805429b0")
+            try
+                StartAutomatedDialog(dialog, false, me)
+            catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                -- nothing
+            end
+            state.CrimesHumanoid.CrimeSetTemporaryHostileRelation(criminal)
+        else
+            if DisturbanceTransferLeadership(disturbanceID, me,
+                    {Tag("GUARD_0b52f35e-fb1f-4865-bcd2-5d21ef7343cd"),
+                     Tag("NOT_MESSING_AROUND_542b58f0-42ad-4157-a28e-27434e0e7b18"),
+                     Tag("BADASSCIVILIAN_91f4b379-63a2-40e9-a509-7b9b2f90e4c8")}) then
+                local newLead = DisturbanceGetLeadInvestigator(disturbanceID)
+                if newLead ~= nil then
+                    SetUnicastEntityEvent(me, "SetNewLead", newLead)
+                end
+            else
+                DebugText(me, "Calling guard while wanting to attack")
+                me.Blackboard.SetFact("GuardSummonFailedReaction", "Attack")
+                SetUnicastEntityEvent(me, "CRIME_StoryCallGuardsAttack_WithReinforcements")
+                -- Osiris will break us out of this Sleep by either suspending this disturbance and starting a WaitingForCalledGuard reaction,
+                -- or by switching us to CallGuardsFailed if no guard is available
+                Sleep(60.0)
+                try
+                    FleeFrom(RelationType.All,10.0)
+                catch e if ls.CheckType(e, error.MovementFailed) then
+                    cowerAnimation = cowerAnimation or Animation("CUST_DebugAsset_CustomAnim_01_Loop_50635108-0b10-4232-820a-aac14df09a75")
+                    try
+                        PlayAnimation(cowerAnimation, true)
+                    catch e if ls.CheckType(e, error.PlayAnimationFailed) then
+                        Sleep(2.0)
+                    end
+                end
+            end
+	end
+    end,
+
+    OnInterrupt = function()
+        StopAnimation(me)
+    end,
+
+    OnEnter = function()
+        BlockNewDisturbanceReactions(me, true)
+    end,
+
+    OnLeave = function()
+        BlockNewDisturbanceReactions(me, false)
+    end
+}
+
+game.actions.generics.ArrestCallHelpWithReinforcements = Action
+{
+    function(state)
+        local cowerAnimation = nil
+        local disturbanceID = me.HandlingDisturbanceID
+
+        --PlayCallHelpDialog(me)
+        local arrestDialog = me.Blackboard.GetFact("ArrestDialog")
+        local dialogToPlay
+        if not arrestDialog or (arrestDialog == Guid("NGB_Arrest_fabc5060-4331-61ef-a99e-f836fbed25bc")) then
+            dialogToPlay = Dialog("GEB_AD_CallForHelp_86d42165-a621-b656-e97d-fc68b6240de9")
+        else
+            dialogToPlay = Dialog(arrestDialog)
+        end
+        if dialogToPlay then
+            try
+                StartAutomatedDialog(dialogToPlay, false, me)
+            catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                -- nothing
+
+            end
+        end
+
+        if not DisturbanceTransferLeadership(disturbanceID, me,
+             {Tag("GUARD_0b52f35e-fb1f-4865-bcd2-5d21ef7343cd")}) then
+
+            DebugText(me, "Calling guard while wanting to arrest")
+            me.Blackboard.SetFact("GuardSummonFailedReaction", "Attack")
+            state.CrimesHumanoid.CallGuardsToArrest("CRIME_StoryCallGuardsArrest_WithReinforcements")
+
+            -- Osiris will break us out of this Sleep by either suspending this disturbance and starting a WaitingForCalledGuard reaction,
+            -- or by switching us to CallGuardsFailed if no guard is available
+            Sleep(60.0)
+        else
+            local newLead = DisturbanceGetLeadInvestigator(disturbanceID)
+            if newLead ~= nil then
+                SetUnicastEntityEvent(me, "SetNewLead", newLead)
+            end
+            try
+                FleeFrom(RelationType.All, 30.0)
+            catch e if ls.CheckType(e, error.MovementFailed) then
+                cowerAnimation = cowerAnimation or Animation("CUST_DebugAsset_CustomAnim_01_Loop_50635108-0b10-4232-820a-aac14df09a75")
+                try
+                    PlayAnimation(cowerAnimation, true)
+                catch e if ls.CheckType(e, error.PlayAnimationFailed) then
+                    Sleep(2.0)
+                end
+            end
+        end
+    end,
+
+    OnInterrupt = function()
+        StopAnimation(me)
+    end,
+    OnEnter = function()
+        BlockNewDisturbanceReactions(me, true)
+    end,
+
+    OnLeave = function()
+        BlockNewDisturbanceReactions(me, false)
+    end
+}
+
+game.actions.generics.CallHelpFlee = Action
+{
+    function(state)
+        local cowerAnimation = nil
+        local disturbanceID = me.HandlingDisturbanceID
+
+        if not DisturbanceTransferLeadership(disturbanceID, me,
+            {Tag("GUARD_0b52f35e-fb1f-4865-bcd2-5d21ef7343cd"),
+             Tag("NOT_MESSING_AROUND_542b58f0-42ad-4157-a28e-27434e0e7b18"),
+             Tag("BADASSCIVILIAN_91f4b379-63a2-40e9-a509-7b9b2f90e4c8")}) then
+            local dialogToPlay = Dialog("GEB_AD_DealWithCrime_2a70dd9f-c256-a987-e4c7-05a629559fd6")
+            DebugText(me, "Calling guard while wanting to flee")
+            -- So we can detect in CRIME_TransferToSummonedGuardFailed that we should flee
+            me.Blackboard.SetFact("GuardSummonFailedReaction", "Flee")
+            state.CrimesHumanoid.CallGuardsToArrest("CRIME_StoryCallGuardsArrest")
+            -- Osiris will break us out of this Sleep by either suspending this disturbance and starting a WaitingForCalledGuard reaction,
+            -- or by switching us to CallGuardsFailed if no guard is available
+            Sleep(60.0)
+
+        else
+            local newLead = DisturbanceGetLeadInvestigator(disturbanceID)
+            if newLead ~= nil then
+                SetUnicastEntityEvent(me, "SetNewLead", newLead)
+            end
+            local criminal = me.Blackboard.GetFact("Criminal1")
+            --PlayCallHelpDialog(me)
+            local arrestDialog = me.Blackboard.GetFact("ArrestDialog")
+            local dialogToPlay
+            if not arrestDialog or (arrestDialog == Guid("NGB_Arrest_fabc5060-4331-61ef-a99e-f836fbed25bc")) then
+                dialogToPlay = "GEB_AD_CallForHelp_86d42165-a621-b656-e97d-fc68b6240de9"
+            else
+                dialogToPlay = arrestDialog
+            end
+            local playDialog = Dialog(dialogToPlay)
+            try
+                StartAutomatedDialog(playDialog, false, me)
+            catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                -- nothing
+            end
+            try
+                FleeFrom(RelationType.All, 30.0)
+            catch e if ls.CheckType(e, error.MovementFailed) then
+                cowerAnimation = cowerAnimation or Animation("CUST_DebugAsset_CustomAnim_01_Loop_50635108-0b10-4232-820a-aac14df09a75")
+                try
+                    PlayAnimation(cowerAnimation, true)
+                catch e if ls.CheckType(e, error.PlayAnimationFailed) then
+                    Sleep(0.5)
+                end
+            end
+        end
+    end,
+
+    OnInterrupt = function()
+        StopAnimation(me)
+    end,
+
+    OnEnter = function()
+        BlockNewDisturbanceReactions(me, true)
+    end,
+
+    OnLeave = function()
+        BlockNewDisturbanceReactions(me, false)
+    end
+
+}
+
+game.actions.generics.CallHelp = Action
+{
+    function(state)
+        local disturbanceID = me.HandlingDisturbanceID
+
+        if not DisturbanceTransferLeadership(disturbanceID, me,
+            {Tag("GUARD_0b52f35e-fb1f-4865-bcd2-5d21ef7343cd"),
+             Tag("NOT_MESSING_AROUND_542b58f0-42ad-4157-a28e-27434e0e7b18"),
+             Tag("BADASSCIVILIAN_91f4b379-63a2-40e9-a509-7b9b2f90e4c8")}) then
+            local dialogToPlay = Dialog("GEB_AD_DealWithCrime_2a70dd9f-c256-a987-e4c7-05a629559fd6")
+            DebugText(me, "Calling guard")
+            -- So we can detect in CRIME_TransferToSummonedGuardFailed that we should flee
+            me.Blackboard.SetFact("GuardSummonFailedReaction", "Flee")
+            state.CrimesHumanoid.CallGuardsToArrest("CRIME_StoryCallGuardsArrest")
+            -- Osiris will break us out of this Sleep by either suspending this disturbance and starting a WaitingForCalledGuard reaction,
+            -- or by switching us to CallGuardsFailed if no guard is available
+            Sleep(60.0)
+
+        else
+            local newLead = DisturbanceGetLeadInvestigator(disturbanceID)
+            if newLead ~= nil then
+                SetUnicastEntityEvent(me, "SetNewLead", newLead)
+            end
+            local criminal = me.Blackboard.GetFact("Criminal1")
+            --PlayCallHelpDialog(me)
+            local arrestDialog = me.Blackboard.GetFact("ArrestDialog")
+            local dialogToPlay
+            if not arrestDialog or (arrestDialog == Guid("NGB_Arrest_fabc5060-4331-61ef-a99e-f836fbed25bc")) then
+                dialogToPlay = "GEB_AD_CallForHelp_86d42165-a621-b656-e97d-fc68b6240de9"
+            else
+                dialogToPlay = arrestDialog
+            end
+            local playDialog = Dialog(dialogToPlay)
+            try
+                StartAutomatedDialog(playDialog, false, me)
+            catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                -- nothing
+            end
+        end
+    end,
+
+    OnEnter = function()
+        BlockNewDisturbanceReactions(me, true)
+    end,
+
+    OnLeave = function()
+        BlockNewDisturbanceReactions(me, false)
+    end
+
+}
+
+game.actions.generics.CallHelpFleeWithReinforcements = Action
+{
+    function(state)
+        local cowerAnimation = nil
+        local disturbanceID = me.HandlingDisturbanceID
+
+        if not DisturbanceTransferLeadership(disturbanceID, me,
+            {Tag("GUARD_0b52f35e-fb1f-4865-bcd2-5d21ef7343cd"),
+             Tag("NOT_MESSING_AROUND_542b58f0-42ad-4157-a28e-27434e0e7b18"),
+             Tag("BADASSCIVILIAN_91f4b379-63a2-40e9-a509-7b9b2f90e4c8")}) then
+            local dialogToPlay = Dialog("GEB_AD_DealWithCrime_2a70dd9f-c256-a987-e4c7-05a629559fd6")
+            DebugText(me, "Calling guard while wanting to flee")
+            -- So we can detect in CRIME_TransferToSummonedGuardFailed that we should flee
+            me.Blackboard.SetFact("GuardSummonFailedReaction", "Flee")
+            state.CrimesHumanoid.CallGuardsToArrest("CRIME_StoryCallGuardsArrest_WithReinforcements")
+            -- Osiris will break us out of this Sleep by either suspending this disturbance and starting a WaitingForCalledGuard reaction,
+            -- or by switching us to CallGuardsFailed if no guard is available
+            Sleep(60.0)
+
+        else
+            local newLead = DisturbanceGetLeadInvestigator(disturbanceID)
+            if newLead ~= nil then
+                SetUnicastEntityEvent(me, "SetNewLead", newLead)
+            end
+            local criminal = me.Blackboard.GetFact("Criminal1")
+            --PlayCallHelpDialog(me)
+            local arrestDialog = me.Blackboard.GetFact("ArrestDialog")
+            local dialogToPlay
+            if not arrestDialog or (arrestDialog == Guid("NGB_Arrest_fabc5060-4331-61ef-a99e-f836fbed25bc")) then
+                dialogToPlay = "GEB_AD_CallForHelp_86d42165-a621-b656-e97d-fc68b6240de9"
+            else
+                dialogToPlay = arrestDialog
+            end
+            local playDialog = Dialog(dialogToPlay)
+            try
+                StartAutomatedDialog(playDialog, false, me)
+            catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                -- nothing
+            end
+            try
+                FleeFrom(RelationType.All, 30.0)
+            catch e if ls.CheckType(e, error.MovementFailed) then
+                cowerAnimation = cowerAnimation or Animation("CUST_DebugAsset_CustomAnim_01_Loop_50635108-0b10-4232-820a-aac14df09a75")
+                try
+                    PlayAnimation(cowerAnimation, true)
+                catch e if ls.CheckType(e, error.PlayAnimationFailed) then
+                    Sleep(0.5)
+                end
+            end
+        end
+    end,
+
+    OnInterrupt = function()
+        StopAnimation(me)
+    end,
+
+    OnEnter = function()
+        BlockNewDisturbanceReactions(me, true)
+    end,
+
+    OnLeave = function()
+        BlockNewDisturbanceReactions(me, false)
+    end
+
+}
+
+game.actions.generics.CallHelpWithReinforcements = Action
+{
+    function(state)
+        local disturbanceID = me.HandlingDisturbanceID
+
+        if not DisturbanceTransferLeadership(disturbanceID, me,
+            {Tag("GUARD_0b52f35e-fb1f-4865-bcd2-5d21ef7343cd"),
+             Tag("NOT_MESSING_AROUND_542b58f0-42ad-4157-a28e-27434e0e7b18"),
+             Tag("BADASSCIVILIAN_91f4b379-63a2-40e9-a509-7b9b2f90e4c8")}) then
+            local dialogToPlay = Dialog("GEB_AD_DealWithCrime_2a70dd9f-c256-a987-e4c7-05a629559fd6")
+            DebugText(me, "Calling guard")
+            -- So we can detect in CRIME_TransferToSummonedGuardFailed that we should flee
+            me.Blackboard.SetFact("GuardSummonFailedReaction", "Flee")
+            state.CrimesHumanoid.CallGuardsToArrest("CRIME_StoryCallGuardsArrest_WithReinforcements")
+            -- Osiris will break us out of this Sleep by either suspending this disturbance and starting a WaitingForCalledGuard reaction,
+            -- or by switching us to CallGuardsFailed if no guard is available
+            Sleep(60.0)
+
+        else
+            local newLead = DisturbanceGetLeadInvestigator(disturbanceID)
+            if newLead ~= nil then
+                SetUnicastEntityEvent(me, "SetNewLead", newLead)
+            end
+            local criminal = me.Blackboard.GetFact("Criminal1")
+            --PlayCallHelpDialog(me)
+            local arrestDialog = me.Blackboard.GetFact("ArrestDialog")
+            local dialogToPlay
+            if not arrestDialog or (arrestDialog == Guid("NGB_Arrest_fabc5060-4331-61ef-a99e-f836fbed25bc")) then
+                dialogToPlay = "GEB_AD_CallForHelp_86d42165-a621-b656-e97d-fc68b6240de9"
+            else
+                dialogToPlay = arrestDialog
+            end
+            local playDialog = Dialog(dialogToPlay)
+            try
+                StartAutomatedDialog(playDialog, false, me)
+            catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                -- nothing
+            end
+        end
+    end,
+
+    OnEnter = function()
+        BlockNewDisturbanceReactions(me, true)
+    end,
+
+    OnLeave = function()
+        BlockNewDisturbanceReactions(me, false)
+    end
+
+}
+
+game.actions.generics.WaitingForCalledGuard = Action
+{
+    function()
+        DebugText(me, "Waiting for called guards")
+        local criminal = me.Blackboard.GetFact("Criminal1")
+        local sawInitially = CanSee(me, criminal)
+        local initialCriminalDistance = GetDistanceTo(me, criminal)
+        local waitingAD = Dialog("GEB_AD_WaitingForGuards_2392c9d3-f664-5b48-fd67-e8df2349d2e0")
+        local tauntingAD = Dialog("GEB_AD_WaitingForGuards_CriminalRunsAway_cb642b7a-0312-3c81-1b97-6f32acc840e0")
+        Sleep(3.0)
+        -- Osiris will normally break us out of this loop by stopping the crime when the guard arrives/dies/...
+        -- Still, safety fallback to stop in case there's a bug -> don't do this longer than +- a minute
+        local loopCount = 1
+        local tauntedDisappear = false
+        while loopCount <= 6 do
+            if IsInDangerousSurfaceFor(me) then
+                FleeFromDangerousSurface()
+            end
+            if CanSee(me, criminal) then
+                SteerTo(criminal)
+                local newDistance = GetDistanceTo(me, criminal)
+                if newDistance > (initialCriminalDistance + 2.0) then
+                    try
+                        StartAutomatedDialog(tauntingAD, true, me, criminal)
+                    catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                        -- nothing
+                    end
+                    initialCriminalDistance = newDistance
+                else
+                    try
+                        StartAutomatedDialog(waitingAD, true, me, criminal)
+                    catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                        -- nothing
+                    end
+                end
+            -- assume the player ran away, but don't do this if the criminal was e.g. invisible
+            elseif sawInitially then
+                if not tauntedDisappear then
+                    -- don't keep talking after the other person disappeared out of sight
+                    tauntedDisappear = true
+                    try
+                        StartAutomatedDialog(tauntingAD, true, me)
+                    catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                        -- nothing
+                    end
+                end
+            end
+            Sleep(8.0 + math.random() * 5.0)
+            loopCount = loopCount + 1
+        end
+        do
+            local timeoutAD = Dialog("GEB_AD_WaitingForGuards_Timeout_85e39f63-8577-8e0e-e7e2-df5b9979144f")
+            try
+                StartAutomatedDialog(timeoutAD, true, me)
+            catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                -- nothing
+            end
+        end
+        DebugText(me, "Timeout while waiting for guard, going to fallback")
+        SetUnicastEntityEvent(me, "CRIME_CallGuardsFailed")
+        -- this event will change us to the CallGuardsFailed reaction
+        Sleep(10.0)
+    end
+}
+
+
+game.actions.generics.CallGuardsFailed = Action
+{
+    function(state)
+        local cowerAnimation = nil
+        local disturbanceID = me.HandlingDisturbanceID
+        local action = me.Blackboard.GetFact("GuardSummonFailedReaction")
+        if me.CanFight and
+           (not IsTagged(me, Tag("CIVILIAN_71120d5d-3853-46e4-9762-33f59aa6b4ae"))
+            or IsTagged(me, Tag("BADASSCIVILIAN_91f4b379-63a2-40e9-a509-7b9b2f90e4c8"))) and
+           (action == "Attack") then
+            local playDialog = Dialog("GEB_AD_DealWithCrime_2a70dd9f-c256-a987-e4c7-05a629559fd6")
+            try
+                StartAutomatedDialog(playDialog, false, me)
+            catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                -- nothing
+            end
+            local criminal = me.Blackboard.GetFact("Criminal1")
+            state.CrimesHumanoid.CrimeSetTemporaryHostileRelation(criminal)
+        else
+            if IsTagged(me, Tag("CROWDSYS_NPC_1274ffab-2fa2-4d6f-801e-751664ceb771")) then
+                if CrowdIsFleeing() then
+                    Sleep(10)
+                else
+                    CrowdFlee()
+                    try
+                        FleeFrom(RelationType.Player, 40.0)
+                    catch e if ls.CheckType(e, error.MovementFailed) then
+                        -- too bad
+                    end
+                    -- Let them cower until they despawn
+                    ApplyStatus(me, "ANIM_COWER", true, -1.0)
+                end
+            else
+                if not IsInDialog(me, true) then
+                    try
+                        StartAutomatedDialog(Dialog("GEB_AD_CallForHelp_86d42165-a621-b656-e97d-fc68b6240de9"), false, me)
+                    catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                        -- nothing
+                    end
+                end
+                -- handled in Osiris
+                SetFlag(Flag("GEB_FleeOutOfSight_f488cbb2-9aca-452f-9b8d-652e07561785"), me)
+            end
+        end
+    end,
+
+    OnInterrupt = function()
+        StopAnimation(me)
+    end,
+
+    OnEnter = function()
+        BlockNewDisturbanceReactions(me, true)
+    end,
+
+    OnLeave = function()
+        BlockNewDisturbanceReactions(me, false)
+    end
+}
+
+game.actions.generics.Draw = Action
+{
+    function()
+        local criminal = me.Blackboard.GetFact("Criminal1")
+        SteerTo(criminal)
+        SetUnicastEntityEvent(me, "CRIME_SetUnsheath")
+    end
+}
+
+game.actions.generics.AttackWithOptionalAD = Action
+{
+    function(state)
+        local arrestDialog = me.Blackboard.GetFact("ArrestDialog")
+        if arrestDialog then
+            local playDialog = Dialog(arrestDialog)
+            try
+                StartAutomatedDialog(playDialog, false, me)
+            catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                -- nothing
+            end
+       end
+        local criminal = me.Blackboard.GetFact("Criminal1")
+        state.CrimesHumanoid.CrimeSetTemporaryHostileRelation(criminal)
+    end
+}
+
+game.actions.generics.AttackNoDialog = Action
+{
+    function(state)
+        local criminal = me.Blackboard.GetFact("Criminal1")
+        state.CrimesHumanoid.CrimeSetTemporaryHostileRelation(criminal)
+    end
+}
+
+game.actions.generics.Flee = Action
+{
+    function()
+        local cowerAnimation = nil
+        try
+            FleeFrom(RelationType.All, 10.0)
+        catch e if ls.CheckType(e, error.MovementFailed) then
+            cowerAnimation = cowerAnimation or Animation("CUST_DebugAsset_CustomAnim_01_Loop_50635108-0b10-4232-820a-aac14df09a75")
+            try
+                PlayAnimation(cowerAnimation, true)
+            catch e if ls.CheckType(e, error.PlayAnimationFailed) then
+                Sleep(2.0)
+            end
+        end
+    end,
+
+    OnInterrupt = function()
+        StopAnimation(me)
+    end,
+
+    OnEnter = function()
+        BlockNewDisturbanceReactions(me, true)
+    end,
+
+    OnLeave = function()
+        BlockNewDisturbanceReactions(me, false)
+    end
+}
+
+game.actions.generics.FleeWithAD = Action
+{
+    function()
+        local cowerAnimation = nil
+        local arrestDialog = me.Blackboard.GetFact("ArrestDialog")
+        if arrestDialog then
+            local playDialog = Dialog(arrestDialog)
+            try
+                StartAutomatedDialog(playDialog, false, me)
+            catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+               -- nothing
+            end
+        end
+        try
+            FleeFrom(RelationType.All, 30.0)
+        catch e if ls.CheckType(e, error.MovementFailed) then
+            cowerAnimation = cowerAnimation or Animation("CUST_DebugAsset_CustomAnim_01_Loop_50635108-0b10-4232-820a-aac14df09a75")
+            try
+                PlayAnimation(cowerAnimation, true)
+            catch e if ls.CheckType(e, error.PlayAnimationFailed) then
+                Sleep(2.0)
+            end
+end
+    end,
+
+    OnInterrupt = function()
+        StopAnimation(me)
+    end,
+
+    OnEnter = function()
+        BlockNewDisturbanceReactions(me, true)
+    end,
+
+    OnLeave = function()
+        BlockNewDisturbanceReactions(me, false)
+    end
+}
+
+game.actions.generics.FleeOutOfSightWithOptionalAD = Action
+{
+    function()
+        local arrestDialog = me.Blackboard.GetFact("ArrestDialog")
+        if arrestDialog then
+            local playDialog = Dialog(arrestDialog)
+            try
+                StartAutomatedDialog(playDialog, false, me)
+            catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                -- nothing
+            end
+        end
+        -- handled in Osiris
+        SetFlag(Flag("GEB_FleeOutOfSight_f488cbb2-9aca-452f-9b8d-652e07561785"), me)
+    end,
+
+    OnInterrupt = function()
+        StopAnimation(me)
+    end,
+
+    OnEnter = function()
+        BlockNewDisturbanceReactions(me, true)
+    end,
+
+    OnLeave = function()
+        BlockNewDisturbanceReactions(me, false)
+    end
+}
+
+game.actions.generics.FleeFromUndead = Action
+{
+    function()
+        local cowerAnimation = nil
+        if math.random() < 0.7 then
+            local arrestDialog = me.Blackboard.GetFact("ArrestDialog")
+            if arrestDialog then
+                local playDialog = Dialog(arrestDialog)
+                try
+                    StartAutomatedDialog(playDialog, false, me)
+                catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                    -- nothing
+                end
+            end
+        end
+        try
+            FleeFrom(RelationType.All, 10.0)
+        catch e if ls.CheckType(e, error.MovementFailed) then
+            cowerAnimation = cowerAnimation or Animation("CUST_DebugAsset_CustomAnim_01_Loop_50635108-0b10-4232-820a-aac14df09a75")
+            try
+                PlayAnimation(cowerAnimation, true)
+            catch e if ls.CheckType(e, error.PlayAnimationFailed) then
+                Sleep(2.0)
+            end
+        end
+    end,
+
+    OnInterrupt = function()
+        StopAnimation(me)
+    end,
+
+    OnEnter = function()
+        BlockNewDisturbanceReactions(me, true)
+    end,
+
+    OnLeave = function()
+        BlockNewDisturbanceReactions(me, false)
+    end
+}
+
+game.actions.generics.KeepDistanceFromCriminalAndOptionalAD = Action
+{
+    function()
+        local playDialog = Dialog(me.Blackboard.GetFact("ArrestDialog"))
+        local criminal = me.Blackboard.GetFact("Criminal1")
+        try
+            MoveInRange(criminal,12.0,20.0,MovementSpeed.Walk)
+        catch e if ls.CheckType(e, error.MovementFailed) then
+            DebugText(me,"Movement Failed")
+        end
+        if (playDialog ~= nil) and
+           me.CanSpeak and
+           not IsInDialog(me, false) then
+            try
+                SteerTo(criminal)
+                StartAutomatedDialog(playDialog,false,me)
+            catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                DebugText(me,"Automated Dialogue Failed")
+            end
+            Sleep(6.0 + math.random() * 6.0)
+        else
+            local loopCount = 0
+            while loopCount < 3 do
+                try
+                    MoveInRange(criminal,12.0,20.0,MovementSpeed.Walk)
+                catch e if ls.CheckType(e, error.MovementFailed) then
+                    DebugText(me,"Movement Failed")
+                end
+                local dX = math.random()*1.0 - 0.5
+                local dZ = math.random()*1.5 - 0.5
+                local offset = ls.math.Vector3(dX, 0, dZ)
+                local randomLookAt = me.Position + offset
+                SteerTo(randomLookAt)
+                Sleep(3.0 + math.random())
+                loopCount = loopCount + 1
+            end
+        end
+    end,
+}
+
+
+game.actions.generics.Approach = Action
+{
+    function()
+        local disturbanceID = me.HandlingDisturbanceID
+        local evidenceList = disturbanceID and DisturbanceGetEvidence(disturbanceID)
+        local distraction = evidenceList and evidenceList[1]
+        if not distraction then
+            return
+        end
+        local playDialog = Dialog(me.Blackboard.GetFact("ArrestDialog"))
+
+        -- Move to the distraction's current position, so that if it's a moving character
+        -- (like a cat), we don't keep following it
+        local distractionPos = distraction.Position
+        if not IsInDangerousSurfaceFor(distractionPos,me.Character) and GetDistance2DTo(me,distractionPos) > 3 then
+            try
+                MoveTo(distractionPos,MovementSpeed.Walk,false,false,2,4)
+            catch e if ls.CheckType(e, error.MovementFailed) then
+                DebugText(me,"Movement Failed")
+            end
+        else
+            SteerTo(distraction)
+        end
+        try
+            if (playDialog ~= nil) and
+               me.CanSpeak and
+               not IsInDialog(me, false) then
+                StartAutomatedDialog(playDialog,false,me)
+            end
+        catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+            DebugText(me,"Automated Dialogue Failed")
+        end
+        Sleep(math.random(2,5))
+        -- might have despawned by now
+        if EntityExists(distraction) then
+            RemoveStatus(distraction, "CRIME_DISTRACTION")
+        end
+    end
+}
+
+-- Only use for continuous disturbances, never exits by itself!
+game.actions.generics.LookAtCriminal = Action
+{
+    function()
+        local criminal = me.Blackboard.GetFact("Criminal1")
+        -- loop because the LookAtEntity may get interrupted
+        repeat
+            if CanSee(me, criminal) then
+                SteerTo(criminal)
+                LookAtEntity(criminal)
+            else
+                Sleep(1.0)
+            end
+        until false
+    end
+}
+
+-- Only use for continuous disturbances, never exits by itself!
+game.actions.generics.ContinuouslyWatchCriminalAndOptionalAD = Action
+{
+    function()
+        local disturbanceID = me.HandlingDisturbanceID
+        local playDialog = Dialog(me.Blackboard.GetFact("ArrestDialog"))
+        local criminal = me.Blackboard.GetFact("Criminal1")
+
+        while true do
+
+            try
+                MoveTo(criminal,MovementSpeed.Walk,false,false,2,4)
+            catch e if ls.CheckType(e, error.MovementFailed) then
+                DebugText(me,"Movement Failed")
+            end
+            SteerTo(criminal)
+            try
+                if (playDialog ~= nil) and
+                  me.CanSpeak and
+                  not IsInDialog(me, false) then
+                    StartAutomatedDialogRateLimited(playDialog,30.0 + math.random() * 20,20.0,false,me)
+                end
+            catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                DebugText(me,"Automated Dialogue Failed")
+            end
+            Sleep(math.random(2,5))
+        end
+    end
+}
+
+game.actions.generics.ContinuouslyWatchCriminalAndOptionalAD_ListeningToBardSong = Action
+{
+    function()
+        local disturbanceID = me.HandlingDisturbanceID
+        local playDialog = Dialog(me.Blackboard.GetFact("ArrestDialog"))
+        local criminal = me.Blackboard.GetFact("Criminal1")
+        local animationStart = Animation("CUST_MusicListening_01_Start_b056b29f-6fc0-4930-97f3-4ad0f16b9606")
+        local animationLoop = { Animation("CUST_MusicListening_01_Loop_7fb126dd-e788-4984-abc3-8a57c65afdd8") }
+        local animationEnd = Animation("CUST_MusicListening_01_End_969df56a-1c5b-44ec-9cb0-69ee3294ccfb")
+
+        while true do
+            local distance = GetDistanceTo(me, criminal)
+            if (distance < 2) or
+               (distance > 4) then
+                try
+                    MoveTo(criminal,MovementSpeed.Walk,false,false,2,4)
+                catch e if ls.CheckType(e, error.MovementFailed) then
+                    DebugText(me,"Movement Failed")
+                end
+            end
+            SteerTo(criminal, false, 10)
+            try
+                if (playDialog ~= nil) and
+                  me.CanSpeak and
+                  not IsInDialog(me, false) then
+                    StartAutomatedDialogRateLimited(playDialog,30.0 + math.random() * 20,20.0,false,me)
+                end
+            catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                DebugText(me,"Automated Dialogue Failed")
+            end
+            try
+                PlayLoopingAnimation(animationStart, animationLoop, animationEnd)
+                WaitForInterrupt()
+            catch e if ls.CheckType(e, error.PlayAnimationFailed) then
+                DebugText(me,"Performance listening animations failed to play")
+                Sleep(math.random(2,5))
+            end
+        end
+    end,
+
+    OnException = function(e)
+        DebugLogCriticalException(e, "bard song listening interrupted by exception")
+    end,
+
+    OnLeave = function()
+        StopAnimation(me)
+    end
+}
+
+
+game.actions.generics.DoNothing = function()
+    DebugText(me,"I am not doing anything")
+    Sleep(0.5)
+end
+
+game.actions.generics.DialogAD_TinyFlee = Action
+{
+    function()
+        local cowerAnimation = nil
+        local arrestDialog = me.Blackboard.GetFact("ArrestDialog")
+        if arrestDialog then
+            local playDialog = Dialog(arrestDialog)
+            try
+                StartAutomatedDialogRateLimited(playDialog, 10.0, 20.0, false, me)
+            catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+               -- nothing
+           end
+        end
+        try
+            FleeFrom(RelationType.All, 5.0)
+        catch e if ls.CheckType(e, error.MovementFailed) then
+            cowerAnimation = cowerAnimation or Animation("CUST_DebugAsset_CustomAnim_01_Loop_50635108-0b10-4232-820a-aac14df09a75")
+            try
+                PlayAnimation(cowerAnimation, true)
+            catch e if ls.CheckType(e, error.PlayAnimationFailed) then
+                -- nothing
+            end
+        end
+        Sleep(0.5)
+    end,
+
+    OnInterrupt = function()
+        StopAnimation(me)
+    end,
+
+    OnEnter = function()
+        BlockNewDisturbanceReactions(me, true)
+    end,
+
+    OnLeave = function()
+        BlockNewDisturbanceReactions(me, false)
+    end
+}
+
+game.actions.generics.PlayAD = function()
+   if not IsInDialog(me, false) then
+        local arrestDialog = me.Blackboard.GetFact("ArrestDialog")
+        if arrestDialog then
+            local playDialog = Dialog(arrestDialog)
+            local criminal = me.Blackboard.GetFact("Criminal1")
+            SteerTo(criminal)
+            try
+                StartAutomatedDialog(playDialog, false, me)
+            catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                Sleep(1.0)
+            end
+        end
+    end
+end
+
+game.actions.generics.PlayADRateLimited = function()
+    if not IsInDialog(me, false) then
+         local arrestDialog = me.Blackboard.GetFact("ArrestDialog")
+         if arrestDialog then
+             local playDialog = Dialog(arrestDialog)
+             local criminal = me.Blackboard.GetFact("Criminal1")
+             try
+                 SteerTo(criminal)
+                 StartAutomatedDialogRateLimited(playDialog, 15.0 + math.random(5.0), 20.0, false, me)
+             catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                 Sleep(1.0)
+             end
+         end
+     end
+ end
+
+ -- Same as above, but waits until the AD is finished before terminating.
+-- Use with zero-tension continuous disturbances where you don't want
+-- every NPC you meet to say the AD:
+--  * set the primary reaction to this one
+--  * set the secondary reaction to CRIME_DoNothing
+-- While the blocking AD is playing, code will keep adding new people
+-- meet (while walking) as secondary investigators (who will use the
+-- the DoNothing reaction), and afterwards all of them will wait
+-- for ContinuosCrimeDelay seconds before triggering again.
+
+-- With a non-blocking AD, the primary reaction will finish very quickly
+-- and hence almost every NPC you meet will trigger it, resulting in AD spam
+game.actions.generics.PlayADBlocked = function()
+    if not IsInDialog(me, false) then
+         local arrestDialog = me.Blackboard.GetFact("ArrestDialog")
+         if arrestDialog then
+            local criminal = me.Blackboard.GetFact("Criminal1")
+            local playDialog = Dialog(arrestDialog)
+             SteerTo(criminal)
+             try
+                 StartAutomatedDialog(playDialog, true, me)
+             catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                 Sleep(1.0)
+             end
+         end
+     end
+ end
+
+ -- same as PlayADBlocked, but caught in story to limit triggering only once
+ game.actions.generics.PlayADOnce = function()
+    if not IsInDialog(me, false) then
+         local arrestDialog = me.Blackboard.GetFact("ArrestDialog")
+         if arrestDialog then
+             local playDialog = Dialog(arrestDialog)
+             try
+                 StartAutomatedDialog(playDialog, true, me)
+             catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+                 Sleep(1.0)
+             end
+         end
+     end
+ end
+
+ -- same as DoNothing, but caught in story to limit triggering only once
+ game.actions.generics.DoNothingOnce = function()
+    DebugText(me,"I am not doing anything once")
+end
+
+ game.actions.generics.ApproachRunningWithAD = function()
+    local criminal = me.Blackboard.GetFact("Criminal1")
+    if not IsInDialog(me, false) then
+        local arrestDialog = me.Blackboard.GetFact("ArrestDialog")
+        if arrestDialog then
+            local playDialog = Dialog(arrestDialog)
+            try
+                StartAutomatedDialog(playDialog, false, me)
+            catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+            end
+        end
+    end
+    if GetDistanceTo(me, criminal) > 7.0 then
+        try
+            MoveTo(criminal, MovementSpeed.Run, false, false, 5.0)
+            SteerTo(criminal)
+            Sleep(2.0)
+        catch e if ls.CheckType(e, error.MovementFailed) then
+            SteerTo(criminal)
+            Sleep(3.0)
+        end
+    else
+        SteerTo(criminal)
+        Sleep(3.0)
+    end
+end
+
+game.actions.generics.PickUpEvidence = Action
+{
+    function()
+        local disturbanceID = me.HandlingDisturbanceID
+        local evidenceList = DisturbanceGetEvidence(disturbanceID)
+        local tries = 0
+        while (#evidenceList > 0) and
+              (tries < 3) do
+            local evidenceLeftOvers = {}
+            local initialListLen = #evidenceList
+            for i, evidence in ipairs(evidenceList) do
+                if EntityExists(evidence) and
+                   evidence.IsItem and
+                   not evidence.Item.IsDestroyed and
+                   evidence.Item.CanPickUp and
+                   not evidence.Item.IsInInventory and
+                   CanSee(me, evidence) then
+                    if IsInDangerousSurfaceFor(evidence, me.Character) then
+                       table.insert(evidenceLeftOvers, evidence)
+                        if i == #evidenceList then
+                            SteerTo(evidence)
+                            Sleep(1.0)
+                        end
+                    else
+                        try
+                            MoveTo(evidence)
+                            PickUpItem(evidence)
+                        catch e if ls.CheckType(e, error.MovementFailed) or ls.CheckType(e, error.PickUpItemFailed) then
+                            SteerTo(evidence)
+                            -- don't retry if picking up failed (unlikely to succeed if we try again later,
+                            -- and can easily result in the character just standing around and doing nothing)
+                            if not ls.CheckType(e, error.PickUpItemFailed) or
+                               (e.Reason == PickUpItemFailReason.MovementFailed) then
+                                table.insert(evidenceLeftOvers, evidence)
+                            else
+                                DebugText(me, "Failed to pickup, reason " .. tostring(e.Reason))
+                            end
+                        end
+                    end
+                end
+            end
+            evidenceList = evidenceLeftOvers
+            evidenceLeftOvers = {}
+            -- If we didn't manage to pick up anything and there are items left,
+            -- wait a bit before trying again (giving surfaces time to dissipate)
+            if initialListLen == #evidenceList then
+                Sleep(5.0 + math.random() * 4)
+            end
+            tries = tries + 1
+        end
+    end
+}
+
+game.actions.generics.AttackEvidence = Action
+{
+    function()
+        local disturbanceID = me.HandlingDisturbanceID
+        local evidenceList = DisturbanceGetEvidence(disturbanceID)
+        for i, evidence in ipairs(evidenceList) do
+            if EntityExists(evidence) and
+               evidence.IsItem and
+               not evidence.Item.IsDestroyed and
+               not evidence.Item.IsInInventory and
+               CanSee(me, evidence) then
+                if IsInDangerousSurfaceFor(evidence, me.Character) then
+                    if i == #evidenceList then
+                        SteerTo(evidence)
+                        Sleep(1.0)
+                    end
+                else
+                    try
+                        MoveTo(evidence)
+                        Attack(evidence)
+                    catch e if ls.CheckType(e, error.MovementFailed) or ls.CheckType(e, error.AttackFailed) then
+                        SteerTo(evidence)
+                        DebugText(me, "Failed to move or attack: " .. tostring(e))
+                    end
+                end
+            end
+            Sleep(3.0 + math.random() * 3)
+        end
+    end
+}
+
+game.actions.generics.KeepingAnEyeOut = Action
+{
+    function()
+        local arrestDialog = Dialog(me.Blackboard.GetFact("ArrestDialog"))
+        local criminals = { me.Blackboard.GetFact("Criminal1"), me.Blackboard.GetFact("Criminal2"), me.Blackboard.GetFact("Criminal3"), me.Blackboard.GetFact("Criminal4") }
+        local criminal = nil
+        while criminal == nil do
+            criminal = criminals[math.random(1, #criminals)]
+        end
+        if not IsInDangerousSurfaceFor(me.Position, me.Character) then
+            if CanSee(me, criminal) then
+                if (math.random() < 0.2) then
+                    MoveInRange(criminal, 0.0, 6.0, MovementSpeed.Walk, nil, false, false)
+                end
+                LookAtEntity(criminal, 2.0 + math.random() * 3)
+                if (arrestDialog ~= nil) and
+                (GetDistanceTo(me, criminal) < 12.0) and
+                not IsInDialog(me, false) and
+                me.CanSpeak then
+                    StartAutomatedDialogRateLimited(arrestDialog, 40.0, 20.0, true, me, criminal)
+                end
+                LookAtEntity(criminal, 5.0 + math.random() * 5)
+            end
+            Sleep(5.0 + math.random() * 5)
+        else
+            FleeFromEntity(criminal, 12.0, false)
+        end
+    end
+
+}
+
+--works best for continuous crimes, so that the reaction can be interrupted if the action stops
+-- (otherwise it will always run until the end and hence always trigger the flee)
+game.actions.generics.NervousADFlee = Action
+{
+    function(state)
+        local criminal = me.Blackboard.GetFact("Criminal1")
+
+        if not CanSee(me, criminal) then
+            Sleep(1.0 + math.random() * 5)
+            return
+        end
+
+        local arrestDialog = Dialog(me.Blackboard.GetFact("ArrestDialog"))
+
+        -- First AD
+        MoveInRange(criminal, 0.0, 2.0, (math.random() < 0.5) and MovementSpeed.Run or MovementSpeed.Walk, nil, false, false)
+        if (arrestDialog ~= nil) and
+            (GetDistanceTo(me, criminal) < 12.0) and
+            not IsInDialog(me, false) and
+            me.CanSpeak then
+            StartAutomatedDialog(arrestDialog, false, me, criminal)
+        end
+        MoveInRange(criminal, 6.0, 10.0, MovementSpeed.Run, nil, false, false)
+        SteerTo(criminal)
+        LookAtEntity(criminal, 3.0 + math.random() * 3)
+
+        -- Second AD
+        if (arrestDialog ~= nil) and
+            (GetDistanceTo(me, criminal) < 12.0) and
+            not IsInDialog(me, false) and
+            me.CanSpeak then
+            StartAutomatedDialog(arrestDialog, true, me, criminal)
+        end
+        MoveInRange(criminal, 0.0, 2.0, (math.random() < 0.5) and MovementSpeed.Run or MovementSpeed.Walk, nil, false, false)
+        if (arrestDialog ~= nil) and
+            (GetDistanceTo(me, criminal) < 12.0) and
+            not IsInDialog(me, false) and
+            me.CanSpeak then
+            StartAutomatedDialog(arrestDialog, true, me, criminal)
+        end
+        LookAtEntity(criminal, 2.0 + math.random() * 3)
+
+        -- Finally flee if not yet interruped
+        FleeFromEntity(criminal, 12.0, false)
+    end,
+}
+
+-- only works for goblins/goblin kids because the stone throwing animation only exists for them
+game.actions.generics.GoblinThrowStones = Action
+{
+    function(state)
+        local target = me.Blackboard.GetFact("Criminal1")
+        local initialPos = me.Position
+        local AD = Dialog(me.Blackboard.GetFact("ArrestDialog"))
+        local isLead = state.CrimesHumanoid.IsLead()
+        local playDialogue = isLead
+
+
+        Sleep(2.0 + math.random() * 5)
+        local loopCount = 1
+        local maxLoopCount = math.random(4, 8)
+        while (loopCount <= maxLoopCount) do
+            if IsInDangerousSurfaceFor(me) then
+                FleeFromDangerousSurface()
+            end
+            if CanSee(me, target) then
+                try
+                    MoveInRange(target, 1.0, 8.0, MovementSpeed.Walk)
+                catch e if ls.CheckType(e, error.MovementFailed) then
+                    -- nothing
+                end
+                LookAtEntity(target, math.random() * 3.0)
+                if AD ~= nil then
+                    if playDialogue then
+                        StartAutomatedDialogRateLimited(AD, 10.0, 20.0, false, me, target)
+                    end
+                    -- avoid all secondary investigators playing their dialgues at the same time
+                    if not isLead then
+                        playDialogue = math.random() < 0.2
+                    end
+                end
+                UseSpell("Projectile_GEB_GoblinKid_ThrowRocks", target, nil, nil, nil, true, true, true, true)
+                Sleep(2.0)
+                LookAtEntity(target, 3.0)
+            else
+                local dX = math.random()*2.0 - 1.0
+                local dZ = math.random()*2.0 - 1.0
+                local offset = ls.math.Vector3(dX, 0, dZ)
+                local randomLookAt = me.Position + offset
+                SteerTo(randomLookAt)
+            end
+            Sleep(2.0 + math.random() * 3)
+            loopCount = loopCount + 1
+        end
+end
+}
+
+game.actions.generics.CrowdFleeFromParty = Action
+{
+    function()
+        if not IsTagged(me, Tag("CROWDSYS_NPC_1274ffab-2fa2-4d6f-801e-751664ceb771")) then
+            DebugLogCritical("[1] is not a crowd character, cannot use CRIME_CrowdFleeFromParty for it", me.Name)
+        end
+
+        if CrowdIsFleeing() then
+            Sleep(10)
+        else
+            CrowdFlee()
+            -- don't do this in a loop so we don't block other characters from reacting if we get
+            -- stuck
+            try
+                FleeFrom(RelationType.Player, 60.0)
+            catch e if ls.CheckType(e, error.MovementFailed) then
+                -- too bad
+            end
+            -- Let them cower until they despawn
+            ApplyStatus(me, "ANIM_COWER", true, -1.0)
+        end
+    end
+}

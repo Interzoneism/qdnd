@@ -1,0 +1,344 @@
+game.states.PerceptionDisarmOnOff = State{
+    function()
+
+        modules = {"shared.util"}
+
+        -- For any object that functions as a trigger by walking on, using, etc.
+
+        params.DC = {
+            type = EParamType.String,
+            default="HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f",
+            help=[[Perception check DC.]]
+        }
+
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = "Does the trap start on?"
+        }
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            required=false,
+            default=6.0,
+            help=[[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]]
+        }
+
+        params.Skill = {
+            type = EParamType.String,
+            default="Perception",
+            help=[[The skill checked.]]
+        }
+
+        params.IsTrap = {
+            type = EParamType.Bool,
+            default=true, 
+            help=[[Is the object a trap?]]
+        }
+
+        params.Type = {
+            type = EParamType.String,
+            default="Invisible",
+            help=[[
+            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]]
+        }
+
+
+        params.VFXOn = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = "VFX while item is on."
+        }
+
+
+        params.VFXOnBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = "Bone on which the the VFX is played."
+        }
+
+        params.VFXOff = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = "VFX while item is off."
+        }
+
+
+        params.VFXOffBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = "Bone on which the the VFX is played."
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_On",
+            help = "Sound when trap is turned on"
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_Off",
+            help = "Sound when trap is turned off"
+        }
+
+        params.DestroyOnDisarm = {
+            type=EParamType.Bool,
+            default = true,
+            help = "Does the item break on Disarm?"
+        }
+
+        params.DisarmOnDestroy = {
+            type=EParamType.Bool,
+            default = true,
+            help = "Does the item stop working when destroyed (set to false if some logic needs to happen when the item is destroyed)."
+        }
+
+        params.PerceptionSuccessAD = {
+            type = EParamType.String, 
+            default="", 
+            help=[[Override AD to play on the player when the non-trapped entity is perceived. Default AD if left blank.]]
+        }
+
+        inputs.TryActivate = {help = [[Try to trigger the trap.]]}
+        outputs.TryActivate = {internal = true}
+        inputs.ActivateAttemptFailed = {internal = true}
+        outputs.ActivateAttemptFailed = {help = [[The trap tried to activate while it was disabled.]]}
+
+        inputs.Enable = {help = "Turn trap or object on"}
+        inputs.Disable = {help = "Turn trap or object off"}
+
+        inputs.Reveal = {help = [[Reveals the mine. The Object will do an AD unless the Param is true.]]}
+        outputs.Reveal = {internal = true}
+
+        outputs.Enable = {internal = true}
+        outputs.Disable = {internal = true}
+        inputs.ToggledInt = {internal = true}
+
+        outputs.Enabled = {help = "Was turned on"}
+        outputs.Disabled = {help = "Was turned off"}
+        inputs.Enabled = {internal = true}
+        inputs.Disabled = {internal = true}
+
+        inputs.DisarmFailed = {internal = true}
+        outputs.DisarmFailed = {help = "Trap disarm failed"}
+
+        inputs.Disarmed = {internal = true}
+        outputs.Disarmed = {help = "Trap was disabled"}
+
+        inputs.Activate = {internal = true}
+        outputs.Activate = {help = "Trigger has successfully activated"}
+
+        inputs.Revealed = {internal = true}
+        outputs.Revealed = {help = "Object was revealed"}
+
+        inputs.Disarm = {help = "Disarm the trap"}
+        outputs.Disarm = {internal=true}
+
+        params.TargetEntity = {type = EParamType.String,
+                               required = false,
+                               default = "me",
+                               help = "Item Disarmed"}
+
+        params.DestroyOnDisarm = {type=EParamType.Bool, default = true, help = "Does the item break on Disarm?"}
+
+        nodes.DisarmOnOff = Proxy{
+            game.states.DisarmOnOff,
+            params = {StartEnabled = params.StartEnabled,
+                      TargetEntity = params.TargetEntity,
+                      DestroyOnDisarm = params.DestroyOnDisarm,
+                      DisarmOnDestroy = params.DisarmOnDestroy},
+            inputs = {TryActivate = {outputs.TryActivate},
+                      Enable = {outputs.Enable},
+                      Disable = {outputs.Disable},
+                      Disarm = {outputs.Disarm}},
+            outputs = {Activate = {inputs.Activate},
+                       DisarmFailed = {inputs.DisarmFailed},
+                       Enabled = {inputs.ToggledInt, inputs.Enabled},
+                       Disabled = {inputs.ToggledInt, inputs.Disabled},
+                       Disarmed = {inputs.Disarmed},
+                       ActivateAttemptFailed = {inputs.ActivateAttemptFailed},
+                       DestroyOnDisarm = params.DestroyOnDisarm}
+        }
+
+        nodes.Perception = Proxy{
+            game.states.Perception,
+            params = {DC = params.DC,
+                      MinDistance = params.MinDistance,
+                      Skill = params.Skill,
+                      Type = params.Type,
+                      IsTrap = params.IsTrap,
+                      PerceptionSuccessAD = params.PerceptionSuccessAD},
+            inputs = {Reveal = {outputs.Reveal}},
+            outputs = {Revealed = {inputs.Revealed}}
+        }
+
+        local preppedVFXOff
+        local preppedVFXOn
+
+        helpers.UpdateVFX = function()
+            -- legend for Cnst.PerceptionDisarmOnOff.OnOff_VFXKindPlaying:
+            --   -1: Off-VFX are playing
+            --    1: On-VFX are playing
+            --    0: no VFX are playing
+
+            if (me.Blackboard.GetFact("Cnst.Perception.Discovered") == 1 or
+                (me.Blackboard.GetFact("Cnst.Perception.Discovered") == nil and
+                 params.Type == "None")) and
+               (me.Blackboard.GetFact("Cnst.Disarm.WasDisarmed") == 0 or 
+                me.Blackboard.GetFact("Cnst.Disarm.WasDisarmed") ==nil) then --TODO: Improve with an 'Initial Armed' value.
+                if me.Blackboard.GetFact("On") == 1 or
+                   (me.Blackboard.GetFact("On") == nil and
+                    params.StartEnabled) then
+                    if me.Blackboard.GetFact("Cnst.PerceptionDisarmOnOff.OnOff_VFXKindPlaying") == -1 then
+                        me.Blackboard.SetFact("Cnst.PerceptionDisarmOnOff.OnOff_VFXKindPlaying", 0)
+                        local playingVFX = me.Blackboard.GetFact("Cnst.PerceptionDisarmOnOff.PlayingVFX")
+                        if playingVFX ~= nil then
+                            StopEffect(PlayingEffect(playingVFX))
+                            me.Blackboard.ClearFact("Cnst.PerceptionDisarmOnOff.PlayingVFX")
+                        end
+                    end
+                    if preppedVFXOn ~= nil and
+                       me.Blackboard.GetFact("Cnst.PerceptionDisarmOnOff.OnOff_VFXKindPlaying") == 0 and
+                       (mod.util.SafeGetHitPointsPercentage(me.Blackboard.GetFact("TargetEntity")) ~= 0) then
+                        local playingVFX = PlayEffectAt(preppedVFXOn, me.Blackboard.GetFact("TargetEntity"), params.VFXOnBone)
+                        me.Blackboard.SetFact("Cnst.PerceptionDisarmOnOff.OnOff_VFXKindPlaying", 1)
+                        me.Blackboard.SetFact("Cnst.PerceptionDisarmOnOff.PlayingVFX", playingVFX.Handle)
+                    end
+                else
+                    if me.Blackboard.GetFact("Cnst.PerceptionDisarmOnOff.OnOff_VFXKindPlaying") == 1 then
+                        me.Blackboard.SetFact("Cnst.PerceptionDisarmOnOff.OnOff_VFXKindPlaying", 0)
+                        local playingVFX = me.Blackboard.GetFact("Cnst.PerceptionDisarmOnOff.PlayingVFX")
+                        if playingVFX ~= nil then
+                            StopEffect(PlayingEffect(playingVFX))
+                            me.Blackboard.ClearFact("Cnst.PerceptionDisarmOnOff.PlayingVFX")
+                        end
+                    end
+                    if preppedVFXOff ~= nil and
+                       me.Blackboard.GetFact("Cnst.PerceptionDisarmOnOff.OnOff_VFXKindPlaying") == 0 and
+                       (mod.util.SafeGetHitPointsPercentage(me.Blackboard.GetFact("TargetEntity")) ~= 0) then
+                        local playingVFX = PlayEffectAt(preppedVFXOff, me.Blackboard.GetFact("TargetEntity"), params.VFXOffBone)
+                        me.Blackboard.SetFact("Cnst.PerceptionDisarmOnOff.OnOff_VFXKindPlaying", -1)
+                        me.Blackboard.SetFact("Cnst.PerceptionDisarmOnOff.PlayingVFX", playingVFX.Handle)
+                    end
+                end
+            elseif me.Blackboard.GetFact("Cnst.PerceptionDisarmOnOff.OnOff_VFXKindPlaying") ~= 0 then
+                    me.Blackboard.SetFact("Cnst.PerceptionDisarmOnOff.OnOff_VFXKindPlaying", 0)
+                    local playingVFX = me.Blackboard.GetFact("Cnst.PerceptionDisarmOnOff.PlayingVFX")
+                    if playingVFX ~= nil then
+                        StopEffect(PlayingEffect(playingVFX))
+                        me.Blackboard.ClearFact("Cnst.PerceptionDisarmOnOff.PlayingVFX")
+                    end
+            end
+        end
+
+        helpers.Init = function()
+            if params.TargetEntity == "me" then
+                me.Blackboard.SetFact("TargetEntity", me)
+            else
+                me.Blackboard.SetFact("TargetEntity", FindEntity(params.TargetEntity))
+            end
+            me.Blackboard.SetFact("Cnst.PerceptionDisarmOnOff.OnOff_VFXKindPlaying", 0)
+        end
+
+        helpers.PrefVFX = function()
+            if preppedVFXOn == nil and
+               params.VFXOn ~= "" then
+                me.Blackboard.SetFact("Cnst.PerceptionDisarmOnOff.OnOff_VFXOnPrepped", 1)
+               preppedVFXOn = PrepareEffect(params.VFXOn)
+            end
+            if preppedVFXOff == nil and
+                params.VFXOff ~= "" then
+                me.Blackboard.SetFact("Cnst.PerceptionDisarmOnOff.OnOff_VFXOffPrepped", 1)
+                preppedVFXOff = PrepareEffect(params.VFXOff)
+            end
+        end
+
+        self.OnLoaded = function()
+            helpers.PrefVFX()
+        end
+
+        self.OnEditorChanges = function()
+            helpers.PrefVFX()
+            helpers.UpdateVFX()
+        end
+
+        self.OnInit = function()
+            if me.Blackboard.GetFact("Cnst.PerceptionDisarmOnOff.OnOff_VFXKindPlaying") == nil then
+                helpers.Init()
+            elseif me.Blackboard.GetFact("Cnst.PerceptionDisarmOnOff.OnOff_VFXKindPlaying") ~= 0 then
+                -- Clear so that the vfx will be restarted after loading a savegame
+                -- Which one should be played is deduced from other blackboard facts
+                me.Blackboard.SetFact("Cnst.PerceptionDisarmOnOff.OnOff_VFXKindPlaying", 0)
+            end
+            helpers.UpdateVFX()
+        end
+
+        socketEvents.TryActivate = function(ev)
+            TriggerOutput(outputs.TryActivate, ev.Object, ev.Param)
+        end
+
+        socketEvents.Activate = function(ev)
+            TriggerOutput(outputs.Activate, ev.Object, ev.Param)
+        end
+
+        socketEvents.ActivateAttemptFailed = function(ev)
+            TriggerOutput(outputs.ActivateAttemptFailed, ev.Object, ev.Param)
+        end
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.Enable, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.Disable, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disarm = function(ev)
+            TriggerOutput(outputs.Disarm, ev.Object, ev.Param)
+        end
+
+        socketEvents.Enabled = function(ev)
+            PlaySound(me.Blackboard.GetFact("TargetEntity"),  params.SoundOn)
+            helpers.UpdateVFX()
+            TriggerOutput(outputs.Enabled, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disabled = function(ev)
+            PlaySound(me.Blackboard.GetFact("TargetEntity"),  params.SoundOff)
+            helpers.UpdateVFX()
+            TriggerOutput(outputs.Disabled, ev.Object, ev.Param)
+        end
+
+        socketEvents.ToggledInt = function(ev)
+            helpers.UpdateVFX()
+        end
+
+        socketEvents.DisarmFailed = function(ev)
+            TriggerOutput(outputs.DisarmFailed, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disarmed = function(ev)
+            helpers.UpdateVFX()
+            TriggerOutput(outputs.Disarmed, ev.Object, ev.Param)
+        end
+
+        socketEvents.Reveal = function(ev)
+            TriggerOutput(outputs.Reveal, ev.Object, ev.Param)
+        end
+
+        socketEvents.Revealed = function(ev)
+            helpers.UpdateVFX()
+            TriggerOutput(outputs.Revealed, ev.Object, ev.Param)
+        end
+
+    end
+
+}

@@ -1,0 +1,665 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="PhysicsBank">
+		<node id="PhysicsBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="24cc447a-0ba9-ba25-08dc-5f51164d6f51" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="REF_FUR_Counter" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/_Reference/REF_FUR_Counter.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/_Reference/REF_FUR_Counter" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855879" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="51529274-3f04-1288-20b0-a52feebea2e7" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="REF_FUR_Bed" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/_Reference/REF_FUR_Bed.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/_Reference/REF_FUR_Bed" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855879" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="c234c0ed-c2a9-03ac-8c68-96f00e9b0d12" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="REF_FUR_Matress" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/_Reference/REF_FUR_Mattress.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/_Reference/REF_FUR_Mattress" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855879" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="c71d9999-a490-d0a8-93fe-6e27aeff9e05" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="REF_FUR_Chair" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/_Reference/REF_FUR_Chair.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/_Reference/REF_FUR_Chair" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855879" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="cc16761c-570a-bb74-389e-a2a9b2d8e4a8" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="REF_FUR_Bench" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/_Reference/REF_FUR_Bench.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/_Reference/REF_FUR_Bench" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855879" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="d8eb7d69-d22f-7f87-a226-03207b37d0b5" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="REF_FUR_Table" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/_Reference/REF_FUR_Table.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/_Reference/REF_FUR_Table" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855879" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="MaterialBank">
+		<node id="MaterialBank">
+			<children>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="3b6bd422-3d75-7b7a-893a-710e1c7c3ed2" />
+					<attribute id="MaterialType" type="uint8" value="13" />
+					<attribute id="Name" type="LSString" value="REF_FUR_Bed_Mattress" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Helper/Helper_Color_Lit.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Metalness" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Roughness" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="1 0.022346377 0.022346377" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Color" />
+							<attribute id="Value" type="fvec3" value="0.49950528 0.49950528 0.49950528" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="58f1dfd8-97c8-b309-d8d6-94b34bc33491" />
+					<attribute id="MaterialType" type="uint8" value="5" />
+					<attribute id="Name" type="LSString" value="REF_FUR_Table" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Helper/Helper_Color_Lit.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Metalness" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Roughness" />
+							<attribute id="Value" type="float" value="0.75" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="1 0.022346377 0.022346377" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Color" />
+							<attribute id="Value" type="fvec3" value="0.24680041 0.106156066 0.04145189" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="b0b064cd-45fc-8c5a-01e6-064e05e979c9" />
+					<attribute id="MaterialType" type="uint8" value="5" />
+					<attribute id="Name" type="LSString" value="REF_FUR_Bench" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Helper/Helper_Color_Lit.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Metalness" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Roughness" />
+							<attribute id="Value" type="float" value="0.75" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="1 0.022346377 0.022346377" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Color" />
+							<attribute id="Value" type="fvec3" value="0.24680041 0.106156066 0.04145189" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="bf40eb7b-2cbc-9a7f-604d-6a7ba11a3a5a" />
+					<attribute id="MaterialType" type="uint8" value="5" />
+					<attribute id="Name" type="LSString" value="REF_FUR_Chair" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Helper/Helper_Color_Lit.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Metalness" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Roughness" />
+							<attribute id="Value" type="float" value="0.75" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="1 0.022346377 0.022346377" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Color" />
+							<attribute id="Value" type="fvec3" value="0.24680041 0.106156066 0.04145189" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="d17fe70e-d824-d281-62dd-6c7a564fd36d" />
+					<attribute id="MaterialType" type="uint8" value="5" />
+					<attribute id="Name" type="LSString" value="REF_FUR_Counter" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Helper/Helper_Color_Lit.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Metalness" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Roughness" />
+							<attribute id="Value" type="float" value="0.75" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="1 0.022346377 0.022346377" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Color" />
+							<attribute id="Value" type="fvec3" value="0.24680041 0.106156066 0.04145189" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="db72cf4c-dbe1-93e5-a9cc-fb5cdf36a1f3" />
+					<attribute id="MaterialType" type="uint8" value="5" />
+					<attribute id="Name" type="LSString" value="REF_FUR_Bed_Frame" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Helper/Helper_Color_Lit.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Metalness" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Roughness" />
+							<attribute id="Value" type="float" value="0.75" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="1 0.022346377 0.022346377" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Color" />
+							<attribute id="Value" type="fvec3" value="0.24680041 0.106156066 0.04145189" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.28380507 1.1349932 0.3463628" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.2962505 0.00532356 -0.27238122" />
+					<attribute id="Center" type="fvec3" value="-0.00622271 0.57015836 0.03699079" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="059a4a83-e2ea-74bd-b8a8-9057790a2128" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="REF_FUR_Chair" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.70630413" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/_Reference/Resources/REF_FUR_Chair.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/_Reference/Resources/REF_FUR_Chair.Dummy_REF_FUR_Chair.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855907" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_01" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="0 0.59999996 0" />
+									<attribute id="Rotation" type="mat3x3" value=" 1.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  1.00 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_Start_01" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="0 0 -0.5" />
+									<attribute id="Rotation" type="mat3x3" value=" 1.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  1.00 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="bf40eb7b-2cbc-9a7f-604d-6a7ba11a3a5a" />
+							<attribute id="ObjectID" type="FixedString" value="REF_FUR_Chair.REF_FUR_Chair_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="1.0000002 1.5945342 0.5245652" />
+					<attribute id="BoundsMin" type="fvec3" value="-1.0000001 -0.00437325 -0.56270254" />
+					<attribute id="Center" type="fvec3" value="5.9604645E-08 0.7950805 -0.019068658" />
+					<attribute id="ID" type="FixedString" value="527c9979-06d4-1cb9-06b6-aa56cce1dfa2" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="REF_FUR_Counter" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="1.3909222" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/_Reference/Resources/REF_FUR_Counter.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/_Reference/Resources/REF_FUR_Counter.Dummy_REF_FUR_Counter.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855895" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="d17fe70e-d824-d281-62dd-6c7a564fd36d" />
+							<attribute id="ObjectID" type="FixedString" value="REF_FUR_Counter.REF_FUR_Counter_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="1.5 0.9 0.75" />
+					<attribute id="BoundsMin" type="fvec3" value="-1.5 0 -0.75" />
+					<attribute id="Center" type="fvec3" value="0 0.45 0" />
+					<attribute id="ID" type="FixedString" value="919866f1-c811-c1b0-9243-2cbeb6db3b24" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="REF_FUR_Table" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="1.7363755" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/_Reference/Resources/REF_FUR_Table.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/_Reference/Resources/REF_FUR_Table.Dummy_REF_FUR_Table.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855895" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_08" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="0 0 1" />
+									<attribute id="Rotation" type="mat3x3" value=" 1.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  1.00 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_05" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="0 0 -1" />
+									<attribute id="Rotation" type="mat3x3" value=" 1.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  1.00 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_07" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="-1 0 -1" />
+									<attribute id="Rotation" type="mat3x3" value=" 1.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  1.00 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_06" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="1 0 -1" />
+									<attribute id="Rotation" type="mat3x3" value=" 1.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  1.00 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_09" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="1 0 1" />
+									<attribute id="Rotation" type="mat3x3" value=" 1.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  1.00 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_10" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="-1 0 1" />
+									<attribute id="Rotation" type="mat3x3" value=" 1.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  1.00 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="58f1dfd8-97c8-b309-d8d6-94b34bc33491" />
+							<attribute id="ObjectID" type="FixedString" value="REF_FUR_Table.REF_FUR_Table_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="1.2836635 1.0180867 1.4999994" />
+					<attribute id="BoundsMin" type="fvec3" value="-1.2836635 0 -1.4999998" />
+					<attribute id="Center" type="fvec3" value="0 0.50904334 -1.7881393E-07" />
+					<attribute id="ID" type="FixedString" value="b2aa1f84-848a-d2cd-e3a0-75212e77e711" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="REF_FUR_Bed" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="2.0388515" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/_Reference/Resources/REF_FUR_Bed.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/_Reference/Resources/REF_FUR_Bed.Dummy_REF_FUR_Bed.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855895" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_13" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="-0.39999998 0.61 0" />
+									<attribute id="Rotation" type="mat3x3" value=" 1.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  1.00 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_12" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="0.39999998 0.61 0" />
+									<attribute id="Rotation" type="mat3x3" value=" 1.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  1.00 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_Start_13" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="-1.6999999 0 0" />
+									<attribute id="Rotation" type="mat3x3" value=" 1.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  1.00 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_Start_12" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="1.6999999 0 0" />
+									<attribute id="Rotation" type="mat3x3" value=" 1.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  1.00 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="db72cf4c-dbe1-93e5-a9cc-fb5cdf36a1f3" />
+							<attribute id="ObjectID" type="FixedString" value="REF_FUR_Bed.REF_FUR_Bed_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="3b6bd422-3d75-7b7a-893a-710e1c7c3ed2" />
+							<attribute id="ObjectID" type="FixedString" value="REF_FUR_Bed.REF_FUR_Bed_Mattress_Mesh.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.6149639 0.16739765 1.361295" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.6151009 0.0013859599 -1.360272" />
+					<attribute id="Center" type="fvec3" value="-6.851554E-05 0.0843918 0.00051146746" />
+					<attribute id="ID" type="FixedString" value="c789c3d0-02cf-d4e5-5667-ea9951161230" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="REF_FUR_Mattress" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="1.4956225" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/_Reference/Resources/REF_FUR_Mattress.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/_Reference/Resources/REF_FUR_Mattress.Dummy_REF_FUR_Mattress.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855895" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_11" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="0 0.14999999 0" />
+									<attribute id="Rotation" type="mat3x3" value=" 1.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  1.00 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="3b6bd422-3d75-7b7a-893a-710e1c7c3ed2" />
+							<attribute id="ObjectID" type="FixedString" value="REF_FUR_Mattress.REF_FUR_Mattress_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="1.1466031 0.6 0.3326918" />
+					<attribute id="BoundsMin" type="fvec3" value="-1.2005342 -0.00352259 -0.3499839" />
+					<attribute id="Center" type="fvec3" value="-0.026965559 0.29823872 -0.008646056" />
+					<attribute id="ID" type="FixedString" value="c883420d-0dd3-ca9c-2e0a-88d330a062bc" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="REF_FUR_Bench" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="1.2589023" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/_Reference/Resources/REF_FUR_Bench.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/_Reference/Resources/REF_FUR_Bench.Dummy_REF_FUR_Bench.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855895" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_04" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="-0.79999995 0.59999996 0" />
+									<attribute id="Rotation" type="mat3x3" value=" 1.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  1.00 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_03" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="0.79999995 0.59999996 0" />
+									<attribute id="Rotation" type="mat3x3" value=" 1.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  1.00 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_02" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="0 0.59999996 0" />
+									<attribute id="Rotation" type="mat3x3" value=" 1.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  1.00 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_Start_04" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="-0.79999995 0 -0.7" />
+									<attribute id="Rotation" type="mat3x3" value=" 1.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  1.00 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_Start_02" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="0 0 -0.7" />
+									<attribute id="Rotation" type="mat3x3" value=" 1.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  1.00 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Pos_Start_03" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="0.79999995 0 -0.7" />
+									<attribute id="Rotation" type="mat3x3" value=" 1.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  1.00 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="b0b064cd-45fc-8c5a-01e6-064e05e979c9" />
+							<attribute id="ObjectID" type="FixedString" value="REF_FUR_Bench.REF_FUR_Bench_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

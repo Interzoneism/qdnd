@@ -1,0 +1,76 @@
+game.states.GEN_PatrolPauses = State{function ()
+
+    -----------------------------------------
+    -- Params
+    params.sleepTimeMin = {type = EParamType.Number,required = false,default = 2.0,
+        help = [[Waiting duration for spline points with the script event 'Sleep' on that point (edit it on the spline).]]}
+    params.sleepTimeMax = {type = EParamType.Number,required = false,default = 4.0,
+        help = [[Waiting duration for spline points with the script event 'Sleep' on that point (edit it on the spline).]]}
+    params.sleepChance = {type = EParamType.Number,required = false,default = 15,
+        help = [[Chance (out of 100) that the character will go to sleep upon reaching a spline point.]]}
+    params.sleepCooldown = {type = EParamType.Number,required = false,default = 3,
+        help = [[Character will not sleep upon passing a spline point if on cooldown. Cooldown decrements every time a point is passed.]]}
+    params.steerToTarget = {type=EParamType.String, required = false,default = "",
+        help = [[Trigger to steer towards when reaching a patrol point with the "SteerTo" script event (provided the character sleeps when reaching this point).]]}
+    params.lookFromSource = {type=EParamType.String, required = false,default = "",
+        help = [[Entity to look from when a sleep starts.]]}
+
+    -----------------------------------------
+    -- Local variables
+    local doSleep = false
+    local doSteerTo = false
+    local doLookFrom = false
+    local sleepCooldown = 0
+    local steerToTarget = nil
+    local lookFromSource = nil
+
+
+    -----------------------------------------
+    -- State nodes
+    self.OnInit = function()
+        if params.steerToTarget ~= nil and params.steerToTarget ~= "" then
+            steerToTarget = Entity(params.steerToTarget)
+        end
+        if params.lookFromSource ~= nil and params.lookFromSource ~= "" then
+            lookFromSource = Entity(params.lookFromSource)
+        end
+    end
+
+    -----------------------------------------
+    -- Nodes   
+    nodes.Sleep = Action {
+        function()
+            if doSteerTo then
+                SteerTo(steerToTarget)
+                doSteerTo = false
+            elseif doLookFrom then
+                LookFrom(steerToTarget)
+            else
+            end
+
+            Sleep(params.sleepTimeMin+(math.random()*(params.sleepTimeMax-params.sleepTimeMin)))
+
+            doSleep = false
+        end
+    }        
+
+    -----------------------------------------
+    -- Events
+    events.SplineControlPointReached = function(e)
+        if sleepCooldown > 0 then
+            sleepCooldown = sleepCooldown - 1
+        elseif math.random(100) <= params.sleepChance then
+            doSleep = true
+            sleepCooldown = params.sleepCooldown
+            if e.Event == "SteerTo" and steerToTarget ~= nil then
+                doSteerTo = true
+            elseif lookFromSource ~= nil then
+                doLookFrom = true
+            end
+        end
+    end
+
+    self.Valid = function()
+        return doSleep
+    end
+end}

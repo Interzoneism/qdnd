@@ -1,0 +1,24 @@
+
+local m = AnubisModule()
+
+m.IsDefeated = function(character, permanentonly)
+    if not character or
+       not character.Character then
+        assert("Checking IsDefeated with a nil character")
+        return false
+    else
+        if character.Character.IsDead or
+           HasActiveStatus(character, "GLO_CAPTUREDINFLASK") then
+            return true
+        end
+        if not permanentlyonly and
+           (HasActiveStatus(character, "KNOCKED_OUT") or
+            HasActiveStatus(character, "SURRENDERED")) then
+                return true
+        end
+    end
+    return false
+end
+
+
+return m

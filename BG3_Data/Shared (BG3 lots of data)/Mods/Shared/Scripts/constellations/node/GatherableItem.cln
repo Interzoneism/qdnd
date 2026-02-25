@@ -1,0 +1,85 @@
+game.states.GLO_GatherableItem = State {
+    function()
+        params.DC = {
+            type = EParamType.String,
+            help = [[Difficulty class to gather this item (Nature Check).]],
+            required = true
+        }
+        
+        params.RewardTemplate = {
+            type = EParamType.String,
+            help = [[Reward added for the gatherer when this item is gathered.]],
+            required = true,
+        }
+
+        local gatherableFact = "Cnst.GLO_GatherableItem.CanBeGathered"
+        local gatherRoll = "Gather_NatureCheck"
+
+        inputs.Gather = {}
+        outputs.Gathered = {help = "Item has been gathered (reward has been emitted)"}
+        outputs.Attempted = {help = "Item has been consumed (it can no longer be gathered)"}
+
+        helpers.SetCanBeGathered = function(canBeGathered)
+            SetCanInteract(me, canBeGathered)
+            local canBeGatheredBlackboard = canBeGathered and 1 or 0
+            me.Blackboard.SetFact(gatherableFact, canBeGatheredBlackboard)
+        end
+
+        helpers.CanBeGathered = function()
+            return me.Blackboard.GetFact(gatherableFact) == 1
+        end
+
+        helpers.Consume = function(gathererEntity)
+            helpers.SetCanBeGathered(false)
+            local gathererEntityRef = gathererEntity and gathererEntity.EntityRef or nil
+            TriggerOutput(outputs.Attempted, gathererEntityRef, nil)
+        end
+
+        helpers.Gather = function(gathererEntity)
+            TriggerOutput(outputs.Gathered, gathererEntity.EntityRef, nil)
+            local template = FindTemplate(params.RewardTemplate)
+            local reward = SpawnItem(template, me.Position, 0.0)
+            
+            local showNotification = true
+            local clearOriginalOwner = true
+            ToInventory(reward, gathererEntity, 1, showNotification, clearOriginalOwner)
+        end
+        
+        self.OnInit = function()
+            if me.Blackboard.GetFact(gatherableFact) == nil then
+                helpers.SetCanBeGathered(true)
+            end
+        end
+
+        socketEvents.Gather = function(ev)
+            if not helpers.CanBeGathered() then
+                return
+            end
+
+            local gathererCharacter = ev.Object and Entity(ev.Object).Character or nil
+            if gathererCharacter == nil then
+                helpers.Consume(nil)
+                return
+            end
+            
+            RequestPassiveRoll(gathererCharacter, me, Skill.Nature, DifficultyClass(params.DC), gatherRoll)
+        end
+
+        events.RollResult = function(e)
+            if e.RollSubject ~= me or e.Event ~= gatherRoll then
+                return
+            end
+
+            if not helpers.CanBeGathered() then
+                return
+            end
+
+            helpers.Consume(e.Roller)
+            if e.Type.name == "Success" then
+                helpers.Gather(e.Roller)
+            end
+        end
+
+    end
+    
+}

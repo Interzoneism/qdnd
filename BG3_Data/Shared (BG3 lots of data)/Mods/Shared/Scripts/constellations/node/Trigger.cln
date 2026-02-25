@@ -1,0 +1,226 @@
+game.states.Trigger = State{
+    function()
+
+        params.EntityFilter = {
+            type = EParamType.String,
+            help = [[Types of Entities to check for. Options:
+            All - check for any kind of entities in the trigger
+            Characters - only check for characters in the trigger
+            LivingCharacters - only check for living characters in the trigger, and character will leave when it dies in the trigger
+            PartyMembers - only check for party members,
+            LivingPartyMembers - only check for living party members,
+            Items - only check for items in the trigger]],
+            required = false,
+            default = [[All]]
+        }
+        
+        params.ExcludeTag = {
+            type = EParamType.String,
+            help = [[Entities entering/leaving trigger with this tag (NAME_Guid) will not trigger the event. Currently only possible to put one tag]],
+            required = false,
+            default = [[]]
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the trigger start enabled?]],
+            required = false,
+            default = true
+        }
+
+        inputs.Disable = {help = [[Disable trigger events]]}
+        inputs.Enable = {help = [[Enable trigger events (won't trigger for entities already in the trigger)]]}
+
+        outputs.OnEnter = {help = [[Output socket that's triggered when an object entered the trigger]]}
+        outputs.OnLeave = {help = [[Output socket that's triggered when an object left the trigger]]}
+
+        outputs.Empty = {help = [[Output socket that's triggered when all objects have left]]}
+
+        local filterFunctions = {} -- See construction in helpers.Init (Enums don't exist at this point)
+        local inited = false
+
+        socketEvents.Disable = function(ev)
+            if me.Blackboard.GetFact("Cnst.Trigger.On") == 1 then
+                local triggerEntities = TriggerGetRegisteredEntitiesInside(me.Trigger)
+                if triggerEntities ~= nil then
+                    local lastEntityInside = nil
+                    for _, entity in pairs(triggerEntities) do
+                        if helpers.EntityFilterCountsFor(entity) then
+                            TriggerOutput(outputs.OnLeave, entity.EntityRef)
+                            lastEntityInside = entity
+                        end
+                    end
+                    if lastEntityInside ~= nil then
+                        TriggerOutput(outputs.Empty, lastEntityInside.EntityRef)
+                    end
+                end
+                me.Blackboard.SetFact("Cnst.Trigger.On", 0)
+            end
+        end
+
+        socketEvents.Enable = function(ev)
+            if me.Blackboard.GetFact("Cnst.Trigger.On") == 0 then
+                me.Blackboard.SetFact("Cnst.Trigger.On", 1)
+                local triggerEntities = TriggerGetRegisteredEntitiesInside(me.Trigger)
+                if triggerEntities ~= nil then
+                    for _, entity in pairs(triggerEntities) do
+                        if helpers.EntityFilterCountsFor(entity) then
+                            TriggerOutput(outputs.OnEnter, entity.EntityRef)
+                        end
+                    end
+                else
+                    TriggerOutput(outputs.Empty, me.EntityRef)
+                end
+            end
+        end
+
+
+        -- there's currently a problem with variable sof the type EntityKind, so
+        -- always convert for now
+        helpers.GetTriggerIsEmptyFilter = function()
+            local filter = filterFunctions[params.EntityFilter].entityKind
+            if filter ~= nil then
+                return filter
+            else
+                DebugLogCritical("params.EntityFilter is invalid for [1]: [2]", me.UUID, params.EntityFilter)
+                return EntityKind.All
+            end
+        end
+
+        -- Does the entity need to be tracked by the trigger according to EntityFilter
+        helpers.EntityFilterCountsFor = function(entity)
+            return (filterFunctions[params.EntityFilter].filterFunction(entity) and not helpers.EntityHasIgnoreTag(entity))
+        end
+
+        helpers.EntityHasIgnoreTag = function(entity)
+            return params.ExcludeTag ~= "" and IsTagged(entity, Tag(params.ExcludeTag))
+        end
+
+        helpers.TriggerHasEntitiesInside = function(trigger)
+            if filterFunctions[params.EntityFilter].onlyEntityKind and
+               params.ExcludeTag ~= "" then
+                -- Faster method when we don't need to check if character is alive
+                return TriggerHasAnyRegisteredEntitiesInside(me.Trigger, helpers.GetTriggerIsEmptyFilter())
+                -- Preferably we get code support for this in TriggerHasAnyRegisteredEntitiesInside
+            else
+                local triggerEntities = TriggerGetRegisteredEntitiesInside(trigger)
+                if triggerEntities ~= nil then
+                    for _, entity in pairs(triggerEntities) do
+                        if helpers.EntityFilterCountsFor(entity) then
+                            return true
+                        end
+                    end
+                end
+                return false
+            end
+        end
+
+        self.OnInit = function()
+            helpers.Init()
+        end
+
+        --OnLoaded to be early enough in normal flow;
+        --OnInit to work for Anubis reloads.
+
+        self.OnLoaded = function()
+            helpers.Init()
+        end
+
+        helpers.Init = function()
+            if not inited then
+                filterFunctions = {All = {filterFunction = function(entity) return true end,
+                                            aliveFilter = nil,
+                                            entityKind = EntityKind.All,
+                                            onlyEntityKind = true},
+                                    Characters = {filterFunction = function(entity) return true end,
+                                                aliveFilter = nil,
+                                                entityKind = EntityKind.Character,
+                                                onlyEntityKind = true},
+                                    Items = {filterFunction = function(entity) return true end,
+                                            aliveFilter = nil,
+                                            entityKind = EntityKind.Item,
+                                            onlyEntityKind = true},
+                                    LivingCharacters = {filterFunction = function(entity) return entity.IsCharacter and not entity.Character.IsDead end,
+                                                        aliveFilter = function(entity) return true end,
+                                                        entityKind = EntityKind.Character,
+                                                        onlyEntityKind = false},
+                                    PartyMembers = {filterFunction = function(entity) return entity.IsCharacter and entity.Character.IsPartyMember end, 
+                                                    aliveFilter = nil,
+                                                    entityKind = EntityKind.Character,
+                                                    onlyEntityKind = false},
+                                    LivingPartyMembers = {filterFunction = function(entity) return entity.IsCharacter and not entity.Character.IsDead and entity.Character.IsPartyMember end,
+                                                        aliveFilter = function(entity) return entity.IsCharacter and entity.Character.IsPartyMember end,
+                                                        entityKind = EntityKind.Character,
+                                                        onlyEntityKind = false}
+                                      }
+                if not filterFunctions[params.EntityFilter] then
+                    DebugLogCritical("params.EntityFilter is invalid for [1]: [2]", me.UUID, params.EntityFilter)
+                else
+                    if me.Blackboard.GetFact("Cnst.Trigger.On") == nil then
+                        me.Blackboard.SetFact("Cnst.Trigger.On", params.StartEnabled and 1 or 0)
+                    end
+                    if filterFunctions[params.EntityFilter].aliveFilter ~= nil then
+                        local triggerEntities = TriggerGetRegisteredEntitiesInside(me.Trigger)
+                        if triggerEntities ~= nil then
+                            for _, entity in pairs(triggerEntities) do
+                                RegisterForEvents(entity)
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        forwardedEvents.Resurrected = function(ev, entityRef)
+            local entity = Entity(entityRef)
+            if me.Blackboard.GetFact("Cnst.Trigger.On") == 1 and
+               IsInTrigger(entity, me.Trigger) and
+               filterFunctions[params.EntityFilter].aliveFilter(entity) and
+               not helpers.EntityHasIgnoreTag(entity) then
+                    TriggerOutput(outputs.OnEnter, entityRef)
+            end
+        end
+
+        forwardedEvents.Died = function(ev, entityRef)
+            local entity = Entity(entityRef)
+            if me.Blackboard.GetFact("Cnst.Trigger.On") == 1 and
+               filterFunctions[params.EntityFilter].aliveFilter(entity) and
+               IsInTrigger(entity, me.Trigger) and
+               not helpers.EntityHasIgnoreTag(entity) then
+                    TriggerOutput(outputs.OnLeave, entityRef)
+                    if not helpers.TriggerHasEntitiesInside(me.Trigger) then
+                        TriggerOutput(outputs.Empty, entityRef)
+                    end
+            end
+        end
+
+        events.EnteredTrigger = function(ev)
+            if (ev.Trigger == me) and
+               (me.Blackboard.GetFact("Cnst.Trigger.On") == 1) then
+                if helpers.EntityFilterCountsFor(ev.Target) then
+                    --InitConstellation(me)
+                    TriggerOutput(outputs.OnEnter, ev.Target.EntityRef)
+                end
+                if filterFunctions[params.EntityFilter].aliveFilter ~= nil then
+                    RegisterForEvents(ev.Target)
+                end
+            end
+        end
+
+        events.LeftTrigger = function(ev)
+            if (ev.Trigger == me) and
+               (me.Blackboard.GetFact("Cnst.Trigger.On") == 1) then
+                if helpers.EntityFilterCountsFor(ev.Target) then
+                    --InitConstellation(me)
+                    TriggerOutput(outputs.OnLeave, ev.Target.EntityRef)
+                    if not helpers.TriggerHasEntitiesInside(me.Trigger) then
+                        TriggerOutput(outputs.Empty, ev.Target.EntityRef)
+                    end
+                end
+                if filterFunctions[params.EntityFilter].aliveFilter ~= nil then
+                    UnregisterForEvents(ev.Target)
+                end
+            end
+        end
+    end
+}

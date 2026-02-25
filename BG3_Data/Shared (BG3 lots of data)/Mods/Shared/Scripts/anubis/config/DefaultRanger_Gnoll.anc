@@ -1,0 +1,9 @@
+game.configs.DefaultRanger_Gnoll = Config{
+    root=StateRef{game.roots.DefaultCharacter,
+        combat = StateRef{game.states.DefaultCombat,
+            FallbackMovementSpell = [[]],
+        },
+        genericBehaviours = StateRef{game.states.CrimesHumanoid},
+        idle = StateRef{game.states.Dummy},
+    }
+}

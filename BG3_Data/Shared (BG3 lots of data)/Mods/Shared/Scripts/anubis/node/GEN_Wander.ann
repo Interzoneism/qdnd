@@ -1,0 +1,36 @@
+game.states.GEN_Wander = State{
+    function ()
+
+        modules = {"shared.math"}
+
+        params.wanderMin = {type = EParamType.Number, required = true, help = "Minimum amount of time (in seconds) spent patrolling"}
+        params.wanderMax = {type = EParamType.Number, required = false, default = 0.0, help = "Maximum amount of time (in seconds) spent patrolling. Leave at 0 if no randomisation is needed."}
+        params.sleepMin = {type = EParamType.Number, required = true, help = "Minimum amount of time (in seconds) spent sleeping between patrols"}
+        params.sleepMax = {type = EParamType.Number, required = false, default = 0.0, help = "Maximum amount of time (in seconds) spent sleeping between patrols. Leave at 0 if no randomisation is needed."}
+        params.trigger = {type = EParamType.String, required = true, help = "Trigger in which the character patrols."}
+
+        local trigger = Entity(params.trigger)
+
+        nodes.Wander = Action{
+            function()
+                local wanderTime
+                local sleepTime
+                if params.wanderMax == nil or params.wanderMax == 0 then
+                    wanderTime = params.wanderMin
+                else
+                    wanderTime = params.wanderMin + (params.wanderMax - params.wanderMin)*math.random()
+                end
+                
+                Wander(trigger, wanderTime, MovementSpeed.Stroll)
+
+                if params.sleepMax == nil or params.sleepMax == 0 then
+                    sleepTime = params.sleepMin
+                else
+                    sleepTime = params.sleepMin + (params.sleepMax - params.sleepMin)*math.random()
+                end
+                Sleep(sleepTime)
+                
+            end
+        }
+    end
+}

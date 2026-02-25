@@ -1,0 +1,56 @@
+game.states.AnimatedOnOff = State{
+    function()
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default = false,
+            help = "Does the object start on?"
+        }
+
+        inputs.Enable = {help = "Turn object on"}
+        inputs.Disable = {help = "Turn object off"}
+        inputs.Switch = {help = "Turn object off if on or the other way around"}
+
+        outputs.SwitchInt = {internal = true}
+
+        nodes.AnimationState = Proxy{
+            game.states.AnimationStates,
+            params = {StateSequence = {0,2,0},
+                      DynamicStates = {}},
+            inputs = {Activate = {outputs.SwitchInt}},
+        }
+
+        self.OnInit = function()
+            if me.Blackboard.GetFact("On") == nil then
+                me.Blackboard.SetFact("On", params.StartEnabled and 1 or 0)
+            end
+            if params.StartEnabled then
+                TriggerOutput(outputs.SwitchInt, nil)
+            end
+        end
+
+        socketEvents.Enable = function(ev)
+            if me.Blackboard.GetFact("On") == 0 then
+                TriggerOutput(outputs.SwitchInt, nil)
+                me.Blackboard.SetFact("On", 1)
+            end
+        end
+
+        socketEvents.Disable = function(ev)
+            if me.Blackboard.GetFact("On") == 1 then
+                TriggerOutput(outputs.SwitchInt, nil)
+                me.Blackboard.SetFact("On", 0)
+            end
+        end
+
+        socketEvents.Switch = function(ev)
+            if me.Blackboard.GetFact("On") == 1 then
+                me.Blackboard.SetFact("On", 0)
+            else
+                me.Blackboard.SetFact("On", 1)
+            end
+            TriggerOutput(outputs.SwitchInt, nil)
+        end
+
+    end
+}

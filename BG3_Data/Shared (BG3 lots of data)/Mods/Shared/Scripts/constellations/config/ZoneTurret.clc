@@ -1,0 +1,115 @@
+game.configs.ZoneTurret = Config{
+    params={
+        VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while item is on.]],
+            required = true,
+        },
+        SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when trap is turned off]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_Off]]
+        },
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the trap start on?]],
+            required = false,
+            default = true
+        },
+        VFX = {
+            type = EParamType.String,
+            help = [[VFX played when the zone spell fires]],
+            required = false,
+        },
+        SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when trap is turned on]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_On]]
+        },
+        MinDistance = {
+            type = EParamType.Number,
+            help = [[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]],
+            required = false,
+            default = 6
+        },
+        VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the the VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        PerceptionSkill = {
+            type = EParamType.String,
+            help = [[The skill DC used for the "Type" parameter check.]],
+            required = false,
+            default = [[Perception]]
+        },
+        PerceptionType = {
+            type = EParamType.String,
+            help = [[                Type of invisibility. Options:
+                None: No perception logic.
+                Invisible: Object is invisible until discovered
+                Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+                Trapped: Hides trapped state until discovered.
+                Highlight: Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[Interactable]]
+        },
+        Spell = {
+            type = EParamType.String,
+            help = [[Zone Spell]],
+            required = true,
+            default_value_provider = [[spell_zone]],
+        },
+        DC = {
+            type = EParamType.String,
+            help = [[Perception check DC.]],
+            required = false,
+            default = [[DC_Legacy_15_bddbb9b8-a242-4c3e-a2eb-3fd274c0c539]]
+        },
+        Offset = {
+            type = EParamType.Vector3,
+            help = [[Offset for the zone spell's start point.]],
+            required = false,
+            default = math.Vector3(0, 0, 0)
+        },
+        Rotation = {
+            type = EParamType.Vector3,
+            help = [[Rotation relative to forward direction in which the zone spell will be cast.]],
+            required = false,
+            default = math.Vector3(0, 0, 0)
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.ZoneTurret,
+            DC = params.DC,
+            MinDistance = params.MinDistance,
+            PerceptionSkill = params.PerceptionSkill,
+            PerceptionType = params.PerceptionType,
+            SoundOff = params.SoundOff,
+            SoundOn = params.SoundOn,
+            Spell = params.Spell,
+            StartEnabled = params.StartEnabled,
+            VFX = params.VFX,
+            VFXOn = params.VFXOn,
+            VFXOnBone = params.VFXOnBone,
+            Offset = params.Offset,
+            Rotation = params.Rotation,
+        },
+    },
+    inputs={
+        Trigger=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Trigger]]}}},
+        Disable=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+        Enable=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+        Reveal=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Reveal]]}}},
+    },
+    outputs={
+        Enabled=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Enabled]]}}},
+        Disabled=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Disabled]]}}},
+        DisarmFailed=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.DisarmFailed]]}}},
+        Disarmed=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Disarmed]]}}},
+    }
+}

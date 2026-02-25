@@ -1,0 +1,25 @@
+game.configs.NumberComparator = Config{
+    params={
+        NumberTreshold = {
+            type = EParamType.Number,
+            help = [[If the number difference is smaller than or equal to this number value, the numbers will be considered equal.]],
+            required = false,
+            default = 0.01
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.NumberComparator,
+        NumberTreshold = params.NumberTreshold,
+        },
+    },
+    inputs={
+        AChanged=ExtSocket{description=[[A changed - value passed]],{SocketRef{[[root.logic.inputs.AChanged]]}}},
+        BChanged=ExtSocket{description=[[B changed - value passed]],{SocketRef{[[root.logic.inputs.BChanged]]}}},
+    },
+    outputs={
+        ValueChanged=ExtSocket{description=[[Either A or B changed in value.]],{SocketRef{[[root.logic.outputs.ValueChanged]]}}},
+        Equals=ExtSocket{description=[[The difference between A and B is under the treshold value.]],{SocketRef{[[root.logic.outputs.Equals]]}}},
+        Lower=ExtSocket{description=[[A is lower than B.]],{SocketRef{[[root.logic.outputs.Lower]]}}},
+        Higher=ExtSocket{description=[[A is higher than B.]],{SocketRef{[[root.logic.outputs.Higher]]}}},
+    }
+}

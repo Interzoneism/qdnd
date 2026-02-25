@@ -1,0 +1,19 @@
+game.configs.Helper_SetParameter_String = Config{
+    params={
+        Value = {
+            type = EParamType.String,
+            help = [[Value with which the param is overridden.]],
+            required = true,
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+    logic = StateRef{game.states.Helper_SetParameter_String,
+                     Value = params.Value}, 
+    },
+    inputs={
+        In=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.In]]}}},
+    },
+    outputs={
+        Out=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Out]]}}},
+    }
+}

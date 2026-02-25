@@ -1,0 +1,21 @@
+game.configs.WaypointShrine = Config{
+    params = {
+        UnlockDistance       = {type = EParamType.Number, required=false, default=18.0,  help=[[Range at which the Waypoint can be unlocked]]},
+        IgnoreSight          = {type = EParamType.Bool,   required=false, default=false, help=[[Whether the Waypoint must be seen to be unlocked]]},
+        DiscoveredEffect     = {type = EParamType.String, required=false, default="",    help=[[Effect to play when the Waypoint is unlocked]]},
+        DiscoveredLoopEffect = {type = EParamType.String, required=false, default="",    help=[[Looping effect to play when the Waypoint is unlocked]]},
+        LoopEffectDelay      = {type = EParamType.Number, required=false, default=0,     help=[[Delay before playing looping effect when the Waypoint is unlocked]]},
+        DiscoveredAnimation  = {type = EParamType.String, required=false, default="",    help=[[Effect to play when the Waypoint is unlocked]]}
+    },
+
+    root = StateRef{game.roots.DefaultItem,
+        idle = StateRef{game.states.WaypointShrine,
+            UnlockDistance = params.UnlockDistance,
+            IgnoreSight = params.IgnoreSight,
+            DiscoveredEffect = params.DiscoveredEffect,
+            DiscoveredLoopEffect = params.DiscoveredLoopEffect,
+            LoopEffectDelay = params.LoopEffectDelay,
+            DiscoveredAnimation = params.DiscoveredAnimation,
+        }
+    }
+}

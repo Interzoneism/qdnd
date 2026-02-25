@@ -1,0 +1,61 @@
+game.configs.Helper_Sequence = Config{
+    params={
+        StartEnabled =
+        {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Whether or not you can start triggering sequence steps from the start.]]
+        },
+
+        StepSequence =
+        {
+            type = EParamType.Int,
+            required = true,
+            arrayRange = "1..",
+            help = [[The sequence in which the StepX sockets need to be triggered (repeats are allowed)]]
+        },
+
+        ResetOnFailure =
+        {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Reset the sequence when an error is made, otherwise stay on the current step number]]
+        },
+
+        DisableOnSuccess =
+        {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Disable further checks once the correct sequence has been triggered once.
+                     Otherwise the sequence will reset on completion.]]
+        }
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.Helper_Sequence,
+            StartEnabled = params.StartEnabled,
+            StepSequence = params.StepSequence,
+            ResetOnFailure = params.ResetOnFailure,
+            DisableOnSuccess = params.DisableOnSuccess
+        }
+    },
+    inputs={
+        Reset=ExtSocket{description=[[Reset the sequence, failure does not get triggered]],{SocketRef{[[root.logic.inputs.Reset]]}}},
+        ResetWithFailure=ExtSocket{description=[[Reset the sequence, failure gets triggered]],{SocketRef{[[root.logic.inputs.ResetWithFailure]]}}},
+        Enable=ExtSocket{description=[[Allow inputs to trigger the logic again]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+        Disable=ExtSocket{description=[[Prevent further inputs from triggering any logic]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+        Step1=ExtSocket{description=[[Trigger Step 1 in the sequence]],{SocketRef{[[root.logic.inputs.Step1]]}}},
+        Step2=ExtSocket{description=[[Trigger Step 2 in the sequence]],{SocketRef{[[root.logic.inputs.Step2]]}}},
+        Step3=ExtSocket{description=[[Trigger Step 3 in the sequence]],{SocketRef{[[root.logic.inputs.Step3]]}}},
+        Step4=ExtSocket{description=[[Trigger Step 4 in the sequence]],{SocketRef{[[root.logic.inputs.Step4]]}}},
+        Step5=ExtSocket{description=[[Trigger Step 5 in the sequence]],{SocketRef{[[root.logic.inputs.Step5]]}}},
+        Step6=ExtSocket{description=[[Trigger Step 6 in the sequence]],{SocketRef{[[root.logic.inputs.Step6]]}}},
+        Step7=ExtSocket{description=[[Trigger Step 7 in the sequence]],{SocketRef{[[root.logic.inputs.Step7]]}}},
+        Step8=ExtSocket{description=[[Trigger Step 8 in the sequence]],{SocketRef{[[root.logic.inputs.Step8]]}}},
+        Step9=ExtSocket{description=[[Trigger Step 9 in the sequence]],{SocketRef{[[root.logic.inputs.Step9]]}}},
+    },
+    outputs={
+        Failure=ExtSocket{description=[[Input sockets got triggered in the wrong order, event parameter = failed step number]],{SocketRef{[[root.logic.outputs.Failure]]}}},
+        Success=ExtSocket{description=[[All required input sockets got triggered in the correct order]],{SocketRef{[[root.logic.outputs.Success]]}}},
+        StepCompleted=ExtSocket{description=[[Successfully triggered a step, event parameter = step number]],{SocketRef{[[root.logic.outputs.StepCompleted]]}}},
+    }
+}

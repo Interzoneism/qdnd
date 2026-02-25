@@ -1,0 +1,9 @@
+game.configs.OnOffStage = Config{
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.OnOffStage},
+    },
+    inputs={
+        OnStage=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.OnStage]]}}},
+        OffStage=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.OffStage]]}}},
+    }
+}

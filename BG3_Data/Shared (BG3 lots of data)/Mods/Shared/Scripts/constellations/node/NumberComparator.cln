@@ -1,0 +1,82 @@
+
+game.states.NumberComparator = State{
+    function()
+
+        modules = {"shared.items"}
+
+        params.NumberTreshold = {type = EParamType.Number, default = 0.01, help = "If the number difference is smaller than or equal to this number value, the numbers will be considered equal."}
+
+        inputs.AChanged = {help = "The left side number changed"}
+        inputs.BChanged = {help = "The right side number changed"}
+
+        outputs.Equals = {help = "The difference between A and B is under the treshold value."}
+        outputs.Lower = {help = "A is lower than B."}
+        outputs.Higher = {help = "A is higher than B."}
+        outputs.ValueChanged = {help = "Either A or B changed in value."}
+
+
+        socketEvents.AChanged = function(ev)
+            --DebugText(me,"A changed: [1]",ev.Param)
+            me.Blackboard.SetFact("Cnst.NumberComparator.A", ev.Param)
+            helpers.DoNumberCheck()
+            TriggerOutput(outputs.ValueChanged, ev.Object, ev.Param)
+        end
+
+        socketEvents.BChanged = function(ev)
+            --DebugText(me,"B changed: [1]",ev.Param)
+            me.Blackboard.SetFact("Cnst.NumberComparator.B", ev.Param)
+            helpers.DoNumberCheck()
+            TriggerOutput(outputs.ValueChanged, ev.Object, ev.Param)
+        end
+
+        helpers.DoNumberCheck = function ()
+            local a = 0.0
+            if me.Blackboard.GetFact("Cnst.NumberComparator.A") ~= nil then
+                a = me.Blackboard.GetFact("Cnst.NumberComparator.A")
+            end
+            if math.floor(a) == a then
+                a = a + 0.00001
+            end
+
+            local b = 0.0
+            if me.Blackboard.GetFact("Cnst.NumberComparator.B") ~= nil then
+                b = me.Blackboard.GetFact("Cnst.NumberComparator.B")
+            end
+            if math.floor(b) == b then
+                b = b + 0.00001
+            end
+
+            local isEqual = math.abs(a-b) <= params.NumberTreshold
+            local higher = a > b and not isEqual
+
+            --A changed
+            if me.Blackboard.GetFact("Cnst.NumberComparator.A") == nil then
+                me.Blackboard.SetFact("Cnst.NumberComparator.A", a)
+            elseif a ~= me.Blackboard.GetFact("Cnst.NumberComparator.A") then
+                me.Blackboard.SetFact("Cnst.NumberComparator.A", a)
+                TriggerOutput(outputs.ValueChanged, nil)
+            end
+
+            --B changed
+            if me.Blackboard.GetFact("Cnst.NumberComparator.B") == nil then
+                me.Blackboard.SetFact("Cnst.NumberComparator.B", b)
+            elseif b ~= me.Blackboard.GetFact("Cnst.NumberComparator.B") then
+                me.Blackboard.SetFact("Cnst.NumberComparator.B", b)
+                TriggerOutput(outputs.ValueChanged, nil)
+            end
+
+            --Trigger isEqual/higher/lower outputs
+            if isEqual then
+                TriggerOutput(outputs.Equals, nil)
+                DebugText(me,"Equal ([1] - [2])",a,b)
+            elseif higher then
+                TriggerOutput(outputs.Higher, nil)
+                DebugText(me,"Higher ([1] - [2])",a,b)
+            else
+                TriggerOutput(outputs.Lower, nil)
+                DebugText(me,"Lower ([1] - [2])",a,b)
+            end
+        end
+
+    end
+}

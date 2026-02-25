@@ -1,0 +1,43 @@
+game.configs.Pump = Config{
+    params={
+        MaxSize = {
+            type = EParamType.Number,
+            required=false,
+            default=30,
+            help=[[Maximum approximate diameter of the surface.]]
+        },
+
+        SizeStep = {
+            type = EParamType.Number,
+            required=false,
+            default=5,
+            help=[[Approximate radius growth of the surface per.]]
+        },
+
+        Status = {
+            type = EParamType.String,
+            required = false,
+            help = [[Status applied when object is used]]
+        },
+
+        SurfaceType = {
+            type = EParamType.String,
+            required = true,
+            help = [[Surface type]],
+            default_value_provider = [[surfacetype]]
+        },
+
+        OffSet = {
+            type = EParamType.Vector3,
+            required = false,
+            default = Vector3(0.0, 0.0, 0.0)
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.Pump,
+            MaxSize = params.MaxSize,
+            SizeStep = params.SizeStep,
+            SurfaceType = params.SurfaceType,
+        },
+    }
+}

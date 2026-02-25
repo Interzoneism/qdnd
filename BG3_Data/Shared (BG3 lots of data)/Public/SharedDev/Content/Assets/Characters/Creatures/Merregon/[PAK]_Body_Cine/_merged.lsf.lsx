@@ -1,0 +1,796 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="AnimationSetBank">
+		<node id="AnimationSetBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="b4e778ab-1a9f-d450-cc55-cca28352ca59" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="MRRGN_CINE_DEV_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241410" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="FallBackAnimation" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets" />
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationBank">
+		<node id="AnimationBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="15.666668" />
+					<attribute id="ID" type="FixedString" value="157314bf-73cf-40d7-ec47-fc0e43090287" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_003" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="9cb51706-27e0-ce6e-90bc-54c78b5cc3f4" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0dd1af66-6537-b610-df68-72acda9882c8" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_003.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_003.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725559" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_L" />
+							<attribute id="Length" type="float" value="0.7333331" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="4.4" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_R" />
+							<attribute id="Length" type="float" value="0.6999998" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="4.766667" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_L" />
+							<attribute id="Length" type="float" value="2.0333333" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="5.133333" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_R" />
+							<attribute id="Length" type="float" value="5.2999997" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="5.5333333" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_L" />
+							<attribute id="Length" type="float" value="2.1999998" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="7.366667" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="12.933334" />
+					<attribute id="ID" type="FixedString" value="30f5bd60-2241-8bd3-2df0-3c093d5377b0" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_004" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="9cb51706-27e0-ce6e-90bc-54c78b5cc3f4" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0dd1af66-6537-b610-df68-72acda9882c8" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_004.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_004.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725559" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_L" />
+							<attribute id="Length" type="float" value="1.0666666" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="8.9" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_R" />
+							<attribute id="Length" type="float" value="1.0666666" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="9.666667" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_L" />
+							<attribute id="Length" type="float" value="0.6999998" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="10.6" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.33333337" />
+					<attribute id="ID" type="FixedString" value="5529320a-b3d6-e371-5f18-8839162c97ef" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_002_LOOP" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="9cb51706-27e0-ce6e-90bc-54c78b5cc3f4" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0dd1af66-6537-b610-df68-72acda9882c8" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_002_LOOP.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_002_LOOP.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725559" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="10.433334" />
+					<attribute id="ID" type="FixedString" value="65a59001-9486-e706-1fdf-32ec454f3282" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_006" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="9cb51706-27e0-ce6e-90bc-54c78b5cc3f4" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0dd1af66-6537-b610-df68-72acda9882c8" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_006.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_006.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725559" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_L" />
+							<attribute id="Length" type="float" value="4.1000004" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="3.6666667" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_R" />
+							<attribute id="Length" type="float" value="3.3666673" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="5.1666665" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_L" />
+							<attribute id="Length" type="float" value="0.33333302" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="8.133333" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_R" />
+							<attribute id="Length" type="float" value="1.8000002" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="8.633333" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.33333337" />
+					<attribute id="ID" type="FixedString" value="6d41ddd6-1e27-e57f-b00a-14dd103cdcce" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_003_LOOP" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="9cb51706-27e0-ce6e-90bc-54c78b5cc3f4" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0dd1af66-6537-b610-df68-72acda9882c8" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_003_LOOP.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_003_LOOP.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725559" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="15.000002" />
+					<attribute id="ID" type="FixedString" value="82792ada-9888-c0e3-2a73-6cd303d1b6b3" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_000" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="9cb51706-27e0-ce6e-90bc-54c78b5cc3f4" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0dd1af66-6537-b610-df68-72acda9882c8" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_000.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_000.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.33333337" />
+					<attribute id="ID" type="FixedString" value="865add2a-8c87-9812-fb31-972175e9f010" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_006_LOOP" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="9cb51706-27e0-ce6e-90bc-54c78b5cc3f4" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0dd1af66-6537-b610-df68-72acda9882c8" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_006_LOOP.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_006_LOOP.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725559" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="10.433334" />
+					<attribute id="ID" type="FixedString" value="8d07b3b0-b356-829e-0a4f-15e2f853071f" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_007" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="9cb51706-27e0-ce6e-90bc-54c78b5cc3f4" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0dd1af66-6537-b610-df68-72acda9882c8" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_007.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_007.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725559" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_R" />
+							<attribute id="Length" type="float" value="0.4333334" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="4.1666665" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_R" />
+							<attribute id="Length" type="float" value="0.2666664" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="6.4" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="15.666668" />
+					<attribute id="ID" type="FixedString" value="8d1d23f2-aef3-2b66-e833-44865f0cecd2" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_002" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="9cb51706-27e0-ce6e-90bc-54c78b5cc3f4" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0dd1af66-6537-b610-df68-72acda9882c8" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_002.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_002.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725559" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_R" />
+							<attribute id="Length" type="float" value="2.2333333" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="1.5333333" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_L" />
+							<attribute id="Length" type="float" value="0.86666656" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="3.7333333" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.33333337" />
+					<attribute id="ID" type="FixedString" value="947fb263-2348-7cce-9abc-06c43aa674af" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_007_LOOP" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="9cb51706-27e0-ce6e-90bc-54c78b5cc3f4" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0dd1af66-6537-b610-df68-72acda9882c8" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_007_LOOP.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_007_LOOP.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725559" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.33333337" />
+					<attribute id="ID" type="FixedString" value="9db21eb8-cbd7-d137-5a86-ac8b7ec3d004" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_004_LOOP" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="9cb51706-27e0-ce6e-90bc-54c78b5cc3f4" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_004_LOOP.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_004_LOOP.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725559" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="15.000002" />
+					<attribute id="ID" type="FixedString" value="ace21c78-4878-4300-915f-bfb6fe09c641" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_005" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="9cb51706-27e0-ce6e-90bc-54c78b5cc3f4" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0dd1af66-6537-b610-df68-72acda9882c8" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_005.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_005.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725559" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_L" />
+							<attribute id="Length" type="float" value="0.23333311" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="6.9333334" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_L" />
+							<attribute id="Length" type="float" value="0.16666698" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="8.266666" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.33333337" />
+					<attribute id="ID" type="FixedString" value="ae753c30-85ec-a4f8-2561-cb4276246f83" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_001_LOOP" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="9cb51706-27e0-ce6e-90bc-54c78b5cc3f4" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_001_LOOP.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_001_LOOP.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725559" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.33333337" />
+					<attribute id="ID" type="FixedString" value="b566ca6b-c75b-e0eb-d9d1-ac7fd08ceef7" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_000_LOOP" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="9cb51706-27e0-ce6e-90bc-54c78b5cc3f4" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0dd1af66-6537-b610-df68-72acda9882c8" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_000_LOOP.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_000_LOOP.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725559" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.33333337" />
+					<attribute id="ID" type="FixedString" value="b974164a-4a26-2106-bda7-f8ada12b2ebc" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_005_LOOP" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="9cb51706-27e0-ce6e-90bc-54c78b5cc3f4" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="0dd1af66-6537-b610-df68-72acda9882c8" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_005_LOOP.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_DeathPose_005_LOOP.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725559" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="12.933334" />
+					<attribute id="ID" type="FixedString" value="fbea2918-5870-bf8f-ba16-b2908d3d17f6" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_001" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="9cb51706-27e0-ce6e-90bc-54c78b5cc3f4" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_001.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Orthon_TrespassLair/MRRGN_Rig_SCENE_SHA_OrthTrpsLair_KillEachOther_001.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725559" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_R" />
+							<attribute id="Length" type="float" value="1.0333328" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="8.666667" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_R" />
+							<attribute id="Length" type="float" value="0.73333263" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="9.733334" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_R" />
+							<attribute id="Length" type="float" value="2.3000002" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="10.633333" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_L" />
+							<attribute id="Length" type="float" value="0.1333332" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="10.766666" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

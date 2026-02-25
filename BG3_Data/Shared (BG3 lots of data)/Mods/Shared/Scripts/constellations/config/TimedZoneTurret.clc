@@ -1,0 +1,146 @@
+game.configs.TimedZoneTurret = Config{
+    params={
+        Skill = {
+            type = EParamType.String,
+            help = [[The skill checked.]],
+            required = false,
+            default = [[Perception]]
+        },
+        VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while item is on.]],
+            required = false,
+            default = [[]]
+        },
+        SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when trap is turned off]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_Off]]
+        },
+        StartRevealed = {
+            type = EParamType.Bool,
+            help = [[Does the mine start revealed?]],
+            required = false,
+            default = false
+        },
+        VFX = {
+            type = EParamType.String,
+            help = [[VFX played when the zone spell fires]],
+            required = false,
+        },
+        Type = {
+            type = EParamType.String,
+            help = [[            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[Interactable]]
+        },
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the trap start on?]],
+            required = false,
+            default = true
+        },
+        MinDistance = {
+            type = EParamType.Number,
+            help = [[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]],
+            required = false,
+            default = 6
+        },
+        VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the the VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        Spell = {
+            type = EParamType.String,
+            help = [[Zone Spell]],
+            required = true,
+            default_value_provider = [[spell_zone]],
+        },
+        SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when trap is turned on]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_On]]
+        },
+        Period = {
+            type = EParamType.Number,
+            help = [[Delay between shots]],
+            required = true,
+        },
+        Delay = {
+            type = EParamType.Number,
+            default = 0.0,
+            help = [[Delay before first shot. Affects immediate shots as well.]],
+        },
+        DestroyOnDisarm = {
+            type = EParamType.Bool,
+            help = [[Does the item break on Disarm?]],
+            required = false,
+            default = true
+        },
+        Immediate = {
+            type = EParamType.Bool,
+            help = [[Does the mine shoot the zone spell immediately when enabled instead of first going through a period?]],
+            required = false,
+            default = false
+        },
+        DC = {
+            type = EParamType.String,
+            help = [[The skill check DC.]],
+            required = false,
+            default = [[DC_Legacy_15_bddbb9b8-a242-4c3e-a2eb-3fd274c0c539]]
+        },
+        Rotation = {
+            type = EParamType.Vector3,
+            help = [[Rotation relative to forward direction in which the zone spell will be cast.]],
+            required = false,
+            default = math.Vector3(0, 0, 0)
+        },
+        Offset = {
+            type = EParamType.Vector3,
+            help = [[Offset for the zone spell's start point.]],
+            required = false,
+            default = math.Vector3(0, 0, 0)
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.TimedZoneTurret,
+            DC = params.DC,
+            DestroyOnDisarm = params.DestroyOnDisarm,
+            Immediate = params.Immediate,
+            MinDistance = params.MinDistance,
+            Period = params.Period,
+            Delay = params.Delay,
+            Skill = params.Skill,
+            SoundOff = params.SoundOff,
+            SoundOn = params.SoundOn,
+            Spell = params.Spell,
+            StartEnabled = params.StartEnabled,
+            Type = params.Type,
+            VFX = params.VFX,
+            VFXOn = params.VFXOn,
+            VFXOnBone = params.VFXOnBone,
+            Rotation = params.Rotation,
+            Offset = params.Offset,
+        },
+    },
+    inputs={
+        Enable=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+        Disable=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+    },
+    outputs={
+        Enabled=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Enabled]]}}},
+        Disabled=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Disabled]]}}},
+        DisarmFailed=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.DisarmFailed]]}}},
+        Disarmed=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Disarmed]]}}},
+    }
+}

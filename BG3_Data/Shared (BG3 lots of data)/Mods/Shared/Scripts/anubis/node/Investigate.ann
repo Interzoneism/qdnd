@@ -1,0 +1,420 @@
+
+-- our default investigation state used by humanoid characters
+
+game.states.Investigate = State{function ()
+
+    params.InvestigateAD = {type = EParamType.String, required = false, default="GEB_AD_Investigation_366afda8-e646-a6cb-1b6d-99d65927ece9", help=[[
+        Dialog to play while investigating
+    ]]}
+
+    -- local state
+
+    -- default AD to play while investigating
+    local defaultInvestigationAD = Dialog(params.InvestigateAD)
+    -- location of the (first) criminal when the investigation started
+    local investigationCriminalLocation
+    -- location where to start investigation
+    local crimePosToInvestigate
+    -- actual AD to play while investigating (can be overridden)
+    local investigationAD
+    -- told code that we arrived at the crime location (called DisturbanceDInvestigationDone)
+    local investigationDone
+    -- received event from story indicating that all investigation variables have been set
+    local hasFinalInvestigationPos = false
+    -- speed with which to go to crimePosToInvestigate
+    local movementSpeed = "Walk"
+    -- finished going to crimePosToInvestigate
+    local arrivedAtScene = false
+    -- should not move around nor talk during investigation behaviours
+    local investigationNoWalkingTalking = false
+    -- custom investigation behaviour node name, if any
+    local customInvestigationBehaviour = nil
+
+    helpers.ArrivedAtScene = function()
+        if not arrivedAtScene then
+            if not investigationDone then
+                investigationDone = true
+                DisturbanceInvestigationDone(me)
+            end
+            arrivedAtScene = true
+        end
+    end
+
+    -- api
+
+    api.GetInvestigateNoWalkingTalking = function()
+        return investigationNoWalkingTalking
+    end
+
+    api.GetInvestigationAD = function()
+        return investigationAD
+    end
+
+    api.GetCrimePosToInvestigate = function()
+        return crimePosToInvestigate
+    end
+
+    api.GetInvestigationCriminalLocation = function()
+        return investigationCriminalLocation
+    end
+
+    api.ClearCustomInvestigationBehaviour = function()
+        customInvestigationBehaviour = nil
+        return
+    end
+
+    -- events
+
+    events.EntityEvent = function(e)
+        if e.TargetEntity == me then
+            if e.Event == "CRIME_InvestigationPosSet" then
+                hasFinalInvestigationPos = true
+                do
+                    local storedFact = me.Blackboard.GetFact("CrimePos")
+                    crimePosToInvestigate = storedFact or crimePosToInvestigate
+                end
+                do
+                    local storedFact = me.Blackboard.GetFact("CRIME_InvestigationCriminalLocation")
+                    investigationCriminalLocation = storedFact or crimePosToInvestigate
+                end
+                do
+                    local storedFact = me.Blackboard.GetFact("bool_RunToInvestigationScene")
+                    if (storedFact == 1) then
+                        movementSpeed = "Sprint"
+                    else
+                        movementSpeed = "Run"
+                    end
+                end
+                do
+                    local storedFact = me.Blackboard.GetFact("CRIME_InvestigationNoWalkingTalking")
+                    if storedFact == 1 then
+                        investigationNoWalkingTalking = true
+                    else
+                        investigationNoWalkingTalking = false
+                    end
+                end
+                if investigationDone then
+                    -- immediately activate the "looking for suspects behaviour"
+                    DisturbanceInvestigationDone(me)
+                end
+            elseif e.Event == "CRIME_StartLookingForInterrogationSuspects" then
+                helpers.ArrivedAtScene()
+            end
+        end
+    end
+
+    events.DisturbanceInvestigationRequest = function(e)
+        crimePosToInvestigate = e.CrimePos
+        investigationDone = e.ReactOnTheWay
+        customInvestigationBehaviour = e.CustomInvestigationBehaviour
+        if e.CustomInvestigationAD ~= nil then
+            investigationAD = Dialog(e.CustomInvestigationAD)
+        else
+            investigationAD = defaultInvestigationAD
+        end
+
+        me.Blackboard.SetFact("CrimePos", crimePosToInvestigate)
+        hasFinalInvestigationPos = false
+        investigationNoWalkingTalking = false
+        movementSpeed = "Run"
+        arrivedAtScene = false
+        -- Ask story for a possible alternative investigation location
+        SetUnicastEntityEvent(me, "CRIME_SetCrimeInvestigationPos")
+    end
+
+    -- actions
+
+    nodes.WaitingForInterrogationAD = Action{
+        function()
+            WaitForInterrupt()
+        end
+        ,
+        Valid = function()
+            return
+              (me.Character.DisturbanceHandlingState == ECrimeInvestigationState.Confronting) and
+              IsInDialog(me, false)
+        end
+    }
+
+    nodes.WalkToCrimeScene = Action{
+        CanEnter = function()
+            return hasFinalInvestigationPos and not arrivedAtScene
+        end,
+
+        function()
+            local posToMoveTo = nil
+            if IsInDangerousSurfaceFor(crimePosToInvestigate, me.Character, 12) then
+                posToMoveTo = FindValidPosition(crimePosToInvestigate, 12.0, me)
+            end
+            -- FindValidPosition returns nil when it can't find a valid position
+            if posToMoveTo ~= nil then
+                crimePosToInvestigate = posToMoveTo
+            end
+            -- first try to get really close, to reduce the chance that we stay standing in front of a closed door
+            local moveResult = MoveTo(crimePosToInvestigate, MovementSpeed[movementSpeed], false, false, 0.0, 2.0, false)
+            if moveResult ~= error.MovementError.None then
+                -- more leniency and longer distance
+                moveResult = MoveTo(crimePosToInvestigate, MovementSpeed[movementSpeed], false, true, 2.0, 5.0, false)
+                if moveResult ~= error.MovementError.None then
+                    SetUnicastEntityEvent(me, "GEB_Investigation_SceneUnreachable")
+                end
+            end
+            Sleep(2.0)
+            helpers.ArrivedAtScene()
+        end
+    }
+
+    nodes.Investigate = Selector {
+        function(nodes)
+            local result = nil
+            if customInvestigationBehaviour ~= nil then
+                result = nodes.TryGetChild(customInvestigationBehaviour)
+                if result == nil then
+                    DebugLogCritical("Could not find investigation behaviour with name [1] for investigator [2] for crime id [3]", customInvestigationBehaviour, me.Name, me.HandlingDisturbanceID)
+                end
+            end
+            if result == nil then
+                result = nodes.TryGetChild("Default")
+            end
+            return result
+        end,
+
+        game.actions.InvestigationBehaviours,
+
+        CanEnter = function()
+            return hasFinalInvestigationPos and arrivedAtScene
+        end
+    }
+
+    nodes.Idle = Action {
+        function()
+            WaitForInterrupt()
+        end,
+
+        Valid = function()
+            return not hasFinalInvestigationPos
+        end
+    }
+end}
+
+game.actions.InvestigationBehaviours.Default = Action{
+    function(state)
+        local investigateNoWalkingTalking = state.Investigate.GetInvestigateNoWalkingTalking()
+        if not investigateNoWalkingTalking and IsInDangerousSurfaceFor(me) then
+            FleeFromDangerousSurface()
+        end
+
+        do
+            local timeToSleep = math.random() + 1.0
+            Sleep(timeToSleep)
+        end
+
+        do
+            local dX = math.random()*2.0 - 1.0
+            local dZ = math.random()*2.0 - 1.0
+            local offset = ls.math.Vector3(dX, 0, dZ)
+            local randomLookAt = me.Position + offset
+            SteerTo(randomLookAt)
+        end
+
+        if not investigateNoWalkingTalking then
+            do
+                local timeToSleep = math.random() + 2.0
+                local investigationAD = state.Investigate.GetInvestigationAD()
+                if investigationAD ~= nil then
+                    StartAutomatedDialog(investigationAD, false, me)
+                end
+                Sleep(timeToSleep)
+            end
+            try
+                Wander(10.0, 5.0, MovementSpeed.Walk)
+            catch e if ls.CheckType(e, error.MovementFailed) then
+                Sleep(2.0 + math.random())
+            end
+
+            local crimePosToInvestigate = state.Investigate.GetCrimePosToInvestigate()
+            local distance = GetDistanceTo(crimePosToInvestigate, me)
+            if distance >= 15.0 then
+                try
+                    MoveInRange(crimePosToInvestigate, 3.0, 8.0, MovementSpeed.Walk)
+                catch e if ls.CheckType(e, error.MovementFailed) then
+                    Sleep(1.0 + math.random())
+                end
+            end
+        end
+    end
+}
+
+game.actions.InvestigationBehaviours.HideFromCriminal = Action
+{
+    function(state)
+        local criminalPosition = state.Investigate.GetInvestigationCriminalLocation()
+        local investigateNoWalkingTalking = state.Investigate.GetInvestigateNoWalkingTalking()
+        local AD = state.Investigate.GetInvestigationAD()
+
+        if not investigateNoWalkingTalking and IsInDangerousSurfaceFor(me) then
+            FleeFromDangerousSurface()
+        end
+
+        local criminalVector = criminalPosition - me.Position
+        local criminalDirection = criminalVector / criminalVector.Length
+        local targetPos
+        local offset
+        local posCount = 0
+        -- run away from the criminal
+        repeat
+            local dX = math.random() * 0.7 - 0.35
+            local dZ = math.random() * 0.7 - 0.35
+            offset = ls.math.Vector3(dX, 0, dZ)
+            local checkPos = me.Position - (criminalDirection + offset) * (1.5 + 8.5 * math.random())
+            targetPos = FindValidPosition(checkPos, 2.0, me, true)
+            if (targetPos ~= nil) and
+               not IsReachable(me.Character, targetPos) then
+                targetPos = nil
+            end
+            posCount = posCount + 1
+        until (targetPos ~= nil) or
+                (posCount == 5)
+        local moveResult = error.MovementError.Unknown
+        if not investigateNoWalkingTalking and targetPos ~= nil then
+            moveResult = MoveTo(targetPos, MovementSpeed.Run, false, false, 0.5, 2.5, false)
+        end
+        SteerTo(me.Position + criminalDirection + offset * 2.0)
+        Sleep(0.5)
+        if not investigateNoWalkingTalking and (moveResult ~= error.MovementError.None) then
+            try
+                FleeFrom(RelationType.All, 10.0)
+            catch e if ls.CheckType(e, error.MovementFailed) then
+                Sleep(math.random() * 3.0 + 4.0)
+            end
+        else
+            if not investigateNoWalkingTalking and (math.random() < 0.25) then
+                StartAutomatedDialog(AD, false, me)
+            end
+            Sleep(math.random() * 10.0 + 3.0)
+        end
+    end,
+
+    OnEnter = function()
+        ApplyStatus(me, "ANIM_COWER", true, -1.0)
+    end,
+
+    OnLeave = function()
+        RemoveStatus(me, "ANIM_COWER")
+    end
+}
+
+game.actions.InvestigationBehaviours.EdgeTowardsCriminal = Action
+{
+    function(state)
+        local criminalPosition = state.Investigate.GetInvestigationCriminalLocation()
+        local originalCrimePosToInvestigate = state.Investigate.GetCrimePosToInvestigate()
+        local investigateNoWalkingTalking = state.Investigate.GetInvestigateNoWalkingTalking()
+        local AD = state.Investigate.GetInvestigationAD()
+
+        if not investigateNoWalkingTalking and IsInDangerousSurfaceFor(me) then
+            FleeFromDangerousSurface()
+        end
+
+        -- start by sprinting in the direction of the criminal up to a certain distance
+        local initialDistance = GetDistanceTo(me, criminalPosition)
+        try
+            MoveInRange(criminalPosition, initialDistance * 0.3, initialDistance * 0.4, MovementSpeed.Run)
+        catch e if ls.CheckType(e, error.MovementFailed) then
+            -- do nothing, immediately skip to edging behaviour
+            DebugText(me, "Couldn't find close position to run to, skipping to edging closer")
+        end
+
+        local criminalVector = criminalPosition - originalCrimePosToInvestigate
+        local criminalDirection = (criminalVector.Length ~= 0) and (criminalVector / criminalVector.Length) or (ls.math.Vector3(math.random(), 0, math.random()))
+        local targetPos
+        local posCount = 0
+        local sqDistToCriminalPosition = (criminalPosition - me.Position) * (criminalPosition - me.Position)
+        local sqDistToOriginalAttackTarget = (originalCrimePosToInvestigate - me.Position) * (originalCrimePosToInvestigate - me.Position)
+        local beyondOriginalCrimePos =
+           sqDistToOriginalAttackTarget > ((originalCrimePosToInvestigate - criminalPosition) * (originalCrimePosToInvestigate - criminalPosition))
+        local nearOriginalCriminalPos = sqDistToCriminalPosition < 4.0
+        -- once near or beyond the original criminal position, start branching out
+        local offsetFactor = (nearOriginalCriminalPos or beyondOriginalCrimePos) and 0.6 or 0.35
+        Sleep(math.random())
+        -- go in the direction of the criminal
+        repeat
+            -- initially a value in interval [-offsetFactor..offsetFactor[
+	        -- if we can't find a valid position, widen the search to broader angles to increase the chance of finding something
+	        -- (to reduce the chance we get stuck against a big object)
+            local dX = math.random() * offsetFactor * (2 + posCount / 5.0) - offsetFactor * (1 + posCount / 10.0)
+            local dZ = math.random() * offsetFactor * (2 + posCount / 5.0) - offsetFactor * (1 + posCount / 10.0)
+            local offset = ls.math.Vector3(dX, 0, dZ)
+            -- try to go between 2 and 8 metres in the selected direction
+            local checkPos = me.Position + (criminalDirection + offset) * (2 + 8.0 * math.random())
+            targetPos = FindValidPosition(checkPos, 2.0, me, true)
+            if (targetPos ~= nil) and
+               not IsReachable(me.Character, targetPos) then
+                targetPos = nil
+            end
+            posCount = posCount + 1
+        until (targetPos ~= nil) or
+                (posCount == 5)
+        if not investigateNoWalkingTalking and (targetPos ~= nil) then
+            DebugText(me, "Edging to [1]", targetPos)
+            MoveTo(targetPos, MovementSpeed.Run, false, true, 0.5, 2.5, false)
+        end
+        local lookCount = math.random(3) + 1
+        if not investigateNoWalkingTalking and (math.random() < 0.75) then
+            StartAutomatedDialog(AD, false, me)
+        end
+        -- look around
+        repeat
+            if not investigateNoWalkingTalking and IsInDangerousSurfaceFor(me) then
+                FleeFromDangerousSurface()
+            end
+            local dX = math.random() * 1.5 - 0.75
+            local dZ = math.random() * 1.5 - 0.75
+            local offset = ls.math.Vector3(dX, 0, dZ)
+            SteerTo(me.Position + offset)
+            Sleep(math.random() * 3.0 + 1.0)
+            lookCount = lookCount - 1
+        until lookCount == 0
+    end
+}
+
+game.actions.InvestigationBehaviours.IdlingReinforcement = Action{
+    function(state)
+        local investigateNoWalkingTalking = state.Investigate.GetInvestigateNoWalkingTalking()
+        local crimePosToInvestigate = state.Investigate.GetCrimePosToInvestigate()
+        if not investigateNoWalkingTalking and IsInDangerousSurfaceFor(me) then
+            FleeFromDangerousSurface()
+        end
+
+        while true do
+            if not investigateNoWalkingTalking then
+                local distance = GetDistanceTo(crimePosToInvestigate, me)
+                if distance >= 15.0 then
+                    try
+                        -- the random is to reduce the chance that multiple guards
+                        -- will overlap (they can even end up on exactly the same tile)
+                        MoveInRange(crimePosToInvestigate, 2.0 + math.random(2.0), 8.0, MovementSpeed.Walk)
+                    catch e if ls.CheckType(e, error.MovementFailed) then
+                        Sleep(5.0 + math.random())
+                    end
+                end
+
+                Sleep(math.random() + 0.5)
+                try
+                    Wander(2.0 + math.random(4.0), 3.0 + math.random(2.0), MovementSpeed.Stroll, crimePosToInvestigate)
+                catch e if ls.CheckType(e, error.MovementFailed) then
+                    Sleep(2.0 + math.random())
+                end
+            end
+
+            do
+                local dX = math.random()*2.0 - 1.0
+                local dZ = math.random()*2.0 - 1.0
+                local offset = ls.math.Vector3(dX, 0, dZ)
+                local randomLookAt = me.Position + offset
+                SteerTo(randomLookAt)
+            end
+            Sleep(math.random() + 1.0)
+        end
+    end
+}

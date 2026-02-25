@@ -1,0 +1,1939 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="CharacterVisualBank">
+		<node id="CharacterVisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="BaseVisual" type="FixedString" value="ad4b58c5-d668-fef4-7882-b3ccee3f533f" />
+					<attribute id="BodySetVisual" type="FixedString" value="974b3204-c1b7-a211-afcb-9102c922818f" />
+					<attribute id="ID" type="FixedString" value="8be33ffa-6a00-d7e5-0833-993c86f13dd0" />
+					<attribute id="Name" type="LSString" value="CROWD_HUM_MS_Base" />
+					<attribute id="ShowEquipmentVisuals" type="bool" value="False" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209008" />
+					<children>
+						<node id="MaterialOverrides">
+							<attribute id="MaterialResource" type="FixedString" value="" />
+							<children>
+								<node id="ColorPreset">
+									<attribute id="ForcePresetValues" type="bool" value="False" />
+									<attribute id="GroupName" type="FixedString" value="" />
+									<attribute id="MaterialPresetResource" type="FixedString" value="" />
+								</node>
+								<node id="MaterialPresets" />
+							</children>
+						</node>
+						<node id="RealMaterialOverrides" />
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="BaseVisual" type="FixedString" value="d5ca831e-40eb-8b06-e7bf-56446194f24a" />
+					<attribute id="BodySetVisual" type="FixedString" value="236cb37e-9e39-ac21-ed71-e70a4542dcba" />
+					<attribute id="ID" type="FixedString" value="9739b7f6-cc70-6aae-1124-bf6dd9ec9124" />
+					<attribute id="Name" type="LSString" value="CROWD_HUM_FS_Body_A" />
+					<attribute id="ShowEquipmentVisuals" type="bool" value="False" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725657" />
+					<children>
+						<node id="MaterialOverrides">
+							<attribute id="MaterialResource" type="FixedString" value="" />
+							<children>
+								<node id="ColorPreset">
+									<attribute id="ForcePresetValues" type="bool" value="False" />
+									<attribute id="GroupName" type="FixedString" value="" />
+									<attribute id="MaterialPresetResource" type="FixedString" value="" />
+								</node>
+								<node id="MaterialPresets" />
+							</children>
+						</node>
+						<node id="RealMaterialOverrides" />
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="SkeletonBank">
+		<node id="SkeletonBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="DynamicPhysicsResourceID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="39d9ffce-6d23-cbea-9a71-b3a940a329a2" />
+					<attribute id="IKRigResourceID" type="FixedString" value="" />
+					<attribute id="Name" type="LSString" value="CROWD_HUM_MS_Base" />
+					<attribute id="PreviewAnimationResource" type="FixedString" value="" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="974b3204-c1b7-a211-afcb-9102c922818f" />
+					<attribute id="RagdollResourceID" type="FixedString" value="" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/Crowds/Humans/_MaleStrong/CROWD_HUM_MS_Base.GR2" />
+					<attribute id="SpringResourceID" type="FixedString" value="" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/Crowds/Humans/_MaleStrong/CROWD_HUM_MS_Base.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209014" />
+					<children>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_R_HandFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_L_HandFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="2" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_MouthFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="4" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_BodyFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="3" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="DynamicPhysicsResourceID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="e023febb-3591-5c6e-14e3-13f98b3f37c8" />
+					<attribute id="IKRigResourceID" type="FixedString" value="" />
+					<attribute id="Name" type="LSString" value="CROWD_HUM_FS_Base" />
+					<attribute id="PreviewAnimationResource" type="FixedString" value="" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RagdollResourceID" type="FixedString" value="" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/Crowds/Humans/_FemaleStrong/CROWD_HUM_FS_Base.GR2" />
+					<attribute id="SpringResourceID" type="FixedString" value="" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/Crowds/Humans/_FemaleStrong/CROWD_HUM_FS_Base.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209014" />
+					<children>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_BodyFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="3" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_MouthFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="4" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_L_HandFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="2" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_R_HandFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="1" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationSetBank">
+		<node id="AnimationSetBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="4a9d11ac-831e-bed5-4ab4-e53d615dc68d" />
+					<attribute id="Name" type="LSString" value="CROWDS_HUM_FS_AnimO_REFUGEE_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209012" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="FallBackAnimation" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets">
+											<children>
+												<node id="Object">
+													<attribute id="FallBackSubSet" type="FixedString" value="" />
+													<attribute id="MapKey" type="FixedString" value="" />
+													<children>
+														<node id="Animation">
+															<children>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9efe821e-afb2-2eb8-61da-d7d2178e7c24" />
+																	<attribute id="MapKey" type="FixedString" value="0532ad73-988e-4b70-bb96-434bb2532bad" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="55761749-3b2a-9f62-69d3-a511eb14352b" />
+																	<attribute id="MapKey" type="FixedString" value="577bcf78-3d3d-4bc3-a064-fc59b2280153" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="5d578ab8-fc38-5f87-8748-48c86f7ad062" />
+					<attribute id="Name" type="LSString" value="CROWD_HUM_MS_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209012" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="FallBackAnimation" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets">
+											<children>
+												<node id="Object">
+													<attribute id="FallBackSubSet" type="FixedString" value="" />
+													<attribute id="MapKey" type="FixedString" value="" />
+													<children>
+														<node id="Animation">
+															<children>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="acb4f887-ffad-7889-7c11-2242c679e5b1" />
+																	<attribute id="MapKey" type="FixedString" value="6e1041c4-7e59-45c4-8ad9-e47480b95020" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="acb4f887-ffad-7889-7c11-2242c679e5b1" />
+																	<attribute id="MapKey" type="FixedString" value="cf3f0e09-1a9e-430d-8be2-7a4c0c8a875e" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f5361fda-34f3-e296-b307-0ec0f41298b0" />
+																	<attribute id="MapKey" type="FixedString" value="0532ad73-988e-4b70-bb96-434bb2532bad" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5f1da564-711a-a875-c36e-8a4f5316ad6c" />
+																	<attribute id="MapKey" type="FixedString" value="577bcf78-3d3d-4bc3-a064-fc59b2280153" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="68926644-58bb-22d1-c9bf-d49f27a7d124" />
+																	<attribute id="MapKey" type="FixedString" value="821aed88-e17b-4b85-b37a-533f90fbba84" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="6e65396a-be2e-2883-4efa-dcab72003a1d" />
+					<attribute id="Name" type="LSString" value="CROWDS_HUM_FS_AnimO_CITIZEN_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209012" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="FallBackAnimation" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets">
+											<children>
+												<node id="Object">
+													<attribute id="FallBackSubSet" type="FixedString" value="" />
+													<attribute id="MapKey" type="FixedString" value="" />
+													<children>
+														<node id="Animation">
+															<children>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="55761749-3b2a-9f62-69d3-a511eb14352b" />
+																	<attribute id="MapKey" type="FixedString" value="577bcf78-3d3d-4bc3-a064-fc59b2280153" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9efe821e-afb2-2eb8-61da-d7d2178e7c24" />
+																	<attribute id="MapKey" type="FixedString" value="0532ad73-988e-4b70-bb96-434bb2532bad" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="9e07eaad-87c3-b5ca-cbb3-11a3e3a83d2d" />
+					<attribute id="Name" type="LSString" value="CROWDS_HUM_MS_AnimO_REFUGEE_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209012" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="FallBackAnimation" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets">
+											<children>
+												<node id="Object">
+													<attribute id="FallBackSubSet" type="FixedString" value="" />
+													<attribute id="MapKey" type="FixedString" value="" />
+													<children>
+														<node id="Animation">
+															<children>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="75f80c26-587f-4294-1ab4-9801b2fbb5d1" />
+																	<attribute id="MapKey" type="FixedString" value="0532ad73-988e-4b70-bb96-434bb2532bad" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="27645827-2818-c285-48d4-19438ce25d30" />
+																	<attribute id="MapKey" type="FixedString" value="577bcf78-3d3d-4bc3-a064-fc59b2280153" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="e79bc74a-dfb1-22da-6283-f2ae01772414" />
+					<attribute id="Name" type="LSString" value="CROWD_HUM_FS_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209012" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="FallBackAnimation" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets">
+											<children>
+												<node id="Object">
+													<attribute id="FallBackSubSet" type="FixedString" value="" />
+													<attribute id="MapKey" type="FixedString" value="" />
+													<children>
+														<node id="Animation">
+															<children>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="752a3fac-a206-f8ae-5036-77924ba4384c" />
+																	<attribute id="MapKey" type="FixedString" value="821aed88-e17b-4b85-b37a-533f90fbba84" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9025b052-6448-2fa7-67ef-09a9059e255e" />
+																	<attribute id="MapKey" type="FixedString" value="577bcf78-3d3d-4bc3-a064-fc59b2280153" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="084a8d21-957a-08be-2999-e4aa4c8a7056" />
+																	<attribute id="MapKey" type="FixedString" value="0532ad73-988e-4b70-bb96-434bb2532bad" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="e957ce65-5007-692a-0004-ac6bcc9f6afd" />
+																	<attribute id="MapKey" type="FixedString" value="6e1041c4-7e59-45c4-8ad9-e47480b95020" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="e957ce65-5007-692a-0004-ac6bcc9f6afd" />
+																	<attribute id="MapKey" type="FixedString" value="cf3f0e09-1a9e-430d-8be2-7a4c0c8a875e" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="f9aa105c-f163-5b91-b373-17e126ecd487" />
+					<attribute id="Name" type="LSString" value="CROWDS_HUM_MS_AnimO_CITIZEN_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209012" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="FallBackAnimation" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets">
+											<children>
+												<node id="Object">
+													<attribute id="FallBackSubSet" type="FixedString" value="" />
+													<attribute id="MapKey" type="FixedString" value="" />
+													<children>
+														<node id="Animation">
+															<children>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="27645827-2818-c285-48d4-19438ce25d30" />
+																	<attribute id="MapKey" type="FixedString" value="577bcf78-3d3d-4bc3-a064-fc59b2280153" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="75f80c26-587f-4294-1ab4-9801b2fbb5d1" />
+																	<attribute id="MapKey" type="FixedString" value="0532ad73-988e-4b70-bb96-434bb2532bad" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationBank">
+		<node id="AnimationBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2" />
+					<attribute id="ID" type="FixedString" value="084a8d21-957a-08be-2999-e4aa4c8a7056" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CROWD_HUM_FS_Rig_DFLT_LOCO_Walk_F_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="236cb37e-9e39-ac21-ed71-e70a4542dcba" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="e023febb-3591-5c6e-14e3-13f98b3f37c8" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/Crowds/Humans/_FemaleStrong/CROWD_HUM_FS_Rig/CROWD_HUM_FS_Rig_DFLT_LOCO_Walk_F_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/Crowds/Humans/_FemaleStrong/CROWD_HUM_FS_Rig/CROWD_HUM_FS_Rig_DFLT_LOCO_Walk_F_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209006" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.23510204" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.7256236" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="1.2277551" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="1.7589116" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4.9666667" />
+					<attribute id="ID" type="FixedString" value="27645827-2818-c285-48d4-19438ce25d30" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CROWD_HUM_MS_Rig_RFG_DFLT_LOCO_Stroll_F_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="974b3204-c1b7-a211-afcb-9102c922818f" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="39d9ffce-6d23-cbea-9a71-b3a940a329a2" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/Crowds/Humans/_MaleStrong/CROWD_HUM_MS_Rig/CROWD_HUM_MS_Rig_RFG_DFLT_LOCO_Stroll_F_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/Crowds/Humans/_MaleStrong/CROWD_HUM_MS_Rig/CROWD_HUM_MS_Rig_RFG_DFLT_LOCO_Stroll_F_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.38893425" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="1.2074376" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="2.060771" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="2.9257143" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="3.662948" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="4.527891" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.4666667" />
+					<attribute id="ID" type="FixedString" value="55761749-3b2a-9f62-69d3-a511eb14352b" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CROWD_HUM_FS_Rig_RFG_DFLT_LOCO_Stroll_F_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="236cb37e-9e39-ac21-ed71-e70a4542dcba" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="e023febb-3591-5c6e-14e3-13f98b3f37c8" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/Crowds/Humans/_FemaleStrong/CROWD_HUM_FS_Rig/CROWD_HUM_FS_Rig_RFG_DFLT_LOCO_Stroll_F_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/Crowds/Humans/_FemaleStrong/CROWD_HUM_FS_Rig/CROWD_HUM_FS_Rig_RFG_DFLT_LOCO_Stroll_F_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.37442178" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.9839456" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="1.5673469" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="2.1449432" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4.9666667" />
+					<attribute id="ID" type="FixedString" value="5f1da564-711a-a875-c36e-8a4f5316ad6c" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CROWD_HUM_MS_Rig_DFLT_LOCO_Stroll_F_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="974b3204-c1b7-a211-afcb-9102c922818f" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="39d9ffce-6d23-cbea-9a71-b3a940a329a2" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/Crowds/Humans/_MaleStrong/CROWD_HUM_MS_Rig/CROWD_HUM_MS_Rig_DFLT_LOCO_Stroll_F_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/Crowds/Humans/_MaleStrong/CROWD_HUM_MS_Rig/CROWD_HUM_MS_Rig_DFLT_LOCO_Stroll_F_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209006" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.38312924" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="1.2887075" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="2.054966" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="2.8792744" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="3.7209978" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="4.591746" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.6666667" />
+					<attribute id="ID" type="FixedString" value="68926644-58bb-22d1-c9bf-d49f27a7d124" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CROWD_HUM_MS_Rig_DFLT_LOCO_Run_F_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="974b3204-c1b7-a211-afcb-9102c922818f" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="39d9ffce-6d23-cbea-9a71-b3a940a329a2" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/Crowds/Humans/_MaleStrong/CROWD_HUM_MS_Rig/CROWD_HUM_MS_Rig_DFLT_LOCO_Run_F_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/Crowds/Humans/_MaleStrong/CROWD_HUM_MS_Rig/CROWD_HUM_MS_Rig_DFLT_LOCO_Run_F_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209006" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.28154194" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.7198186" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="1.1087528" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="1.5194558" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.5666667" />
+					<attribute id="ID" type="FixedString" value="752a3fac-a206-f8ae-5036-77924ba4384c" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CROWD_HUM_FS_Rig_DFLT_LOCO_Run_F_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="236cb37e-9e39-ac21-ed71-e70a4542dcba" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="e023febb-3591-5c6e-14e3-13f98b3f37c8" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/Crowds/Humans/_FemaleStrong/CROWD_HUM_FS_Rig/CROWD_HUM_FS_Rig_DFLT_LOCO_Run_F_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/Crowds/Humans/_FemaleStrong/CROWD_HUM_FS_Rig/CROWD_HUM_FS_Rig_DFLT_LOCO_Run_F_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209006" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.33233562" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.6864399" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="1.0898867" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="1.4570522" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.466667" />
+					<attribute id="ID" type="FixedString" value="75f80c26-587f-4294-1ab4-9801b2fbb5d1" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CROWD_HUM_MS_Rig_RFG_DFLT_LOCO_Walk_F_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="974b3204-c1b7-a211-afcb-9102c922818f" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="39d9ffce-6d23-cbea-9a71-b3a940a329a2" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/Crowds/Humans/_MaleStrong/CROWD_HUM_MS_Rig/CROWD_HUM_MS_Rig_RFG_DFLT_LOCO_Walk_F_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/Crowds/Humans/_MaleStrong/CROWD_HUM_MS_Rig/CROWD_HUM_MS_Rig_RFG_DFLT_LOCO_Walk_F_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.24961454" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.83882093" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="1.3844899" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="1.9707938" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="2.5687077" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="3.175329" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.4666667" />
+					<attribute id="ID" type="FixedString" value="9025b052-6448-2fa7-67ef-09a9059e255e" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CROWD_HUM_FS_Rig_DFLT_LOCO_Stroll_F_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="236cb37e-9e39-ac21-ed71-e70a4542dcba" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="e023febb-3591-5c6e-14e3-13f98b3f37c8" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/Crowds/Humans/_FemaleStrong/CROWD_HUM_FS_Rig/CROWD_HUM_FS_Rig_DFLT_LOCO_Stroll_F_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/Crowds/Humans/_FemaleStrong/CROWD_HUM_FS_Rig/CROWD_HUM_FS_Rig_DFLT_LOCO_Stroll_F_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209006" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.38603175" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.96943325" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="1.5296146" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="2.2058957" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2" />
+					<attribute id="ID" type="FixedString" value="9efe821e-afb2-2eb8-61da-d7d2178e7c24" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CROWD_HUM_FS_Rig_RFG_DFLT_LOCO_Walk_F_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="236cb37e-9e39-ac21-ed71-e70a4542dcba" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="e023febb-3591-5c6e-14e3-13f98b3f37c8" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/Crowds/Humans/_FemaleStrong/CROWD_HUM_FS_Rig/CROWD_HUM_FS_Rig_RFG_DFLT_LOCO_Walk_F_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/Crowds/Humans/_FemaleStrong/CROWD_HUM_FS_Rig/CROWD_HUM_FS_Rig_RFG_DFLT_LOCO_Walk_F_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.22058956" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.7198186" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="1.2132427" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="1.7502041" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.2333333" />
+					<attribute id="ID" type="FixedString" value="acb4f887-ffad-7889-7c11-2242c679e5b1" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CROWD_HUM_MS_Rig_DFLT_LOCO_Sprint_F_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="974b3204-c1b7-a211-afcb-9102c922818f" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="39d9ffce-6d23-cbea-9a71-b3a940a329a2" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/Crowds/Humans/_MaleStrong/CROWD_HUM_MS_Rig/CROWD_HUM_MS_Rig_DFLT_LOCO_Sprint_F_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/Crowds/Humans/_MaleStrong/CROWD_HUM_MS_Rig/CROWD_HUM_MS_Rig_DFLT_LOCO_Sprint_F_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209006" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.3076644" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.5863039" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.904127" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="1.2204989" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.2333333" />
+					<attribute id="ID" type="FixedString" value="e957ce65-5007-692a-0004-ac6bcc9f6afd" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CROWD_HUM_FS_Rig_DFLT_LOCO_Sprint_F_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="236cb37e-9e39-ac21-ed71-e70a4542dcba" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="e023febb-3591-5c6e-14e3-13f98b3f37c8" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/Crowds/Humans/_FemaleStrong/CROWD_HUM_FS_Rig/CROWD_HUM_FS_Rig_DFLT_LOCO_Sprint_F_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/Crowds/Humans/_FemaleStrong/CROWD_HUM_FS_Rig/CROWD_HUM_FS_Rig_DFLT_LOCO_Sprint_F_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209006" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.24671201" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.5514739" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.8547846" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="1.1842177" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.466667" />
+					<attribute id="ID" type="FixedString" value="f5361fda-34f3-e296-b307-0ec0f41298b0" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="CROWD_HUM_MS_Rig_DFLT_LOCO_Walk_F_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="974b3204-c1b7-a211-afcb-9102c922818f" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="39d9ffce-6d23-cbea-9a71-b3a940a329a2" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/Crowds/Humans/_MaleStrong/CROWD_HUM_MS_Rig/CROWD_HUM_MS_Rig_DFLT_LOCO_Walk_F_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/Crowds/Humans/_MaleStrong/CROWD_HUM_MS_Rig/CROWD_HUM_MS_Rig_DFLT_LOCO_Walk_F_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209006" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.22058958" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.85913837" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="1.4135149" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="2.0288439" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="2.5890253" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="3.1521091" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.87743527 2.0270298 0.16003698" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.87743527 -0.008109231 -0.21839446" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="236cb37e-9e39-ac21-ed71-e70a4542dcba" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Proxy_CROWD_HUM_FS_FullBody_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Characters/_Anims/Crowds/Humans/_FemaleStrong/Resources/Proxy_CROWD_HUM_FS_FullBody_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Characters/_Anims/Crowds/Humans/_FemaleStrong/Resources/Proxy_CROWD_HUM_FS_FullBody_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209017" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="149b9a30-7ce4-33ad-c31b-3319787f70e4" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_CROWD_HUM_FS_FullBody_A.Proxy_HUM_FS_NKD_Body_A_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="149b9a30-7ce4-33ad-c31b-3319787f70e4" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_CROWD_HUM_FS_FullBody_A.Proxy_HUM_FS_NKD_Head_A_Ears_Mesh.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="149b9a30-7ce4-33ad-c31b-3319787f70e4" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_CROWD_HUM_FS_FullBody_A.Proxy_HUM_FS_NKD_Head_A_Eyes_Mesh.2" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="149b9a30-7ce4-33ad-c31b-3319787f70e4" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_CROWD_HUM_FS_FullBody_A.Proxy_HUM_FS_NKD_Head_A_Mesh.3" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.8844438 2.1434329 0.19119146" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.88519406 -0.00200547 -0.22279449" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="974b3204-c1b7-a211-afcb-9102c922818f" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Proxy_CROWD_HUM_MS_FullBody" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Characters/_Anims/Crowds/Humans/_MaleStrong/Resources/Proxy_CROWD_HUM_MS_FullBody.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Characters/_Anims/Crowds/Humans/_MaleStrong/Resources/Proxy_CROWD_HUM_MS_FullBody.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209017" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="149b9a30-7ce4-33ad-c31b-3319787f70e4" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_CROWD_HUM_MS_FullBody.Proxy_HUM_MS_NKD_Head_A_Eyes_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="149b9a30-7ce4-33ad-c31b-3319787f70e4" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_CROWD_HUM_MS_FullBody.Proxy_HUM_MS_NKD_Head_A_Mesh.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="149b9a30-7ce4-33ad-c31b-3319787f70e4" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_CROWD_HUM_MS_FullBody.Proxy_HUM_MS_NKD_Head_A_Ears_Mesh.2" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="149b9a30-7ce4-33ad-c31b-3319787f70e4" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_CROWD_HUM_MS_FullBody.Proxy_HUM_MS_NKD_Head_A_Eyelashes_Mesh.3" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="149b9a30-7ce4-33ad-c31b-3319787f70e4" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_CROWD_HUM_MS_FullBody.Proxy_HUM_MS_NKD_Head_A_Tearline_Mesh.4" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="149b9a30-7ce4-33ad-c31b-3319787f70e4" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_CROWD_HUM_MS_FullBody.Proxy_HUM_MS_NKD_Head_A_Eyeshadow_Mesh.5" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="149b9a30-7ce4-33ad-c31b-3319787f70e4" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_CROWD_HUM_MS_FullBody.Proxy_HUM_MS_NKD_Body_A_Mesh.6" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="10e1841d-e990-1b47-6f7a-951917596d33" />
+					<attribute id="BoundsMax" type="fvec3" value="0 0 0" />
+					<attribute id="BoundsMin" type="fvec3" value="0 0 0" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="ad4b58c5-d668-fef4-7882-b3ccee3f533f" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="CROWD_HUM_MS_Base" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="39d9ffce-6d23-cbea-9a71-b3a940a329a2" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="EMPTY_VISUAL_TEMPLATE" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209012" />
+					<children>
+						<node id="AnimationSetOverrides">
+							<attribute id="PairElement1" type="guid" value="a68a47bf-e96a-4d2e-8c7b-9fc87799e1d4" />
+							<attribute id="PairElement2" type="FixedString" value="f9aa105c-f163-5b91-b373-17e126ecd487" />
+							<attribute id="strAnimationSetOverrideType" type="int32" value="0" />
+						</node>
+						<node id="AnimationSetOverrides">
+							<attribute id="PairElement1" type="guid" value="e6da9172-3876-44c5-8353-ccbf83cc1726" />
+							<attribute id="PairElement2" type="FixedString" value="9e07eaad-87c3-b5ca-cbb3-11a3e3a83d2d" />
+							<attribute id="strAnimationSetOverrideType" type="int32" value="0" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="5d578ab8-fc38-5f87-8748-48c86f7ad062" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="4dcf73f6-dab6-8438-42ce-6edf51436d3d" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="da29fce1-056a-4f86-b110-d61679c21238" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="10e1841d-e990-1b47-6f7a-951917596d33" />
+					<attribute id="BoundsMax" type="fvec3" value="0 0 0" />
+					<attribute id="BoundsMin" type="fvec3" value="0 0 0" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="d5ca831e-40eb-8b06-e7bf-56446194f24a" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="CROWD_HUM_FS_Base" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="e023febb-3591-5c6e-14e3-13f98b3f37c8" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="EMPTY_VISUAL_TEMPLATE" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209012" />
+					<children>
+						<node id="AnimationSetOverrides">
+							<attribute id="PairElement1" type="guid" value="a68a47bf-e96a-4d2e-8c7b-9fc87799e1d4" />
+							<attribute id="PairElement2" type="FixedString" value="6e65396a-be2e-2883-4efa-dcab72003a1d" />
+							<attribute id="strAnimationSetOverrideType" type="int32" value="0" />
+						</node>
+						<node id="AnimationSetOverrides">
+							<attribute id="PairElement1" type="guid" value="e6da9172-3876-44c5-8353-ccbf83cc1726" />
+							<attribute id="PairElement2" type="FixedString" value="4a9d11ac-831e-bed5-4ab4-e53d615dc68d" />
+							<attribute id="strAnimationSetOverrideType" type="int32" value="0" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="e79bc74a-dfb1-22da-6283-f2ae01772414" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="4dcf73f6-dab6-8438-42ce-6edf51436d3d" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="da29fce1-056a-4f86-b110-d61679c21238" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

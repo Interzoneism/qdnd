@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="8" build="606" lslib_meta="v1,bswap_guids,lsf_keys_adjacency" />
+	<region id="Tags">
+		<node id="Tags">
+			<attribute id="UUID" type="guid" value="6d60bed7-10cc-4b52-8fb7-baa75181cd49" />
+			<attribute id="Name" type="FixedString" value="IGNORE_COMBAT_LATE_JOIN_PENALTY" />
+			<attribute id="DisplayName" type="TranslatedString" handle="ls::TranslatedStringRepository::s_HandleUnknown" version="0" />
+			<attribute id="DisplayDescription" type="TranslatedString" handle="ls::TranslatedStringRepository::s_HandleUnknown" version="0" />
+			<attribute id="Icon" type="FixedString" value="" />
+			<attribute id="Description" type="LSString" value="Allows object to ignore late join penalties and not have their turn skipped when entering an active combat." />
+			<children>
+				<node id="Categories">
+					<children>
+						<node id="Category">
+							<attribute id="Name" type="LSString" value="Code" />
+						</node>
+					</children>
+				</node>
+				<node id="Properties">
+					<children>
+						<node id="Property">
+							<attribute id="Name" type="LSString" value="EnterCombatInCurrentRound" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

@@ -1,0 +1,320 @@
+game.states.Perception =  State{
+    function ()
+
+        description = [[Object is made visible, or revealed to be interactable, if a skill check (Perception by default) is passed.]]
+
+        modules = {"shared.dialog", "shared.util"}
+
+        inputs.Reveal = {help = [[Reveal entity. The Object will do an AD unless the Param is true.]]}
+
+        inputs.AutoReveal = {help = "Reveal entity when any player sees it (without a check)."}
+
+        outputs.Revealed = {help = "entity is revealed"}
+
+        params.MinDistance = {type = EParamType.Number, required=false, default=6.0,
+        help=[[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]]}
+
+        params.Skill = {type = EParamType.String, default="Perception", help=[[
+            The skill checked.
+        ]]}
+
+        params.DC = {
+            type = EParamType.String,
+            default="DC_Legacy_15_bddbb9b8-a242-4c3e-a2eb-3fd274c0c539",
+            help=[[
+            The skill check DC.
+        ]]}
+
+        params.Type = {type = EParamType.String,
+                       default="None",
+                       help=[[
+            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]]
+        }
+
+        params.IsTrap = {type = EParamType.Bool,
+                         default = false,
+                         help="Is this object a trap?"}
+
+
+        params.TargetEntity = {type = EParamType.String, required = false, default = "me", help = "Object on which the perception VFX are played. Currently only supports default/'me'"}
+
+        params.PerceptionSuccessAD = {type = EParamType.String, default="", help=[[Override AD to play on the player when the non-trapped entity is perceived. Default AD if left blank.]]}
+
+        local failedPlayers = {}
+        local perceptionAD = nil
+        local suppressFlag = Flag("CONST_SuppressTrapADs_cf3d6d5b-5c2d-403f-a0c3-105922f8c5f1")
+
+        helpers.StartEffect = function()
+            local discoveredEffect
+            if params.IsTrap then
+                discoveredEffect = PrepareEffect("VFX_Script_Perception_Danger_01_100c3407-e65a-bc79-7ecb-cf33ce00b302")
+            else
+                discoveredEffect = PrepareEffect("VFX_Script_Perception_Default_01_46bd169e-bbb5-a6fe-0fe7-97c64f620d5d")
+            end
+            local activeEffect = PlayEffectAt(discoveredEffect, me.Blackboard.GetFact("TargetEntity"))
+            me.Blackboard.SetFact("Cnst.Perception.ActiveEffect", activeEffect.Handle)
+        end
+
+        helpers.RestartEffectIfStarted = function()
+            local activeEffect = me.Blackboard.GetFact("Cnst.Perception.ActiveEffect")
+            if activeEffect ~= nil then
+                -- This will assert if we've loaded the handle from a savegame,
+                -- but there is no way to avoid this right now
+                StopEffect(PlayingEffect(activeEffect))
+                helpers.StartEffect()
+            end
+        end
+
+        helpers.StopEffectIfStarted = function()
+            local activeEffect = me.Blackboard.GetFact("Cnst.Perception.ActiveEffect")
+            if activeEffect ~= nil then
+                StopEffect(PlayingEffect(activeEffect))
+                me.Blackboard.ClearFact("Cnst.Perception.ActiveEffect")
+            end
+        end
+
+        helpers.Reveal = function(spotter, silent, hideVFX)
+            StopTimer(me, "Cnst.Perception.CheckSight")
+            StopTimer(me, "Cnst.Perception.RemoveOverlay")
+            me.Blackboard.SetFact("Cnst.Perception.Discovered", 1)
+            if hideVFX ~= true then
+                helpers.StartEffect()
+            end
+            StartRealtimeTimer (me, "Cnst.Perception.RemoveOverlay", 5.0, 0)
+            local entity = me.Blackboard.GetFact("TargetEntity")
+            if spotter ~= nil and
+               EntityExists(spotter) and
+               spotter.IsCharacter and
+               spotter.Character.IsPartyMember then
+                RequestPing(entity.Position, entity, spotter, false)
+                if silent ~= true and
+                   perceptionAD ~= nil and
+                   mod.dialog.IsSpeakerAvailable(spotter) then
+                    if not GetFlag(suppressFlag, spotter) then
+                        StartAutomatedDialogImmediate(perceptionAD, spotter)
+                    end
+                    SetEntityEvent(entity, "CONST_PreventADSpam", spotter)
+                end
+            end
+
+            if params.Type == "Invisible" then
+                SetVisible(entity, true)
+            elseif params.Type == "Interactable" then
+                SetCanInteract(entity, true)
+                SetTrapDiscovered(entity, true)
+            elseif params.Type == "Trapped" then
+                SetTrapDiscovered(entity, true)
+            end
+            failedPlayers = nil --Throw away the table, you'll not need it any more.
+            mod.util.ClearTableOnBlackboard(me, "Cnst.Perception.FailedPlayers")
+            if spotter ~= nil then
+                TriggerOutput(outputs.Revealed, spotter.EntityRef)
+            else
+                TriggerOutput(outputs.Revealed, nil)
+            end
+        end
+
+        helpers.SetPerceptionTypeProperties = function()
+            local entity = me.Blackboard.GetFact("TargetEntity")
+            if params.Type == "Invisible" then
+                me.Blackboard.SetFact("Cnst.Perception.Discovered", 0)
+                SetVisible(entity, false)
+            elseif params.Type == "Interactable" then
+                me.Blackboard.SetFact("Cnst.Perception.Discovered", 0)
+                SetTrapDiscovered(entity, false)
+                SetCanInteract(entity, false)
+            elseif params.Type == "Trapped" then
+                me.Blackboard.SetFact("Cnst.Perception.Discovered", 0)
+                SetTrapDiscovered(entity, false)
+            elseif params.Type == "None" then
+                me.Blackboard.SetFact("Cnst.Perception.Discovered", 1)
+            elseif params.Type ~= "Highlight" then
+                DebugLogCritical( "Object [1]_[2] has invalid Perception Type: '[3]'", me.Name, me.UUID.String, params.Type)
+            end
+
+            if params.Type ~= "None" then
+                AddTag(entity, Tag("DISCOVERABLE_ebe17d12-23a8-4554-8bf4-20589d42ea52"))
+            end
+        end
+
+        helpers.Init = function(clearOldPerceptionTypeProperties)
+            failedPlayers = {}
+
+            if params.TargetEntity == "me" then
+                me.Blackboard.SetFact("TargetEntity", me)
+            else
+                me.Blackboard.SetFact("TargetEntity", FindEntity(params.TargetEntity))
+            end
+            if clearOldPerceptionTypeProperties then
+                local entity = me.Blackboard.GetFact("TargetEntity")
+                -- undo changes potentially done by the previous type/interactions
+                SetVisible(entity, true)
+                SetCanInteract(entity, true)
+                SetTrapDiscovered(entity, true)
+                me.Blackboard.ClearFact("Cnst.Perception.Discovered")
+                RemoveTag(entity, Tag("DISCOVERABLE_ebe17d12-23a8-4554-8bf4-20589d42ea52"))
+
+                helpers.SetPerceptionTypeProperties()
+            end
+
+            if ((me.Blackboard.GetFact("Cnst.Perception.Discovered") == 0) or
+                (me.Blackboard.GetFact("Cnst.Perception.Discovered") == nil)) and
+               (params.MinDistance > 0.0001) and
+               (params.Type ~= "None") then
+                StartRealtimeTimer(me, "Cnst.Perception.CheckSight", 0.5, -1)
+                me.Blackboard.SetFact("Cnst.Perception.TimerRunning", 1)
+            end
+        end
+
+        self.OnEditorChanges = function()
+            StopTimer(me, "Cnst.Perception.CheckSight")
+            StopTimer (me, "Cnst.Perception.RemoveOverlay")
+            me.Blackboard.ClearFact("Cnst.Perception.TimerRunning")
+            me.Blackboard.ClearFact("Cnst.Perception.Known")
+            helpers.Init(true)
+        end
+
+        self.OnInit = function()
+            helpers.RestartEffectIfStarted()
+
+            if me.Blackboard.GetFact("Cnst.Perception.TimerRunning") ~= nil then
+                return
+            end
+
+            helpers.Init(false)
+        end
+
+        self.OnLoaded = function()
+            if me.Blackboard.GetFact("Cnst.Perception.Discovered") ~= 1 then
+                failedPlayers = mod.util.LoadTableFromBlackboard(
+                    me,
+                    "Cnst.Perception.FailedPlayers",
+                    function(val) return (val == 0) and false or true end)
+            end
+
+            if params.PerceptionSuccessAD == "" or params.PerceptionSuccessAD == nil then
+                if params.IsTrap then
+                    perceptionAD = Dialog("GLO_PerceptionSuccess_Trap_8aae78c8-a937-e386-0a0e-66e1046e8577")
+                else
+                    perceptionAD = Dialog("GLO_PerceptionSuccess_48825dbe-a320-7c4c-fe3e-372b717d5bc9")
+                end
+            else
+                perceptionAD = Dialog(params.PerceptionSuccessAD)
+            end
+        end
+
+        events.LevelLoaded = function(e)
+             -- make sure our visibility is changed as soon as possible for networking reasons
+            if me.Blackboard.GetFact("Cnst.Perception.Discovered") ~= 1 then
+                -- only set the target entity here since the entities might not exist yet in OnLoaded
+                if params.TargetEntity == "me" then
+                    me.Blackboard.SetFact("TargetEntity", me)
+                else
+                    me.Blackboard.SetFact("TargetEntity", FindEntity(params.TargetEntity))
+                end
+                helpers.SetPerceptionTypeProperties()
+            end
+        end
+
+        events.TimerFinished  = function(e)
+            if e.TimerName == "Cnst.Perception.CheckSight" then
+                local entity = me.Blackboard.GetFact("TargetEntity")
+                local actives = GetActiveCharacters(entity, params.MinDistance)
+
+                for _,char in pairs(actives) do
+                    if char.Character.IsPlayer and
+                       HasLineOfSight(char, me) then
+                        if me.Blackboard.GetFact("Cnst.Perception.Known") ~= 1 then
+                            local charUUID = char.UUID.String
+                            if not failedPlayers[charUUID] then
+                                failedPlayers[charUUID] = true
+                                mod.util.SetTableMapEntryOnBlackboard(me, "Cnst.Perception.FailedPlayers", charUUID, 1)
+                                local DC
+                                if me.Blackboard.GetFact("Cnst.Perception.BUGFIX_DCOverride") ~= nil then
+                                    DC = DifficultyClass(me.Blackboard.GetFact("Cnst.Perception.BUGFIX_DCOverride"))
+                                else
+                                    DC = DifficultyClass(params.DC)
+                                end
+                                if DC == nil then
+                                    DC = DifficultyClass("HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f")
+                                    DebugLogCritical("Invalid DC supplied in params.DC for [1]", me.UUID.String)
+                                end
+
+                                RequestPassiveRoll(char.Character, me, Skill[params.Skill], DC, "GLO_CONST_HiddenItemCheck")
+                                RemoveTag(entity, Tag("DISCOVERABLE_ebe17d12-23a8-4554-8bf4-20589d42ea52"))
+                            end
+                        else
+                            helpers.Reveal(char, false)
+                        end
+                    end
+                end
+            elseif e.TimerName == "Cnst.Perception.RemoveOverlay" then
+                helpers.StopEffectIfStarted()
+            end
+        end
+
+        events.RollResult = function(ev)
+            if ev.RollSubject == me and
+               ev.Event == "GLO_CONST_HiddenItemCheck" and
+               ev.Type == RollResultType.Success and
+               me.Blackboard.GetFact("Cnst.Perception.Discovered") ~= 1 then
+                helpers.Reveal(ev.Roller, false)
+            end
+        end
+
+       socketEvents.Reveal = function(ev)
+            if me.Blackboard.GetFact("Cnst.Perception.Discovered") ~= 1 then
+                if ev.Object ~= nil then
+                    helpers.Reveal(Entity(ev.Object), ev.Param)
+                else
+                    helpers.Reveal(nil, ev.Param)
+                end
+            end
+        end
+
+        socketEvents.AutoReveal = function(ev)
+            me.Blackboard.SetFact("Cnst.Perception.Known", 1)
+        end
+
+        events.UseStarted = function(ev)
+            -- Warning: this cannot work with TargetEntity ~= me, because
+            -- UseStarted is not broadcasted. Should be removed in the
+            -- future (was added when we thought we would get more code
+            -- support)
+            if ev.Object == me.Blackboard.GetFact("TargetEntity") then
+                helpers.StopEffectIfStarted()
+            end
+        end
+
+        events.Damaged = function(ev)
+            if me.Blackboard.GetFact("Cnst.Perception.Discovered") ~= 1 and
+               ev.DamageAmount > 0 then
+                local hideVfx = ((params.Type == "Highlight") or (mod.util.SafeGetHitPointsPercentage(me.Blackboard.GetFact("TargetEntity")) == 0))
+                if ev.Source.Character.IsPartyMember then
+                    helpers.Reveal(ev.Source, hideVfx, hideVfx)
+                else
+                    helpers.Reveal(nil, hideVfx, hideVfx)
+                end
+            else
+                helpers.StopEffectIfStarted()
+            end
+        end
+
+--[[
+        events.Disarmed = function(ev)
+            if e.Object == me.Blackboard.GetFact("TargetEntity") and
+            activeEffect ~= nil then
+                StopEffect(activeEffect)
+                activeEffect = nil
+            end
+        end
+    ]]
+
+    end
+}

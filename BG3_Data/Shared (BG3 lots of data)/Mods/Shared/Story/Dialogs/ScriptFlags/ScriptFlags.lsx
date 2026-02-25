@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<save>
+    <version major="4" minor="6" revision="0" build="800"/>
+    <region id="ScriptFlags">
+        <node id="root">
+            <children>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Bribing is allowed, or it&apos;s CIVILIAN (civilians can always be bribed)"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsFlag(1,&quot;GEB_BribeDisabled_9e426938-8a06-8f2d-3d7d-7bdc975c3c02&quot;,0)
+CONDITION IsTagged(1,&quot;CIVILIAN_71120d5d-3853-46e4-9762-33f59aa6b4ae&quot;)
+CHECK &quot;c1|c2&quot;"/>
+                    <attribute id="UUID" type="guid" value="2a7c4f74-438b-4987-9def-4f918c98b9db"/>
+                    <attribute id="name" type="FixedString" value="Bribing enabled or CIVILIAN"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="returns true if this NPC is considered a guard"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsTagged(1,&quot;GUARD_0b52f35e-fb1f-4865-bcd2-5d21ef7343cd&quot;)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="69cf6c1f-fc1f-4e22-b55d-dc40768f6669"/>
+                    <attribute id="name" type="FixedString" value="CRIME_IsGuard"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Second warning, or redirected from third warning"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsFlag(2,&quot;GEB_CrimeWarning_2_4e017c74-10c1-b90f-6d61-969b1bdb8d38&quot;,1)
+CONDITION IsLocalFlag(&quot;GEB_PassedViaWarning_3&quot;,1)
+CHECK &quot;c1|c2&quot;"/>
+                    <attribute id="UUID" type="guid" value="b61d399d-2008-4201-970e-738fb4698d21"/>
+                    <attribute id="name" type="FixedString" value="Crime Warning - Second time, or no attack third"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Has enough money to bribe out of a crime"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsMagicPocketsGold(%Speaker_7533666e-edd8-4c7f-ab34-09fc1f703087,&quot;&gt;=&quot;,%GEN_BribeAmount_ccd7ffc9-58ab-438e-90b6-7b0a252d9441)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="09eda0ce-c2bc-4a8a-a1c0-8d4993105ede"/>
+                    <attribute id="name" type="FixedString" value="GEB_HasBribeMoney"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Check if the speaker #2 has either a Detect Thoughts spell already casted or has any way to immediately cast it"/>
+                    <attribute id="Script" type="LSString" value="CONDITION CanCastSpell(2,&quot;SC_DetectThoughts&quot;)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="44f9fbf3-735d-8eaf-94dc-6c1d1cf5382d"/>
+                    <attribute id="name" type="FixedString" value="GEN_CanDetectThoughts_2"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Check if the speaker #3 has either a Detect Thoughts spell already casted or has any way to immediately cast it"/>
+                    <attribute id="Script" type="LSString" value="CONDITION CanCastSpell(3,&quot;SC_DetectThoughts&quot;)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="4de7d1de-17cf-f791-921e-e79dcd559e13"/>
+                    <attribute id="name" type="FixedString" value="GEN_CanDetectThoughts_3"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Check if the speaker #4 has either a Detect Thoughts spell already casted or has any way to immediately cast it"/>
+                    <attribute id="Script" type="LSString" value="CONDITION CanCastSpell(4,&quot;SC_DetectThoughts&quot;)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="b97931a9-d470-98d3-ca09-6a18b8855243"/>
+                    <attribute id="name" type="FixedString" value="GEN_CanDetectThoughts_4"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Check if the speaker #5 has either a Detect Thoughts spell already casted or has any way to immediately cast it"/>
+                    <attribute id="Script" type="LSString" value="CONDITION CanCastSpell(5,&quot;SC_DetectThoughts&quot;)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="f55180c5-f39e-3a48-3dfd-f4e1668fc9a1"/>
+                    <attribute id="name" type="FixedString" value="GEN_CanDetectThoughts_5"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Check if the speaker #6 has either a Detect Thoughts spell already casted or has any way to immediately cast it"/>
+                    <attribute id="Script" type="LSString" value="CONDITION CanCastSpell(6,&quot;SC_DetectThoughts&quot;)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="a96ae717-2267-1984-bc5e-bb3dfcf0ed80"/>
+                    <attribute id="name" type="FixedString" value="GEN_CanDetectThoughts_6"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Speaker GEN_CheckHasItem_Speaker has at least GEN_CheckHasItem_Amount instance(s) of GEN_CheckHasItem_Template"/>
+                    <attribute id="Script" type="LSString" value="CONDITION HasItemTemplateInMagicPockets(%GEN_CheckHasItemTemplate_Speaker_a41274ae-7edf-4f3d-a137-dd45978c6224, %GEN_CheckHasItemTemplate_Template_ae6d2014-ca40-414b-a222-84b87efb1f05, &quot;&gt;=&quot;, %GEN_CheckHasItemTemplate_Amount_573b8076-ac9f-4c43-9161-f6eb76a90781,%GEN_CheckHasItemTemplateInMagicPockets_MoveAndReport_be71112b-b695-0105-2287-da42f04d3640)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="09ca858e-4bac-48ae-9aca-52602199f813"/>
+                    <attribute id="name" type="FixedString" value="GEN_CheckHasItemTemplate"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Speaker GEN_CheckHasItem_Speaker_2 has at least GEN_CheckHasItem_Amount_2 instance(s) of GEN_CheckHasItem_Template_2"/>
+                    <attribute id="Script" type="LSString" value="CONDITION HasItemTemplateInMagicPockets(%GEN_CheckHasItemTemplate_Speaker_2_2674a9aa-1c71-42c3-977e-ffee67be69c6, %GEN_CheckHasItemTemplate_Template_2_1c16723d-50a0-4917-a198-0970edb93555, &quot;&gt;=&quot;, %GEN_CheckHasItemTemplate_Amount_2_0663d6aa-c918-4b65-85a7-bd8e10247734,%GEN_CheckHasItemTemplateInMagicPockets_MoveAndReport_2_60877960-2b33-3727-0341-67999b9d4176)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="a20e81d5-e22e-47ea-a32d-8817932acf8d"/>
+                    <attribute id="name" type="FixedString" value="GEN_CheckHasItemTemplate_2"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Speaker GEN_CheckHasItem_Speaker_3 has at least GEN_CheckHasItem_Amount_3 instance(s) of GEN_CheckHasItem_Template_3"/>
+                    <attribute id="Script" type="LSString" value="CONDITION HasItemTemplateInMagicPockets(%GEN_CheckHasItemTemplate_Speaker_3_7f89238b-be41-4d7a-a9a8-6dc74a2ef8be, %GEN_CheckHasItemTemplate_Template_3_3965b187-cbef-40cd-9d7c-37bcb37ea2cd, &quot;&gt;=&quot;, %GEN_CheckHasItemTemplate_Amount_3_3837a5d2-c5d1-4200-bb5c-d7b8ad45f53a,%GEN_CheckHasItemTemplateInMagicPockets_MoveAndReport_3_3a6d57e8-6548-0be9-aa3c-760fca2f8b02)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="38b96730-eb03-455b-ba54-bafc5aa145bd"/>
+                    <attribute id="name" type="FixedString" value="GEN_CheckHasItemTemplate_3"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Speaker GEN_CheckHasItem_Speaker_4 has at least GEN_CheckHasItem_Amount_4 instance(s) of GEN_CheckHasItem_Template_4"/>
+                    <attribute id="Script" type="LSString" value="CONDITION HasItemTemplateInMagicPockets(%GEN_CheckHasItemTemplate_Speaker_4_33065191-7bc1-40dc-bd8c-3b897abb591e, %GEN_CheckHasItemTemplate_Template_4_4343086d-0af4-4509-8af7-efb6ae4ca057, &quot;&gt;=&quot;, %GEN_CheckHasItemTemplate_Amount_4_32f62ba7-e482-4651-8927-636de5701edc,%GEN_CheckHasItemTemplateInMagicPockets_MoveAndReport_4_cc7e9ca0-43ac-d8fa-8b18-9942f1feceb5)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="1ae0ef34-eede-467e-b612-508d48b1ef7a"/>
+                    <attribute id="name" type="FixedString" value="GEN_CheckHasItemTemplate_4"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Speaker GEN_CheckHasItem_Speaker_5 has at least GEN_CheckHasItem_Amount_5 instance(s) of GEN_CheckHasItem_Template_5"/>
+                    <attribute id="Script" type="LSString" value="CONDITION HasItemTemplateInMagicPockets(%GEN_CheckHasItemTemplate_Speaker_5_4fa046a9-a305-4b89-8383-ff6173a8b774, %GEN_CheckHasItemTemplate_Template_5_069bdd27-9c44-4f21-b062-fcf75a541407, &quot;&gt;=&quot;, %GEN_CheckHasItemTemplate_Amount_5_51db6483-c37d-4e38-b423-ebeb975571ac,%GEN_CheckHasItemTemplateInMagicPockets_MoveAndReport_5_6007fc56-ec7c-616b-38b8-f91b4b824720)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="46382d61-4319-49ad-aac3-84465a1af940"/>
+                    <attribute id="name" type="FixedString" value="GEN_CheckHasItemTemplate_5"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Checks that amount of gold in magic pockets is sufficient"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsMagicPocketsGold(%GEN_CheckPocketGold_SpeakerIndex_8504b4e0-886e-4912-9525-fbe559c5f8ff,&quot;&gt;=&quot;,%GEN_CheckMagicPocketGold_6057ad05-9492-4630-9f0a-be548b134c54)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="e678bd59-74f4-4a7b-8776-aca807d9ef22"/>
+                    <attribute id="name" type="FixedString" value="GEN_CheckPocketGold"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Checks that amount of gold in magic pockets is sufficient"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsMagicPocketsGold(%GEN_CheckPocketGold_2_SpeakerIndex_a9c4d456-3ef5-491d-a1eb-49f09b91e8b4,&quot;&gt;=&quot;,%GEN_CheckMagicPocketGold_2_463b0f43-5410-412d-aba3-875cf81c38ca)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="d6480be7-500e-4160-927f-86acfd5c4e7b"/>
+                    <attribute id="name" type="FixedString" value="GEN_CheckPocketGold_2"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Checks that amount of gold in magic pockets is sufficient"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsMagicPocketsGold(%GEN_CheckPocketGold_3_SpeakerIndex_d7fa1537-77d4-4d7d-a955-7ffda90e6207,&quot;&gt;=&quot;,%GEN_CheckMagicPocketGold_3_01f129ea-b4dc-44b6-8154-9a948f876a82)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="da0e2ddc-8a30-454e-b9c6-89e998a0d1db"/>
+                    <attribute id="name" type="FixedString" value="GEN_CheckPocketGold_3"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Checks that amount of gold in magic pockets is sufficient"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsMagicPocketsGold(%GEN_CheckPocketGold_4_SpeakerIndex_5c499066-448b-4d0c-8dc9-d1553d04c6d4,&quot;&gt;=&quot;,%GEN_CheckMagicPocketGold_4_5dac5eea-faeb-459c-b675-46c51519b784)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="acf9180c-206c-410a-b43e-65ecac0ed670"/>
+                    <attribute id="name" type="FixedString" value="GEN_CheckPocketGold_4"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Checks that amount of gold in magic pockets is sufficient"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsMagicPocketsGold(%GEN_CheckPocketGold_5_SpeakerIndex_65757687-b815-43fe-be9c-1cefe82efb60,&quot;&gt;=&quot;,%GEN_CheckMagicPocketGold_5_8860ed48-ba5f-4b7b-82bf-f1220f967d41)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="abd0c198-5c8e-4fc9-a26b-f937ca8ffa11"/>
+                    <attribute id="name" type="FixedString" value="GEN_CheckPocketGold_5"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Checks that amount of gold in magic pockets is sufficient"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsMagicPocketsGold(%GEN_CheckPocketGold_6_SpeakerIndex_197aa5e5-de7f-2ff0-7ec7-268384b5ca7c,&quot;&gt;=&quot;,%GEN_CheckMagicPocketGold_6_ebf7de6b-4598-4feb-9c50-8083fc0fc59d)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="c8d8e4d6-a923-5f94-2a93-08c950e70d44"/>
+                    <attribute id="name" type="FixedString" value="GEN_CheckPocketGold_6"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Checks that amount of gold in magic pockets is sufficient"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsMagicPocketsGold(%GEN_CheckPocketGold_7_SpeakerIndex_051d7620-9791-488f-8a0e-f5791367fe59,&quot;&gt;=&quot;,%GEN_CheckMagicPocketGold_7_4f22f91f-28ec-8f22-c546-1f8b69a2725a)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="e4b81834-912c-63da-0836-5cf5fda1cc4d"/>
+                    <attribute id="name" type="FixedString" value="GEN_CheckPocketGold_7"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Checks that speaker #1 is present in dialog"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsSpeakerPresent(1)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="c6b28a2d-4095-40fc-bed0-de222e6af105"/>
+                    <attribute id="name" type="FixedString" value="GEN_IsSpeakerPresent_1"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Checks that speaker #10 is present in dialog"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsSpeakerPresent(10)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="59d0ad61-4513-4d53-a397-c84dae053a2b"/>
+                    <attribute id="name" type="FixedString" value="GEN_IsSpeakerPresent_10"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Checks that speaker #11 is present in dialog"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsSpeakerPresent(11)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="d8adf775-47c0-94fc-21f1-9b879498af45"/>
+                    <attribute id="name" type="FixedString" value="GEN_IsSpeakerPresent_11"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Checks that speaker #2 is present in dialog"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsSpeakerPresent(2)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="25c1ac70-f65f-4869-8a74-eff5827d9cde"/>
+                    <attribute id="name" type="FixedString" value="GEN_IsSpeakerPresent_2"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Checks that speaker #3 is present in dialog"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsSpeakerPresent(3)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="8a4a686d-6c47-411f-a0b3-d79ff33e2922"/>
+                    <attribute id="name" type="FixedString" value="GEN_IsSpeakerPresent_3"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Checks that speaker #4 is present in dialog"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsSpeakerPresent(4)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="7fd98b6e-11d5-28e0-bc67-bb0925834fa3"/>
+                    <attribute id="name" type="FixedString" value="GEN_IsSpeakerPresent_4"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Checks that speaker #5 is present in dialog"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsSpeakerPresent(5)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="ec46b5c3-2306-a90d-a05b-84e9abaebfda"/>
+                    <attribute id="name" type="FixedString" value="GEN_IsSpeakerPresent_5"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Checks that speaker #6 is present in dialog"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsSpeakerPresent(6)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="b0a3c5e5-1bbe-7b76-76d9-6dec398a5297"/>
+                    <attribute id="name" type="FixedString" value="GEN_IsSpeakerPresent_6"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Checks that speaker #7 is present in dialog"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsSpeakerPresent(7)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="607bbdd2-9891-589d-d8b0-53cbd89f0367"/>
+                    <attribute id="name" type="FixedString" value="GEN_IsSpeakerPresent_7"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Checks that speaker #8 is present in dialog"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsSpeakerPresent(8)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="8bbae11e-9e79-ef99-e49b-1217192221ed"/>
+                    <attribute id="name" type="FixedString" value="GEN_IsSpeakerPresent_8"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Checks that speaker #9 is present in dialog"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsSpeakerPresent(9)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="c101c641-784d-da62-a0e1-140e2e2896b2"/>
+                    <attribute id="name" type="FixedString" value="GEN_IsSpeakerPresent_9"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value=""/>
+                    <attribute id="Script" type="LSString" value="CONDITION HasItemTagInMagicPockets(2,&quot;EXPLOSIVES_f6e89388-0e91-4e9d-b5b7-1d4938dda540&quot;)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="f827139c-5f16-84a1-5892-2bd6ae5e54a6"/>
+                    <attribute id="name" type="FixedString" value="GEN_MagicPocket_TAG_EXPLOSIVES_Sp2"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value=""/>
+                    <attribute id="Script" type="LSString" value="CONDITION HasItemTagInMagicPockets(3,&quot;EXPLOSIVES_f6e89388-0e91-4e9d-b5b7-1d4938dda540&quot;)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="363ef226-990e-727e-f992-f0089c8c8611"/>
+                    <attribute id="name" type="FixedString" value="GEN_MagicPocket_TAG_EXPLOSIVES_Sp3"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value=""/>
+                    <attribute id="Script" type="LSString" value="CONDITION HasItemTagInMagicPockets(2,&quot;FISH_ec16c2d2-2943-41cf-9796-0439ef65b2cf&quot;)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="54d7be3c-6808-8c50-748f-4c57589be7e6"/>
+                    <attribute id="name" type="FixedString" value="GEN_MagicPocket_TAG_FISH_Sp2"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value=""/>
+                    <attribute id="Script" type="LSString" value="CONDITION HasItemTagInMagicPockets(2,&quot;FOOD_c86e0114-a5ab-48f6-b497-de321ebff577&quot;)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="390be7cb-05b8-304f-f42c-5e417059f076"/>
+                    <attribute id="name" type="FixedString" value="GEN_MagicPocket_TAG_FOOD_Sp2"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value=""/>
+                    <attribute id="Script" type="LSString" value="CONDITION HasItemTagInMagicPockets(2,&quot;HEALING_POTION_1879a93d-2edf-4f54-85dd-81a3724d677f&quot;)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="08dea970-ede4-ee76-8464-13a1f8afa1b5"/>
+                    <attribute id="name" type="FixedString" value="GEN_MagicPocket_TAG_HEALING_POTION_Sp2"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value=""/>
+                    <attribute id="Script" type="LSString" value="CONDITION HasItemTagInMagicPockets(2,&quot;LOCKPICKS_1013e720-9b0f-4783-8686-9b5506840088&quot;)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="9afb0f0a-bff7-5c72-1220-1ac9858e4e4a"/>
+                    <attribute id="name" type="FixedString" value="GEN_MagicPocket_TAG_LOCKPICKS_Sp2"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value=""/>
+                    <attribute id="Script" type="LSString" value="CONDITION HasItemTagInMagicPockets(2,&quot;MEAT_fae436d4-da32-42a6-a2b2-9635da0b82eb&quot;)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="589b95d6-c3f6-0e2c-c651-7523003a56dc"/>
+                    <attribute id="name" type="FixedString" value="GEN_MagicPocket_TAG_MEAT_Sp2"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value=""/>
+                    <attribute id="Script" type="LSString" value="CONDITION HasItemTagInMagicPockets(2,&quot;SHOVEL_e2db698a-0705-43f4-9674-06fff1fd1e67&quot;)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="8ecf6929-1a19-7517-0ada-ac4bc4901f2a"/>
+                    <attribute id="name" type="FixedString" value="GEN_MagicPocket_TAG_SHOVEL_Sp2"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Check there&apos;s 0 peanut players present in dialog"/>
+                    <attribute id="Script" type="LSString" value="CONDITION CheckNumberOfPartyPeanuts(&quot;==&quot;, 0)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="94e2adaf-2706-7099-8315-804e0887af25"/>
+                    <attribute id="name" type="FixedString" value="GEN_NumPeanuts_EQ_0"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Check there&apos;s 1 peanut players present in dialog"/>
+                    <attribute id="Script" type="LSString" value="CONDITION CheckNumberOfPartyPeanuts(&quot;==&quot;, 1)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="4b500ada-7eac-784c-e8ba-a4b0d9764d39"/>
+                    <attribute id="name" type="FixedString" value="GEN_NumPeanuts_EQ_1"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Check there&apos;s 2 peanut players present in dialog"/>
+                    <attribute id="Script" type="LSString" value="CONDITION CheckNumberOfPartyPeanuts(&quot;==&quot;, 2)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="27f18def-a930-7af2-570c-e3fd24fa66d7"/>
+                    <attribute id="name" type="FixedString" value="GEN_NumPeanuts_EQ_2"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Check there&apos;s peanut players present in the dialog"/>
+                    <attribute id="Script" type="LSString" value="CONDITION CheckNumberOfPartyPeanuts(&quot;&gt;&quot;, 0)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="b77ea64d-00e6-c9e1-693f-8aa9effec5c5"/>
+                    <attribute id="name" type="FixedString" value="GEN_NumPeanuts_GT_0"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Do you have thieves tools"/>
+                    <attribute id="Script" type="LSString" value="CONDITION HasItemTemplateInMagicPockets(2,%GLO_ThievesTools_Open_9a80491d-0721-4fea-b0b5-f8307cae4ec8,&quot;&gt;=&quot;,%GEN_FixedAmount1_395b7d0f-5a14-4ab5-a794-4ac3082abcdb,0)
+CONDITION HasItemTemplateInMagicPockets(2,%GLO_ThievesTools_Closed_60d8efd6-b6da-0db3-ad72-1af78c096614,&quot;&gt;=&quot;,%GEN_FixedAmount1_395b7d0f-5a14-4ab5-a794-4ac3082abcdb,0)
+CHECK &quot;c1|c2&quot;"/>
+                    <attribute id="UUID" type="guid" value="cb9494cb-8bb7-49fe-8818-6b2b0a8128fb"/>
+                    <attribute id="name" type="FixedString" value="GLO_ThievesToolsInMagicPockets"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Bribing disabled"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsFlag(1,&quot;GEB_BribeDisabled_9e426938-8a06-8f2d-3d7d-7bdc975c3c02&quot;,1)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="93147083-af38-43f5-8354-9737c3e928d2"/>
+                    <attribute id="name" type="FixedString" value="No Bribiing"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Check if the speaker has the assigned spell active"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsSpellActive(%Spell_Check_1_Source_36a8665f-9e1c-bc03-80f4-aacc826d7c81,%Spell_Check_1_cd20feec-f089-63ab-089a-960f840dfb92,1)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="2e809d9c-a165-a404-778e-de2c92f45ae1"/>
+                    <attribute id="name" type="FixedString" value="Spell Check 1"/>
+                </node>
+                <node id="ScriptFlag">
+                    <attribute id="Description" type="LSString" value="Check if the speaker has the assigned spell active"/>
+                    <attribute id="Script" type="LSString" value="CONDITION IsSpellActive(%Spell_Check_2_Source_0096afc1-68ec-37ef-3541-e865510ff1d5,%Spell_Check_2_917ae77e-ef83-1237-9a46-ab74bf9111af,1)
+CHECK &quot;c1&quot;"/>
+                    <attribute id="UUID" type="guid" value="0f900eb6-b6f3-41b8-3d51-8f9064e0f6a6"/>
+                    <attribute id="name" type="FixedString" value="Spell Check 2"/>
+                </node>
+            </children>
+        </node>
+    </region>
+</save>

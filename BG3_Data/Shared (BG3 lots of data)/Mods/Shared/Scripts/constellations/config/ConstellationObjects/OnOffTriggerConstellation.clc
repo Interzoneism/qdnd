@@ -1,0 +1,13 @@
+game.configs.OnOffTriggerConstellation = Config{
+    root=StateRef{game.roots.OnOffTriggerConstellation},
+    inputs={
+        Triggered=ExtSocket{description=[[]],{SocketRef{[[root.inputs.Triggered]]}}},
+        On=ExtSocket{description=[[]],{SocketRef{[[root.inputs.On]]}}},
+        Off=ExtSocket{description=[[]],{SocketRef{[[root.inputs.Off]]}}},
+    },
+    outputs={
+        Triggered=ExtSocket{description=[[]],{SocketRef{[[root.outputs.Triggered]]}}},
+        Off=ExtSocket{description=[[]],{SocketRef{[[root.outputs.Off]]}}},
+        On=ExtSocket{description=[[]],{SocketRef{[[root.outputs.On]]}}},
+    }
+}

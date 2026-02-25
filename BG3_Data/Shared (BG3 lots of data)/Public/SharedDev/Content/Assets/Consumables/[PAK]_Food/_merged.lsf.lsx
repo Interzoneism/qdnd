@@ -1,0 +1,345 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="VirtualTextureBank">
+		<node id="VirtualTextureBank">
+			<children>
+				<node id="Resource">
+					<attribute id="GTexFileName" type="FixedString" value="0236fdba3a6fc3fd9dcc900ac3e39278" />
+					<attribute id="ID" type="FixedString" value="29c9bd78-f034-be00-2780-ea8315b6f71f" />
+					<attribute id="Name" type="LSString" value="CONS_Food_Meat_Skewer_A" />
+					<attribute id="Prefetch" type="bool" value="False" />
+					<attribute id="PrefetchMipLevel" type="int8" value="-1" />
+					<attribute id="ReferencedColorSpaces" type="uint32" value="6" />
+					<attribute id="VirtualTextureLayerConfig" type="uint32" value="3" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209024" />
+				</node>
+				<node id="Resource">
+					<attribute id="GTexFileName" type="FixedString" value="dc523b3c279ebc9909c0ff8d6602ca79" />
+					<attribute id="ID" type="FixedString" value="5ade4dcc-2d1b-302f-5d8b-ba5d2920b346" />
+					<attribute id="Name" type="LSString" value="CONS_GEN_Food_Giant_Hamster_Grilled_A" />
+					<attribute id="Prefetch" type="bool" value="False" />
+					<attribute id="PrefetchMipLevel" type="int8" value="-1" />
+					<attribute id="ReferencedColorSpaces" type="uint32" value="6" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="VirtualTextureLayerConfig" type="uint32" value="3" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725669" />
+				</node>
+				<node id="Resource">
+					<attribute id="GTexFileName" type="FixedString" value="6db9f58cceaef26ce8f00257caeb9bca" />
+					<attribute id="ID" type="FixedString" value="75db4480-0626-fd2b-7850-8d8aa080ff31" />
+					<attribute id="Name" type="LSString" value="CONS_Food_Meat_PorkPiece_Bloodless_A" />
+					<attribute id="Prefetch" type="bool" value="False" />
+					<attribute id="PrefetchMipLevel" type="int8" value="-1" />
+					<attribute id="ReferencedColorSpaces" type="uint32" value="6" />
+					<attribute id="VirtualTextureLayerConfig" type="uint32" value="3" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209024" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="PhysicsBank">
+		<node id="PhysicsBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="1b9ccccb-2265-35b2-b2d0-688f7543df22" />
+					<attribute id="Name" type="LSString" value="CONS_Food_Meat_Skewer_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Consumables/CONS_Food_Meat/CONS_Food_Meat_Skewer_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Consumables/CONS_Food_Meat/CONS_Food_Meat_Skewer_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209024" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="cf9afc72-dfce-ea64-47b8-bef82e99edd3" />
+					<attribute id="Name" type="LSString" value="CONS_GEN_Food_Giant_Hamster_Grilled_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Consumables/CONS_GEN_Food_Giant_Hamster_Grilled_ABC/CONS_GEN_Food_Giant_Hamster_Grilled_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Consumables/CONS_GEN_Food_Giant_Hamster_Grilled_ABC/CONS_GEN_Food_Giant_Hamster_Grilled_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725669" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="MaterialBank">
+		<node id="MaterialBank">
+			<children>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="54416f74-0f81-9c53-edbb-e25905c8655f" />
+					<attribute id="MaterialType" type="uint8" value="38" />
+					<attribute id="Name" type="LSString" value="CONS_GEN_Food_Giant_Hamster_Grilled_ABC" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Base/Base_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="5ade4dcc-2d1b-302f-5d8b-ba5d2920b346" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="ec750ce8-9ccc-28c3-2efb-56ad92f1f996" />
+					<attribute id="MaterialType" type="uint8" value="38" />
+					<attribute id="Name" type="LSString" value="CONS_Food_Meat_PorkPiece_Bloodless_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Base/Base_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="75db4480-0626-fd2b-7850-8d8aa080ff31" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="eede7f07-4790-f228-5460-a0f5e405e7ee" />
+					<attribute id="MaterialType" type="uint8" value="38" />
+					<attribute id="Name" type="LSString" value="CONS_Food_Meat_Skewer_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Base/Base_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="29c9bd78-f034-be00-2780-ea8315b6f71f" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.28959814 0.2104041 0.46622446" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.2663818 0.025098283 -0.5247942" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="1f18b4b2-af71-82c8-aad5-e3d4a02d7cc5" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="CONS_GEN_Food_Giant_Hamster_Grilled_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Consumables/CONS_GEN_Food_Giant_Hamster_Grilled_ABC/Resources/CONS_GEN_Food_Giant_Hamster_Grilled_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Consumables/CONS_GEN_Food_Giant_Hamster_Grilled_ABC/Resources/CONS_GEN_Food_Giant_Hamster_Grilled_A.Dummy_CONS_GEN_Food_Giant_Hamster_Grilled_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725669" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="54416f74-0f81-9c53-edbb-e25905c8655f" />
+							<attribute id="ObjectID" type="FixedString" value="CONS_GEN_Food_Giant_Hamster_Grilled_A.CONS_GEN_Food_Giant_Hamster_Grilled_A_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="54416f74-0f81-9c53-edbb-e25905c8655f" />
+							<attribute id="ObjectID" type="FixedString" value="CONS_GEN_Food_Giant_Hamster_Grilled_A.CONS_GEN_Food_Giant_Hamster_Grilled_A_Mesh_LOD1.1" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.17506729 0.27180532 0.47991022" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.15724054 -0.006925715 -0.28699547" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="6722ee3a-b90c-78ee-725b-ab24ac65b363" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="CONS_Food_Meat_PorkPiece_Bloodless_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Consumables/CONS_Food_Meat/Resources/CONS_Food_Meat_PorkPiece_B.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Consumables/CONS_Food_Meat/Resources/CONS_Food_Meat_PorkPiece_B.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209010" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="ec750ce8-9ccc-28c3-2efb-56ad92f1f996" />
+							<attribute id="ObjectID" type="FixedString" value="CONS_Food_Meat_PorkPiece_B.CONS_Food_Meat_PorkPiece_B_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="ec750ce8-9ccc-28c3-2efb-56ad92f1f996" />
+							<attribute id="ObjectID" type="FixedString" value="CONS_Food_Meat_PorkPiece_B.CONS_Food_Meat_PorkPiece_B_Mesh_LOD1.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="ec750ce8-9ccc-28c3-2efb-56ad92f1f996" />
+							<attribute id="ObjectID" type="FixedString" value="CONS_Food_Meat_PorkPiece_B.CONS_Food_Meat_PorkPiece_B_Mesh_LOD2.2" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="3" />
+							<attribute id="MaterialID" type="FixedString" value="ec750ce8-9ccc-28c3-2efb-56ad92f1f996" />
+							<attribute id="ObjectID" type="FixedString" value="CONS_Food_Meat_PorkPiece_B.CONS_Food_Meat_PorkPiece_B_Mesh_LOD3.3" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="4" />
+							<attribute id="MaterialID" type="FixedString" value="ec750ce8-9ccc-28c3-2efb-56ad92f1f996" />
+							<attribute id="ObjectID" type="FixedString" value="CONS_Food_Meat_PorkPiece_B.CONS_Food_Meat_PorkPiece_B_Mesh_LOD4.4" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.0454105 0.045759242 0.46108732" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.058195915 -0.041661434 -0.13069914" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="b1402a27-ee3e-b031-62fe-bad05cb0c3c7" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="CONS_Food_Meat_Skewer_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Consumables/CONS_Food_Meat/Resources/CONS_Food_Meat_Skewer_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Consumables/CONS_Food_Meat/Resources/CONS_Food_Meat_Skewer_A.Dummy_CONS_Food_Meat_Skewer_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209024" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="0c0440e0-d7a8-071d-7191-4f9d142375a5" />
+							<attribute id="ObjectID" type="FixedString" value="CONS_Food_Meat_Skewer_A.CONS_Food_Meat_Skewer_A_Meat_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="eede7f07-4790-f228-5460-a0f5e405e7ee" />
+							<attribute id="ObjectID" type="FixedString" value="CONS_Food_Meat_Skewer_A.CONS_Food_Meat_Skewer_A_Veggie_Mesh.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="0c0440e0-d7a8-071d-7191-4f9d142375a5" />
+							<attribute id="ObjectID" type="FixedString" value="CONS_Food_Meat_Skewer_A.CONS_Food_Meat_Skewer_A_Meat_Mesh_LOD1.2" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="eede7f07-4790-f228-5460-a0f5e405e7ee" />
+							<attribute id="ObjectID" type="FixedString" value="CONS_Food_Meat_Skewer_A.CONS_Food_Meat_Skewer_A_Veggie_Mesh_LOD1.3" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

@@ -1,0 +1,1247 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="330" lslib_meta="v1,bswap_guids" />
+	<region id="TLScene">
+		<node id="TLScene">
+			<attribute id="Identifier" type="guid" value="0b35425a-fa7e-cbcd-1c64-e031be1dfc78" />
+			<attribute id="SceneBounds" type="fvec3" value="0.6645 0 1.8193448" />
+			<attribute id="SceneType" type="uint8" value="2" />
+			<children>
+				<node id="Conditions">
+					<children>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="180d5f2a-5974-478a-b655-9e8c0ca26c8e" />
+							<children>
+								<node id="Conditions">
+									<attribute id="Id" type="guid" value="180d5f2a-5974-478a-b655-9e8c0ca26c8e" />
+									<attribute id="Name" type="LSString" value="Small to Tall" />
+									<children>
+										<node id="Conditions">
+											<children>
+												<node id="Condition">
+													<attribute id="ConditionType" type="int32" value="1" />
+													<attribute id="Threshold" type="float" value="20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="ac6bfd58-2c71-47fa-a884-1cc869afa337" />
+							<children>
+								<node id="Conditions">
+									<attribute id="Id" type="guid" value="ac6bfd58-2c71-47fa-a884-1cc869afa337" />
+									<attribute id="Name" type="LSString" value="Tall to Medium" />
+									<children>
+										<node id="Conditions">
+											<children>
+												<node id="Condition">
+													<attribute id="Comparison" type="int32" value="1" />
+													<attribute id="ConditionType" type="int32" value="1" />
+													<attribute id="Threshold" type="float" value="-5" />
+												</node>
+												<node id="Condition">
+													<attribute id="ConditionType" type="int32" value="1" />
+													<attribute id="Threshold" type="float" value="-15" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="2896bb35-dce0-4b86-a055-15623ac0e5f8" />
+							<children>
+								<node id="Conditions">
+									<attribute id="Id" type="guid" value="2896bb35-dce0-4b86-a055-15623ac0e5f8" />
+									<attribute id="Name" type="LSString" value="Tall to Small" />
+									<children>
+										<node id="Conditions">
+											<children>
+												<node id="Condition">
+													<attribute id="Comparison" type="int32" value="1" />
+													<attribute id="ConditionType" type="int32" value="1" />
+													<attribute id="Threshold" type="float" value="-20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Labels">
+					<attribute id="Object" type="FixedString" value="MediumAnimalFinal" />
+				</node>
+				<node id="LightingSetups">
+					<children>
+						<node id="LightingSetup">
+							<attribute id="Id" type="guid" value="00000000-0000-0000-0000-000000000000" />
+							<attribute id="Name" type="LSString" value="Default" />
+							<children>
+								<node id="Lights">
+									<children>
+										<node id="Light">
+											<attribute id="CastShadow" type="bool" value="True" />
+											<attribute id="Color" type="fvec3" value="1 0.9764706 0.8980392" />
+											<attribute id="Id" type="guid" value="d3ff4672-e030-463f-b021-3b33b2b046a8" />
+											<attribute id="Intensity" type="float" value="10" />
+											<attribute id="LightChannelFlags" type="uint8" value="2" />
+											<attribute id="LightCookieTexture" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+											<attribute id="Name" type="LSString" value="Key" />
+											<attribute id="Position" type="fvec3" value="-0.8 0.3 -0.5" />
+											<attribute id="PreExpose" type="bool" value="False" />
+											<attribute id="Radius" type="float" value="3" />
+											<attribute id="SpotLightAngles" type="fvec2" value="75 90" />
+											<attribute id="Type" type="uint8" value="1" />
+										</node>
+										<node id="Light">
+											<attribute id="Color" type="fvec3" value="0.5294118 0.8627451 1" />
+											<attribute id="FillLight" type="bool" value="True" />
+											<attribute id="Id" type="guid" value="3c3f7348-ed3d-4832-a648-72b566832495" />
+											<attribute id="Intensity" type="float" value="2.5" />
+											<attribute id="LightChannelFlags" type="uint8" value="2" />
+											<attribute id="LightCookieTexture" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+											<attribute id="Name" type="LSString" value="Fill" />
+											<attribute id="Position" type="fvec3" value="0.6 -0.55 -0.75" />
+											<attribute id="PreExpose" type="bool" value="False" />
+											<attribute id="Radius" type="float" value="3" />
+											<attribute id="SpotLightAngles" type="fvec2" value="75 90" />
+											<attribute id="Type" type="uint8" value="1" />
+										</node>
+										<node id="Light">
+											<attribute id="CastShadow" type="bool" value="True" />
+											<attribute id="Color" type="fvec3" value="0.79607844 1 0.78039217" />
+											<attribute id="Id" type="guid" value="da58d5f1-361b-44a3-aea8-01fb1555b773" />
+											<attribute id="Intensity" type="float" value="15" />
+											<attribute id="LightChannelFlags" type="uint8" value="2" />
+											<attribute id="LightCookieTexture" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+											<attribute id="Name" type="LSString" value="Rim" />
+											<attribute id="Position" type="fvec3" value="0.7 0.8 1" />
+											<attribute id="PreExpose" type="bool" value="False" />
+											<attribute id="Radius" type="float" value="4" />
+											<attribute id="SpotLightAngles" type="fvec2" value="75 90" />
+											<attribute id="Type" type="uint8" value="1" />
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="TLActors">
+					<children>
+						<node id="TLActor">
+							<attribute id="ActorType" type="uint8" value="1" />
+							<attribute id="LookAtSpeaker" type="int32" value="-267535682" />
+							<children>
+								<node id="Transforms">
+									<children>
+										<node id="Object">
+											<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+											<children>
+												<node id="MapValue">
+													<attribute id="Position" type="fvec3" value="0 0 0" />
+													<attribute id="RotationQuat" type="fvec4" value="0 0 0 1" />
+													<attribute id="Scale" type="float" value="1" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="TLActor">
+							<attribute id="ActorType" type="uint8" value="2" />
+							<attribute id="LookAtInterpMode" type="uint8" value="2" />
+							<attribute id="LookAtSpeaker" type="int32" value="5" />
+							<attribute id="TargetBone" type="FixedString" value="Head_M" />
+							<attribute id="TemplateId" type="guid" value="fd7f2707-8f86-4836-bda8-e0db99c389cc" />
+							<children>
+								<node id="Transforms">
+									<children>
+										<node id="Object">
+											<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+											<children>
+												<node id="MapValue">
+													<attribute id="Position" type="fvec3" value="0 0 1.1371583" />
+													<attribute id="RotationQuat" type="fvec4" value="0 0 0 1" />
+													<attribute id="Scale" type="float" value="0.9999999" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="TLActor">
+							<attribute id="ActorType" type="uint8" value="4" />
+							<attribute id="LookAtSpeaker" type="int32" value="-267535682" />
+							<attribute id="TemplateId" type="guid" value="3278f064-5353-4c08-ab96-c2f432d0fda0" />
+							<children>
+								<node id="Transforms">
+									<children>
+										<node id="Object">
+											<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+											<children>
+												<node id="MapValue">
+													<attribute id="Position" type="fvec3" value="0.689 0 2.3111584" />
+													<attribute id="RotationQuat" type="fvec4" value="0 0.07019175 0 0.99753356" />
+													<attribute id="Scale" type="float" value="0.9999997" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="TLActor">
+							<attribute id="ActorType" type="uint8" value="4" />
+							<attribute id="LookAtSpeaker" type="int32" value="-267535682" />
+							<attribute id="TemplateId" type="guid" value="3278f064-5353-4c08-ab96-c2f432d0fda0" />
+							<children>
+								<node id="Transforms">
+									<children>
+										<node id="Object">
+											<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+											<children>
+												<node id="MapValue">
+													<attribute id="Position" type="fvec3" value="1.046 0 1.4471582" />
+													<attribute id="RotationQuat" type="fvec4" value="0 0.15665859 0 0.9876528" />
+													<attribute id="Scale" type="float" value="0.9999997" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="TLActor">
+							<attribute id="ActorType" type="uint8" value="4" />
+							<attribute id="LookAtSpeaker" type="int32" value="-267535682" />
+							<attribute id="TemplateId" type="guid" value="3278f064-5353-4c08-ab96-c2f432d0fda0" />
+							<children>
+								<node id="Transforms">
+									<children>
+										<node id="Object">
+											<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+											<children>
+												<node id="MapValue">
+													<attribute id="Position" type="fvec3" value="-0.283 0 2.4051583" />
+													<attribute id="RotationQuat" type="fvec4" value="0 -0.077162765 0 0.9970186" />
+													<attribute id="Scale" type="float" value="0.9999999" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="TLActor">
+							<attribute id="ActorType" type="uint8" value="8" />
+							<attribute id="AnimationSourceId" type="guid" value="a02c3e09-9b21-1f0a-394a-2f9ac5e35853" />
+							<attribute id="LookAtSpeaker" type="int32" value="1" />
+							<attribute id="TargetBone" type="FixedString" value="Head_M" />
+							<attribute id="TemplateId" type="guid" value="67f39af3-b9ea-4e95-8237-7aa4f6bd7cef" />
+							<children>
+								<node id="Transforms">
+									<children>
+										<node id="Object">
+											<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+											<children>
+												<node id="MapValue">
+													<attribute id="Position" type="fvec3" value="0 0 -1.2335312" />
+													<attribute id="RotationQuat" type="fvec4" value="0 1 0 -4.3711385E-08" />
+													<attribute id="Scale" type="float" value="0.75" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="TLCameras">
+					<children>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="fe605a63-6daf-4d3e-8bd7-ecfbb95b1224" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="1" />
+									<attribute id="Identifier" type="guid" value="fe605a63-6daf-4d3e-8bd7-ecfbb95b1224" />
+									<attribute id="LookAt" type="int32" value="1" />
+									<attribute id="Name" type="LSString" value="cam_player_MID" />
+									<attribute id="RetargetableTo" type="uint8" value="1" />
+									<children>
+										<node id="AttachBone">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="FixedString" value="Socket_DIAG_Camera" />
+												</node>
+											</children>
+										</node>
+										<node id="DOF">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="bool" value="True" />
+												</node>
+											</children>
+										</node>
+										<node id="DOFAperature">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="22" />
+												</node>
+											</children>
+										</node>
+										<node id="DOFFarSharpDistance">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="1.7" />
+												</node>
+											</children>
+										</node>
+										<node id="DOFFocalDistance">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="0.81" />
+												</node>
+											</children>
+										</node>
+										<node id="DOFNearSharpDistance">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="0.81" />
+												</node>
+											</children>
+										</node>
+										<node id="FoV">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="25" />
+												</node>
+											</children>
+										</node>
+										<node id="FramingOffset">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="fvec2" value="0.0817574 0.027839987" />
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="5bbe0b80-1af1-4de5-af8f-43ca40088daa" />
+													<attribute id="MapValue" type="fvec2" value="0.08180345 -0.01231773" />
+												</node>
+											</children>
+										</node>
+										<node id="Transform">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="-0.58640856 -0.58295774 -1.8163861" />
+															<attribute id="RotationQuat" type="fvec4" value="-0.08252364 0.2489593 0.021042343 0.9647624" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="5bbe0b80-1af1-4de5-af8f-43ca40088daa" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="-0.22840005 -0.39248633 -2.5787778" />
+															<attribute id="RotationQuat" type="fvec4" value="-0.039271325 0.12145016 0.0047769775 0.99180883" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="87d41b34-fbd5-40f6-beb1-79487d881aef" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="Identifier" type="guid" value="87d41b34-fbd5-40f6-beb1-79487d881aef" />
+									<attribute id="LookAt" type="int32" value="5" />
+									<attribute id="Name" type="LSString" value="cam_subject1_MID" />
+									<attribute id="RetargetableTo" type="uint8" value="1" />
+									<children>
+										<node id="AttachBone">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="FixedString" value="Socket_DIAG_Camera" />
+												</node>
+											</children>
+										</node>
+										<node id="DOF">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="bool" value="True" />
+												</node>
+											</children>
+										</node>
+										<node id="DOFAperature">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="22" />
+												</node>
+											</children>
+										</node>
+										<node id="DOFFarSharpDistance">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="1.7" />
+												</node>
+											</children>
+										</node>
+										<node id="DOFFocalDistance">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="1.4" />
+												</node>
+											</children>
+										</node>
+										<node id="DOFNearSharpDistance">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="1" />
+												</node>
+											</children>
+										</node>
+										<node id="FoV">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="23" />
+												</node>
+											</children>
+										</node>
+										<node id="FramingOffset">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="fvec2" value="0.18579978 -0.028959924" />
+												</node>
+											</children>
+										</node>
+										<node id="SoftZoneRampTime">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="2" />
+												</node>
+											</children>
+										</node>
+										<node id="Transform">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="1.7792504 0.43270886 -2.8475988" />
+															<attribute id="RotationQuat" type="fvec4" value="0.07547571 -0.23384939 0.018183364 0.9691684" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="8fc02530-77b1-40ea-9d28-13f21aab35db" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="1" />
+									<attribute id="CameraType" type="uint8" value="1" />
+									<attribute id="Identifier" type="guid" value="8fc02530-77b1-40ea-9d28-13f21aab35db" />
+									<attribute id="LookAt" type="int32" value="5" />
+									<attribute id="Name" type="LSString" value="cam_subject1_OTS_player" />
+									<children>
+										<node id="FramingOffset">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="fvec2" value="0.2056471 -0.025081072" />
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="e7f07fe6-50c0-4a8e-98a3-a1e3ddc43f79" />
+													<attribute id="MapValue" type="fvec2" value="0.2165821 -0.016773427" />
+												</node>
+											</children>
+										</node>
+										<node id="Transform">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="-0.5067127 -0.12002921 0.8475032" />
+															<attribute id="RotationQuat" type="fvec4" value="0.020390049 0.9741494 -0.09888783 0.20208545" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="e7f07fe6-50c0-4a8e-98a3-a1e3ddc43f79" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="-0.40201738 0.27683198 0.77666295" />
+															<attribute id="RotationQuat" type="fvec4" value="0.035780355 0.96271724 -0.19902514 0.17967872" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="b3a907cb-7bce-4218-b375-7bd557c341bf" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="1" />
+									<attribute id="Identifier" type="guid" value="b3a907cb-7bce-4218-b375-7bd557c341bf" />
+									<attribute id="LookAt" type="int32" value="5" />
+									<attribute id="Name" type="LSString" value="Q_cam_subject1_WIDEOTS_player" />
+									<children>
+										<node id="DOFNearSharpDistance">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="5bbe0b80-1af1-4de5-af8f-43ca40088daa" />
+													<attribute id="MapValue" type="float" value="0.8" />
+												</node>
+											</children>
+										</node>
+										<node id="FoV">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="22" />
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="5bbe0b80-1af1-4de5-af8f-43ca40088daa" />
+													<attribute id="MapValue" type="float" value="16" />
+												</node>
+											</children>
+										</node>
+										<node id="FramingOffset">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="fvec2" value="0.2095972 -0.012392307" />
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="5bbe0b80-1af1-4de5-af8f-43ca40088daa" />
+													<attribute id="MapValue" type="fvec2" value="0.17914407 0.03125322" />
+												</node>
+											</children>
+										</node>
+										<node id="Tags">
+											<attribute id="Object" type="FixedString" value="Question Shot" />
+										</node>
+										<node id="Transform">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="-1.2214664 -0.35187948 1.4940474" />
+															<attribute id="RotationQuat" type="fvec4" value="0.016064268 0.96150744 -0.057599045 0.26819354" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="5bbe0b80-1af1-4de5-af8f-43ca40088daa" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="-0.49327612 -0.11188781 1.2429241" />
+															<attribute id="RotationQuat" type="fvec4" value="0.022233108 0.97749925 -0.14939366 0.14724994" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="c2bfd699-9613-4378-96c7-637e351f4b26" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="1" />
+									<attribute id="Identifier" type="guid" value="c2bfd699-9613-4378-96c7-637e351f4b26" />
+									<attribute id="LookAt" type="int32" value="-2" />
+									<attribute id="Name" type="LSString" value="Q_cam_player_WIDE" />
+									<children>
+										<node id="FramingOffset">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="fvec2" value="0.042407423 0.04906569" />
+												</node>
+											</children>
+										</node>
+										<node id="Tags">
+											<attribute id="Object" type="FixedString" value="Question Shot" />
+										</node>
+										<node id="Transform">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="-2.1661246 -0.9769458 -3.070536" />
+															<attribute id="RotationQuat" type="fvec4" value="-0.059954792 0.36645138 0.023452794 0.92820734" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="5bbe0b80-1af1-4de5-af8f-43ca40088daa" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="-0.9604924 -1.1624428 -3.9148412" />
+															<attribute id="RotationQuat" type="fvec4" value="-0.08939847 0.19387998 0.017304663 0.97679013" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="ff9136ca-e96e-4709-8d3c-f4a6d0de5690" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="CameraType" type="uint8" value="1" />
+									<attribute id="Identifier" type="guid" value="ff9136ca-e96e-4709-8d3c-f4a6d0de5690" />
+									<attribute id="LookAt" type="int32" value="1" />
+									<attribute id="Name" type="LSString" value="cam_player_OTS_subject1" />
+									<children>
+										<node id="DOFNearSharpDistance">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="0.5" />
+												</node>
+											</children>
+										</node>
+										<node id="FramingOffset">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="fvec2" value="-0.007945106 0.046703793" />
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="5c6748bc-1e7f-4fba-83cd-15bacbfa12be" />
+													<attribute id="MapValue" type="fvec2" value="0.010230357 0.0442445" />
+												</node>
+											</children>
+										</node>
+										<node id="Transform">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="1.9791179 -0.089434505 1.0462852" />
+															<attribute id="RotationQuat" type="fvec4" value="0.015224758 0.96941715 0.06445212 -0.23631422" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="5c6748bc-1e7f-4fba-83cd-15bacbfa12be" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="1.6476471 -0.31141883 0.77291995" />
+															<attribute id="RotationQuat" type="fvec4" value="-0.026170196 -0.9612906 -0.10241421 0.25445426" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="788e3996-fcf7-4113-9dc0-e4b971935c06" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="CameraType" type="uint8" value="1" />
+									<attribute id="Identifier" type="guid" value="788e3996-fcf7-4113-9dc0-e4b971935c06" />
+									<attribute id="LookAt" type="int32" value="1" />
+									<attribute id="Name" type="LSString" value="cam_player_OTSCLOSE_subject1" />
+									<children>
+										<node id="DOFNearSharpDistance">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="0.75" />
+												</node>
+											</children>
+										</node>
+										<node id="DampingStrength">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="4" />
+												</node>
+											</children>
+										</node>
+										<node id="FoV">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="13" />
+												</node>
+											</children>
+										</node>
+										<node id="FramingOffset">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="fvec2" value="0.021917604 0.012621414" />
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="bfc6359d-bb16-4e15-8834-8169b313dcf1" />
+													<attribute id="MapValue" type="fvec2" value="0.0068042185 0.01000549" />
+												</node>
+											</children>
+										</node>
+										<node id="Transform">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="2.2780929 -0.5809902 1.8468432" />
+															<attribute id="RotationQuat" type="fvec4" value="0.024433339 0.9726553 0.12325071 -0.1953305" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="bfc6359d-bb16-4e15-8834-8169b313dcf1" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="1.606207 -0.5799984 1.2245133" />
+															<attribute id="RotationQuat" type="fvec4" value="-0.030016607 -0.9683371 -0.15189986 0.19582878" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="79aefc5a-42e2-45ca-9617-798b77e9601d" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="1" />
+									<attribute id="Identifier" type="guid" value="79aefc5a-42e2-45ca-9617-798b77e9601d" />
+									<attribute id="LookAt" type="int32" value="5" />
+									<attribute id="Name" type="LSString" value="cam_subject1_OTSMID_player" />
+									<children>
+										<node id="FramingOffset">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="fvec2" value="0.2547764 -0.010695019" />
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="6a0b2b64-431e-4831-93c7-9cd9d1ee3ee5" />
+													<attribute id="MapValue" type="fvec2" value="0.28568107 -0.02211633" />
+												</node>
+											</children>
+										</node>
+										<node id="Transform">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="-0.61744314 -0.17063606 0.86927104" />
+															<attribute id="RotationQuat" type="fvec4" value="0.025094649 0.96689445 -0.10548609 0.23099396" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="6a0b2b64-431e-4831-93c7-9cd9d1ee3ee5" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="-0.3110294 0.13724399 0.5269215" />
+															<attribute id="RotationQuat" type="fvec4" value="0.03802788 0.9604249 -0.19742548 0.1927721" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="190185b2-1b46-402d-9039-15d89b636d84" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="CameraType" type="uint8" value="4" />
+									<attribute id="Identifier" type="guid" value="190185b2-1b46-402d-9039-15d89b636d84" />
+									<attribute id="LookAt" type="int32" value="-2" />
+									<attribute id="Name" type="LSString" value="cam_subject1_CU" />
+									<children>
+										<node id="DOFFarSharpDistance">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="1.5" />
+												</node>
+											</children>
+										</node>
+										<node id="DOFNearSharpDistance">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="1.2" />
+												</node>
+											</children>
+										</node>
+										<node id="FoV">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="20" />
+												</node>
+											</children>
+										</node>
+										<node id="FramingOffset">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="fvec2" value="0.18042196 -0.04779415" />
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="8961d292-bfd7-4a07-959c-90ac7d5226f0" />
+													<attribute id="MapValue" type="fvec2" value="0.21571015 -0.001980204" />
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="e2b2b616-1233-40d3-8a5b-c1e5a663ad9e" />
+													<attribute id="MapValue" type="fvec2" value="0.20884988 -0.04413251" />
+												</node>
+											</children>
+										</node>
+										<node id="FreeZoneDelay">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="0.5" />
+												</node>
+											</children>
+										</node>
+										<node id="SoftZoneDelay">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="0.5" />
+												</node>
+											</children>
+										</node>
+										<node id="SoftZoneRampTime">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="2" />
+												</node>
+											</children>
+										</node>
+										<node id="Transform">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="1.3781266 0.10447323 -2.2029905" />
+															<attribute id="RotationQuat" type="fvec4" value="0.033156753 -0.19054858 0.006441029 0.9810966" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="8961d292-bfd7-4a07-959c-90ac7d5226f0" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="1.1747366 -0.62399507 -2.0280187" />
+															<attribute id="RotationQuat" type="fvec4" value="-0.1343882 -0.16952921 -0.022351468 0.97606355" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="e2b2b616-1233-40d3-8a5b-c1e5a663ad9e" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="1.1796433 0.3782555 -1.8740661" />
+															<attribute id="RotationQuat" type="fvec4" value="0.11050323 -0.22372226 0.02528237 0.96803844" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="2fad736c-047d-4964-a8d6-0f1d8fb085b1" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="1" />
+									<attribute id="CameraType" type="uint8" value="1" />
+									<attribute id="Identifier" type="guid" value="2fad736c-047d-4964-a8d6-0f1d8fb085b1" />
+									<attribute id="LookAt" type="int32" value="5" />
+									<attribute id="Name" type="LSString" value="cam_subject1_OTSCLOSE_player" />
+									<children>
+										<node id="DOFNearSharpDistance">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="5bbe0b80-1af1-4de5-af8f-43ca40088daa" />
+													<attribute id="MapValue" type="float" value="1" />
+												</node>
+											</children>
+										</node>
+										<node id="FoV">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="16" />
+												</node>
+											</children>
+										</node>
+										<node id="FramingOffset">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="fvec2" value="0.16085915 -0.036382962" />
+												</node>
+											</children>
+										</node>
+										<node id="Transform">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="-0.34782428 0.06118822 0.81441283" />
+															<attribute id="RotationQuat" type="fvec4" value="0.020833738 0.9774556 -0.11894865 0.17319858" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="33cbd7b0-a3a5-43d0-b305-41b9b97c5730" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="-0.2647784 0.3472916 0.83017457" />
+															<attribute id="RotationQuat" type="fvec4" value="0.027506817 0.96881413 -0.20640203 0.13431627" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="5bbe0b80-1af1-4de5-af8f-43ca40088daa" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="-0.15003061 -0.13228583 0.7287688" />
+															<attribute id="RotationQuat" type="fvec4" value="0.039459392 0.9592487 -0.17846394 0.2154889" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="11af72e5-4f30-4a42-92af-c03646348dc2" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="1" />
+									<attribute id="Identifier" type="guid" value="11af72e5-4f30-4a42-92af-c03646348dc2" />
+									<attribute id="LookAt" type="int32" value="-2" />
+									<attribute id="Name" type="LSString" value="Q_cam_player_MID" />
+									<children>
+										<node id="FramingOffset">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="fvec2" value="0.06828018 0.047461644" />
+												</node>
+											</children>
+										</node>
+										<node id="Tags">
+											<attribute id="Object" type="FixedString" value="Question Shot" />
+										</node>
+										<node id="Transform">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="-1.2603483 -0.6356492 -2.1752443" />
+															<attribute id="RotationQuat" type="fvec4" value="-0.04973878 0.33785182 0.017718153 0.9397172" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="62dc4211-3d45-4e20-b6bc-62e18087b085" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="CameraType" type="uint8" value="2" />
+									<attribute id="Identifier" type="guid" value="62dc4211-3d45-4e20-b6bc-62e18087b085" />
+									<attribute id="LookAt" type="int32" value="-2" />
+									<attribute id="Name" type="LSString" value="cam_subject1_MCU" />
+									<children>
+										<node id="FramingOffset">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="fvec2" value="0.1862259 -0.039378908" />
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="62ee6d55-3a5d-45e2-9606-196768110f51" />
+													<attribute id="MapValue" type="fvec2" value="0.19317779 -0.037006278" />
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="5bbe0b80-1af1-4de5-af8f-43ca40088daa" />
+													<attribute id="MapValue" type="fvec2" value="0.17059012 0.020720128" />
+												</node>
+											</children>
+										</node>
+										<node id="Transform">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="1.494523 0.46404278 -2.4421437" />
+															<attribute id="RotationQuat" type="fvec4" value="0.08292563 -0.20709273 0.017572174 0.9746421" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="62ee6d55-3a5d-45e2-9606-196768110f51" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="1.2602828 0.38234055 -2.131847" />
+															<attribute id="RotationQuat" type="fvec4" value="0.10214961 -0.20579214 0.021500047 0.9730122" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="5bbe0b80-1af1-4de5-af8f-43ca40088daa" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="0.89972806 -0.11877561 -1.3681388" />
+															<attribute id="RotationQuat" type="fvec4" value="-0.04774901 -0.2746508 -0.013577228 0.9602618" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="5b5462a1-0dc5-478e-82da-c5d8fe9ace95" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="Identifier" type="guid" value="5b5462a1-0dc5-478e-82da-c5d8fe9ace95" />
+									<attribute id="LookAt" type="int32" value="1" />
+									<attribute id="Name" type="LSString" value="cam_player_OTSMID_subject1" />
+									<children>
+										<node id="DOFNearSharpDistance">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="0.4" />
+												</node>
+											</children>
+										</node>
+										<node id="FramingOffset">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="fvec2" value="0.03674105 0.054490305" />
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="7ad57345-8299-4189-bf67-7440ad0ba384" />
+													<attribute id="MapValue" type="fvec2" value="0.015506713 0.051336084" />
+												</node>
+											</children>
+										</node>
+										<node id="Transform">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="1.8836131 -0.10311329 0.54584473" />
+															<attribute id="RotationQuat" type="fvec4" value="0.017571682 0.96877027 0.07479361 -0.23575707" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="7ad57345-8299-4189-bf67-7440ad0ba384" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="1.6596228 -0.2976951 0.5454764" />
+															<attribute id="RotationQuat" type="fvec4" value="-0.02879328 -0.9534176 -0.10144451 0.28262174" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="ddfb863d-2376-4882-8d26-6a7f95eed0ca" />
+							<children>
+								<node id="TLCameras">
+									<attribute id="AttachTo" type="int32" value="5" />
+									<attribute id="Identifier" type="guid" value="ddfb863d-2376-4882-8d26-6a7f95eed0ca" />
+									<attribute id="LookAt" type="int32" value="1" />
+									<attribute id="Name" type="LSString" value="Q_cam_player_WIDEOTS_subject1" />
+									<children>
+										<node id="DOFNearSharpDistance">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="float" value="0.5" />
+												</node>
+											</children>
+										</node>
+										<node id="FoV">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="5bbe0b80-1af1-4de5-af8f-43ca40088daa" />
+													<attribute id="MapValue" type="float" value="20" />
+												</node>
+											</children>
+										</node>
+										<node id="FramingOffset">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="fvec2" value="0.01943254 0.058385346" />
+												</node>
+											</children>
+										</node>
+										<node id="Tags">
+											<attribute id="Object" type="FixedString" value="Question Shot" />
+										</node>
+										<node id="Transform">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="2.7495148 -0.54176974 1.6911356" />
+															<attribute id="RotationQuat" type="fvec4" value="0.022290573 0.95685065 0.07882877 -0.27879423" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="5bbe0b80-1af1-4de5-af8f-43ca40088daa" />
+													<children>
+														<node id="MapValue">
+															<attribute id="Position" type="fvec3" value="1.6880168 -0.67503446 1.6382802" />
+															<attribute id="RotationQuat" type="fvec4" value="0.022523591 0.9755356 0.13179967 -0.17450519" />
+															<attribute id="Scale" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="TLInheritedScenes">
+					<children>
+						<node id="TLScene">
+							<attribute id="Object" type="string" value="Public/Shared/Timeline/Scenes/Default/bnz_standing_Px1_Shipping.lsx" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

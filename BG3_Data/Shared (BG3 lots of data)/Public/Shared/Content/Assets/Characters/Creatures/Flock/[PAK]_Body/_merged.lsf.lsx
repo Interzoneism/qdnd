@@ -1,0 +1,2334 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="AnimationBlueprintBank">
+		<node id="AnimationBlueprintBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="526c7df2-ca3c-4d98-dcc4-bd95f015a4b0" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="758b4afb-72b1-9b5f-4a5f-91dba81e8fae" />
+					<attribute id="SourceFile" type="LSString" value="Editor/Mods/Shared/Assets/Blueprints/Objects_ActivateDeactivate.lsabp" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855930" />
+					<children>
+						<node id="Params" />
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="CharacterVisualBank">
+		<node id="CharacterVisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="BaseVisual" type="FixedString" value="ec771e59-6dbd-4646-0d58-edf4b8679467" />
+					<attribute id="BodySetVisual" type="FixedString" value="54d00aaf-82b9-0711-1a2a-a02b842dd3c3" />
+					<attribute id="ID" type="FixedString" value="3a8a8c49-70f1-5de8-7af6-eb2d9021c8f6" />
+					<attribute id="Name" type="LSString" value="FLOCK_Body_Pigeon" />
+					<attribute id="ShowEquipmentVisuals" type="bool" value="False" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+					<children>
+						<node id="MaterialOverrides">
+							<attribute id="MaterialResource" type="FixedString" value="" />
+							<children>
+								<node id="MaterialPresets" />
+								<node id="ScalarParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="Reflectance" />
+									<attribute id="Value" type="float" value="0.4" />
+								</node>
+								<node id="Vector3Parameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="Color_01" />
+									<attribute id="Value" type="fvec3" value="0.24279635 0.44787082 0.8671355" />
+								</node>
+								<node id="Vector3Parameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="Color_02" />
+									<attribute id="Value" type="fvec3" value="0.8591736 0.78931373 0.68002033" />
+								</node>
+								<node id="Vector3Parameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="Color_03" />
+									<attribute id="Value" type="fvec3" value="1 1 1" />
+								</node>
+							</children>
+						</node>
+						<node id="RealMaterialOverrides" />
+						<node id="Slots">
+							<attribute id="Bone" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="Unassigned" />
+							<attribute id="VisualResource" type="FixedString" value="0a6bcae0-c2a3-c81d-cc06-f614551447cb" />
+						</node>
+						<node id="Slots">
+							<attribute id="Bone" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="Unassigned" />
+							<attribute id="VisualResource" type="FixedString" value="c7f54b43-5a4a-d705-8a13-bb2081a54151" />
+						</node>
+						<node id="Slots">
+							<attribute id="Bone" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="Unassigned" />
+							<attribute id="VisualResource" type="FixedString" value="a627713e-170b-731c-21e9-03bb2d89a3de" />
+						</node>
+						<node id="Slots">
+							<attribute id="Bone" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="Unassigned" />
+							<attribute id="VisualResource" type="FixedString" value="ec771e59-6dbd-4646-0d58-edf4b8679467" />
+						</node>
+						<node id="Slots">
+							<attribute id="Bone" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="Unassigned" />
+							<attribute id="VisualResource" type="FixedString" value="e29562a6-8830-9252-784b-dfb04c6f3e66" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="SkeletonBank">
+		<node id="SkeletonBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="DynamicPhysicsResourceID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="ID" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="IKRigResourceID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="Name" type="LSString" value="FLOCK_Base" />
+					<attribute id="PreviewAnimationResource" type="FixedString" value="" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RagdollResourceID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Base.GR2" />
+					<attribute id="SpringResourceID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Base.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209006" />
+					<children>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_5_Head_M_endBone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_5_Head_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_5_Feet_M_endBone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_5_Feet_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_5_LowerLegs_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_5_UpperLegs_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_5_Tail_M_endBone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_5_Tail_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_5_Wing2_R_endbone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_5_Wing1_R" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_5_Wing0_R" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_5_Wing2_L_endbone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_5_Wing1_L" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_5_Wing0_L" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_5_Root_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_4_Head_M_endBone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_4_Head_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_4_Feet_M_endBone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_4_Feet_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_4_LowerLegs_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_4_UpperLegs_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_4_Tail_M_endBone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_4_Tail_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_4_Wing2_L_endbone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_4_Wing1_L" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_4_Wing0_L" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_4_Wing2_R_endbone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_4_Wing1_R" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_4_Wing0_R" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_4_Root_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+									<attribute id="SoundObjectIndex" type="uint8" value="8" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_3_Head_M_endBone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_3_Head_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_3_Feet_M_endBone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_3_Feet_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_3_LowerLegs_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_3_UpperLegs_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_3_Tail_M_endBone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_3_Tail_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_3_Wing2_L_endbone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_3_Wing1_L" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_3_Wing0_L" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_3_Wing2_R_endbone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_3_Wing1_R" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_3_Wing0_R" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_3_Root_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+									<attribute id="SoundObjectIndex" type="uint8" value="7" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_2_Head_M_endBone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_2_Head_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_2_Feet_M_endBone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_2_Feet_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_2_LowerLegs_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_2_UpperLegs_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_2_Tail_M_endBone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_2_Tail_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_2_Wing2_L_endbone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_2_Wing1_L" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_2_Wing0_L" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_2_Wing2_R_endbone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_2_Wing1_R" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_2_Wing0_R" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_2_Root_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+									<attribute id="SoundObjectIndex" type="uint8" value="6" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_1_Head_M_endBone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_1_Head_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_1_Feet_M_endBone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_1_Feet_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_1_LowerLegs_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_1_UpperLegs_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_1_Tail_M_endBone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_1_Tail_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_1_Wing2_L_endbone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_1_Wing1_L" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_1_Wing0_L" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_1_Wing2_R_endbone" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_1_Wing1_R" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_1_Wing0_R" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Flock_1_Root_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+									<attribute id="SoundObjectIndex" type="uint8" value="5" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Root" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationSetBank">
+		<node id="AnimationSetBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="9eb6c831-f56d-6824-1ec1-2e489eca3f1d" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855930" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="FallBackAnimation" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets">
+											<children>
+												<node id="Object">
+													<attribute id="FallBackSubSet" type="FixedString" value="" />
+													<attribute id="MapKey" type="FixedString" value="" />
+													<children>
+														<node id="Animation">
+															<children>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="52a0516e-c102-490c-8e69-43006d62e2bf" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="607367f6-5e43-29d3-3db8-2311a9bb54d3" />
+																	<attribute id="MapKey" type="FixedString" value="972a6050-aa7b-4f51-9cb0-1d07952eaa87" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="2be3011d-0cce-fcb4-1a5e-fe2083d52c45" />
+																	<attribute id="MapKey" type="FixedString" value="e681a32e-8720-4f63-ad1a-2ab57d1fdc77" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="22fe4bae-ece3-e8b2-55cb-cd88d7297eea" />
+																	<attribute id="MapKey" type="FixedString" value="5c67fe36-c8e3-4fac-a789-761efa688c33" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="d1e14818-f577-6243-d755-ee42e06401cd" />
+																	<attribute id="MapKey" type="FixedString" value="7e6dcd9b-674e-47e5-adf4-8db68a793c35" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="cc0b97e6-aa92-5a0d-93e7-03b0f86ef8f7" />
+																	<attribute id="MapKey" type="FixedString" value="cd80aa30-42f2-46b0-8079-ce960f8c49eb" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="e7033913-9f92-0f2c-7ddc-d6bece8566e4" />
+																	<attribute id="MapKey" type="FixedString" value="694e2880-6fad-4b48-bf84-09925967bfef" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="03668113-33e9-56c4-e874-6b962e75740d" />
+																	<attribute id="MapKey" type="FixedString" value="b195807e-cd4e-4e82-9422-24f602d4aa5f" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f065c0b7-a2cd-9efb-8a5c-335fcdbfba01" />
+																	<attribute id="MapKey" type="FixedString" value="29614676-6f7a-4023-9ca7-c5c5c28fead6" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="096d5de5-5513-e8d4-aaeb-6f0a05422e7e" />
+																	<attribute id="MapKey" type="FixedString" value="7d43dd94-b3de-44d2-8491-e039637ddf18" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="55a3dc25-d3d2-4305-8ad9-6bb636195cdd" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="d9d7c7a1-2651-4185-aa6e-b3582e93a623" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="74eab1d1-f475-4045-9b76-ff2ed4ded8e8" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="81bf4daf-3176-4718-bbcc-6619b98f4f02" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="05538f86-9746-4b66-b2a5-fc407fb3c597" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="ae562e3c-673e-992d-6b06-748eb787d320" />
+																	<attribute id="MapKey" type="FixedString" value="755dda01-a9f8-4a8d-a363-5eb55893bb80" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="cd3448d0-6c52-c131-f844-8f1a159d80fb" />
+																	<attribute id="MapKey" type="FixedString" value="b0ec4606-359b-447f-bb5c-4ddf412ec90a" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f3dfda98-8200-b681-71db-9823918012bc" />
+																	<attribute id="MapKey" type="FixedString" value="3a76773f-0804-4972-b452-4be1877005ba" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="1b0eaf6c-b8e7-5bbe-6099-943cc9a3ff6b" />
+																	<attribute id="MapKey" type="FixedString" value="732c22bf-2d2f-4a7d-bee4-d4df2e9acdf6" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="d20a4c67-9b9a-f276-74ff-2dba68e9aa88" />
+																	<attribute id="MapKey" type="FixedString" value="1164be33-ac81-4efc-a497-aacf81fae051" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="6f4e3304-e674-4985-9739-2132d735e259" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="c24cec94-572b-465d-b1f5-e30c8de262be" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="172ce698-cf3f-4ae1-a9b1-f5bcdeec4d0f" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="a716764f-5cee-47b9-81b9-bec503df65cf" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="fb87d6c6-11b6-41c0-8384-0fb83e4c69b5" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="5a325e6a-0c2b-4165-99b0-639772c8d0d8" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="de8e608a-86dd-499e-9b89-d2f9865b1e5e" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="e633ed17-2e89-47b5-839e-6c7584bf33a6" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="f8505fc9-34fd-4ff9-9711-4725063e52f8" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="60e992d7-818e-406d-a0d0-54a02f9c1c33" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="b8d99ec5-dab0-4d02-994c-3802f43918c8" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="bce433c3-95da-4f5f-9732-17ecf96b30b7" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="0a2f464c-a1b2-8eb1-ebd3-8574b5906f69" />
+																	<attribute id="MapKey" type="FixedString" value="bb1e8405-8773-46d1-92c8-9f42d900922b" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="b8991ad1-3d34-c248-ec6e-75bf9f93265e" />
+																	<attribute id="MapKey" type="FixedString" value="8d930ddf-c3d4-4683-8aba-fbe031581191" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="41d5384e-860b-5621-66a8-9ae48af43226" />
+																	<attribute id="MapKey" type="FixedString" value="148f6c2e-2241-47d5-87fe-54b2f5fdc1ac" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="53ca809a-833d-7033-f276-d9a485415a43" />
+																	<attribute id="MapKey" type="FixedString" value="8be9179a-3dc5-4a35-bd61-33af16176cf4" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="53ca809a-833d-7033-f276-d9a485415a43" />
+																	<attribute id="MapKey" type="FixedString" value="07e81afc-95c4-452b-ac68-5cbb74710cca" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="e7033913-9f92-0f2c-7ddc-d6bece8566e4" />
+																	<attribute id="MapKey" type="FixedString" value="6dd3d472-9e11-47bf-8f7a-04e75ffe6c26" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="9d5b7fc5-d643-44bf-8cbb-38c98fe27179" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="53ca809a-833d-7033-f276-d9a485415a43" />
+																	<attribute id="MapKey" type="FixedString" value="5cff24c4-99d7-4205-9187-21eada3d1614" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="25aac953-33e9-d76c-cb53-d322a5b7e5fd" />
+																	<attribute id="MapKey" type="FixedString" value="d55eccb3-e344-453e-9b26-73f3c38e1ac8" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="6a45a91b-30fc-44f5-9bfb-8ad05d5432ad" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="8ea248f7-c1fb-2850-bc46-d22466c771f1" />
+																	<attribute id="MapKey" type="FixedString" value="9e02c309-46c1-43ef-b47c-ad6983058c19" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="53ca809a-833d-7033-f276-d9a485415a43" />
+																	<attribute id="MapKey" type="FixedString" value="5658922f-15c5-4729-b736-ca4456228628" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="8ea248f7-c1fb-2850-bc46-d22466c771f1" />
+																	<attribute id="MapKey" type="FixedString" value="42c02cc0-0503-4ca9-9ea0-45564bd0e5d4" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="0a2f464c-a1b2-8eb1-ebd3-8574b5906f69" />
+																	<attribute id="MapKey" type="FixedString" value="b5d99946-0646-4bdd-88a0-9604872a0dd9" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="93605598-791b-c21e-b747-86707f137292" />
+																	<attribute id="MapKey" type="FixedString" value="7def448c-ee51-48da-a683-e8f8992efb82" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="41d5384e-860b-5621-66a8-9ae48af43226" />
+																	<attribute id="MapKey" type="FixedString" value="f04c4e0b-c35a-47ef-8e7f-1036f690a665" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="93605598-791b-c21e-b747-86707f137292" />
+																	<attribute id="MapKey" type="FixedString" value="4b798a6b-3261-4933-8dc9-749b90b630eb" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+																	<attribute id="MapKey" type="FixedString" value="85397535-5cc7-4dd3-9dca-277e73f405ce" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationBank">
+		<node id="AnimationBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.3333335" />
+					<attribute id="ID" type="FixedString" value="03668113-33e9-56c4-e874-6b962e75740d" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp07_Landing_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp07_Landing_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp07_Landing_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855929" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.6666667" />
+					<attribute id="ID" type="FixedString" value="096d5de5-5513-e8d4-aaeb-6f0a05422e7e" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp03_Landing_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp03_Landing_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp03_Landing_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855929" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.3333335" />
+					<attribute id="ID" type="FixedString" value="0a2f464c-a1b2-8eb1-ebd3-8574b5906f69" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp01_TakingOff_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp01_TakingOff_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp01_TakingOff_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209017" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="5" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="2" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="6" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="3" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="7" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="4" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="8" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="10.000001" />
+					<attribute id="ID" type="FixedString" value="1b0eaf6c-b8e7-5bbe-6099-943cc9a3ff6b" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp04_Idling_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp04_Idling_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp04_Idling_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855929" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.3333335" />
+					<attribute id="ID" type="FixedString" value="22fe4bae-ece3-e8b2-55cb-cd88d7297eea" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp05_TakingOff_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp05_TakingOff_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp05_TakingOff_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209006" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="2" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="6" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="3" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="7" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="4" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="8" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="5" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.5000002" />
+					<attribute id="ID" type="FixedString" value="25aac953-33e9-d76c-cb53-d322a5b7e5fd" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp05_Landing_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp05_Landing_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp05_Landing_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855929" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.3333335" />
+					<attribute id="ID" type="FixedString" value="2be3011d-0cce-fcb4-1a5e-fe2083d52c45" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp06_TakingOff_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp06_TakingOff_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp06_TakingOff_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209006" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="5" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="2" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="6" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="3" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="7" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="4" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="8" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.4" />
+					<attribute id="ID" type="FixedString" value="41d5384e-860b-5621-66a8-9ae48af43226" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp02_Landing_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp02_Landing_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp02_Landing_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855929" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="10.000001" />
+					<attribute id="ID" type="FixedString" value="53ca809a-833d-7033-f276-d9a485415a43" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp01_Idling_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp01_Idling_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp01_Idling_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855929" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.3333335" />
+					<attribute id="ID" type="FixedString" value="607367f6-5e43-29d3-3db8-2311a9bb54d3" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp07_TakingOff_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp07_TakingOff_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp07_TakingOff_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209006" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="5" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="2" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="6" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="3" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="7" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="4" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="8" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.3333335" />
+					<attribute id="ID" type="FixedString" value="8ea248f7-c1fb-2850-bc46-d22466c771f1" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp01_Landing_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp01_Landing_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp01_Landing_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855929" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="10.000001" />
+					<attribute id="ID" type="FixedString" value="93605598-791b-c21e-b747-86707f137292" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp02_Idling_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp02_Idling_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp02_Idling_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855929" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="10.000001" />
+					<attribute id="ID" type="FixedString" value="ae562e3c-673e-992d-6b06-748eb787d320" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp07_Idling_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp07_Idling_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp07_Idling_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855929" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.266667" />
+					<attribute id="ID" type="FixedString" value="b8991ad1-3d34-c248-ec6e-75bf9f93265e" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp04_Landing_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp04_Landing_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp04_Landing_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855929" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.90000004" />
+					<attribute id="ID" type="FixedString" value="c9dfe1d5-6235-26b4-f1fb-46e8b174d395" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Idle_Still_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Idle_Still_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Idle_Still_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855928" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.3333335" />
+					<attribute id="ID" type="FixedString" value="cc0b97e6-aa92-5a0d-93e7-03b0f86ef8f7" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp03_TakingOff_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp03_TakingOff_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp03_TakingOff_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209006" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="3" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="7" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="4" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="8" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="2" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="5" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="6" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="10.000001" />
+					<attribute id="ID" type="FixedString" value="cd3448d0-6c52-c131-f844-8f1a159d80fb" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp06_Idling_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp06_Idling_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp06_Idling_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855929" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.3333335" />
+					<attribute id="ID" type="FixedString" value="d1e14818-f577-6243-d755-ee42e06401cd" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp04_TakingOff_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp04_TakingOff_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp04_TakingOff_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209006" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="5" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="2" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="6" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="3" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="7" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="4" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="8" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="10.000001" />
+					<attribute id="ID" type="FixedString" value="d20a4c67-9b9a-f276-74ff-2dba68e9aa88" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp03_Idling_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp03_Idling_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp03_Idling_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855929" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.6666667" />
+					<attribute id="ID" type="FixedString" value="e7033913-9f92-0f2c-7ddc-d6bece8566e4" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp02_TakingOff_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp02_TakingOff_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp02_TakingOff_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209006" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="5" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="2" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="6" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="4" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="8" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SE_BirdFlockScatter" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="3" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="4a26609c-0e9e-424d-9d58-7e07da4234f5" />
+									<attribute id="SoundObjectIndex" type="uint8" value="7" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.3333335" />
+					<attribute id="ID" type="FixedString" value="f065c0b7-a2cd-9efb-8a5c-335fcdbfba01" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp06_Landing_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp06_Landing_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp06_Landing_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855929" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="10.000001" />
+					<attribute id="ID" type="FixedString" value="f3dfda98-8200-b681-71db-9823918012bc" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="FLOCK_Rig_DFLT_Comp05_Idling_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp05_Idling_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/FLOCK_Rig/FLOCK_Rig_DFLT_Comp05_Idling_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855929" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.47500712 0.3766667 0.33599076" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.47450495 -0.004036637 -0.2984587" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="0300bb0f-d2a5-ac40-18fd-a745fc6d4f3c" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="FLOCK_03_Bluejay" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Body" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Flock/Resources/FLOCK_03_Bluejay.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Flock/Resources/FLOCK_03_Bluejay.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209024" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="b976a633-d313-8de4-7380-c59ca87e2667" />
+							<attribute id="ObjectID" type="FixedString" value="FLOCK_03_Bluejay.FLOCK_03_Bluejay_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="b976a633-d313-8de4-7380-c59ca87e2667" />
+							<attribute id="ObjectID" type="FixedString" value="FLOCK_03_Bluejay.FLOCK_03_Bluejay_Mesh_LOD1.1" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.51746005 0.37110236 0.39558586" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.51746005 -0.0050811423 -0.29273468" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="0a6bcae0-c2a3-c81d-cc06-f614551447cb" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="FLOCK_03_Pigeon_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Flock/Resources/FLOCK_03_Pigeon_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Flock/Resources/FLOCK_03_Pigeon_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209026" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="d021a679-cbde-5d8d-fe5c-8a3b7fad1deb" />
+							<attribute id="ObjectID" type="FixedString" value="FLOCK_03_Pigeon_A.FLOCK_03_Pigeon_A_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="d021a679-cbde-5d8d-fe5c-8a3b7fad1deb" />
+							<attribute id="ObjectID" type="FixedString" value="FLOCK_03_Pigeon_A.FLOCK_03_Pigeon_A_Mesh_LOD1.1" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.47500712 0.3766667 0.33599076" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.47450495 -0.004036637 -0.2984587" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="44f4eb20-f7a7-4593-cf0d-e7c3101b0451" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="FLOCK_04_Bluejay" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Body" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Flock/Resources/FLOCK_04_Bluejay.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Flock/Resources/FLOCK_04_Bluejay.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209024" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="b976a633-d313-8de4-7380-c59ca87e2667" />
+							<attribute id="ObjectID" type="FixedString" value="FLOCK_04_Bluejay.FLOCK_04_Bluejay_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="b976a633-d313-8de4-7380-c59ca87e2667" />
+							<attribute id="ObjectID" type="FixedString" value="FLOCK_04_Bluejay.FLOCK_04_Bluejay_Mesh_LOD1.1" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.51746005 0.37110236 0.39558586" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.51746005 -0.0050811423 -0.29273468" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="54d00aaf-82b9-0711-1a2a-a02b842dd3c3" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="FLOCK_01_Pigeon_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Flock/Resources/FLOCK_01_Pigeon_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Flock/Resources/FLOCK_01_Pigeon_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209026" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="d021a679-cbde-5d8d-fe5c-8a3b7fad1deb" />
+							<attribute id="ObjectID" type="FixedString" value="FLOCK_01_Pigeon_A.FLOCK_01_Pigeon_A_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="d021a679-cbde-5d8d-fe5c-8a3b7fad1deb" />
+							<attribute id="ObjectID" type="FixedString" value="FLOCK_01_Pigeon_A.FLOCK_01_Pigeon_A_Mesh_LOD1.1" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.47500712 0.3766667 0.33599076" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.47450495 -0.004036637 -0.2984587" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="612eb527-4f0d-ef3c-627b-6b8a675d9977" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="FLOCK_02_Bluejay" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Body" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Flock/Resources/FLOCK_02_Bluejay.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Flock/Resources/FLOCK_02_Bluejay.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209024" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="b976a633-d313-8de4-7380-c59ca87e2667" />
+							<attribute id="ObjectID" type="FixedString" value="FLOCK_02_Bluejay.FLOCK_02_Bluejay_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="b976a633-d313-8de4-7380-c59ca87e2667" />
+							<attribute id="ObjectID" type="FixedString" value="FLOCK_02_Bluejay.FLOCK_02_Bluejay_Mesh_LOD1.1" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.47500712 0.3766667 0.33599076" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.47450495 -0.004036637 -0.2984587" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="711bc887-33a1-e8ad-957d-83279c60ba04" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="FLOCK_01_Bluejay" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="NakedBody" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Flock/Resources/FLOCK_01_Bluejay.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Flock/Resources/FLOCK_01_Bluejay.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209024" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="b976a633-d313-8de4-7380-c59ca87e2667" />
+							<attribute id="ObjectID" type="FixedString" value="FLOCK_01_Bluejay.FLOCK_01_Bluejay_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="b976a633-d313-8de4-7380-c59ca87e2667" />
+							<attribute id="ObjectID" type="FixedString" value="FLOCK_01_Bluejay.FLOCK_01_Bluejay_Mesh_LOD1.1" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.51746005 0.37110236 0.39558586" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.51746005 -0.0050811423 -0.29273468" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="a627713e-170b-731c-21e9-03bb2d89a3de" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="FLOCK_05_Pigeon_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Flock/Resources/FLOCK_05_Pigeon_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Flock/Resources/FLOCK_05_Pigeon_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209026" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="d021a679-cbde-5d8d-fe5c-8a3b7fad1deb" />
+							<attribute id="ObjectID" type="FixedString" value="FLOCK_05_Pigeon_A.FLOCK_05_Pigeon_A_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="d021a679-cbde-5d8d-fe5c-8a3b7fad1deb" />
+							<attribute id="ObjectID" type="FixedString" value="FLOCK_05_Pigeon_A.FLOCK_05_Pigeon_A_Mesh_LOD1.1" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.51746005 0.37110236 0.39558586" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.51746005 -0.0050811423 -0.29273468" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="c7f54b43-5a4a-d705-8a13-bb2081a54151" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="FLOCK_04_Pigeon_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Flock/Resources/FLOCK_04_Pigeon_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Flock/Resources/FLOCK_04_Pigeon_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209026" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="d021a679-cbde-5d8d-fe5c-8a3b7fad1deb" />
+							<attribute id="ObjectID" type="FixedString" value="FLOCK_04_Pigeon_A.FLOCK_04_Pigeon_A_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="d021a679-cbde-5d8d-fe5c-8a3b7fad1deb" />
+							<attribute id="ObjectID" type="FixedString" value="FLOCK_04_Pigeon_A.FLOCK_04_Pigeon_A_Mesh_LOD1.1" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.47500712 0.3766667 0.33599076" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.47450495 -0.004036637 -0.2984587" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="ce1ee0ef-925b-a3ac-1b41-ab5248bd96b2" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="FLOCK_05_Bluejay" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Body" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Flock/Resources/FLOCK_05_Bluejay.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Flock/Resources/FLOCK_05_Bluejay.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209024" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="b976a633-d313-8de4-7380-c59ca87e2667" />
+							<attribute id="ObjectID" type="FixedString" value="FLOCK_05_Bluejay.FLOCK_05_Bluejay_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="b976a633-d313-8de4-7380-c59ca87e2667" />
+							<attribute id="ObjectID" type="FixedString" value="FLOCK_05_Bluejay.FLOCK_05_Bluejay_Mesh_LOD1.1" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.51746005 0.37110236 0.39558586" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.51746005 -0.0050811423 -0.29273468" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="e29562a6-8830-9252-784b-dfb04c6f3e66" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="FLOCK_02_Pigeon_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Flock/Resources/FLOCK_02_Pigeon_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Flock/Resources/FLOCK_02_Pigeon_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209026" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="d021a679-cbde-5d8d-fe5c-8a3b7fad1deb" />
+							<attribute id="ObjectID" type="FixedString" value="FLOCK_02_Pigeon_A.FLOCK_02_Pigeon_A_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="d021a679-cbde-5d8d-fe5c-8a3b7fad1deb" />
+							<attribute id="ObjectID" type="FixedString" value="FLOCK_02_Pigeon_A.FLOCK_02_Pigeon_A_Mesh_LOD1.1" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="526c7df2-ca3c-4d98-dcc4-bd95f015a4b0" />
+					<attribute id="BoundsMax" type="fvec3" value="0 0 0" />
+					<attribute id="BoundsMin" type="fvec3" value="0 0 0" />
+					<attribute id="Center" type="fvec3" value="0 0 0" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="ec771e59-6dbd-4646-0d58-edf4b8679467" />
+					<attribute id="Initialized" type="bool" value="False" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="FLOCK_Base" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0" />
+					<attribute id="SkeletonResource" type="FixedString" value="84d72170-1c37-b616-fb1c-1f2b44ff0035" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="EMPTY_VISUAL_TEMPLATE" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855930" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="9eb6c831-f56d-6824-1ec1-2e489eca3f1d" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="626ca75d-477d-9e92-c78a-27f6fee448df" />
+						</node>
+						<node id="Base" />
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.47500712 0.3766667 0.33599076" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.47450495 -0.0030061435 -0.2984587" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="f943e9ef-ef81-19a5-e7a3-c9b6dae4b830" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Proxy_FLOCK_Bluejay_Full" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/Resources/Proxy_FLOCK_Bluejay_Full.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Anims/_Creatures/Flock/Resources/Proxy_FLOCK_Bluejay_Full.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725669" />
+					<children>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="b976a633-d313-8de4-7380-c59ca87e2667" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_FLOCK_Bluejay_Full.Proxy_FLOCK_01_Bluejay_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="b976a633-d313-8de4-7380-c59ca87e2667" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_FLOCK_Bluejay_Full.Proxy_FLOCK_02_Bluejay_Mesh.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="b976a633-d313-8de4-7380-c59ca87e2667" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_FLOCK_Bluejay_Full.Proxy_FLOCK_03_Bluejay_Mesh.2" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="b976a633-d313-8de4-7380-c59ca87e2667" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_FLOCK_Bluejay_Full.Proxy_FLOCK_04_Bluejay_Mesh.3" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="b976a633-d313-8de4-7380-c59ca87e2667" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_FLOCK_Bluejay_Full.Proxy_FLOCK_05_Bluejay_Mesh.4" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

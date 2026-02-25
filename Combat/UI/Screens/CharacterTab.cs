@@ -11,7 +11,7 @@ namespace QDND.Combat.UI.Screens
     /// Scrollable layout: header, HP, ability scores, combat stats, saves,
     /// skills, resistances/immunities/vulnerabilities, features, resources.
     /// </summary>
-    public partial class CharacterTab : Control
+    public partial class CharacterTab : MarginContainer
     {
         // ── Skill → Ability mapping (standard 5e) ──────────────────
         private static readonly Dictionary<string, string> SkillAbilityMap = new()
@@ -69,12 +69,11 @@ namespace QDND.Combat.UI.Screens
         {
             SizeFlagsHorizontal = SizeFlags.ExpandFill;
             SizeFlagsVertical = SizeFlags.ExpandFill;
-            AnchorsPreset = (int)LayoutPreset.FullRect;
 
             var scroll = new ScrollContainer();
             scroll.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             scroll.SizeFlagsVertical = SizeFlags.ExpandFill;
-            scroll.AnchorsPreset = (int)LayoutPreset.FullRect;
+            scroll.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
             AddChild(scroll);
 
             _content = new VBoxContainer();
@@ -83,6 +82,12 @@ namespace QDND.Combat.UI.Screens
             scroll.AddChild(_content);
 
             BuildLayout();
+
+            // Dark background matching equipment tab
+            AddThemeConstantOverride("margin_left", 8);
+            AddThemeConstantOverride("margin_right", 8);
+            AddThemeConstantOverride("margin_top", 4);
+            AddThemeConstantOverride("margin_bottom", 4);
         }
 
         // ── Public API ─────────────────────────────────────────────
@@ -92,7 +97,7 @@ namespace QDND.Combat.UI.Screens
         /// </summary>
         public void SetData(CharacterDisplayData data)
         {
-            if (data == null) return;
+            if (data == null || _content == null) return;
 
             // Header
             _nameLabel.Text = data.Name ?? "Unknown";

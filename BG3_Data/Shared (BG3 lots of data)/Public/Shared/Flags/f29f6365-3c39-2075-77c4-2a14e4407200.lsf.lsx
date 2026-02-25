@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="7" build="403" lslib_meta="v1,bswap_guids,lsf_keys_adjacency" />
+	<region id="Flags">
+		<node id="Flags">
+			<attribute id="Description" type="LSString" value="Set on investigating/confronting NPC. REQUIRES A &quot;wait a frame&quot; LOGIC node afterwards. Instructs script to set the CRIME_GuiltFound and CRIME_FoundEvidenceCurrentCrime flags on the *NPC* if applicable. Mainly/only useful in interrogation dialogues." />
+			<attribute id="Name" type="FixedString" value="CRIME_Allow_Search" />
+			<attribute id="UUID" type="guid" value="f29f6365-3c39-2075-77c4-2a14e4407200" />
+			<attribute id="Usage" type="uint8" value="4" />
+		</node>
+	</region>
+</save>

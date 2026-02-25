@@ -1,0 +1,1115 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="SkeletonBank">
+		<node id="SkeletonBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="DynamicPhysicsResourceID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="IKRigResourceID" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wings_Base" />
+					<attribute id="PreviewAnimationResource" type="FixedString" value="" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RagdollResourceID" type="FixedString" value="" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/Humans/_FemaleStrong/HUM_FS_Wings_Base.GR2" />
+					<attribute id="SpringResourceID" type="FixedString" value="" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/Humans/_FemaleStrong/HUM_FS_Wings_Base.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241813" />
+					<children>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_MouthFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="4" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_BodyFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="3" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_R_HandFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_L_HandFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="2" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationSetBank">
+		<node id="AnimationSetBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="941fa8ff-d19c-85ee-0ca0-b0aa1daf1550" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wings_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209035" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets">
+											<children>
+												<node id="Object">
+													<attribute id="FallBackSubSet" type="FixedString" value="" />
+													<attribute id="MapKey" type="FixedString" value="" />
+													<children>
+														<node id="Animation">
+															<children>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="0af78ca3-1a88-80a7-5ba5-9ddcffb1db4d" />
+																	<attribute id="MapKey" type="FixedString" value="9acc8342-26ac-48ac-b569-18c07296456b" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="e9b776cd-ae37-6e2b-10f3-f8aaab520b7b" />
+																	<attribute id="MapKey" type="FixedString" value="1bd83a91-45b5-4105-8840-6968b9b7837d" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationBank">
+		<node id="AnimationBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="91.86668" />
+					<attribute id="ID" type="FixedString" value="07bdf991-e5fe-b1c4-8473-b6addb4bb5ed" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCE_IsobelNightsongReunion_Reunion_ALL" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SCE/SCE_IsobelNightsongReunion/HUM_FS_Wing_Rig_SCE_IsobelNightsongReunion_Reunion_ALL.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SCE/SCE_IsobelNightsongReunion/HUM_FS_Wing_Rig_SCE_IsobelNightsongReunion_Reunion_ALL.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403208704" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="5.3333335" />
+					<attribute id="ID" type="FixedString" value="0a40dc4b-b0cf-4e80-c47c-263a9753f295" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_FlyUp_fromPrison_NS" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Nightsong_CINE_NightsongsFlight/HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_FlyUp_fromPrison_NS.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Nightsong_CINE_NightsongsFlight/HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_FlyUp_fromPrison_NS.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.033333335" />
+					<attribute id="ID" type="FixedString" value="0af78ca3-1a88-80a7-5ba5-9ddcffb1db4d" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Nightsong_Wing_Rig_DFLT_CC_Portrait_Still_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/Humans/_FemaleStrong/HUM_FS_Rig_Nightsong/HUM_FS_Nightsong_Wing_Rig_DFLT_CC_Portrait_Still_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/Humans/_FemaleStrong/HUM_FS_Rig_Nightsong/HUM_FS_Nightsong_Wing_Rig_DFLT_CC_Portrait_Still_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209025" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4.666667" />
+					<attribute id="ID" type="FixedString" value="0f03831a-2261-adbf-f887-bb07a491c8c9" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_COL_KethericShowdown_KethericDefeated_NightSongEntry_Land" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/COL/COL_KethericShowdown_KethericDefeated/HUM_FS_Wing_Rig_SCENE_COL_KethericShowdown_KethericDefeated_NightSongEntry_Land.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/COL/COL_KethericShowdown_KethericDefeated/HUM_FS_Wing_Rig_SCENE_COL_KethericShowdown_KethericDefeated_NightSongEntry_Land.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.1000001" />
+					<attribute id="ID" type="FixedString" value="123fa61a-656b-43e6-4cf1-c4b190993685" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_05_Approach" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_05_Approach.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_05_Approach.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.0000001" />
+					<attribute id="ID" type="FixedString" value="1792e7ad-5ef4-52d8-4167-dccc7d203848" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Assault_Jaheira_FliesAcross_Nightsong" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_Jaheira/HUM_FS_Wing_Rig_SCENE_MOO_Assault_Jaheira_FliesAcross_Nightsong.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_Jaheira/HUM_FS_Wing_Rig_SCENE_MOO_Assault_Jaheira_FliesAcross_Nightsong.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="12.500001" />
+					<attribute id="ID" type="FixedString" value="18f7f3a5-205c-d368-9662-e9e742be5229" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Assault_Jaheira_Hovering_Nightsong" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_Jaheira/HUM_FS_Wing_Rig_SCENE_MOO_Assault_Jaheira_Hovering_Nightsong.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_Jaheira/HUM_FS_Wing_Rig_SCENE_MOO_Assault_Jaheira_Hovering_Nightsong.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.466667" />
+					<attribute id="ID" type="FixedString" value="2122450d-5b2e-8d56-5ce2-7508cdf0fdde" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_FlyUp_toHover" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Nightsong_CINE_NightsongsFlight/HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_FlyUp_toHover.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Nightsong_CINE_NightsongsFlight/HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_FlyUp_toHover.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.6666669" />
+					<attribute id="ID" type="FixedString" value="2a9e6073-87fb-2a1a-b369-0c09bfda68f5" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_BoxFloat_IN" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_BoxFloat_IN.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_BoxFloat_IN.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4.9000006" />
+					<attribute id="ID" type="FixedString" value="35caca9d-e520-38bf-fb3a-013fc0188814" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_KTPsionic_OUT" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_KTPsionic_OUT.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_KTPsionic_OUT.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.0000002" />
+					<attribute id="ID" type="FixedString" value="3e3571e8-6f37-396e-3d50-acf6f9629cf4" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_04_WpnCharge" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_04_WpnCharge.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_04_WpnCharge.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.0000001" />
+					<attribute id="ID" type="FixedString" value="4cefcd8b-3566-50bb-e293-fd53950468cf" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_Flying_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_Flying_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_Flying_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.666667" />
+					<attribute id="ID" type="FixedString" value="4d414cfd-ddc1-a1c0-6f56-278214a0845e" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_02_Back" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_02_Back.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_02_Back.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.5000005" />
+					<attribute id="ID" type="FixedString" value="5616a203-d092-142f-34ec-b9949af8c24a" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_Glide_NS_OUT" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="00e372a0-51fe-9b41-2121-eb9dbf4e49ef" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Nightsong_CINE_NightsongsFlight/HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_Glide_NS_OUT.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Nightsong_CINE_NightsongsFlight/HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_Glide_NS_OUT.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.9000003" />
+					<attribute id="ID" type="FixedString" value="577d1e56-c981-24c3-3cd4-2dfae4d60530" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_NSCombat_LOOP" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_NSCombat_LOOP.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_NSCombat_LOOP.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725666" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.6666669" />
+					<attribute id="ID" type="FixedString" value="5b21aa77-6070-1934-fe7d-6c2095ae3f30" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_01_SummonReact" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_01_SummonReact.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_01_SummonReact.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.0000002" />
+					<attribute id="ID" type="FixedString" value="60cd0ba4-cdfb-0d10-4de5-de4d236f32c3" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_Glide_NS_IN" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="00e372a0-51fe-9b41-2121-eb9dbf4e49ef" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Nightsong_CINE_NightsongsFlight/HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_Glide_NS_IN.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Nightsong_CINE_NightsongsFlight/HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_Glide_NS_IN.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.2666671" />
+					<attribute id="ID" type="FixedString" value="61cb42c7-0d4d-5d88-fd9a-0ac9b1c38fd4" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_FlyingAttack" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_FlyingAttack.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_FlyingAttack.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.1333334" />
+					<attribute id="ID" type="FixedString" value="657c0777-643f-38e5-009c-089da6328e29" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_06_PreHitReact" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_06_PreHitReact.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_06_PreHitReact.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="10.000001" />
+					<attribute id="ID" type="FixedString" value="668f0519-97f9-e6da-4e78-24550a8e57e7" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_NSLanding_IN" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_NSLanding_IN.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_NSLanding_IN.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4.666667" />
+					<attribute id="ID" type="FixedString" value="66b1c2b2-8272-61a1-75ee-e781d551fee8" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_TakeOff" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_TakeOff.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_TakeOff.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="28.333334" />
+					<attribute id="ID" type="FixedString" value="6b19c2e3-fcf0-4492-df6b-3d73ae2eb4f5" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_SHA_Nightsong_Transformation_Wings" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_NightsongPrison_NightsongsFate/HUM_FS_Wing_Rig_SCENE_SHA_Nightsong_Transformation_Wings.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_NightsongPrison_NightsongsFate/HUM_FS_Wing_Rig_SCENE_SHA_Nightsong_Transformation_Wings.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.666667" />
+					<attribute id="ID" type="FixedString" value="6ba86891-8762-d100-8598-c4fcec6eccb7" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_FlyAcross_LtoR" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Nightsong_CINE_NightsongsFlight/HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_FlyAcross_LtoR.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Nightsong_CINE_NightsongsFlight/HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_FlyAcross_LtoR.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="5.966667" />
+					<attribute id="ID" type="FixedString" value="7215cdb7-3d32-4788-2a5f-07120555a41d" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Assault_Jaheira_FliesUp_Nightsong" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_Jaheira/HUM_FS_Wing_Rig_SCENE_MOO_Assault_Jaheira_FliesUp_Nightsong.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_Jaheira/HUM_FS_Wing_Rig_SCENE_MOO_Assault_Jaheira_FliesUp_Nightsong.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.7000003" />
+					<attribute id="ID" type="FixedString" value="936c920b-73dc-55ce-f8e5-9fb39b20bd1d" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_KTPsionic_IN" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_KTPsionic_IN.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_KTPsionic_IN.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.1333337" />
+					<attribute id="ID" type="FixedString" value="9b73529e-89dc-380a-5766-96109787ca7a" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_Up" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_Up.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_Up.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="8.000001" />
+					<attribute id="ID" type="FixedString" value="a229b025-b383-3a0a-9494-5603db9c61b6" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_Glide_NS_LOOP" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="00e372a0-51fe-9b41-2121-eb9dbf4e49ef" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Nightsong_CINE_NightsongsFlight/HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_Glide_NS_LOOP.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Nightsong_CINE_NightsongsFlight/HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_Glide_NS_LOOP.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403208705" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="11.400002" />
+					<attribute id="ID" type="FixedString" value="b7535aea-3c14-4209-8892-e307af0bd7af" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_Shocked" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_Shocked.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_Shocked.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.0333338" />
+					<attribute id="ID" type="FixedString" value="b78d9b40-f675-8c70-0296-a06dab5eb218" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_COL_KethericShowdown_KethericDefeated_NightSongEntry_Fly" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/COL/COL_KethericShowdown_KethericDefeated/HUM_FS_Wing_Rig_SCENE_COL_KethericShowdown_KethericDefeated_NightSongEntry_Fly.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/COL/COL_KethericShowdown_KethericDefeated/HUM_FS_Wing_Rig_SCENE_COL_KethericShowdown_KethericDefeated_NightSongEntry_Fly.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.7000003" />
+					<attribute id="ID" type="FixedString" value="c073fa95-d956-14b3-c61e-557aeaee7fff" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_FlyAcross_Balcony" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Nightsong_CINE_NightsongsFlight/HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_FlyAcross_Balcony.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Nightsong_CINE_NightsongsFlight/HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_FlyAcross_Balcony.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="10.666667" />
+					<attribute id="ID" type="FixedString" value="c14eb398-b9c6-a8b5-e8a5-0cde9ffc6212" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_SHA_Nightsong_TakesFlight_Wings" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_NightsongPrison_NightsongsFate/HUM_FS_Wing_Rig_SCENE_SHA_Nightsong_TakesFlight_Wings.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_NightsongPrison_NightsongsFate/HUM_FS_Wing_Rig_SCENE_SHA_Nightsong_TakesFlight_Wings.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.0000002" />
+					<attribute id="ID" type="FixedString" value="c337da7f-182e-e78d-7211-1574ab3d7057" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_Glide_Dive" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Nightsong_CINE_NightsongsFlight/HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_Glide_Dive.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Nightsong_CINE_NightsongsFlight/HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_Glide_Dive.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.66666675" />
+					<attribute id="ID" type="FixedString" value="c37c75c8-3d91-4f80-69dc-43f6d254d452" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_07_HitFall_LOOP" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_07_HitFall_LOOP.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_07_HitFall_LOOP.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725662" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.1333337" />
+					<attribute id="ID" type="FixedString" value="ce4e9036-7dc8-18f6-4012-b20160b61afb" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_03_BackStop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_03_BackStop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_03_BackStop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="12.866668" />
+					<attribute id="ID" type="FixedString" value="d0ba9668-74bc-d76c-05ca-15f129355708" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_COL_KethericShowdown_KethericDefeated_NightSongEntry_StompOut" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/COL/COL_KethericShowdown_KethericDefeated/HUM_FS_Wing_Rig_SCENE_COL_KethericShowdown_KethericDefeated_NightSongEntry_StompOut.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/COL/COL_KethericShowdown_KethericDefeated/HUM_FS_Wing_Rig_SCENE_COL_KethericShowdown_KethericDefeated_NightSongEntry_StompOut.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.8666669" />
+					<attribute id="ID" type="FixedString" value="d32a6745-a3cc-a6aa-e430-aa945b54a4f7" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_Flying_03" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_Flying_03.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_Flying_03.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="15.233335" />
+					<attribute id="ID" type="FixedString" value="d38ca708-0c31-ef48-8d3d-db1fba8a2da7" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_StandUp" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_StandUp.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_StandUp.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="11.666668" />
+					<attribute id="ID" type="FixedString" value="d56695fa-1653-b7ef-e311-0762db9816ed" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_COL_KethericShowdown_KethericDefeated_NightSongEntry_StompLoop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/COL/COL_KethericShowdown_KethericDefeated/HUM_FS_Wing_Rig_SCENE_COL_KethericShowdown_KethericDefeated_NightSongEntry_StompLoop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/COL/COL_KethericShowdown_KethericDefeated/HUM_FS_Wing_Rig_SCENE_COL_KethericShowdown_KethericDefeated_NightSongEntry_StompLoop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4.1000004" />
+					<attribute id="ID" type="FixedString" value="e064e7fa-6708-3943-b991-b066a2ff705a" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_NSCombat_IN" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_NSCombat_IN.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_NSCombat_IN.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.3" />
+					<attribute id="ID" type="FixedString" value="e73e4604-30d7-115b-aae5-966af6809841" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_SHA_NightsongPrison_Folded_LOOP" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_NightsongPrison_NightsongsFate/HUM_FS_Wing_Rig_SCENE_SHA_NightsongPrison_Folded_LOOP.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_NightsongPrison_NightsongsFate/HUM_FS_Wing_Rig_SCENE_SHA_NightsongPrison_Folded_LOOP.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144818875517633012" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.3333335" />
+					<attribute id="ID" type="FixedString" value="e80c48ac-4412-eb15-885f-98c5d2ec3e63" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Assault_Jaheira_Hovering_Nightsong_IN" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_Jaheira/HUM_FS_Wing_Rig_SCENE_MOO_Assault_Jaheira_Hovering_Nightsong_IN.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_Jaheira/HUM_FS_Wing_Rig_SCENE_MOO_Assault_Jaheira_Hovering_Nightsong_IN.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.3" />
+					<attribute id="ID" type="FixedString" value="e9b776cd-ae37-6e2b-10f3-f8aaab520b7b" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_CINE_Idle_Fallback" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/Humans/_FemaleStrong/HUM_FS_Wing_Rig/_Construction/HUM_FS_Wing_Rig_CINE_Idle_Fallback.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/Humans/_FemaleStrong/HUM_FS_Wing_Rig/_Construction/HUM_FS_Wing_Rig_CINE_Idle_Fallback.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209035" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.0000002" />
+					<attribute id="ID" type="FixedString" value="ea4e3fe2-9bfd-2690-c392-76632acc5799" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_07_HitFall" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_07_HitFall.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_FKTIntrp_Flying_07_HitFall.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="11.500001" />
+					<attribute id="ID" type="FixedString" value="f1e3e413-0ae8-b0b5-f0c3-03138f4c4fd2" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_LOW_SorcSundries_FinalConfrontation_Nightsong_Arrival" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act03/LOW/LOW_SorcerousSundries_FinalConfrontation/HUM_FS_Wing_Rig_SCENE_LOW_SorcSundries_FinalConfrontation_Nightsong_Arrival.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act03/LOW/LOW_SorcerousSundries_FinalConfrontation/HUM_FS_Wing_Rig_SCENE_LOW_SorcSundries_FinalConfrontation_Nightsong_Arrival.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144818875517633112" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.9333336" />
+					<attribute id="ID" type="FixedString" value="f53992d9-4c8b-1c9f-0183-21a0565e0769" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_BoxFloat_LOOP" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_BoxFloat_LOOP.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_BoxFloat_LOOP.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725663" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.3333335" />
+					<attribute id="ID" type="FixedString" value="f9c6abc8-ea6f-8bd7-ea4e-ff316622f459" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_Flying_02" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_Flying_02.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/HUM_FS_Wing_Rig_SCENE_MOO_Aslt_BFI_Flying_02.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4.0000005" />
+					<attribute id="ID" type="FixedString" value="fd11ea12-6d72-67e5-40fd-3c52862b315d" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_Glide_FlapWings_NS" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="00e372a0-51fe-9b41-2121-eb9dbf4e49ef" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Nightsong_CINE_NightsongsFlight/HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_Glide_FlapWings_NS.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/SHA/SHA_Nightsong_CINE_NightsongsFlight/HUM_FS_Wing_Rig_SCENE_SHA_NightsongsFlight_Glide_FlapWings_NS.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="86c2af56-8ea8-4270-aed8-4b07a7a905be" />
+					<attribute id="BoundsMax" type="fvec3" value="2.174573 2.5912182 0.99246275" />
+					<attribute id="BoundsMin" type="fvec3" value="-2.174573 1.1259397 0.06045844" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="00e372a0-51fe-9b41-2121-eb9dbf4e49ef" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="HUM_FS_Wings" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="3ab16354-81a3-a5af-8b72-e7f3011deb7b" />
+					<attribute id="SkeletonSlot" type="FixedString" value="Wings" />
+					<attribute id="Slot" type="FixedString" value="Body" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Characters/_Models/Humans/_FemaleStrong/Resources/HUM_FS_Wings.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Characters/_Models/Humans/_FemaleStrong/Resources/HUM_FS_Wings.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144537400540922158" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="941fa8ff-d19c-85ee-0ca0-b0aa1daf1550" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="17b85ba0-f4b7-abd3-4ed5-307d71a55836" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="5e5b7f76-8fa5-16ff-0cf3-33d94f5ea041" />
+							<attribute id="ObjectID" type="FixedString" value="HUM_FS_Wings.HUM_FS_Wings_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="9106a412-4963-2147-914b-838fd337cf43" />
+							<attribute id="ObjectID" type="FixedString" value="HUM_FS_Wings.HUM_FS_Wings_Attachment_Mesh.1" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="2.174573 2.5912182 0.99246275" />
+					<attribute id="BoundsMin" type="fvec3" value="-2.174573 1.1259397 0.06045844" />
+					<attribute id="Center" type="fvec3" value="0 1.8585789 0.5264606" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="efd49d65-258e-921a-7f25-fec31cee5528" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Proxy_HUM_FS_Wings" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="2.3415136" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Characters/_Anims/Humans/_FemaleStrong/Resources/Proxy_HUM_FS_Wings.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Characters/_Anims/Humans/_FemaleStrong/Resources/Proxy_HUM_FS_Wings.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241813" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="9e2966c7-b61c-4bc1-bef1-a79cb5fde067" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_HUM_FS_Wings.Proxy_HUM_FS_Wings_Attachment_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="9e2966c7-b61c-4bc1-bef1-a79cb5fde067" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_HUM_FS_Wings.Proxy_HUM_FS_Wings_Mesh.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

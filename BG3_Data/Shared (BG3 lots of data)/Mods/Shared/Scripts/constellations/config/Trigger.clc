@@ -1,0 +1,44 @@
+game.configs.Trigger = Config{
+    params={
+        EntityFilter = {
+            type = EParamType.String,
+            help = [[Types of Entities to check for. Options:
+            All - check for any kind of entities in the trigger
+            Characters - only check for characters in the trigger
+            LivingCharacters - only check for living characters in the trigger, and character will leave when it dies in the trigger
+            PartyMembers - only check for party members,
+            LivingPartyMembers - only check for living party members,
+            Items - only check for items in the trigger]],
+            required = false,
+            default = [[All]]
+        },
+        ExcludeTag = {
+            type = EParamType.String,
+            help = [[Entities entering/leaving trigger with this tag (NAME_Guid) will not trigger the event. Currently only possible to put one tag. Script currently does not handle setting/clearing the tag in gameplay.]],
+            required = false,
+            default = [[]]
+        },
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the trigger start enabled?]],
+            required = false,
+            default = true
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+    logic = StateRef{game.states.Trigger,
+            EntityFilter = params.EntityFilter,
+            StartEnabled = params.StartEnabled,
+            ExcludeTag = params.ExcludeTag
+        },
+    },
+    inputs={
+        Disable=ExtSocket{description=[[Disable trigger events]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+        Enable=ExtSocket{description=[[Enable trigger events (won't trigger for entities already in the trigger)]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+    },
+    outputs={
+        OnLeave=ExtSocket{description=[[An entity left the trigger]],{SocketRef{[[root.logic.outputs.OnLeave]]}}},
+        OnEnter=ExtSocket{description=[[An entity entered the trigger]],{SocketRef{[[root.logic.outputs.OnEnter]]}}},
+        Empty=ExtSocket{description=[[All entities have left the trigger]],{SocketRef{[[root.logic.outputs.Empty]]}}},
+    }
+}

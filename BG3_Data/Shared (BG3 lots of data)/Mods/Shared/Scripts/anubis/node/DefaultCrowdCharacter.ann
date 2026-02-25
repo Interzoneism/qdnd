@@ -1,0 +1,126 @@
+game.roots.DefaultCrowdCharacter = State{function ()
+    description = [[Default script for crowd NPCs]]
+
+    params.combatInSightRange = { type = EParamType.Int, required = true, default = nil,
+       help= [[Expression that checks for nearby combats, use game.expressions.GLO_CombatInSightRange]]}
+
+    self.OnException = function(e)
+        DebugLogCriticalException(e, "Unhandled Anubis exception caught in DefaultCrowdCharacter for " .. me.Name .. " - " .. tostring(me.UUID) .. "\n")
+        return true
+    end
+
+    local GLO_State_Cowering = Flag("GLO_State_Cowering_cf16110e-3767-4585-8028-83cb9857adcd")
+    local isHandlingDisturbance = false
+    local isFleeing = false
+
+    nodes.StatusOverrides = Proxy{
+        game.states.DefaultStatusOverrides
+    }
+
+    -- generic behaviours
+    nodes.GenericBehaviours = Proxy{
+        game.states.CrimesHumanoid
+    }
+
+    -- cowering around combat.
+    --[[
+    nodes.Cower = Proxy{
+        game.states.CombatCowerFlee,
+        Valid = function()
+            return
+                not isHandlingDisturbance and
+                (params.combatInSightRange ~= 0)
+        end
+    }
+    ]]
+    -- State is inlined in an action until we can pass expressions as parameters to proxy states
+    nodes.CombatCowerFlee = Action{
+        OnEnter = function()
+            SetFlag(GLO_State_Cowering, me)
+            DialogRequestStopRepeated(me)
+            ApplyStatus(me, "ANIM_COWER")
+            isFleeing = CrowdIsFleeing()
+        end,
+
+        OnLeave = function()
+            RemoveStatus(me, "ANIM_COWER")
+            ClearFlag(GLO_State_Cowering, me)
+        end,
+
+        function()
+            DebugText(me, "In CombatCowerFlee")
+            if isFleeing then
+                Sleep(10)
+            else
+                PlaySound(me, "Amb_Walla_Crowd_FleeingState")
+                CrowdFlee()
+                if params.combatInSightRange == 2 then
+                    -- avoid too many crowd characters fleeing at the same time
+                    -- (pathfinding is expensive)
+                    if math.random() < 0.5 then
+                        isFleeing = true
+                        try
+                            FleeFrom(RelationType.Player, 40.0 + math.random() * 5.0)
+                        catch ex if ls.CheckType(ex, error.MovementFailed) then
+                            DebugText(me,"Failed FleeFrom All")
+                        end
+                    else
+                        Sleep(0.2 + 0.2 * math.random())
+                    end
+                else
+                    -- An enemy could come close again, but there may be lots of
+                    -- crowd characters, so avoid constant new flee operations.
+                    -- In a way it makes sense they would be too scared to move,
+                    -- and they're also marked as "Shoot through" to avoid them
+                    -- blocking projectiles (unless they're aimed at them
+                    -- explicitly)
+                    -- This needs to be lowish as wandering character can move in to combat sight range
+                    Sleep(2.0 + math.random(1.0))
+                end
+            end
+        end,
+        Valid = function()
+            return
+                not isHandlingDisturbance and
+                (params.combatInSightRange ~= 0)
+        end
+    }
+
+    nodes.fallback = Action{
+        function()
+            RestoreDefaultCrowdBehaviour()
+            WaitForInterrupt()
+        end,
+        OnLeave = function()
+            ClearDefaultCrowdBehaviour()
+        end,
+        Valid = function()
+            return
+                (not isHandlingDisturbance or
+                -- avoid "no node can be selected" because of frame delay between switching disturbance handling to idle
+                -- (resulting in game.states.CrimesHumanoid becoming invalid) and the
+                -- DisturbanceInvestigatorSwitchedState event arriving. Use the local variable for performance
+                -- reasons (will succeed the check most of the time)
+                 (me.HandlingDisturbanceID == nil)) and
+                (params.combatInSightRange == 0)
+        end
+    }
+
+    events.StatusApplied = function(ev)
+        if IsStatusFromGroup(ev.Status.StatusID, "SG_ScriptedPeaceBehaviour") or
+           IsStatusFromGroup(ev.Status.StatusID, "SG_Fleeing") then
+            Interrupt()
+        end
+    end
+
+    events.DisturbanceInvestigatorSwitchedState = function(e)
+        if (e.ToState == ECrimeInvestigationState.Idle) then
+            DebugText(me, "Not handling disturbance")
+            isHandlingDisturbance = false
+        else
+            DebugText(me, "Handling disturbance")
+            isHandlingDisturbance = true
+        end
+    end
+
+end}

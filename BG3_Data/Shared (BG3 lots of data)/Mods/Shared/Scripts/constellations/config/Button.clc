@@ -1,0 +1,116 @@
+game.configs.Button = Config{
+    params={
+        VFXOff = {
+            type = EParamType.String,
+            help = [[VFX while button is disabled and has been spotted.]],
+            required = false,
+            default = [[]]
+        },
+        MinDistance = {
+            type = EParamType.Number,
+            help = [[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]],
+            required = false,
+            default = 6
+        },
+        VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while button is enabled and has been spotted.]],
+            required = false,
+            default = [[]]
+        },
+        VFXOffBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOff' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the enabled-VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        Type = {
+            type = EParamType.String,
+            help = [[            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[Interactable]]
+        },
+        DC = {
+            type = EParamType.String,
+            help = [[The skill check DC.]],
+            required = false,
+            default = [[HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f]]
+        },
+        Skill = {
+            type = EParamType.String,
+            help = [[The skill checked for discovering the button if the 'Type' is not 'None'.]],
+            required = false,
+            default = [[Perception]]
+        },
+        SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when button is enabled]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_On]]
+        },
+        OneShot = {
+            type = EParamType.Bool,
+            help = [[Does the button disable itself after the first successful use?]],
+            required = false,
+            default = false
+        },
+        SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when button is disabled]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_Off]]
+        },
+        ActivatedSound = {
+            type = EParamType.String,
+            help = [[The skill checked for discovering the button if the 'Type' is not 'None'.]],
+            required = false,
+            default = [[II_Generic_Button]]
+        },
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the button start enabled? (enabled = pressing it will trigger the 'Pressed' output; disabled = pressing it will the the CantUseAD, if any)]],
+            required = false,
+            default = true
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.Button,
+            ActivatedSound = params.ActivatedSound,
+            DC = params.DC,
+            MinDistance = params.MinDistance,
+            OneShot = params.OneShot,
+            Skill = params.Skill,
+            SoundOff = params.SoundOff,
+            SoundOn = params.SoundOn,
+            StartEnabled = params.StartEnabled,
+            Type = params.Type,
+            VFXOff = params.VFXOff,
+            VFXOffBone = params.VFXOffBone,
+            VFXOn = params.VFXOn,
+            VFXOnBone = params.VFXOnBone,
+        },
+    },
+    inputs={
+        Enable=ExtSocket{description=[[Enable the button]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+        UseBlockedFromStory=ExtSocket{description=[[The button's use was blocked from story (because it was not enabled)]],{SocketRef{[[root.logic.inputs.UseBlockedFromStory]]}}},
+        ExternalPress=ExtSocket{description=[[A scripted press of the button]],{SocketRef{[[root.logic.inputs.ForceActivate]]}}},
+        Disable=ExtSocket{description=[[Disable the button (pressing it will not trigger Pressed output)]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+        Reveal=ExtSocket{description=[[Reveal the button]],{SocketRef{[[root.logic.inputs.Reveal]]}}},
+    },
+    outputs={
+        Pressed=ExtSocket{description=[[The button has been pressed]],{SocketRef{[[root.logic.outputs.Pressed]]}}},
+        UsedWhileDisabled=ExtSocket{description=[[Button used while deactivated]],{SocketRef{[[root.logic.outputs.ActivateAttemptFailed]]}}},
+    }
+}

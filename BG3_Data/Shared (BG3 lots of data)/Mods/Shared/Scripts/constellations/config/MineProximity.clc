@@ -1,0 +1,123 @@
+game.configs.MineProximity = Config{
+    params={
+        GlowWarning = {
+            type = EParamType.String,
+            help = [[VFX that plays on mine while it is active and warning and not exploding.]],
+            required = false,
+            default = [[VFX_Script_Light_Mine_Yellow_01_aa29ff85-8912-d0f0-9e6a-186354d7adec]]
+        },
+        ExplodeDelay = {
+            type = EParamType.Number,
+            help = [[Amount of seconds it takes for the mine to explode after primed]],
+            required = false,
+            default = 0.5
+        },
+        AbsoluteValueThreshold = {
+            type = EParamType.Bool,
+            help = [[If true, treat the threshold as an absolute value rather than a medium value]],
+            required = false,
+            default = false
+        },
+        ExcludeDamageTypes = {
+            type = EParamType.Bool,
+            help = [[Instead of trying to match the damage types, ignore them]],
+            required = false,
+            default = false
+        },
+        GlowPrimed = {
+            type = EParamType.String,
+            help = [[VFX that plays on mine while it is active and exploding.]],
+            required = false,
+            default = [[VFX_Script_Light_Mine_Red_01_a8a269a9-6f65-02aa-471e-d61afb22bd5a]]
+        },
+        DestroyOnDisarm = {
+            type = EParamType.Bool,
+            help = [[Does the item break on Disarm?]],
+            required = false,
+            default = true
+        },
+        DamageTypes = {
+            type = EParamType.String,
+            help = [[Damage Types]],
+            required = false,
+            arrayRange=[[0..2147483647]],
+            default = {
+            }
+        },
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the trap start on?]],
+            required = false,
+            default = true
+        },
+        SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when mine is disabled]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_Off]]
+        },
+        SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when mine is enabled]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_On]]
+        },
+        PrimeDelay = {
+            type = EParamType.Number,
+            help = [[Amount of seconds it takes for the mine to prime. The character needs to stay near the mine before it is primed.]],
+            required = false,
+            default = 1
+        },
+        VFXBone = {
+            type = EParamType.String,
+            help = [[Bone on which the the VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        GlowActive = {
+            type = EParamType.String,
+            help = [[VFX that plays on mine while it is active and not warning and not exploding.]],
+            required = false,
+            default = [[VFX_Script_Light_Mine_Green_01_96c29903-0613-cabd-8110-491f4534774d]]
+        },
+        Projectile = {
+            type = EParamType.String,
+            help = [[The projectile that explodes]],
+            required = false,
+            default = [[Projectile_Fireball_Trap]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.MineProximity,
+            AbsoluteValueThreshold = params.AbsoluteValueThreshold,
+            DamageTypes = params.DamageTypes,
+            DestroyOnDisarm = params.DestroyOnDisarm,
+            ExcludeDamageTypes = params.ExcludeDamageTypes,
+            ExplodeDelay = params.ExplodeDelay,
+            GlowActive = params.GlowActive,
+            GlowPrimed = params.GlowPrimed,
+            GlowWarning = params.GlowWarning,
+            PrimeDelay = params.PrimeDelay,
+            Projectile = params.Projectile,
+            SoundOff = params.SoundOff,
+            SoundOn = params.SoundOn,
+            StartEnabled = params.StartEnabled,
+            VFXBone = params.VFXBone,
+        },
+    },
+    inputs={
+        Warning=ExtSocket{description=[[Mine shows warning effect]],{SocketRef{[[root.logic.inputs.Warning]]}}},
+        Prime=ExtSocket{description=[[Mine will explode soon]],{SocketRef{[[root.logic.inputs.Prime]]}}},
+        PrimeOff=ExtSocket{description=[[Mine will no longer explode soon]],{SocketRef{[[root.logic.inputs.PrimeOff]]}}},
+        Enable=ExtSocket{description=[[Turns mine on]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+        WarningOff=ExtSocket{description=[[Mine no longer shows warning effect]],{SocketRef{[[root.logic.inputs.WarningOff]]}}},
+        Explode=ExtSocket{description=[[Explodes the mine]],{SocketRef{[[root.logic.inputs.Explode]]}}},
+        Disable=ExtSocket{description=[[Turns mine off]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+    },
+    outputs={
+        On=ExtSocket{description=[[Mine is turned on]],{SocketRef{[[root.logic.outputs.On]]}}},
+        Disarmed=ExtSocket{description=[[Mine is disarmed]],{SocketRef{[[root.logic.outputs.Disarmed]]}}},
+        Explode=ExtSocket{description=[[Mine exploding]],{SocketRef{[[root.logic.outputs.Explode]]}}},
+        Off=ExtSocket{description=[[Mine is turned off]],{SocketRef{[[root.logic.outputs.Off]]}}},
+    }
+}

@@ -1,0 +1,42 @@
+game.states.StatusApplier = State{
+    function()
+
+        params.Status = {type = EParamType.String, help = [[Status to apply]]}
+        params.ApplyDuration = {type = EParamType.Number, default = -1.0, help = [[Duration for which to apply the status. -1.0 for indefinite.]]}
+        params.OnlyApplyIfMissing = {type = EParamType.Bool, default = false, help = [[Only apply the status if it is not already applied.]]}
+
+        inputs.ApplyToObject = {help = [[Applies the status to the object that is transmitted into this socket.]]}
+        inputs.RemoveFromObject = {help = [[Removes the status to the object that is transmitted into this socket.]]}
+
+        socketEvents.ApplyToObject = function(ev)
+            local targetObject = ev.Object and Entity(ev.Object) or nil
+
+            if targetObject == nil then
+                DebugText(me,"Target object is nil")
+                return
+            end
+
+            if not params.OnlyApplyIfMissing or not HasActiveStatus(targetObject,params.Status) then
+                ApplyStatus(targetObject, params.Status, true, params.ApplyDuration, Entity(ev.Object))
+            end
+        end
+
+        socketEvents.RemoveFromObject = function(ev)
+            local targetObject = ev.Object and Entity(ev.Object) or nil
+
+            if targetObject == nil then
+                DebugText(me,"Target object is nil")
+                return
+            end
+
+            RemoveStatus(targetObject, params.Status)
+        end
+
+        events.UseStarted = function(ev)
+            if not params.OnlyApplyIfMissing or not HasActiveStatus(targetObject,params.Status) then
+                ApplyStatus(me, params.Status, true, params.ApplyDuration, ev.User)
+            end
+        end
+
+    end
+}

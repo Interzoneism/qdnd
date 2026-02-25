@@ -1,0 +1,310 @@
+game.states.AnimationStates = State{
+    function()
+
+        description = [[Continues to the next Dynamic state when activated, waits for it to be executed, and then proceeds to the
+                       next Static state.]]
+
+        --dependencies = {EComponentList.AnimationState} -- not supported yet
+        --[[Connects to an AnimationState component, which stores the current animationstate)]]
+
+        params.StateSequence = {type = EParamType.Int, help = [[Sequence of states through which the object goes]], arrayRange = ".."}
+        params.DynamicStates = {type = EParamType.Int, help = [[Dynamic states, which should be fast-forwarded when the item is loaded.]], arrayRange = ".."}
+
+        --[[E.g. parameters for levers:
+        One state: 1-4-1; 1 dynamic
+        Two states: 1-5-3-8-1; 5 & 8 dynamic
+        Three states: 1-6-2-7-3-8-1; 6, 7, 8 dynamic
+
+        Similarly applies to anything like e.g. rotating puzzle disks as well.
+        Could replace these by strings if that helps legibility.]]
+        --
+
+        inputs.Activate = {help = [[Input socket that's triggered when the object is triggered and should transition to the next state]]}
+        inputs.GoToState = {help = [[Input socket to force the object to move to a specific state. Any static states met during the transition will trigger a NewState output.]]}
+
+        outputs.NewState = {help = [[Output socket that's triggered when the lever enters one of the static states, i.e. stops moving]]}
+
+        helpers.findStateIndex = function(animationState)
+            for i,state in pairs(params.StateSequence) do
+                if state == animationState then
+                    return i
+                end
+            end
+        end
+
+        helpers.isStateDynamic = function(state)
+            for _,foundstate in pairs(params.DynamicStates) do
+                if state == foundstate then
+                    return true
+                end
+            end
+            return false
+        end
+
+        helpers.nextState = function(previousState)
+            local index = helpers.findStateIndex(previousState)
+            local sequence = params.StateSequence
+            if index == #sequence then
+                return params.StateSequence[1]
+            else
+                return params.StateSequence[helpers.findStateIndex(previousState) + 1]
+            end
+        end
+
+        -- Tries to find the next state of a given type (static or dynamic) and progress the state there.
+        -- Note that the wanted state will get incremented, not the current state. This is to queue states
+        helpers.nextTypedState = function(dynamic)
+            local wantedState = me.Blackboard.GetFact("Cnst.AnimationState.WantedState")
+            wantedState = helpers.nextState(wantedState) --Move to one state further.
+            while helpers.isStateDynamic(wantedState) ~= dynamic do
+                wantedState = helpers.nextState(wantedState) -- If this state isn't right, go to next state.
+            end
+            helpers.goToState(wantedState)
+        end
+
+        -- Tries to put the object in a specific static (static or dynamic) and progress the state there.
+        -- Note that this will override any potential existing wanted states, clearing any queued states.
+        helpers.goToState = function(wantedState)
+            local currentState = me.Blackboard.GetFact("Cnst.AnimationState.CurrentState")
+            if currentState == wantedState then
+                return
+            end
+            me.Blackboard.SetFact("Cnst.AnimationState.WantedState", wantedState)
+
+            if not helpers.isStateDynamic(currentState) then -- lever is in a static state, and is not playing an animation
+                StopTimer(me, "Cnst.AnimationState.TimerFallback")
+                local nextState = helpers.nextState(currentState)
+                me.Blackboard.SetFact("Cnst.AnimationState.CurrentState", nextState)
+                SetAnimationEvent(me, "SetState", me.Blackboard.GetFact("Cnst.AnimationState.CurrentState"))
+                --Start the next state. If it's the right type, at the animation event handler, it will match the wanted state.
+                --Otherwise, it will simply continue.
+                StartTimer(me, "Cnst.AnimationState.TimerFallback", 10.0, 0)
+            end
+        end
+
+        helpers.animationEnded = function()
+            StopTimer(me, "Cnst.AnimationState.TimerFallback")
+            local currentState = me.Blackboard.GetFact("Cnst.AnimationState.CurrentState")
+            local wantedState = me.Blackboard.GetFact("Cnst.AnimationState.WantedState")
+            --code re-sends an event when we load savegames, make sure we were actually waiting for something
+            if wantedState and wantedState ~= currentState then
+                local nextState = helpers.nextState(currentState)
+                me.Blackboard.SetFact("Cnst.AnimationState.CurrentState", nextState)
+
+                if not helpers.isStateDynamic(nextState) then
+                    TriggerOutput(outputs.NewState, nil, nextState)
+                end
+
+                if nextState ~= wantedState then
+                    SetAnimationEvent(me, "SetState", nextState) --If you're not where you need to be, continue to the next.
+                end
+            end
+        end
+
+        -- On Load, if in dynamic state, set the state to the next one.
+        -- If not in a dynamic state, force animation state to current wanted state.
+        self.OnLoaded = function()
+            if me.Blackboard.GetFact("Cnst.AnimationState.CurrentState") == nil then
+                me.Blackboard.SetFact("Cnst.AnimationState.CurrentState", params.StateSequence[1])
+                me.Blackboard.SetFact("Cnst.AnimationState.WantedState", params.StateSequence[1])
+            end
+        end
+
+        socketEvents.Activate = function(ev)
+            --local animationState = me.AnimationState.State -- not supported yet
+            helpers.nextTypedState(false) -- Move to next static state after the current, passing through any events.
+        end
+
+        socketEvents.GoToState = function(ev)
+            --local animationState = me.AnimationState.State -- not supported yet
+            local nextState = ev.Param
+            if helpers.findStateIndex(nextState) == nil then
+                DebugLog("For item [1], the GoToState event was thrown with Param [2], which is not a valid state included in params.StateSequence", tostring(me), tostring(nextState))
+                return
+            end
+            helpers.goToState(nextState) -- Move to next static state after the current, passing through any events.
+        end
+
+        events.TimerFinished = function(ev)
+            if (ev.TimerName == "Cnst.AnimationState.TimerFallback") then
+                DebugLog("For item [1], animation did not finish within 10 seconds. Falling back.", tostring(me))
+                helpers.animationEnded()
+            end
+        end
+
+        
+        -- Dynamic states (4 - 8) finish, at which point the script transitions, both internally and in Genome, to the next state,
+        -- and sends the fitting event.
+        events.AnimationEvent = function(ev)
+            if ev.EventName == "stateEnded" then
+                helpers.animationEnded()
+            end
+        end
+
+    end
+}
+
+game.states.LogicGate_OR = State{
+    function()
+
+        description = [[Sends an event if either of the 'on' events have arrived.
+                        Either of the 'off' events closes the gate until the corresponding 'on' has arrived.]]
+
+        params.StartOn1 = {type = EParamType.Bool, default = false, help = [[Does the first object start on?]]}
+        params.StartOn2 = {type = EParamType.Bool, default = false, help = [[Does the second object start on?]]}
+
+        inputs.On1 = {}
+        inputs.On2 = {}
+        inputs.Off1 = {}
+        inputs.Off2 = {}
+        outputs.On = {}
+        outputs.Off = {}
+
+        self.OnInit = function(ev)
+            if me.Blackboard.GetFact("Cnst.LogicGate_OR.Input1On") == nil then
+                me.Blackboard.SetFact("Cnst.LogicGate_OR.Input1On", params.StartOn1 and 1 or 0)
+                me.Blackboard.SetFact("Cnst.LogicGate_OR.Input2On", params.StartOn2 and 1 or 0)
+            end
+        end
+
+        socketEvents.On1 = function(ev)
+            me.Blackboard.SetFact("Cnst.LogicGate_OR.Input1On", 1)
+            TriggerOutput(outputs.On, ev.Object, ev.Param)
+        end
+
+        socketEvents.On2 = function(ev)
+            me.Blackboard.SetFact("Cnst.LogicGate_OR.Input2On", 1)
+            TriggerOutput(outputs.On, ev.Object, ev.Param)
+        end
+
+        socketEvents.Off1 = function(ev)
+            me.Blackboard.SetFact("Cnst.LogicGate_OR.Input1On", 0)
+            if me.Blackboard.GetFact("Cnst.LogicGate_OR.Input2On") ~= 1 then
+                TriggerOutput(outputs.Off, ev.Object, ev.Param)
+            end
+        end
+
+        socketEvents.Off2 = function(ev)
+            me.Blackboard.SetFact("Cnst.LogicGate_OR.Input2On", 0)
+            if me.Blackboard.GetFact("Cnst.LogicGate_OR.Input1On") ~= 1 then
+                TriggerOutput(outputs.Off, ev.Object, ev.Param)
+            end
+        end
+
+    end
+}
+
+game.states.LogicGate_AND = State{
+    function()
+
+        description = [[Sends an event if both of the 'on' events have arrived.
+                        Either of the 'off' events closes the gate until the corresponding 'on' has arrived.]]
+
+        params.StartOn1 = {type = EParamType.Bool, default = false, help = [[Does the first object start on?]]}
+        params.StartOn2 = {type = EParamType.Bool, default = false, help = [[Does the second object start on?]]}
+
+        inputs.On1 = {}
+        inputs.On2 = {}
+        inputs.Off1 = {}
+        inputs.Off2 = {}
+        outputs.On = {}
+        outputs.Off = {}
+
+        self.OnInit = function(ev)
+            if me.Blackboard.GetFact("Cnst.LogicGate_OR.Input1On") == nil then
+                me.Blackboard.SetFact("Cnst.LogicGate_OR.Input1On", params.StartOn1 and 1 or 0)
+                me.Blackboard.SetFact("Cnst.LogicGate_OR.Input2On", params.StartOn2 and 1 or 0)
+            end
+        end
+
+        socketEvents.On1 = function(ev)
+            me.Blackboard.SetFact("Cnst.LogicGate_OR.Input1On", 1)
+            if me.Blackboard.GetFact("Cnst.LogicGate_OR.Input2On") == 1 then
+                TriggerOutput(outputs.On, ev.Object)
+            end
+        end
+
+        socketEvents.On2 = function(ev)
+            me.Blackboard.SetFact("Cnst.LogicGate_OR.Input2On", 1)
+            if me.Blackboard.GetFact("Cnst.LogicGate_OR.Input1On") == 1 then
+                TriggerOutput(outputs.On, ev.Object)
+            end
+        end
+
+        socketEvents.Off1 = function(ev)
+            me.Blackboard.SetFact("Cnst.LogicGate_OR.Input1On", 0)
+            TriggerOutput(outputs.Off, ev.Object)
+        end
+
+        socketEvents.Off2 = function(ev)
+            me.Blackboard.SetFact("Cnst.LogicGate_OR.Input2On", 0)
+            TriggerOutput(outputs.Off, ev.Object)
+        end
+
+    end
+}
+
+
+game.states.StoryInteractionFilter = State{
+    function()
+        description = [[Enable/distable blocking use through story]]
+
+        params.StartUseEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = "Does the item's use start enabled?"
+        }
+
+        inputs.EnableStoryItemUse = {help = [[Allow item use from story]]}
+        inputs.DisableStoryItemUse = {help = [[Block item use from story]]}
+
+        -- Mainly to centralise the sockets related to this functionality,
+        -- since the input just triggers the output. Also allows hooking up
+        -- this socket to the same socket handler as that for other blocked/
+        -- failed uses where appropriate (non-trapped entities).
+        inputs.UseBlockedFromStory = {help = [[Item use was blocked from story]]}
+        outputs.UseBlockedFromStory = {help = [[Item use was blocked from story]]}
+
+        helpers.UpdateStoryBlockTag = function(enabled)
+            local tag = Tag("BLOCK_USE_FROM_CONSTELLATION_89a63758-d622-41cd-81f9-baceffc12618")
+            if enabled then
+                RemoveTag(me, tag)
+            else
+                AddTag(me, tag)
+            end
+        end
+
+        self.OnEditorChanges = function()
+            me.Blackboard.ClearFact("Cnst.StoryInteractionFilter.Inited")
+        end
+
+        self.OnInit = function()
+            if me.Blackboard.GetFact("Cnst.StoryInteractionFilter.Inited") == nil then
+                me.Blackboard.SetFact("Cnst.StoryInteractionFilter.Inited", 1)
+                helpers.UpdateStoryBlockTag(params.StartUseEnabled)
+            end
+        end
+
+        socketEvents.EnableStoryItemUse = function(ev)
+            helpers.UpdateStoryBlockTag(true)
+        end
+
+        socketEvents.DisableStoryItemUse = function(ev)
+            helpers.UpdateStoryBlockTag(false)
+        end
+
+        socketEvents.UseBlockedFromStory = function(ev)
+            TriggerOutput(outputs.UseBlockedFromStory, ev.Object, ev.Param)
+        end
+
+    end
+}
+
+
+game.states.Dummy = State{
+    function()
+
+        description = [[Does nothing.]]
+
+    end
+}

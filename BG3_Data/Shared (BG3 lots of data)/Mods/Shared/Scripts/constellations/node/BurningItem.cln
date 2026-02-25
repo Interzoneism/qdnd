@@ -1,0 +1,154 @@
+game.states.BurningItem = State{
+    function()
+        params.BurnEffect = {
+            type = EParamType.String,
+            required = false,
+            default = "VFX_LightSources_GEN_Torch_A_01_0aee588d-ba2a-aa3b-a048-5fbc03779371",
+            help = "VFX while item is burning."
+        }
+
+        params.BurnEffectBone = {
+            type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = "Bone on which the VFX is played."
+        }
+
+        params.GameplayLight = {
+            type = EParamType.Bool,
+            required = false,
+            default = false,
+            help = "Does the item cast a gameplay light, or is purely decorative?"
+        }
+
+        params.GameplayLightRadius = {
+            type = EParamType.Number,
+            required = false,
+            default = 5.0,
+            help = "Radius of gameplay light"
+        }
+
+        params.GameplayLightSharpness = {
+            type = EParamType.Number,
+            required = false,
+            default = 0.1,
+            help = "Sharpness of gameplay light"
+        }
+
+        params.GameplayLightOffsetFallback = {
+            type = EParamType.Vector3,
+            help = [[Places the gameplay light at this position if the provided bone is not valid for the entity.]],
+            required = false,
+            default = Vector3(0, 0, 0)
+        }
+
+        params.LightOnSound = {
+            type = EParamType.String,
+            required = false,
+            default = "",
+            help = "Sound played when this light is turned on."
+        }
+
+        params.LightOffSound = {
+            type = EParamType.String,
+            required = false,
+            default = "",
+            help = "Sound played when this light is turned off."
+        }
+
+        params.StartLit = {
+            type = EParamType.Bool,
+            required = false,
+            default = true,
+            help = "Does the item start lit?"
+        }
+
+        params.GameplayLightPointLightVerticalLimit = {
+            type = EParamType.Number,
+            required = false,
+            default = 2.5,
+            help = "Vertical limit of a point light that does not check line-of-sight"
+        }
+
+        inputs.TurnOn = {}
+        inputs.TurnOff = {}
+        inputs.Toggle = {}
+        inputs.ChangeVFX = {}
+
+        outputs.TurnOnInt = {internal = true}
+        outputs.ToggleInt = {internal = true}
+        outputs.TurnOffInt = {internal = true}
+        outputs.ChangeVFXInt = { internal = true }
+
+        outputs.On = {help = "Light turned on"}
+        outputs.Off = {help = "Light turned off"}
+
+        inputs.OnInt = {internal = true}
+        inputs.OffInt = {internal = true}
+
+        nodes.DamageTrigger = Proxy {
+            game.states.DamageTrigger,
+            params = {DamageTypes = {"FIRE", "RADIANT"}},
+            outputs = {TookDamage = {inputs.TurnOn}}
+        }
+
+        nodes.Light = Proxy{
+            game.states.StatusDrivenLight,
+            params = {
+                LightEffect = params.BurnEffect,
+                LightEffectBone = params.BurnEffectBone,
+                GameplayLight = params.GameplayLight,
+                GameplayLightRadius = params.GameplayLightRadius,
+                GamplayLightSharpness = params.GameplayLightSharpness,
+                GameplayLightOffsetFallback = params.GameplayLightOffsetFallback,
+                LightOnSound = params.LightOnSound,
+                LightOffSound = params.LightOffSound,
+                StartLit = params.StartLit,
+                Status = "BURNING",
+                GameplayLightPointLightVerticalLimit = params.GameplayLightPointLightVerticalLimit
+            }, 
+            inputs = {
+                TurnOn = {outputs.TurnOnInt},
+                TurnOff = {outputs.TurnOffInt},
+                Toggle = {outputs.ToggleInt},
+                ChangeVFX = {outputs.ChangeVFXInt}
+            },
+            outputs = {
+                On = {inputs.OnInt},
+                Off= {inputs.OffInt}
+            }
+        }
+
+        self.OnLoaded = function()
+            -- We already manage the status VFX through the scripted light, 
+            -- don't waste resources trying to evaluate multi effects from the BURNING status.
+            DisableStatusVisual(me, "BURNING")
+        end
+
+        socketEvents.TurnOn = function(ev)
+            TriggerOutput(outputs.TurnOnInt, ev.Object, ev.Param)
+        end
+
+        socketEvents.TurnOff = function(ev)
+            TriggerOutput(outputs.TurnOffInt, ev.Object, ev.Param)
+        end
+
+        socketEvents.Toggle = function(ev)
+            TriggerOutput(outputs.ToggleInt, ev.Object, ev.Param)
+        end
+
+        socketEvents.ChangeVFX = function(ev)
+            TriggerOutput(outputs.ChangeVFXInt, ev.Object, ev.Param)
+        end
+
+        socketEvents.OnInt = function(ev)
+            TriggerOutput(outputs.On, ev.Object, ev.Param)
+        end
+
+        socketEvents.OffInt = function(ev)
+            TriggerOutput(outputs.Off, ev.Object, ev.Param)
+        end
+
+    end
+    
+}

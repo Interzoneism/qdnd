@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="AnimationSetBank">
+		<node id="AnimationSetBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="633fcd3a-06ea-4560-0214-43e22b7715d7" />
+					<attribute id="Name" type="LSString" value="DRAGON_Red_World_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209017" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="FallBackAnimation" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets" />
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationBank">
+		<node id="AnimationBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="6.8333335" />
+					<attribute id="ID" type="FixedString" value="5a5056a3-a5e1-a32a-3c81-d772ac69e9ad" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="Dragon_Red_Rig_WRLD_DFLT_CUST_DragonLoopHull_02" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="71dc2ca8-9e59-5afe-f704-fccb61b1ccb6" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="cf8b7b9b-1a3b-8217-be54-b38bc971bb9d" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Dragons/DRAGON_Red_Rig/Dragon_Red_Rig_WRLD_DFLT_CUST_DragonLoopHull_02.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Dragons/DRAGON_Red_Rig/Dragon_Red_Rig_WRLD_DFLT_CUST_DragonLoopHull_02.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Effect" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="2" />
+							<attribute id="Time" type="float" value="0.522449" />
+							<attribute id="Track" type="uint8" value="3" />
+							<children>
+								<node id="Properties">
+									<attribute id="Bone" type="FixedString" value="" />
+									<attribute id="Effect" type="FixedString" value="VFX_Script_Tutorial_CameraShake_01" />
+									<attribute id="HardAttach" type="bool" value="False" />
+									<attribute id="InterruptLoopAtEnd" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_L" />
+							<attribute id="Length" type="float" value="0.8333335" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="6" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_R" />
+							<attribute id="Length" type="float" value="0.8000002" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="6.0333333" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="3" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_R" />
+							<attribute id="Length" type="float" value="0.8000002" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="6.0333333" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_L" />
+							<attribute id="Length" type="float" value="0.7666669" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="6.0666666" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="2" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="6.8333335" />
+					<attribute id="ID" type="FixedString" value="8a1771b2-b965-528a-ed23-d79a670335d0" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="Dragon_Red_Rig_WRLD_DFLT_CUST_DragonLoopHull_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="71dc2ca8-9e59-5afe-f704-fccb61b1ccb6" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="cf8b7b9b-1a3b-8217-be54-b38bc971bb9d" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Dragons/DRAGON_Red_Rig/Dragon_Red_Rig_WRLD_DFLT_CUST_DragonLoopHull_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Dragons/DRAGON_Red_Rig/Dragon_Red_Rig_WRLD_DFLT_CUST_DragonLoopHull_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209018" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Effect" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="2" />
+							<attribute id="Time" type="float" value="1.0507029" />
+							<attribute id="Track" type="uint8" value="3" />
+							<children>
+								<node id="Properties">
+									<attribute id="Bone" type="FixedString" value="" />
+									<attribute id="Effect" type="FixedString" value="VFX_Script_UnderDark_Explosion_Camera_Shake_01" />
+									<attribute id="HardAttach" type="bool" value="False" />
+									<attribute id="InterruptLoopAtEnd" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

@@ -1,0 +1,53 @@
+game.configs.GEN_PatrolWithPauses_Simple = Config{
+    params={
+        patrolSpline = {
+            type = EParamType.String,
+            help = [[Spline to be patrolled.]],
+            required = true,
+        },
+        sleepTimeMin = {
+            type = EParamType.Number,
+            help = [[Min wait duration at spline points.]],
+            required = false,
+            default = 4
+        },
+        patrolSpeed = {
+            type = EParamType.String,
+            help = [[Speed at which to patrol: Stroll, Walk, Run, or Sprint]],
+            required = false,
+            default = [[Walk]]
+        },
+        sleepChance = {
+            type = EParamType.Number,
+            help = [[Chance (out of 100) that the character will go to sleep/wait upon reaching a spline point.]],
+            required = false,
+            default = 100
+        },
+        lookFromSource = {
+            type = EParamType.String,
+            help = [[Entity to look from when a sleep starts. Can be the patrol spline.]],
+            required = false,
+            default = [[]]
+        },
+        sleepTimeMax = {
+            type = EParamType.Number,
+            help = [[Max wait duration at spline points.]],
+            required = false,
+            default = 6
+        },
+    },
+    root=StateRef{game.roots.DefaultCharacter,
+        combatCowerState = StateRef{game.states.CombatCower},
+        genericBehaviours = StateRef{game.states.CrimesHumanoid},
+        idle = StateRef{game.states.GEN_Patrol,
+            patrolActions = StateRef{game.states.GEN_PatrolPauses,
+                lookFromSource = params.lookFromSource,
+                sleepChance = params.sleepChance,
+                sleepTimeMax = params.sleepTimeMax,
+                sleepTimeMin = params.sleepTimeMin,
+            },
+            patrolSpeed = params.patrolSpeed,
+            patrolSpline = params.patrolSpline,
+        },
+    }
+}

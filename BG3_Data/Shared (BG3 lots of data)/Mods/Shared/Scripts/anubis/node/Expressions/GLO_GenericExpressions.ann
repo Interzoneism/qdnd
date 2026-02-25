@@ -1,0 +1,138 @@
+game.expressions.GLO_PlayersNearby = Expression{
+    -- Detects if there are any nearby players to the entity
+    ttl = 0.3,
+
+    function(distance) -- Evaluator function
+        local actives = GetActiveCharacters(me, distance)
+        if #actives > 0 then
+            for _,char in pairs(actives) do
+                if char.Character.IsPlayer then
+                    return true
+                end
+            end
+        end
+        return false
+    end,
+    args = {EParamType.Number},
+    result = EParamType.Bool
+}
+
+game.expressions.GLO_PlayersNearbyToEntity = Expression{
+    -- Detects if there are any nearby players to the given entity
+    ttl = 0.3,
+
+    function(entity, distance) -- Evaluator function
+        local actives = GetActiveCharacters(FindEntity(entity), distance)
+        if #actives > 0 then
+            for _,char in pairs(actives) do
+                if char.Character.IsPlayer then
+                    return true
+                end
+            end
+        end
+        return false
+    end,
+    args = {EParamType.String, EParamType.Number},
+    result = EParamType.Bool
+}
+
+game.expressions.GLO_PartyMembersNearbyToEntity = Expression{
+    -- Detects if there are any nearby players to the given entity
+    ttl = 0.3,
+
+    function(entity, distance) -- Evaluator function
+        local actives = GetActiveCharacters(FindEntity(entity), distance)
+        if #actives > 0 then
+            for _,char in pairs(actives) do
+                if char.Character.IsPartyMember then
+                    return true
+                end
+            end
+        end
+        return false
+    end,
+    args = {EParamType.String, EParamType.Number},
+    result = EParamType.Bool
+}
+
+game.expressions.GLO_UnhiddenCharacterNearby = Expression{
+    modules = { "gustav.Act1.Underdark" },
+    ttl = 0.3,
+
+    function(distance)
+        return mod.Underdark.FindClosestActiveCharacter(me.Position,distance,true) ~= nil
+    end,
+    args = {EParamType.Number},
+    result = EParamType.Bool
+}
+
+game.expressions.GLO_DetectDarkness = Expression{
+
+    ttl = 0.3,
+
+    function() -- Evaluator function
+        if not me.OnStage then
+            return false
+        end
+        return (GetObscuredState(me) == ObscuredState.HeavilyObscured)--: receiving Variant<Entity, float3> and returning enum
+    end,
+    -- Argument types, must be exactly the number of arguments in the evaluator function, where ... is counted as
+    -- one argument (all params to be plugged into those args should have this type)
+    args = {},
+    -- Result type
+    --
+    -- Will be validated in run-time, so choose wisely
+    --
+    -- Optional. EParamType.Bool by default
+    result = EParamType.Bool
+}
+
+
+-- Possible results:
+--  * 0: no combat in detect range -> idle
+--		OR combat in detect range with ally in combat and in sight -> idle 
+--		OR combat in detect range with enemy in detect range -> idle
+--  * 1: combat in detect range with no visible combat characters -> cower, don't flee
+--  * 2: combat in detect range with neutral visible combat characters -> flee
+game.expressions.GLO_CombatInSightRange = Expression{
+    ttl = 1.0,
+
+    function()
+        local sightRange = me.Character.SightRange
+        -- sight range can be reduced to 0 by e.g. casting sleep
+        if sightRange < 0.1 then
+            return 0
+        end
+        local canSeeCombatInActiveRange = false
+        local combatInActiveRange = false
+        local activeDistance = 30
+        local actives = GetActiveCharacters(me, activeDistance)
+        for _,char in pairs(actives) do
+            if char ~= me then
+                if char.IsInCombat then
+                    if GetRelation(me.Faction, char.Faction) == FactionRelation.Enemy and me.CanFight then
+                        return 0 -- Enemy visible. Don't cower away from enemies.
+                    elseif GetRelation(me.Faction, char.Faction) == FactionRelation.Ally and GetDistanceTo(me, char) < sightRange and me.CanFight then
+                        return 0 -- Ally visible. Won't cower as will join combat when their enemy is seen.
+                    else
+                        if GetDistanceTo(me, char) < sightRange then
+                            canSeeCombatInActiveRange = true
+                        else
+                            combatInActiveRange = true
+                        end
+                    end
+                end
+            end
+        end
+        if canSeeCombatInActiveRange then
+            return 2
+        elseif combatInActiveRange then
+            return 1
+        end
+        return 0
+    end,
+
+    args = {},
+
+    result = EParamType.Int
+}

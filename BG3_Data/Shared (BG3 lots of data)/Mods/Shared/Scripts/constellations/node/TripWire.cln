@@ -1,0 +1,184 @@
+game.states.Tripwire = State{
+    function()
+
+        params.DC = {
+            type = EParamType.String,
+            default="HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f",
+            help=[[Perception check DC.]]
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = "Does the tripwire start on?"
+        }
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            required=false,
+            default=6,
+            help=[[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]]
+        }
+
+        params.Skill = {
+            type = EParamType.String,
+            default="Perception",
+            help=[[The skill checked.]]
+        }
+
+        params.Type = {
+            type = EParamType.String,
+            default="Invisible",
+            help=[[
+            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]]
+        }
+
+        params.VFXOff = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = [[VFX while mine is disabled and has been spotted.]]
+        }
+
+        params.VFXOffBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = [[Bone on which the 'VFXOff' VFX is played.]]
+        }
+
+        params.VFXOn = {type = EParamType.String,
+            required = false,
+            default = "VFX_Script_Trap_Overlay_Red_01_a7361f25-e942-e071-7ce3-7a8182f4e0ef",
+            help = [[VFX while mine is enabled and has been spotted.]]
+        }
+
+        params.VFXOnBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = [[Bone on which the enabled-VFX is played.]]
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_Off",
+            help = "Sound when mine is disabled"
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_On",
+            help = "Sound when mine is enabled"
+        }
+
+        params.DestroyOnDisarm = {
+            type=EParamType.Bool,
+            default = true,
+            help = "Does the item break on Disarm?"
+        }
+
+        inputs.Enable = {help = "Turn mine on"}
+        inputs.Disable = {help = "Turn mine off"}
+        inputs.Trip = {help = "Makes tripwire trigger"}
+
+        inputs.Reveal = {help = [[Reveals the mine. The Object will do an AD unless the Param is true.]]}
+
+        outputs.Tripped = {help = [[Tripwire was triggered, object parameter is the tripping entity]]}
+
+        outputs.Enable = {internal = true}
+        outputs.Disable = {internal = true}
+
+        outputs.Reveal = {internal=true}
+        outputs.TryActivate = {internal = true}
+        outputs.Destroy = {internal=true}
+        inputs.Activate = {internal = true}
+        inputs.DisarmFailed = {internal = true}
+        inputs.Disarmed = {internal = true}
+
+        inputs.EntityOnTop =  {internal = true}
+
+        nodes.PerceptionDisarmOnOff = Proxy{
+            game.states.PerceptionDisarmOnOff,
+            params = {StartEnabled = params.StartEnabled,
+                      DC = params.DC,
+                      MinDistance = params.MinDistance,
+                      Skill = params.Skill,
+                      Type = params.Type,
+                      VFXOn= params.VFXOn,
+                      VFXOff = params.VFXOff,
+                      VFXOnBone = params.VFXOnBone,
+                      VFXOffBone = params.VFXOffBone,
+                      SoundOn = params.SoundOn,
+                      SoundOff = params.SoundOff,
+                      DestroyOnDisarm = params.DestroyOnDisarm,
+                      DisarmOnDestroy = false},
+            inputs = {TryActivate = {outputs.TryActivate},
+                      Enable = {outputs.Enable},
+                      Disable = {outputs.Disable},
+                      Reveal = {outputs.Reveal}},
+            outputs = {Activate = {inputs.Activate},
+                       DisarmFailed = {inputs.DisarmFailed},
+                       Disarmed = {inputs.Disarmed}}
+        }
+
+
+        nodes.OnTopTrigger = Proxy{
+            game.states.OnTopTrigger,
+            params = {CheckInterval = 0.1},
+            inputs = {Deactivate = {outputs.TryActivate}},
+            outputs = {NewEntityOnTop = {inputs.EntityOnTop}}
+        }
+
+        nodes.Destructible = Proxy{
+            game.states.Destructible,
+            params = {GenerateTreasure = false,
+                      DestroyVFX = ""},
+            inputs = {Destroy = {outputs.Destroy, outputs.Tripped}},
+            outputs = {Destroyed = {inputs.Trip}}
+        }
+
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.Enable, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.Disable, ev.Object, ev.Param)
+        end
+
+        socketEvents.EntityOnTop = function(ev)
+            local object = Entity(ev.Object)
+            if object.Weight > 0.0001 then
+                TriggerOutput(outputs.Destroy, ev.Object, ev.Param)
+            end
+        end
+
+        socketEvents.Trip = function(ev)
+            TriggerOutput(outputs.TryActivate, ev.Object, ev.Param)
+        end
+
+        socketEvents.DisarmFailed = function(ev)
+            TriggerOutput(outputs.TryActivate, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disarmed = function(ev)
+            TriggerOutput(outputs.Destroy, ev.Object, ev.Param)
+        end
+
+        socketEvents.Activate = function(ev)
+            TriggerOutput(outputs.Tripped, ev.Object)
+            TriggerOutput(outputs.Disable, ev.Object)
+            TriggerOutput(outputs.Reveal, ev.Object)
+        end
+
+
+        socketEvents.Reveal = function(ev)
+            TriggerOutput(outputs.Reveal, ev.Object)
+        end
+
+    end
+}

@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="MaterialBank">
+		<node id="MaterialBank">
+			<children>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="83ca3470-b742-9bd1-df64-689e7d3f1392" />
+					<attribute id="MaterialType" type="uint8" value="2" />
+					<attribute id="Name" type="LSString" value="DCL_Gith_Symbol_Vlaakith_ABC" />
+					<attribute id="SourceFile" type="LSString" value="Public/Engine/Assets/Materials/Engine_Default_Decal_Deferred.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="5b558f4f-4659-60d1-a125-dd2903ad4d8e" />
+							<attribute id="ParameterName" type="FixedString" value="basecolor" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="746097ef-bd56-0718-3667-bfa3741855a8" />
+							<attribute id="ParameterName" type="FixedString" value="normalmap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="76ee9a52-b099-02b0-aad5-52a0a31eef4a" />
+							<attribute id="ParameterName" type="FixedString" value="physicalmap" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="TextureBank">
+		<node id="TextureBank">
+			<children>
+				<node id="Resource">
+					<attribute id="Depth" type="int32" value="1" />
+					<attribute id="Height" type="int32" value="2048" />
+					<attribute id="ID" type="FixedString" value="5b558f4f-4659-60d1-a125-dd2903ad4d8e" />
+					<attribute id="Name" type="LSString" value="DCL_Gith_Symbol_Vlaakith_ABC_BMA" />
+					<attribute id="SRGB" type="bool" value="True" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Decals/Gith_Creche/DCL_Gith_Symbol_Vlaakith_ABC/Resources/DCL_Gith_Symbol_Vlaakith_ABC_BMA.DDS" />
+					<attribute id="Streaming" type="bool" value="True" />
+					<attribute id="Template" type="FixedString" value="DCL_Gith_Symbol_Vlaakith_ABC_BMA" />
+					<attribute id="Type" type="int32" value="1" />
+					<attribute id="Width" type="int32" value="2048" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403208705" />
+				</node>
+				<node id="Resource">
+					<attribute id="Depth" type="int32" value="1" />
+					<attribute id="Height" type="int32" value="2048" />
+					<attribute id="ID" type="FixedString" value="746097ef-bd56-0718-3667-bfa3741855a8" />
+					<attribute id="Name" type="LSString" value="DCL_Gith_Symbol_Vlaakith_ABC_NM" />
+					<attribute id="SRGB" type="bool" value="False" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Decals/Gith_Creche/DCL_Gith_Symbol_Vlaakith_ABC/Resources/DCL_Gith_Symbol_Vlaakith_ABC_NM.DDS" />
+					<attribute id="Streaming" type="bool" value="True" />
+					<attribute id="Template" type="FixedString" value="DCL_Gith_Symbol_Vlaakith_ABC_NM" />
+					<attribute id="Type" type="int32" value="1" />
+					<attribute id="Width" type="int32" value="2048" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403208705" />
+				</node>
+				<node id="Resource">
+					<attribute id="Depth" type="int32" value="1" />
+					<attribute id="Height" type="int32" value="2048" />
+					<attribute id="ID" type="FixedString" value="76ee9a52-b099-02b0-aad5-52a0a31eef4a" />
+					<attribute id="Name" type="LSString" value="DCL_Gith_Symbol_Vlaakith_ABC_PMA" />
+					<attribute id="SRGB" type="bool" value="False" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Decals/Gith_Creche/DCL_Gith_Symbol_Vlaakith_ABC/Resources/DCL_Gith_Symbol_Vlaakith_ABC_PMA.DDS" />
+					<attribute id="Streaming" type="bool" value="True" />
+					<attribute id="Template" type="FixedString" value="DCL_Gith_Symbol_Vlaakith_ABC_PMA" />
+					<attribute id="Type" type="int32" value="1" />
+					<attribute id="Width" type="int32" value="2048" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403208705" />
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

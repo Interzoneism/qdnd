@@ -1,0 +1,574 @@
+game.states.Helper_Continue = State{
+    function()
+
+        description = [[Just sends the event on as it came in. For organisational purposes.]]
+
+        inputs.In = {}
+        outputs.Out = {}
+
+        socketEvents.In = function(ev)
+            TriggerOutput(outputs.Out, ev.Object, ev.Param)
+        end
+
+    end
+}
+
+game.states.Helper_SetParameter_Bool = State{
+    function()
+
+        description = [[Overrides the Param of the socket event with the provided value]]
+
+        params.Value = {type = EParamType.Bool, required=true, help=[[
+            Value with which the param is overridden.
+        ]]}
+
+        inputs.In = {}
+        outputs.Out = {}
+
+        socketEvents.In = function(ev)
+            TriggerOutput(outputs.Out, ev.Object, params.Value)
+        end
+
+    end
+}
+
+game.states.Helper_ObjectParameterSwap = State{
+    function()
+
+        description = [[Swaps Object and Parameter]]
+
+
+        inputs.In = {}
+        outputs.Out = {}
+
+        socketEvents.In = function(ev)
+            TriggerOutput(outputs.Out, ev.Param, ev.Object)
+        end
+
+    end
+}
+
+game.states.Helper_SetParameter_String = State{
+    function()
+
+        description = [[Overrides the Param of the socket event with the provided value]]
+
+        params.Value = {type = EParamType.String, required=true, help=[[
+            Value with which the param is overridden.
+        ]]}
+
+        inputs.In = {}
+        outputs.Out = {}
+
+        socketEvents.In = function(ev)
+            TriggerOutput(outputs.Out, ev.Object, params.Value)
+        end
+
+    end
+}
+
+game.states.Helper_Toggle = State{
+    function()
+
+        description = [[Toggles a value on or off]]
+
+        params.StartValue = {type = EParamType.Bool, required=true, help=[[
+            Start value.
+        ]]}
+
+        self.OnInit = function()
+            if not me.Blackboard.GetFact("Cnst.Toggle.Value") then
+                me.Blackboard.SetFact("Cnst.Toggle.Value", params.StartValue and 1 or 0)
+            end
+        end
+
+        self.OnEditorChanges = function()
+            me.Blackboard.ClearFact("Cnst.Toggle.Value")
+        end
+
+        inputs.Toggle = {}
+        outputs.On = {}
+        outputs.Off = {}
+
+        socketEvents.Toggle = function(ev)
+            local currentValue = me.Blackboard.GetFact("Cnst.Toggle.Value")
+            local newValue = currentValue == 1 and 0 or 1
+            me.Blackboard.SetFact("Cnst.Toggle.Value", newValue)
+
+            if newValue == 1 then
+                TriggerOutput(outputs.On, ev.Object, ev.Param)
+            else
+                TriggerOutput(outputs.Off, ev.Object, ev.Param)
+            end
+        end
+
+    end
+}
+
+game.states.Helper_CompareParameter_Number = State{
+    function()
+
+        description = [[Compares the Param of the socket event with the provided value]]
+
+        params.Value = {type = EParamType.Number, required=true, help=[[
+            Value with which the param is compared.
+        ]]}
+
+        inputs.In = {}
+        outputs.Equal = {}
+        outputs.LessThan = {}
+        outputs.GreaterThan = {}
+
+        socketEvents.In = function(ev)
+            if type(ev.Param) == "number" then
+                if ev.Param == params.Value then
+                    TriggerOutput(outputs.Equal, ev.Object, ev.Param)
+                elseif ev.Param < params.Value then
+                    TriggerOutput(outputs.LessThan, ev.Object, ev.Param)
+                else
+                    TriggerOutput(outputs.GreaterThan, ev.Object, ev.Param)
+                end
+            else
+                DebugLogCritical("Helper_CompareParameter_Number '[1]' (GUID [2]) got socket event with non-number parameter", me.Name, me.UUID.String)
+            end
+        end
+
+    end
+}
+
+game.states.Helper_CompareParameter_Bool = State{
+    function()
+
+        description = [[Compares the Param of the socket event with the provided value]]
+
+        params.Value = {type = EParamType.Bool, required=true, help=[[
+            Value with which the param is compared.
+        ]]}
+
+        inputs.In = {}
+        outputs.Equal = {}
+        outputs.NotEqual = {}
+
+        socketEvents.In = function(ev)
+            if type(ev.Param) == "boolean" then
+                if ev.Param == params.Value then
+                    TriggerOutput(outputs.Equal, ev.Object, ev.Param)
+                else
+                    TriggerOutput(outputs.NotEqual, ev.Object, ev.Param)
+                end
+            else
+                DebugLogCritical("Helper_CompareParameter_Bool '[1]' (GUID [2]) got socket event with non-bool parameter", me.Name, me.UUID.String)
+            end
+        end
+
+    end
+}
+
+
+game.states.Helper_EntityEvent_In = State{
+    function()
+
+        description = [[Catches an entity event & sends a Socket event]]
+
+        params.EventName = {type = EParamType.String, required=true, help=[[
+            Name of the event
+        ]]}
+
+        outputs.EventSent = {}
+
+        events.EntityEvent = function(e)
+            if e.Event == params.EventName and
+                e.TargetEntity == me then
+                if e.Params[2] ~= nil then
+                    TriggerOutput(outputs.EventSent, nil, e.Params[2])
+                else
+                    TriggerOutput(outputs.EventSent, nil)
+                    end
+                end
+            end
+
+    end
+}
+
+game.states.Helper_EntityEvent_Out = State{
+    function()
+
+        description = [[Sends an entity event with the Parameter, if any, of the incoming socket event]]
+
+        params.EventName = {type = EParamType.String, required=true, help=[[
+            Name of the event
+        ]]}
+
+        params.EventTarget = {type = EParamType.String, required=false, default="me", help=[[
+            'Name_UUID' of the target that will receive the entity event or 'me' to send the event to the helper itself.
+        ]]}
+
+        params.SendAllParams = {type = EParamType.Bool, default=false, help=[[
+            Send all information in the event: ev.Sender, ev.Object, ev.Param (if not nil)
+        ]]}
+
+        inputs.In = {}
+
+        socketEvents.In = function(ev)
+            local eventTarget = (params.EventTarget == "me") and me or FindEntity(params.EventTarget)
+            if params.SendAllParams then
+                if ev.Param == nil then
+                    SetUnicastEntityEvent(eventTarget, params.EventName, Entity(ev.Sender), Entity(ev.Object))
+                else
+                    SetUnicastEntityEvent(eventTarget, params.EventName, Entity(ev.Sender), Entity(ev.Object), Entity(ev.Param))
+                end
+            else
+                if ev.Param == nil then
+                    SetUnicastEntityEvent(eventTarget, params.EventName)
+                else
+                    SetUnicastEntityEvent(eventTarget, params.EventName, Entity(ev.Param))
+                end
+            end
+        end
+
+
+    end
+}
+
+
+game.states.Helper_GlobalFlag = State{
+    function()
+
+        description = [[Catches the setting & clearing of a global flag. Allows the setting and clearing of a global flag.]]
+
+        params.FlagName = {type = EParamType.String, required=true, help=[[
+            Name of the Flag
+        ]]}
+
+        outputs.FlagSet = {}
+        outputs.FlagCleared = {}
+
+        inputs.SetFlag = {}
+        inputs.ClearFlag = {}
+
+        local flagGuid
+
+        self.OnInit = function(e)
+            if me.Blackboard.GetFact("Cnst.GlobalFlag.LastSent") == nil then
+                me.Blackboard.SetFact("Cnst.GlobalFlag.LastSent", 0)
+            end
+            if not flagGuid then
+                flagGuid = Flag(params.FlagName).Guid
+            end
+            if me.Blackboard.GetFact("Cnst.GlobalFlag.LastSent") == 0 and
+               GetFlag(Flag(params.FlagName)) == true
+            then
+                TriggerOutput(outputs.FlagSet, nil)
+                me.Blackboard.SetFact("Cnst.GlobalFlag.LastSent", 1)
+            elseif me.Blackboard.GetFact("Cnst.GlobalFlag.LastSent") == 1 and
+                   GetFlag(Flag(params.FlagName)) == false
+            then
+               TriggerOutput(outputs.FlagCleared, nil)
+               me.Blackboard.SetFact("Cnst.GlobalFlag.LastSent", 0)
+            end
+        end
+
+        socketEvents.SetFlag = function(ev)
+            SetFlag(Flag(params.FlagName))
+        end
+
+        socketEvents.ClearFlag = function(ev)
+            ClearFlag(Flag(params.FlagName))
+        end
+
+        events.FlagSet = function(e)
+            if not flagGuid then
+                flagGuid = Flag(params.FlagName).Guid
+            end
+            if e.Flag == flagGuid then
+                TriggerOutput(outputs.FlagSet, nil)
+                me.Blackboard.SetFact("Cnst.GlobalFlag.LastSent", 1)
+            end
+        end
+
+        events.FlagCleared = function(e)
+            if not flagGuid then
+                flagGuid = Flag(params.FlagName).Guid
+            end
+            if e.Flag == flagGuid then
+                TriggerOutput(outputs.FlagCleared, nil)
+                me.Blackboard.SetFact("Cnst.GlobalFlag.LastSent", 0)
+            end
+        end
+
+    end
+}
+
+game.states.Helper_Sequence = State{
+    function()
+        description = [[Check whether a number of steps are triggered in sequence]]
+
+        params.StepSequence =
+        {
+            type = EParamType.Int,
+            required = true,
+            arrayRange = "1..",
+            help = [[The sequence in which the StepX sockets need to be triggered (repeats are allowed)]]
+        }
+
+        params.StartEnabled =
+        {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Whether or not you can start triggering sequence steps from the start.]]
+        }
+
+        params.ResetOnFailure =
+        {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Reset the sequence when an error is made, otherwise stay on the current step number]]
+        }
+
+        params.DisableOnSuccess =
+        {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Disable further checks once the correct sequence has been triggered once.
+                     Otherwise the sequence will reset on completion.]]
+        }
+
+        inputs.Reset = { help = [[Reset the sequence to the beginning, failure does not get triggered]] }
+        inputs.ResetWithFailure = { help = [[Reset the sequence, failure gets triggered]] }
+        inputs.Enable = { help = [[Allow inputs to trigger the logic again]] }
+        inputs.Disable = { help = [[Prevent further inputs from triggering any logic]] }
+
+        outputs.Failure = { help = [[Input sockets got triggered in the wrong order, event parameter = failed step number]] }
+        outputs.Success = { help = [[All required input sockets got triggered in the correct order]] }
+        outputs.StepCompleted = { help = [[Successfully triggered a step, event parameter = step number]]}
+
+        inputs.Step1 = { help = [[Trigger Step 1 in the sequence]] }
+        inputs.Step2 = { help = [[Trigger Step 2 in the sequence]] }
+        inputs.Step3 = { help = [[Trigger Step 3 in the sequence]] }
+        inputs.Step4 = { help = [[Trigger Step 4 in the sequence]] }
+        inputs.Step5 = { help = [[Trigger Step 5 in the sequence]] }
+        inputs.Step6 = { help = [[Trigger Step 6 in the sequence]] }
+        inputs.Step7 = { help = [[Trigger Step 7 in the sequence]] }
+        inputs.Step8 = { help = [[Trigger Step 8 in the sequence]] }
+        inputs.Step9 = { help = [[Trigger Step 9 in the sequence]] }
+
+        helpers.StepTriggered = function(stepNumber, ev)
+            -- Disabled -> do nothing
+            if me.Blackboard.GetFact("Cnst.CheckedSequence.Disabled") ~= nil then
+                return
+            end
+
+            local currentIndex = me.Blackboard.GetFact("Cnst.CheckedSequence.Index")
+
+            if params.StepSequence[currentIndex] ~= stepNumber then
+                -- wrong step triggered
+                TriggerOutput(outputs.Failure, ev.Object, stepNumber)
+
+                if params.ResetOnFailure then
+                    me.Blackboard.SetFact("Cnst.CheckedSequence.Index", 1)
+                end
+
+                -- otherwise stay on current step number
+            else
+                -- correct step triggered
+                TriggerOutput(outputs.StepCompleted, ev.Object, stepNumber)
+
+                if currentIndex == #params.StepSequence then
+                    -- end of sequence
+                    TriggerOutput(outputs.Success, ev.Object, ev.Param)
+
+                    if params.DisableOnSuccess then
+                        me.Blackboard.SetFact("Cnst.CheckedSequence.Disabled", 1)
+                    end
+
+                    -- always set index back to the start (can be re-enabled later
+                    -- even if disabled above)
+                    me.Blackboard.SetFact("Cnst.CheckedSequence.Index", 1)
+                else
+                    -- next step
+                    me.Blackboard.SetFact("Cnst.CheckedSequence.Index", currentIndex + 1)
+                end
+            end
+        end
+
+        self.OnInit = function()
+            if me.Blackboard.GetFact("Cnst.CheckedSequence.Index") == nil then
+                me.Blackboard.SetFact("Cnst.CheckedSequence.Index", 1)
+                if not params.StartEnabled then
+                    me.Blackboard.SetFact("Cnst.CheckedSequence.Disabled", 1)
+                end
+            end
+        end
+
+        socketEvents.Reset = function(ev)
+            me.Blackboard.SetFact("Cnst.CheckedSequence.Index", 1)
+        end
+
+        socketEvents.ResetWithFailure = function(ev)
+            me.Blackboard.SetFact("Cnst.CheckedSequence.Index", 1)
+            TriggerOutput(outputs.Failure, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disable = function(ev)
+            me.Blackboard.SetFact("Cnst.CheckedSequence.Disabled", 1)
+        end
+
+        socketEvents.Enable = function(ev)
+            me.Blackboard.ClearFact("Cnst.CheckedSequence.Disabled")
+        end
+
+        socketEvents.Step1 = function(ev)
+            helpers.StepTriggered(1, ev)
+        end
+
+        socketEvents.Step2 = function(ev)
+            helpers.StepTriggered(2, ev)
+        end
+
+        socketEvents.Step3 = function(ev)
+            helpers.StepTriggered(3, ev)
+        end
+
+        socketEvents.Step4 = function(ev)
+            helpers.StepTriggered(4, ev)
+        end
+
+        socketEvents.Step5 = function(ev)
+            helpers.StepTriggered(5, ev)
+        end
+
+        socketEvents.Step6 = function(ev)
+            helpers.StepTriggered(6, ev)
+        end
+
+        socketEvents.Step7 = function(ev)
+            helpers.StepTriggered(7, ev)
+        end
+
+        socketEvents.Step8 = function(ev)
+            helpers.StepTriggered(8, ev)
+        end
+
+        socketEvents.Step9 = function(ev)
+            helpers.StepTriggered(9, ev)
+        end
+
+    end
+}
+
+game.states.PlayBeamVFX = State{
+    function()
+        description = "Play a beam VFX"
+
+        params.VFXTarget1 = {
+            type = EParamType.String, 
+            required = false,
+            default = "me",
+            help = [[Entity on which to play the VFX start.]]
+        }
+
+        params.VFXTarget2 = {
+            type = EParamType.String, 
+            required = true,
+            help = [[Entity on which to play the VFX end.]]
+        }
+
+        params.VFX = {type = EParamType.String,
+                      required=true,
+                      help = [[VFX to play.]]}
+
+        params.VFXBone1 = {type = EParamType.String,
+                          required=false,
+                          default = "Dummy_FX",
+                          help = [[Bone on which to play the VFX for object 1.]]}
+                          
+        params.VFXBone2 = {type = EParamType.String,
+                           required=false,
+                           default = "Dummy_FX",
+                           help = [[Bone on which to play the VFX for object 2.]]}
+
+        inputs.PlayVFX = {help = "Play the VFX"}
+        inputs.StopVFX = {help = "Stop the VFX (if it was a looping one)"}
+        
+        params.StartEnabled = {
+            help = "Does the VFX play initially?",
+            type = EParamType.Bool,
+            default = false
+            }
+
+
+        local preparedVFX
+        local vfxTarget1
+        local vfxTarget2
+
+        helpers.playVFX = function()
+            local vfxHandle = me.Blackboard.GetFact("Cnst.PlayBeamVFX.vfxHandle")
+            if not preparedVFX.IsLooping or
+               (vfxHandle == nil) then
+                local playingEffect = PlayBeamEffectAt(preparedVFX, vfxTarget1, vfxTarget2, params.VFXBone1, params.VFXBone2)
+                if preparedVFX.IsLooping then
+                    me.Blackboard.SetFact("Cnst.PlayBeamVFX.vfxHandle", playingEffect.Handle)
+                end
+            end
+        end
+
+        self.OnLoaded = function()
+            if preparedVFX == nil then
+                preparedVFX = PrepareEffect(params.VFX)
+            end
+        end
+
+        self.OnEditorChanges = function()
+            local vfxHandle = me.Blackboard.GetFact("Cnst.PlayBeamVFX.vfxHandle")
+            if vfxHandle ~= nil then
+                StopEffect(PlayingEffect(vfxHandle))
+                -- don't clear blackboard, so that self.OnInit will start playing the
+                -- (potentially different) effect again
+            end
+        end
+
+        self.OnInit = function()
+            if params.VFXTarget1 == "me" then
+                vfxTarget1 = me
+            else
+                vfxTarget1 = FindEntity(params.VFXTarget1)
+            end
+
+            if params.VFXTarget1 == "me" then
+                vfxTarget2 = me
+            else
+                vfxTarget2 = FindEntity(params.VFXTarget2)
+            end
+
+            if (me.Blackboard.GetFact("Cnst.PlayBeamVFX.On") == nil) then
+                if params.StartEnabled then
+                    me.Blackboard.SetFact("Cnst.PlayBeamVFX.On", 1)
+                else
+                    me.Blackboard.SetFact("Cnst.PlayBeamVFX.On", 0)
+                end
+            end
+            
+            if 
+                me.Blackboard.GetFact("Cnst.PlayBeamVFX.On") == 1 then
+                me.Blackboard.ClearFact("Cnst.PlayVFX.vfxHandle") --VFX handle is outdated, if it exists.
+                helpers.playVFX()
+            end
+        end
+
+        socketEvents.PlayVFX = function()
+            me.Blackboard.SetFact("Cnst.PlayBeamVFX.Off", 1)
+            -- don't start playing a effect again if it's already playing
+            helpers.playVFX()
+        end
+
+        socketEvents.StopVFX = function()
+            me.Blackboard.SetFact("Cnst.PlayBeamVFX.Off", 1)
+            local vfxHandle = me.Blackboard.GetFact("Cnst.PlayBeamVFX.vfxHandle")
+            if vfxHandle ~= nil then
+                StopEffect(PlayingEffect(vfxHandle))
+                me.Blackboard.ClearFact("Cnst.PlayBeamVFX.vfxHandle")
+            end
+        end
+
+    end
+}

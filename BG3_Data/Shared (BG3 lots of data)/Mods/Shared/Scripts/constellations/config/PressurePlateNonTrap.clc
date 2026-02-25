@@ -1,0 +1,109 @@
+game.configs.PressurePlateNonTrap = Config{
+    params={
+        VFXOff = {
+            type = EParamType.String,
+            help = [[VFX while item is off.]],
+            required = false,
+            default = [[VFX_Script_Trap_Overlay_Grey_01_63087405-2949-2c01-facc-8cddd1905264]]
+        },
+        WeightLimit = {
+            type = EParamType.Number,
+            help = [[Max Weight]],
+            required = false,
+            default = 50
+        },
+        MinDistance = {
+            type = EParamType.Number,
+            help = [[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]],
+            required = false,
+            default = 6
+        },
+        VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while item is on.]],
+            required = false,
+            default = [[]]
+        },
+        VFXOffBone = {
+            type = EParamType.String,
+            help = [[Bone on which the the VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the the VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        Skill = {
+            type = EParamType.String,
+            help = [[The skill checked.]],
+            required = false,
+            default = [[Perception]]
+        },
+        SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when trap is turned on]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_On]]
+        },
+        Type = {
+            type = EParamType.String,
+            help = [[            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[Interactable]]
+        },
+        DC = {
+            type = EParamType.String,
+            help = [[The skill check DC.]],
+            required = false,
+            default = [[DC_Legacy_15_bddbb9b8-a242-4c3e-a2eb-3fd274c0c539]]
+        },
+        SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when trap is turned off]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_Off]]
+        },
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the trap start on?]],
+            required = false,
+            default = true
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.PressurePlate,
+            DC = params.DC,
+            DestroyOnDisarm = false,
+            IsTrap = false,
+            MinDistance = params.MinDistance,
+            Skill = params.Skill,
+            SoundOff = params.SoundOff,
+            SoundOn = params.SoundOn,
+            StartEnabled = params.StartEnabled,
+            Type = params.Type,
+            VFXOff = params.VFXOff,
+            VFXOffBone = params.VFXOffBone,
+            VFXOn = params.VFXOn,
+            VFXOnBone = params.VFXOnBone,
+            WeightLimit = params.WeightLimit,
+        },
+    },
+    inputs={
+        Enable=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+        Disable=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+        Reveal=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Reveal]]}}},
+    },
+    outputs={
+        Up=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Up]]}}},
+        Down=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Down]]}}},
+    }
+}

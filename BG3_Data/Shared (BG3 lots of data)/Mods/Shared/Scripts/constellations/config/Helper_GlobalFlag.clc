@@ -1,0 +1,23 @@
+game.configs.Helper_GlobalFlag = Config{
+    params={
+        FlagName = {
+            type = EParamType.String,
+            help = [[Name of the Flag
+        ]],
+            required = true,
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.Helper_GlobalFlag,
+            FlagName = params.FlagName,
+        },
+    },
+    outputs={
+        FlagSet=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.FlagSet]]}}},
+        FlagCleared=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.FlagCleared]]}}},
+    },
+    inputs={
+        SetFlag=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.SetFlag]]}}},
+        ClearFlag=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.ClearFlag]]}}},
+    }
+}

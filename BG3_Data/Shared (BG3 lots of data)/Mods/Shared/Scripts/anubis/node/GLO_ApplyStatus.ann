@@ -1,0 +1,22 @@
+game.states.GLO_ApplyStatus = State{function ()
+
+    params.Status = {type = EParamType.String, help=[[
+        The status to apply to this character
+    ]]}
+
+    params.idle = {type = EParamType.State, help=[[
+        Default behaviour that will be executed when not in combat or otherwise blocked (moving for items, generic behaviours and certain status for characters)
+    ]]}
+
+    nodes.Idle = Proxy{
+        params.idle
+    }
+
+    events.Activated = function(e)
+        if not HasAppliedStatus(me, params.Status) then
+            -- Do here instead of in OnInit to handle spawned characters in combat as well
+            ApplyStatus(me, params.Status, true, -1)
+        end
+    end
+end
+}

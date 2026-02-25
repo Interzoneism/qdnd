@@ -1,0 +1,66 @@
+game.configs.PerceptionHelper = Config{
+    params={
+        TargetEntity = {
+            type = EParamType.String,
+            help = [[Object on which the perception VFX are played.]],
+            required = false,
+        },
+        Skill = {
+            type = EParamType.String,
+            help = [[            The skill checked.
+        ]],
+            required = false,
+            default = [[Perception]]
+        },
+        DC = {
+            type = EParamType.String,
+            help = [[The skill check DC.]],
+            required = false,
+            default = [[DC_Legacy_15_bddbb9b8-a242-4c3e-a2eb-3fd274c0c539]]
+        },
+        IsTrap = {
+            type = EParamType.Bool,
+            help = [[Is this object a trap?]],
+            required = false,
+            default = false
+        },
+        Type = {
+            type = EParamType.String,
+            help = [[            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[None]]
+        },
+        MinDistance = {
+            type = EParamType.Number,
+            help = [[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]],
+            required = false,
+            default = 6
+        },
+        PerceptionSuccessAD = {
+            type = EParamType.String,
+            help = [[Override AD to play on the player when the non-trapped entity is perceived. Default AD if left blank.]],
+            required = false,
+            default = [[]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.Perception,
+            DC = params.DC,
+            IsTrap = params.IsTrap,
+            MinDistance = params.MinDistance,
+            PerceptionSuccessAD = params.PerceptionSuccessAD,
+            Skill = params.Skill,
+            TargetEntity = params.TargetEntity,
+            Type = params.Type,
+        },
+    },
+    inputs={
+        Reveal=ExtSocket{description=[[Reveal object]],{SocketRef{[[root.logic.inputs.Reveal]]}}},
+    }
+}

@@ -1,0 +1,539 @@
+-- our default combat actions
+-- TODO move into own file?
+
+game.actions.combat.CAN_NOT_EXECUTE_THIS_TURN = Action
+{
+    function(state)
+        -- NOTE Exceptions are not caught, because we want to re-evaluate in that case
+        local cmd = FetchTopAiCommand()
+        assert(ls.CheckType(cmd, AiActionCanNotExecuteThisTurn))
+        local fallbackMovementSpell = state.DefaultCombat.GetFallbackMovementSpell()
+        if fallbackMovementSpell ~= nil and fallbackMovementSpell ~= "" and CanCast(me.Character, fallbackMovementSpell,nil,false) then
+            UseSpell(fallbackMovementSpell, me, nil, nil, nil, false, false, false, cmd.MoveAvoidAoO)
+            SetUnicastEntityEvent(me,"GLO_AiExecuteRecalc")
+        end
+        DebugText(me,"[Combat Ai: Can't reach cast position this turn, will move as far as possible]")
+        AiMove(cmd.CastPosition, cmd.Target, cmd.EndPosition, true, cmd.MoveAvoidAoO)
+      --[[
+        if HasActiveStatus(me, "INVISIBLE") then
+            PlayEffectAt(me, "RS3_FX_UI_Icon_SkipTurn_01", "Dummy_OverheadFX")
+        end
+        --]]
+        AIFinishAction()
+    end
+}
+
+game.actions.combat.CONSUME = Action
+{
+    function()
+        local cmd = FetchTopAiCommand()
+        assert(ls.CheckType(cmd, AiActionConsume))
+         DebugText(me,"[Combat Ai: Going to consume root template [1]]", cmd.Item.Template.Guid)
+        if CanUseItemInInventory(me.Character, cmd.Item, false) then
+            UseItem(cmd.Item)
+            Sleep(0.02)
+        else
+            --[[
+            if not HasActiveStatus(me,"INVISIBLE") then
+                CharacterPlayEffect(__Me, "RS3_FX_UI_Icon_SkipTurn_01", "Dummy_OverheadFX")
+            end
+            --]]
+            Sleep(0.05) --wait for the player to see and understand skip turn icon
+            EndTurn(me)
+        end
+        AIFinishAction()
+    end
+}
+
+game.actions.combat.SPELL = Action
+{
+    function()
+        local cmd = FetchTopAiCommand()
+        assert(ls.CheckType(cmd, AiActionSpell))
+
+        DebugText(me, "[Combat Ai: Going to cast [1] from root template [2]]", cmd.SpellID,
+            (cmd.SpellItem ~= nil and cmd.SpellItem.Template.Guid or "null"))
+        -- Check if we can still cast the spell
+        local character = me.Character
+        -- TODO: we should allow items here too
+        if not (character and CanCast(character, cmd.SpellID, cmd.SpellItem)) then
+            if CanSee(me, cmd.Target) then
+                SteerTo(cmd.Target)
+            end
+
+           --[[
+            if not HasActiveStatus(me,"INVISIBLE") then
+                CharacterPlayEffect(__Me, "RS3_FX_UI_Icon_SkipTurn_01", "Dummy_OverheadFX")
+            end
+            --]]
+
+            DebugText(me, "[Combat Ai: Could not cast [1]... ending turn]", cmd.SpellID)
+
+            Sleep(0.05) --wait for the player to see and understand skip turn icon
+            EndTurn(me)
+        else
+            -- Cast the Spell
+            if cmd.Target then
+                UseSpell(cmd.SpellID, cmd.Target, cmd.Target2, cmd.SpellItem, cmd.EndPosition, false, false, false, cmd.MoveAvoidAoO)
+            end
+        end
+        AIFinishAction()
+    end
+}
+
+game.actions.combat.FALLBACK = Action
+{
+    --NOTE: any exceptions thrown by this are not caught, which is fine, since in the original one
+    --      they just had it restart calculations
+    function(state)
+        DebugText(me,"[Combat Ai: Moving to a better position as a fallback]")
+        local cmd = FetchTopAiCommand()
+        assert(ls.CheckType(cmd, AiActionFallback))
+        AiMove(cmd.TargetPosition, nil, nil, true, cmd.MoveAvoidAoO)
+        SteerTo(cmd.LookAtPosition)
+        local fallbackAD = state.DefaultCombat.GetFallbackAD()
+        if cmd.PlayFallbackAD and fallbackAD
+           and state.DefaultCombat.IsSpeakerAvailableForCombatAD(me) then
+            StartAutomatedDialog(fallbackAD, true, me)
+        end
+        AIFinishAction()
+        EndTurn(me)
+    end
+}
+
+game.actions.combat.MOVE = Action
+{
+    function(state)
+        DebugText(me,"[Combat Ai: Moving]")
+        local cmd = FetchTopAiCommand()
+        assert(ls.CheckType(cmd, AiActionMove))
+        AiMove(cmd.TargetPosition, cmd.Target, nil, true, cmd.MoveAvoidAoO, cmd.IgnoreEntities)
+        SteerTo(cmd.LookAtPosition)
+        AIFinishAction()
+    end
+}
+
+game.actions.combat.MOVE_SPELL = Action
+{
+    function()
+        local cmd = FetchTopAiCommand()
+        assert(ls.CheckType(cmd, AiMoveSpell))
+
+        DebugText(me,"[Combat Ai: Going to cast spell to get in position: [1] from root template [2]", cmd.SpellID,
+            (cmd.SpellItem ~= nil and cmd.SpellItem.Template.Guid or "null"))
+        -- Check if we can still cast the spell
+        local character = me.Character
+        -- TODO: we should allow items here too
+        if not (character and CanCast(character, cmd.SpellID, cmd.SpellItem)) then
+            SteerTo(cmd.TargetPosition)
+            --[[
+            if not HasActiveStatus(me,"INVISIBLE") then
+                CharacterPlayEffect(__Me, "RS3_FX_UI_Icon_SkipTurn_01", "Dummy_OverheadFX")
+            end
+            --]]
+            Sleep(0.05) --wait for the player to see and understand skip turn icon
+            AIFinishAction()
+            EndTurn(me)
+        else
+            -- Cast the Spell
+            if GetSpellType(cmd.SpellID) == Spells.Teleportation then
+                UseSpell(cmd.SpellID, me, cmd.TargetPosition, cmd.SpellItem)
+            else
+                UseSpell(cmd.SpellID, cmd.TargetPosition, nil, cmd.SpellItem, nil, false, false, false, cmd.MoveAvoidAoO)
+            end
+            AIFinishAction()
+            AIFinishMoveSpell()
+        end
+    end
+}
+
+game.actions.combat.SEEK = Action
+{
+    function(state)
+        DebugText(me,"[Combat AI: Seeking hidden character]")
+        local cmd = FetchTopAiCommand()
+        assert(ls.CheckType(cmd, AiActionSeek))
+        AiMove(cmd.TargetPosition, nil, nil, true, cmd.MoveAvoidAoO)
+        if not IsTagged(me, Tag("MONSTER_90101158-141e-4896-8e60-f8db03f6dde3")) and
+           not IsTagged(me, Tag("BEAST_890b5a2a-e773-48df-b191-c887d87bec16")) and
+           state.DefaultCombat.IsSpeakerAvailableForCombatAD(me) then
+            StartAutomatedDialog(Dialog("CMB_AD_SeekFallback_e8df32fb-c91d-b410-84c5-452d83f305e5"), false, me)
+        end
+
+        local function SteerAndSleep(steerPosition, sleepTime)
+            if HasActiveStatusWithGroup(cmd.Target, "SG_Invisible") or HasActiveStatus(cmd.Target, "SNEAKING") then
+                SteerTo(steerPosition)
+                Sleep(math.random() * 0.5 + sleepTime)
+            end
+        end
+
+        local function DetectAndSleep(sleepTime)
+            if HasActiveStatusWithGroup(cmd.Target, "SG_Invisible") or HasActiveStatus(cmd.Target, "SNEAKING") then
+                UseSpell("Shout_SeeInvisibility_Seek", me, nil, nil, nil, false, true)
+                Sleep(math.random() * 0.5 + sleepTime)
+            end
+        end
+
+        -- Look around a bit, trying to trigger a stealth roll of the hidden character
+        SteerAndSleep(cmd.LookAtPosition, 1.0)
+        local offset = me.RightDirection * 0.5 * ((math.random() < 0.5) and 1.0 or -1.0)
+        SteerAndSleep(me.Position + offset, 0.5)
+        SteerAndSleep(me.Position - offset, 0.5)
+        SteerAndSleep(me.Position + offset, 0.2)
+
+        -- Look back at the last known enemy position
+        SteerTo(cmd.LookAtPosition)
+
+        -- Then cast a spell to attempt detecting invisible enemies
+        try
+            DetectAndSleep(0.5)
+        catch e if ls.CheckType(e, error.UseSpellFailed) then
+            -- If the spell cast failed, for example because of lack of resources, ignore and continue
+        end
+
+        AIFinishAction()
+        AIFinishSeek(cmd.Target)
+    end
+}
+
+game.actions.combat.WEAPON_PICKUP = Action
+{
+    function(state)
+        DebugText(me, "[Combat AI: picking up weapon]")
+        local cmd = FetchTopAiCommand()
+        assert(ls.CheckType(cmd, AiActionWeaponPickUp))
+        if cmd.Weapon then
+            try
+                if not IsInInventoryOf(cmd.Weapon, me) then
+                    PickUpItem(cmd.Weapon, cmd.MoveAvoidAoO)
+                end
+                Equip(me.Character, cmd.Weapon.Item, true)
+            catch e if ls.CheckType(e, error.PickUpItemFailed) then
+                -- ignore the exception and continue execution without end turn
+            end
+        end
+        AIFinishAction()
+    end
+}
+
+game.actions.combat.USE_ITEM = Action
+{
+    function()
+        DebugText(me, "[Combat AI: using item]")
+        local cmd = FetchTopAiCommand()
+        assert(ls.CheckType(cmd, AiActionUseItem))
+        if cmd.Item then
+            DebugText(me,"[Combat Ai: Going to use root template [1]]", cmd.Item.Item.Template.Guid)
+            UseItem(cmd.Item.Item)
+            Sleep(0.02)
+        end
+        AIFinishAction()
+    end
+}
+
+game.actions.combat.NoCommandFallback = Action
+{
+    function()
+        EndTurn(me)
+    end
+}
+
+game.states.DefaultCombat = State{function ()
+    description = [[Default combat script]]
+
+    modules = { "shared.items" }
+
+    params.FallbackAD = {type = EParamType.String, required=false,
+     default="CMB_AD_CombatFallback_300686d9-9f7e-c18d-9d64-3f176c78b98b", help=[[
+        Dialog to play when the NPC has no available options
+    ]]}
+
+    params.FallbackMovementSpell = {type = EParamType.String, required=false, help=[[
+        Spell to try to use if the NPC cannot use it's top priority spell this turn due to movement limitations
+    ]]}
+
+    params.customCombat = {type = EParamType.State, required=false, default=nil, help=[[
+        Custom combat behaviour that can override the AI
+    ]]}
+
+    
+    params.CustomFallback = {type = EParamType.String, required=false, default="FALLBACK", help=[[
+        Custom Action to override the Fallback behaviour
+    ]]}
+
+    -- state locals
+    -- do we need to calculate our AI scores or not?
+    local calculatingScores = true
+    local recalcScores = false
+    local combatBehaviorDelay = 0
+    local FallbackAD = nil
+    local fallbackADIsBlocked = false
+    local FallbackMovementSpell = nil
+
+    api.GetFallbackAD = function()
+        if fallbackADIsBlocked then
+            return nil
+        end
+        return FallbackAD
+    end
+
+    api.GetFallbackMovementSpell = function()
+        return FallbackMovementSpell
+    end
+
+    api.IsSpeakerAvailableForCombatAD = function(initiator)
+        return initiator.OnStage and
+            initiator.Visible and
+            not HasActiveStatus(initiator,"INVISIBLE") and
+            not IsInDialog(initiator, false) and
+            ((initiator.IsCharacter and
+            not initiator.Character.IsDead and
+            not initiator.Character.IsInteractionDisabled) or
+            (initiator.IsItem and
+            not mod.item.SafeIsDestroyed(initiator.Item)))
+    end
+
+    helpers.StartScoreCalc = function()
+        if not AIIsCalculating() then
+            AIStartCalculating()
+        end
+        calculatingScores = true
+    end
+
+    helpers.StopScoreCalc = function()
+        calculatingScores = false
+        AIStopCalculating()
+    end
+
+    self.OnInit = function()
+        if params.FallbackAD then
+            FallbackAD = Dialog(params.FallbackAD)
+        end
+
+        if params.FallbackMovementSpell then
+            FallbackMovementSpell = params.FallbackMovementSpell
+        end
+    end
+
+    self.CanEnter = function()
+        return me.IsInCombat
+    end
+
+    self.Valid = function()
+        return me.IsInCombat
+    end
+
+    self.OnEnter = function()
+        SetEnemy(me, nil)
+        if me.CanActInCombatTeamTurn then
+            helpers.StartScoreCalc()
+        end
+    end
+
+    self.OnLeave = function()
+        calculatingScores = true
+        SetEnemy(me, nil)
+        helpers.StopScoreCalc()
+    end
+
+    self.OnException = function(e)
+        if me.CanActInCombatTeamTurn then
+            if ls.CheckType(e, error.UseSpellFailed) or ls.CheckType(e, error.MovementFailed) then
+                -- Planned movement didn't succeed. This is not a major concern in combat, just try a different action (e.g. ranged attack)
+                -- ignore the exception and continue execution without end turn
+                return true;
+            end
+
+            DebugLogCriticalException(e, "Unhandled exception encountered during combat behaviour for " .. me.Name .. "\n")
+            helpers.StopScoreCalc()
+            --recalcScores = true
+            EndTurn(me)
+            return true
+        end
+        return false
+    end
+
+    --Events
+    events.AICalculationDone = function()
+        calculatingScores = false
+        Interrupt()
+    end
+
+    events.TurnStarted = function()
+        --see GUS-285786
+        if me.CanActInCombatTeamTurn then 
+            helpers.StartScoreCalc()
+        end
+        Interrupt()
+    end
+
+    events.TurnEnded = function()
+        helpers.StopScoreCalc()
+
+        -- A spell might end combat in which case we don't want to interrupt the spell
+        if me.IsInCombat then
+            Interrupt()
+        end
+    end
+
+    events.EntityEvent = function(ev)
+        if ev.TargetEntity == me then
+            if (ev.Event == "GLO_CombatWait")  then
+                if type(ev.Params[1]) == "number" or not ev.Params[1] then --Default without parameter shouldn't give an error message.
+                    combatBehaviorDelay =  math.floor((ev.Params[1] or 5.0)*1000)
+                    Interrupt()
+                else
+                    DebugText(me, "Trying to Combat Delay with a non-number parameter. Type is "..  type(ev.Params[1])..". Please don't.")
+                    combatBehaviorDelay = 5000
+                    if me.IsInCombat and me.CanActInCombatTeamTurn then
+                    Interrupt()
+                    end
+                end
+            elseif (ev.Event == "GLO_CancelCombatWait") then
+                recalcScores = true
+                combatBehaviorDelay = 0
+                Interrupt()
+            elseif (ev.Event == "GLO_AiExecuteRecalc") then
+                recalcScores = true
+                Interrupt()
+            elseif (ev.Event == "GLO_BlockCombatFallbackAD") then
+                fallbackADIsBlocked = true
+            elseif (ev.Event == "GLO_AllowCombatFallbackAD") then
+                fallbackADIsBlocked = false
+            end
+        end
+    end
+
+    -- Actions
+
+    nodes.Wait = Action
+    {
+        function()
+            if combatBehaviorDelay > 0 then
+                Sleep(combatBehaviorDelay/1000)
+                combatBehaviorDelay = 0
+                recalcScores = true
+            else
+                Sleep(1.0)
+            end
+        end,
+
+        Valid = function()
+            return combatBehaviorDelay ~= 0 and me.CanActInCombatTeamTurn
+        end,
+        OnEnter = function()
+            recalcScores = true
+            helpers.StopScoreCalc()
+            DebugText(me, "Setting combat timeout to -1")
+            SetCombatTimeout(me, -1.0)
+        end,
+        OnLeave = function()
+            DebugText(me, "Resetting combat timeout to 30")
+            ResetCombatTimeout(me)
+        end,
+    }
+
+    nodes.CustomCombat = Proxy
+    {
+        params.customCombat,
+
+        Valid = function(node)
+            return
+              DEPRECATED_StillSelected(node)
+        end,
+
+        OnEnter = function()
+            helpers.StopScoreCalc()
+            recalcScores = true
+            SetCombatTimeout(me, -1.0)
+        end,
+
+        OnLeave = function()
+            ResetCombatTimeout(me)
+        end
+    }
+
+    --put this under customs so we leave the option to override this one 
+    nodes.TemporaryServerControlledPlayer = Action
+    {
+        function()
+            WaitForInterrupt()
+        end,
+
+        Valid = function()
+            --lost control characters are fine to do regular combat
+            --other means of being server controlled would be for technical reasons (spell casts)
+            --or Osiris taking over (in which case Anubis does not run anyway)
+            --However, if the worldtester is running, let it do its thing
+            return not me.Character.HasLostControl and not IsTagged(me,Tag("NUWT_ACTIVE_82e21d0f-75cf-49d9-89d9-614b6020a40c"))
+        end,
+
+        CanEnter = function()
+            return me.IsCharacter and me.Character.IsPartyMember
+        end
+    }
+
+    --see GUS-285786: wait until we can act and then restart AI calculations
+    nodes.WaitForCanAct = Action 
+    {
+        function()
+            WaitForInterrupt()
+        end,
+
+        Valid = function()
+            return not me.CanActInCombatTeamTurn or me.IsIncapacitated
+        end,
+
+        OnLeave = function()
+            recalcScores = true
+        end
+    }
+
+    nodes.ExecuteRecalc = Action
+    {
+        function()
+            if me.CanActInCombatTeamTurn then
+                --hack for GUS-285786, wait an additional frame before starting calculations
+                Sleep(0.0)
+                helpers.StartScoreCalc()
+            end
+            recalcScores = false
+        end,
+
+        CanEnter = function()
+            return recalcScores
+        end
+    }
+
+    nodes.CombatActions = Selector
+    {
+        function(nodes)
+            local cmd = PeekTopAiCommand()
+            if cmd == AiActionType.FALLBACK then
+                recalcScores = true
+                return nodes[params.CustomFallback]
+            elseif cmd ~= AiActionType.UNKNOWN then
+                recalcScores = true
+                return nodes[cmd.name]
+            else
+                --Calculation didn't result in a command, so we end the turn
+                return nodes["NoCommandFallback"]
+            end
+        end,
+
+        game.actions.combat,
+
+        Valid = function()
+            return not calculatingScores and
+                   me.CanActInCombatTeamTurn and
+                   combatBehaviorDelay == 0 and
+                   (not me.IsCombatPaused or
+                    me.IsInInterruptZone)
+        end
+    }
+    -- Waiting for  turn action
+    nodes.Waiting = function()
+        --DebugText(me,"[Waiting for turn]")
+        Sleep(1.0)
+    end
+end}

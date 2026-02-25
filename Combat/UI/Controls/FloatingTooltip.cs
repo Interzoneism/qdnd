@@ -13,7 +13,8 @@ namespace QDND.Combat.UI.Controls
     {
         private const float OffsetX = 14f;
         private const float OffsetY = -8f;
-        private const float MaxWidth = 260f;
+        private const float MaxWidth = 300f;
+        private const float MaxHeight = 400f;
         private const float HoverDelayMs = 400f;  // ms before tooltip shows
 
         private VBoxContainer _content;
@@ -34,6 +35,7 @@ namespace QDND.Combat.UI.Controls
             Visible = false;
             MouseFilter = MouseFilterEnum.Ignore;
             ZIndex = 100;
+            ClipContents = true;
             CustomMinimumSize = new Vector2(160, 40);
 
             AddThemeStyleboxOverride("panel", HudTheme.CreatePanelStyle(
@@ -69,6 +71,7 @@ namespace QDND.Combat.UI.Controls
             _statsLabel = new Label();
             _statsLabel.MouseFilter = MouseFilterEnum.Ignore;
             _statsLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+            _statsLabel.CustomMinimumSize = new Vector2(MaxWidth - 24, 0);
             HudTheme.StyleLabel(_statsLabel, HudTheme.FontSmall, HudTheme.WarmWhite);
             _content.AddChild(_statsLabel);
 
@@ -76,7 +79,7 @@ namespace QDND.Combat.UI.Controls
             _descLabel = new Label();
             _descLabel.MouseFilter = MouseFilterEnum.Ignore;
             _descLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-            _descLabel.CustomMinimumSize = new Vector2(140, 0);
+            _descLabel.CustomMinimumSize = new Vector2(MaxWidth - 24, 0);
             HudTheme.StyleLabel(_descLabel, HudTheme.FontTiny, HudTheme.MutedBeige);
             _content.AddChild(_descLabel);
 
@@ -91,6 +94,7 @@ namespace QDND.Combat.UI.Controls
             _comparisonLabel = new Label();
             _comparisonLabel.MouseFilter = MouseFilterEnum.Ignore;
             _comparisonLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+            _comparisonLabel.CustomMinimumSize = new Vector2(MaxWidth - 24, 0);
             _comparisonLabel.Visible = false;
             HudTheme.StyleLabel(_comparisonLabel, HudTheme.FontTiny, HudTheme.WarmWhite);
             _content.AddChild(_comparisonLabel);
@@ -177,13 +181,12 @@ namespace QDND.Combat.UI.Controls
                 _comparisonLabel.Visible = false;
             }
 
-            // Constrain max width
-            CustomMinimumSize = new Vector2(Mathf.Min(MaxWidth, 200), 0);
             Size = Vector2.Zero; // Let it auto-size
 
             _isShowing = true;
             Visible = true;
             SetProcess(true);
+            CallDeferred(nameof(ClampTooltipSize));
         }
 
         /// <summary>
@@ -196,6 +199,7 @@ namespace QDND.Combat.UI.Controls
 
         private void DoShowSlot(EquipSlot slot)
         {
+            Size = Vector2.Zero;
             string slotName = slot switch
             {
                 EquipSlot.MainHand => "Main Hand",
@@ -227,6 +231,7 @@ namespace QDND.Combat.UI.Controls
             _isShowing = true;
             Visible = true;
             SetProcess(true);
+            CallDeferred(nameof(ClampTooltipSize));
         }
 
         /// <summary>
@@ -239,6 +244,7 @@ namespace QDND.Combat.UI.Controls
 
         private void DoShowText(string title, string body, Color? titleColor)
         {
+            Size = Vector2.Zero;
             _nameLabel.Text = title;
             _nameLabel.AddThemeColorOverride("font_color", titleColor ?? HudTheme.Gold);
             _typeLabel.Visible = false;
@@ -251,6 +257,15 @@ namespace QDND.Combat.UI.Controls
             _isShowing = true;
             Visible = true;
             SetProcess(true);
+            CallDeferred(nameof(ClampTooltipSize));
+        }
+
+        private void ClampTooltipSize()
+        {
+            var size = Size;
+            if (size.X > MaxWidth) size.X = MaxWidth;
+            if (size.Y > MaxHeight) size.Y = MaxHeight;
+            Size = size;
         }
 
         /// <summary>

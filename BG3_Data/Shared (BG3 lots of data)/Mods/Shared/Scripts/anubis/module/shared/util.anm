@@ -1,0 +1,85 @@
+local m = AnubisModule()
+
+-- call engine's ls.anubis.game.deferred.Sleep with a random float duration
+-- in range [minSec, maxSec)
+m.action.SleepRandom = function(minSec, maxSec)
+    local sleepTime = math.random() * (maxSec - minSec) + minSec
+    Sleep(sleepTime) -- from ls.anubis.game.deferred
+end
+
+m.DebugTextLog = function(entity, formattedString)
+    DebugLog("[1]: [2]", entity.Name, formattedString)
+    DebugText(entity, formattedString)
+end
+
+m.RandomFrom = function(dict)
+    local keys = {}
+    for key, gob in pairs(dict) do
+        table.insert(keys, key)
+    end
+    if #keys == 0 then
+        return nil
+    end
+
+    local key = keys[math.random(1, #keys)]
+    return key, dict[key]
+end
+
+m.ContainsValue = function(aTable, value)
+    for _, v in pairs(aTable) do
+        if value == v then
+            return true
+        end
+    end
+    return false
+end
+
+m.GetFlagAny = function(flagList, entity)
+    for _, fl in pairs(flagList) do
+        if GetFlag(fl, entity) then
+            return true
+        end
+    end
+    return false
+end
+
+m.GetFlagAll = function(flagList, entity)
+    for _, fl in pairs(flagList) do
+        if not GetFlag(fl, entity) then
+            return false
+        end
+    end
+    return true
+end
+
+m.GetNearbyPlayer = function(source, distance)
+    local activeCharacters = GetActiveCharacters(source, distance)
+
+    for _,v in pairs(activeCharacters) do
+        if (v.Character.IsPlayer) then return v end
+    end
+
+    return nil
+end
+
+m.GetNearbyPartyMember = function(source, distance)
+    local activeCharacters = GetActiveCharacters(source, distance)
+
+    for _,v in pairs(activeCharacters) do
+        if (v.Character.IsPartyMember) then return v end
+    end
+
+    return nil
+end
+
+m.GetIndexOf = function(table, element)
+    for iteration, indexdedElement in pairs(table) do
+        if element == indexdedElement then
+            return iteration
+        end
+    end
+    return nil
+end
+
+
+return m

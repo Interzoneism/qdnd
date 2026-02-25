@@ -1,0 +1,71 @@
+game.states.DefaultItemCombat = State{function()
+    self.Valid = function()
+        return me.IsInCombat
+    end
+
+    nodes.EndTurn = Action{
+        function()
+            EndTurn(me)
+        end,
+        Valid = function()
+            return me.CanActInCombatTeamTurn
+        end
+    }
+
+    nodes.CombatWait = Action{
+        function()
+            WaitForInterrupt()
+        end,
+        Valid = function()
+            return not me.CanActInCombatTeamTurn
+        end
+    }
+
+end}
+
+game.roots.DefaultItem = State{function ()
+    description = [[Default script for items]]
+
+    params.combat = {type = EParamType.State, required=false, default=StateRef{game.states.DefaultItemCombat}, help=[[
+        State that will be executed when entity is in combat
+    ]]}
+
+    params.idle = {type = EParamType.State, help=[[
+        Default behaviour that will be executed when not in combat or otherwise blocked (moving for items, generic behaviours and certain status for characters)
+    ]]}
+
+    self.OnException = function(e)
+        DebugLogCriticalException(e, "Unhandled Anubis exception caught in DefaultItem for " .. me.Name .. "\n")
+        return true
+    end
+
+    -- events
+    events.EnteredCombat = function(e)
+        if e.Entity == me then
+            Interrupt()
+        end
+    end
+
+    nodes =  ImmediateSelector{
+        function(nodes)
+            return FindFirstSelectable(nodes)
+        end
+    }
+
+    -- child nodes
+
+    -- combat behaviour
+    nodes.Combat = Proxy{
+        params.combat
+    }
+
+    -- scene waiting, temporarily block idle behaviours
+    nodes.Waiting = Proxy{
+        game.states.Waiting
+    }
+
+    -- idle behaviour, lowest priority
+    nodes.Idle = Proxy{
+        params.idle
+    }
+end}

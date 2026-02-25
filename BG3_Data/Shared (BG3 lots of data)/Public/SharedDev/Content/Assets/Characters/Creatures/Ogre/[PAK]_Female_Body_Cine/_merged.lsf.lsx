@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="AnimationSetBank">
+		<node id="AnimationSetBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="72cbf242-a0b9-6447-8a26-fd9442a0e70a" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="OGRE_F_CINE_Dev_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725356" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="FallBackAnimation" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets" />
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationBank">
+		<node id="AnimationBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="11.500001" />
+					<attribute id="ID" type="FixedString" value="9c9e711e-5b85-be2a-ec28-689922cb759d" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="OGRE_F_Rig_SCENE_MOO_Executioner_FallDead" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7edaab71-01fa-3ed6-2b1a-79643158697f" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="5f6de633-8bf3-3166-8d35-94f3c117cfe6" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Executioner/OGRE_F_Rig_SCENE_MOO_Executioner_FallDead.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Executioner/OGRE_F_Rig_SCENE_MOO_Executioner_FallDead.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_R" />
+							<attribute id="Length" type="float" value="0.0666666" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="9" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_R" />
+							<attribute id="Length" type="float" value="0.16666698" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="9.366667" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_R" />
+							<attribute id="Length" type="float" value="1.833333" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="9.666667" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

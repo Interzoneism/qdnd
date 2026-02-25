@@ -1,0 +1,59 @@
+game.configs.GEN_PatrolWithPauses = Config{
+    params={
+        patrolSpeed = {
+            type = EParamType.String,
+            help = [[Speed at which to patrol: Stroll, Walk, Run, or Sprint]],
+            required = false,
+            default = [[Walk]]
+        },
+        sleepTimeMin = {
+            type = EParamType.Number,
+            help = [[Waiting duration for spline points with the script event 'Sleep' on that point (edit it on the spline).]],
+            required = false,
+            default = 2
+        },
+        patrolSpline = {
+            type = EParamType.String,
+            help = [[Spline to be patrolled]],
+            required = true,
+        },
+        sleepCooldown = {
+            type = EParamType.Number,
+            help = [[Character will not sleep upon passing a spline point if on cooldown. Cooldown decrements every time a point is passed.]],
+            required = false,
+            default = 3
+        },
+        steerToTarget = {
+            type = EParamType.String,
+            help = [[Trigger to steer towards when reaching a patrol point with the "SteerTo" script event (provided the character sleeps when reaching this point).]],
+            required = false,
+            default = [[]]
+        },
+        sleepChance = {
+            type = EParamType.Number,
+            help = [[Chance (out of 100) that the character will go to sleep upon reaching a spline point.]],
+            required = false,
+            default = 15
+        },
+        sleepTimeMax = {
+            type = EParamType.Number,
+            help = [[Waiting duration for spline points with the script event 'Sleep' on that point (edit it on the spline).]],
+            required = false,
+            default = 4
+        },
+    },
+    root=StateRef{game.roots.DefaultCharacter,
+        genericBehaviours = StateRef{game.states.CrimesHumanoid},
+        idle = StateRef{game.states.GEN_Patrol,
+            patrolActions = StateRef{game.states.GEN_PatrolPauses,
+                sleepChance = params.sleepChance,
+                sleepCooldown = params.sleepCooldown,
+                sleepTimeMax = params.sleepTimeMax,
+                sleepTimeMin = params.sleepTimeMin,
+                steerToTarget = params.steerToTarget,
+            },
+            patrolSpeed = params.patrolSpeed,
+            patrolSpline = params.patrolSpline,
+        },
+    }
+}

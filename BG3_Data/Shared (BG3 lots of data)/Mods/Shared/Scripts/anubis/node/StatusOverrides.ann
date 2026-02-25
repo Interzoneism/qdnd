@@ -1,0 +1,228 @@
+-------------------------------------------------------------------------
+------- Status reactions while in peace mode, or in current combat turn
+-------------------------------------------------------------------------
+
+-- Priorities 500,000 - 599,999: Charmed
+game.actions.statusOverrides.HarpySong = Action
+{
+    function()
+        local stationaryFlag = Flag("GLO_HarpySong_State_Stationary_b1b560d0-05e4-40a6-a0ae-3c4d354e212e")
+        local source = GetStatusSource(me, "LURING_SONG")
+
+        if (GetDistance2DTo(me, source) > 1.0) and not GetFlag(stationaryFlag,me) then
+            local moveResult = MoveTo(source, MovementSpeed.Walk, false, false, 1.0, 5.0, false)
+            if moveResult == error.MovementError.None then
+                SetUnicastEntityEvent(me,"GLO_HarpySong_ReachedCharmer")
+            end
+        end
+        Sleep(1.0)
+        if me.IsInTurnBasedMode then
+            SetTurnActionsCompleted(me, true)
+        end
+    end
+    ,
+    Valid = function(node)
+        return
+            HasActiveStatus(me, "LURING_SONG") and
+            (not(me.IsInCombat) or me.CanActInCombatTeamTurn)
+    end
+    ,
+    OnLeave = function()
+        SetTurnActionsCompleted(me, false)
+    end
+    ,
+    Priority = 550000
+}
+
+game.actions.statusOverrides.TimmaskConfusion = Action
+{
+    function()
+        local source = GetStatusSource(me, "TIMMASK_SPORES_HELPER")
+        if (GetDistance2DTo(me, source) > 1.0) then
+            local moveResult = MoveTo(source, MovementSpeed.Run, false, false, 1.0, 1.5, false)
+            if moveResult == error.MovementError.None then
+                SetUnicastEntityEvent(me, "UND_TimmaskMushrooms_UpdateStatus")
+            end
+            if me.IsInTurnBasedMode then
+                SetTurnActionsCompleted(me, true)
+            end
+        elseif me.IsInTurnBasedMode then
+            SetTurnActionsCompleted(me, true)
+		else
+			Sleep(1.0)
+        end
+    end
+    ,
+    Valid = function(node)
+        return
+            HasActiveStatus(me, "TIMMASK_SPORES_HELPER") and
+            (not(me.IsInCombat) or me.CanActInCombatTeamTurn)
+    end,
+    OnLeave = function()
+       SetTurnActionsCompleted(me, false)
+    end
+    ,
+    Priority = 560000
+}
+
+game.actions.statusOverrides.CommandApproach = Action
+{
+    function()
+        local source = GetStatusSource(me, "COMMAND_APPROACH")
+        if (source ~= nil and GetDistance2DTo(me, source) > 1.5) then
+            local moveResult = MoveTo(source, MovementSpeed.Run, false, false, 1.0, 1.5, false)
+            if moveResult ~= error.MovementError.None then
+                DebugText(me, "Debug: MoveTo failed or run out of resources")
+            end
+
+            SteerTo(source)
+
+            if me.IsInTurnBasedMode then
+                SetTurnActionsCompleted(me, true)
+            end
+        elseif me.IsInTurnBasedMode then
+            if source ~= nil then
+                SteerTo(source)
+            end
+            SetTurnActionsCompleted(me, true)
+		elseif source ~= nil then
+            SteerTo(source)
+            Sleep(1.0)
+        else
+			Sleep(1.0)
+        end
+    end
+    ,
+    Valid = function(node)
+        return
+            HasActiveStatus(me, "COMMAND_APPROACH") and
+            (not(me.IsInCombat) or me.CanActInCombatTeamTurn)
+    end,
+    OnLeave = function()
+        DebugText(me, "Debug: left CommandApproach Override")
+        SetTurnActionsCompleted(me, false)
+    end,
+    OnEnter = function()
+        DebugText(me, "Debug: entered CommandApproach Override")
+    end
+    ,
+    Priority = 570000
+}
+
+game.actions.statusOverrides.Enthrall = Action
+{
+    function()
+        local source = GetStatusSource(me, "ENTHRALL_AURA")
+
+        SteerTo(source,false)
+        -- wait for next combat turn, or until leaving combat
+        WaitForInterrupt()
+    end
+    ,
+    Valid = function(node)
+            -- design decision: enthrall does not prevent a character from performing
+            --   its regular combat actions, they just turn back to the caster at the
+            --   end\ of their turn (if still in range) -> NOT me.CanActInCombatTeamTurn
+            -- Outside combat, a crime reaction takes care of the reacting
+            return
+                HasActiveStatus(me, "ENTHRALL_AURA") and
+                (me.IsInCombat and not me.CanActInCombatTeamTurn)
+    end
+    ,
+    OnLeave = function()
+        SetTurnActionsCompleted(me, false)
+    end
+    ,
+    Priority = 510000
+}
+
+
+-- Priorities 400,000 - 499,999: Fear
+game.actions.statusOverrides.ScaredFlee = Action
+{
+    function()
+        local noFleeMoveFlag = Flag("GLO_StatusOverrides_NoFleeMove_ec2e86bc-fcb9-4e1c-871b-f7a696a717e1")
+        local statusSource = nil
+        if not GetFlag(noFleeMoveFlag,me) then
+            local fleeingStatuses = GetActiveStatusesWithGroup(me, "SG_Fleeing")
+
+            if #fleeingStatuses > 0 then
+                statusSource = GetStatusSource(me, fleeingStatuses[#fleeingStatuses]) -- Get last status applied
+            else
+                DebugLogCritical("NULL status source in game.actions.statusOverrides.ScaredFlee action")
+            end
+        end
+        if (statusSource ~= nil) and
+           (GetDistanceTo(me, statusSource) < 10.0) then
+            try
+                FleeFromEntity(statusSource, 10.0)
+                if me.IsInTurnBasedMode then
+                    SetTurnActionsCompleted(me, true)
+                end
+            catch e if ls.CheckType(e, error.MovementFailed) then
+                if me.IsInTurnBasedMode then
+                    SetTurnActionsCompleted(me, true)
+                else
+                    Sleep(1.0 + math.random())
+                end
+            end
+        else
+            if me.IsInTurnBasedMode then
+                SetTurnActionsCompleted(me, true)
+            else
+                Sleep(1.0 + math.random())
+            end
+        end
+    end
+    ,
+    Valid = function()
+        return
+            HasActiveStatusWithGroup(me, "SG_Fleeing") and
+            (not me.IsInTurnBasedMode or (not me.IsInCombat or me.CanActInCombatTeamTurn))
+    end
+    ,
+    OnLeave = function()
+        SetTurnActionsCompleted(me, false)
+    end
+    ,
+    Priority = 489500
+}
+
+game.actions.statusOverrides.Distracted = Action
+{
+    function()
+        local distraction = GetStatusSource(me, "CRIME_DISTRACTED")
+        SteerTo(distraction)
+        Sleep(0.5)
+        if HasActiveStatus(distraction, "MINOR_ILLUSION") then
+            local effect = PrepareEffect("VFX_Script_NPC_Perception_HeadFX_01_b8fe40e4-b49b-f7b1-25ba-f5b97341a16d")
+            PlayEffectAt(effect, me)
+            -- Result handled in Osiris
+            RequestPassiveRoll(me.Character, distraction, Skill.Investigation, DifficultyClass("HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f"), "STATUS_CombatDistraction")
+            WaitForInterrupt()
+        else
+            -- E.g. cat meow
+            RemoveStatus(distraction, "CRIME_DISTRACTION")
+        end
+    end,
+    Valid = function(node)
+        return
+            HasActiveStatus(me, "CRIME_DISTRACTED") and
+            me.IsInCombat and
+            not me.CanActInCombatTeamTurn and
+            not me.Character.IsPartyMember and
+            not GetFlag(Flag("GLO_State_Cowering_cf16110e-3767-4585-8028-83cb9857adcd"), me)
+    end
+    ,
+    Priority = 487000
+}
+
+game.states.DefaultStatusOverrides = State{function ()
+    nodes = Selector {
+        game.actions.statusOverrides,
+
+        CanEnter = function(node)
+            return CheckAnySelectable(node)
+        end
+    }
+end}

@@ -1,0 +1,35 @@
+game.states.GLO_PlayLoopingAnimationAtTrigger = State{function ()
+    description = [[Forces NPC to go to a trigger and then play a looping animation (not one-shot animation!)]] 
+
+    params.StandAtTrigger = {type = EParamType.State, required=false, default = StateRef{game.states.GLO_StandAtTrigger}, help=[[move to trigger]]}
+    params.PlayLoopingAnimation = { type = EParamType.State, required= false, default = StateRef{game.states.GLO_PlaySimpleLoopingAnimation}, help=[[play anim]]}
+
+    local currentAction
+
+    self.OnInit = function()
+        currentAction = "moving"
+    end
+
+    nodes.StandAtTrigger = Proxy
+    {
+        params.StandAtTrigger,
+
+        Valid = function(node)
+            return currentAction == "moving"
+        end,
+        OnFinished = function()
+            currentAction = "animating"
+        end
+    }
+   
+    nodes.PlayLoopingAnimation = Proxy
+    {
+        params.PlayLoopingAnimation,
+        Valid = function(node)
+            return currentAction == "animating"
+        end,
+        OnFinished = function()
+            currentAction = "moving"
+        end
+    }
+end}

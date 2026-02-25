@@ -1,0 +1,11 @@
+game.configs.Helper_Continue = Config{
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.Helper_Continue},
+    },
+    inputs={
+        In=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.In]]}}},
+    },
+    outputs={
+        Out=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Out]]}}},
+    }
+}

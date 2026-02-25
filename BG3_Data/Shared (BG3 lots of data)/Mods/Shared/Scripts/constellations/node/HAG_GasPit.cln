@@ -1,0 +1,167 @@
+game.states.HAG_Gaspit = State{
+    function()
+
+        description = [[Hag GasPit. Like a Gaspit, but turns off when under the effects of a status.]]
+        
+        params.DC = {
+            type = EParamType.String,
+            default="HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f",
+            help=[[Perception check DC.]]
+        }
+
+        params.WeightLimit = {
+            type = EParamType.Number,
+            help = [[Max Weight before the gaspit is blocked]],
+            default = 50.0,
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = "Does the gaspit start enabled?"
+        }
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            required=false,
+            default=6,
+            help=[[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]]
+        }
+
+        params.PerceptionSkill = {
+            type = EParamType.String,
+            default="Perception",
+            help=[[The skill checked for perception.]]
+        }
+
+        params.PerceptionType = {
+            type = EParamType.String,
+            default="Invisible",
+            help=[[Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]]
+        }
+
+        params.SurfaceType = {
+            type = EParamType.String,
+            required = true,
+            help = [[Surface type]],
+            default_value_provider = [[surfacetype]]
+        }
+
+        params.MinRadius = {
+            type = EParamType.Number,
+            required=false,
+            default=0.0,
+            help=[[Minimum radius of the gas pit]]
+        }
+
+        params.MaxRadius = {
+            type = EParamType.Number,
+            required=false,
+            default=3.0,
+            help=[[Maximum radius of the gas pit]]
+        }
+
+        params.RadiusStep = {
+            type = EParamType.Number,
+            required=false,
+            default=0.5,
+            help=[[Step by which the surface increases every step.]]
+        }
+
+        params.TimeStep = {
+            type = EParamType.Number,
+            required=false,
+            default=0.5,
+            help=[[Time, in seconds, between every step]]
+        }
+
+        params.TargetEntity = {
+            type = EParamType.String,
+            help = "Object which behaves as a gaspit",
+            default = "me"
+        }
+
+        params.StepsPerTurn = {
+            type = EParamType.Number,
+            default=1,
+            help=[[How many Radius Steps per turn the surface grows]]
+        }
+
+        inputs.Enable = {}
+        inputs.Disable = {}
+
+        outputs.EnableInt = {internal = true}
+        outputs.DisableInt = {internal = true}
+        outputs.ExplodeInt = {internal = true}
+
+        outputs.RevealInt = {internal = true}
+
+
+        nodes.GasPit = Proxy{
+            game.states.GasPit,
+            params = {WeightLimit = params.WeightLimit,
+                        StartEnabled = params.StartEnabled,
+                        Type = params.PerceptionType,
+                        Skill = params.PerceptionSkill,
+                        MinDistance = params.MinDistance,
+                        MinRadius = params.MinRadius,
+                        MaxRadius = params.MaxRadius,
+                        RadiusStep = params.RadiusStep,
+                        SurfaceType = params.SurfaceType,
+                        TimeStep = params.TimeStep,
+                        StartEnabled = params.StartEnabled,
+                        TargetEntity = params.TargetEntity,
+                        StepsPerTurn = params.StepsPerTurn},
+            inputs = {Enable = {outputs.EnableInt},
+                      Disable = {outputs.DisableInt},
+                      Reveal = {outputs.RevealInt}},
+        }
+        
+        self.OnInit = function(ev)
+            if me.Blackboard.GetFact("Cnst.HAG.On") == nil then
+                if params.StartEnabled then
+                    me.Blackboard.SetFact("Cnst.HAG.On", 1)
+                else
+                    me.Blackboard.SetFact("Cnst.HAG.On", 0)
+                end
+            end
+        end
+
+        socketEvents.Enable = function(ev)
+            me.Blackboard.SetFact("Cnst.HAG.On", 1)
+            if not HasActiveStatus(me, "HAG_MASK_ILLUSION") then
+                TriggerOutput(outputs.EnableInt, ev.Object)
+            end
+        end
+
+        socketEvents.Disable = function(ev)
+            me.Blackboard.SetFact("Cnst.HAG.On", 0)
+            TriggerOutput(outputs.DisableInt, ev.Object)
+        end
+
+        events.StatusApplied = function(ev)
+            if ev.Status.StatusID == "HAG_MASK_ILLUSION" then
+                local causeEntity = ev.CauseEntity and ev.CauseEntity.EntityRef or nil
+                TriggerOutput(outputs.DisableInt, causeEntity)
+                TriggerOutput(outputs.RevealInt, causeEntity, true)
+            end
+        end
+
+        events.StatusRemoved = function(ev)
+            if ev.Status.StatusID == "HAG_MASK_ILLUSION" and
+               me.Blackboard.GetFact("Cnst.HAG.On") == 1 then
+                local causeEntity = ev.CauseEntity and ev.CauseEntity.EntityRef or nil
+                TriggerOutput(outputs.EnableInt, causeEntity)
+            end
+        end
+        
+    end
+
+
+}

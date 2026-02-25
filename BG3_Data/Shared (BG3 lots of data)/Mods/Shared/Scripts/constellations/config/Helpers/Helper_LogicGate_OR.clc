@@ -1,0 +1,15 @@
+game.configs.Helper_LogicGate_OR = Config{
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.LogicGate_OR},
+    },
+    inputs={
+        A_True=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.On1]]}}},
+        A_False=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Off1]]}}},
+        B_True=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.On2]]}}},
+        B_False=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Off2]]}}},
+    },
+    outputs={
+        On=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.On]]}}},
+        Off=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Off]]}}},
+    }
+}

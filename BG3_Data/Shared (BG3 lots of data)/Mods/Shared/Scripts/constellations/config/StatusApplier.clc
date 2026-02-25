@@ -1,0 +1,32 @@
+game.configs.StatusApplier = Config{
+    params={
+        ApplyDuration = {
+            type = EParamType.Number,
+            help = [[Duration for which to apply the status. -1.0 for indefinite.]],
+            required = false,
+            default = -1
+        },
+        OnlyApplyIfMissing = {
+            type = EParamType.Bool,
+            help = [[Only apply the status if it is not already applied.]],
+            required = false,
+            default = false
+        },
+        Status = {
+            type = EParamType.String,
+            help = [[Status to apply]],
+            required = true,
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.StatusApplier,
+            ApplyDuration = params.ApplyDuration,
+            OnlyApplyIfMissing = params.OnlyApplyIfMissing,
+            Status = params.Status,
+        },
+    },
+    inputs={
+        RemoveFromObject=ExtSocket{description=[[Removes the status to the object that is transmitted into this socket.]],{SocketRef{[[root.logic.inputs.RemoveFromObject]]}}},
+        ApplyToObject=ExtSocket{description=[[Applies the status to the object that is transmitted into this socket.]],{SocketRef{[[root.logic.inputs.ApplyToObject]]}}},
+    }
+}

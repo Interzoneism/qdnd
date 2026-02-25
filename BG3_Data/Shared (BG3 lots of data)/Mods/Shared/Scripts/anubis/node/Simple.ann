@@ -1,0 +1,44 @@
+game.roots.Simple = State{function ()
+
+    description = [[Default]]
+
+    params.testStringArray = { type = EParamType.String, arrayRange = "..20", help = "String Array", default = { "Foo", "Bar" } }
+	params.testIntegerArray = { type = EParamType.Int, arrayRange = "2..20", help = "Integer Array", default = { 1, 2, 3, 4, 5, 6 } }
+	params.testNumberArray = { type = EParamType.Number, arrayRange = "1..", help = "Number Array", default = { 1.1, 2.2, 3.3, 4.4, 5.5, 6.6, 7.7, 8.8, 9.9, 10.10 } }
+	params.testBoolArray = { type = EParamType.Bool, arrayRange = "..", help = "Boolean Array", default = { true, false, true, false, false } }
+	params.testVectorArray = { type = EParamType.Vector3, arrayRange = "..", help = "Vector Array", required = false }
+
+	params.numberParameter = { type = EParamType.Number, help = "Number Parameter", default = 1.1 }
+    params.integerParameter = { type = EParamType.Int, help = "Integer Parameter", default = 1 }
+	params.vectorParameter = { type = EParamType.Vector3, help = "Vector3 Parameter", required = false }
+	params.boolParameter = { type = EParamType.Bool, help = "Boolean Parameter", default = true }
+
+	-- State parameter with complex default value
+	params.complexStateParameter = { type = EParamType.State, help = "State Parameter", default = StateRef{
+		game.states.TestSubState,
+		subStateIntegerArray = { 42, 228, 123 },
+		numberParam = 100500.42,
+		innerStateParameter = StateRef{
+			game.states.TestSubState,
+			numberParam = 1.23
+		}
+	}}
+
+    -- public API
+    nodes.Patrol = function()
+        if not params.patrol then
+            return
+        end
+        for _, point in ipairs(params.patrol) do
+            MoveTo(point)
+        end
+    end
+end}
+
+game.states.TestSubState = State{function()
+    params.subStateIntegerArray = { type = EParamType.Int, arrayRange = "..", help = "Test Substate Integer Array Parameter", default = { 0 } }
+    params.subStateNumberArray = { type = EParamType.Number, arrayRange = "..", help = "Test Substate Number Array Parameter", default = { 1.1 } }
+    params.subStateStringArray = { type = EParamType.String, arrayRange = "..", help = "Test Substate String Array Parameter", default = { "" } }
+	params.numberParam = { type = EParamType.Number, default = 1488.228 }
+    params.innerStateParameter = { type = EParamType.State, help = "Test State Parameter", required = false }
+end}

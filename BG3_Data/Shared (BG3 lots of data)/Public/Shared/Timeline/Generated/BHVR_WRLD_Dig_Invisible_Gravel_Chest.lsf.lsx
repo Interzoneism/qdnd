@@ -1,0 +1,848 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="5" revision="0" build="0" lslib_meta="v1,bswap_guids,lsf_keys_adjacency" />
+	<region id="TimelineContent">
+		<node id="TimelineContent">
+			<attribute id="CompilationTimeStamp" type="int64" value="1700743155" />
+			<children>
+				<node id="Effect">
+					<attribute id="Duration" type="float" value="5.5000005" />
+					<children>
+						<node id="Phases">
+							<children>
+								<node id="Phase">
+									<attribute id="Duration" type="float" value="5.5000005" />
+									<attribute id="PlayCount" type="int32" value="1" />
+									<attribute id="DialogNodeId" type="guid" value="96b3ac6c-3f0d-4865-9ea7-963119651ae7" />
+									<children>
+										<node id="QuestionHoldAutomation" />
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Inputs" />
+						<node id="EffectComponents">
+							<children>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLShowVisual" />
+									<attribute id="ID" type="guid" value="f932f939-5cb3-449b-a6f6-d01e81079423" />
+									<attribute id="EndTime" type="float" value="5.5000005" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="24b657df-a968-480e-a05e-fdd803638e73" />
+										</node>
+										<node id="Keys">
+											<children>
+												<node id="Key">
+													<attribute id="InterpolationType" type="uint8" value="3" />
+													<attribute id="ShowVisual" type="bool" value="False" />
+												</node>
+												<node id="Key">
+													<attribute id="Time" type="float" value="0.37" />
+													<attribute id="InterpolationType" type="uint8" value="3" />
+												</node>
+												<node id="Key">
+													<attribute id="Time" type="float" value="4.9" />
+													<attribute id="InterpolationType" type="uint8" value="3" />
+													<attribute id="ShowVisual" type="bool" value="False" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLPlayEffectEvent" />
+									<attribute id="ID" type="guid" value="b0a70ec4-fdd9-4a9d-8c63-4ac9f98160e1" />
+									<attribute id="EndTime" type="float" value="5.5000005" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="f2de6bd7-c85a-42c7-a4fb-449dd6241591" />
+										</node>
+										<node id="Keys">
+											<children>
+												<node id="Key">
+													<attribute id="Time" type="float" value="3.32" />
+													<attribute id="InterpolationType" type="uint8" value="3" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLPlayEffectEvent" />
+									<attribute id="ID" type="guid" value="2c372d30-8f83-4506-8eec-026af4731b02" />
+									<attribute id="EndTime" type="float" value="5.5000005" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="44dd59fa-1f77-48d6-b937-e2d5a6fef993" />
+										</node>
+										<node id="Keys">
+											<children>
+												<node id="Key">
+													<attribute id="Time" type="float" value="1.8" />
+													<attribute id="InterpolationType" type="uint8" value="3" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLAnimation" />
+									<attribute id="ID" type="guid" value="644973ed-6c4b-43e0-8e3a-b626aa0c5787" />
+									<attribute id="EndTime" type="float" value="5.5000005" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<attribute id="AnimationSourceId" type="guid" value="2e899500-c8cf-4ff2-b440-897ddec333b7" />
+									<attribute id="FadeIn" type="double" value="0" />
+									<attribute id="FadeOut" type="double" value="0" />
+									<attribute id="AnimationGroup" type="guid" value="67d9b240-b4f5-45d4-967e-359b2902487c" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="d0a6a915-3e27-4c28-97d5-17d42075adb7" />
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLAnimation" />
+									<attribute id="ID" type="guid" value="e4bc860a-e5c1-49a1-840e-383cd616c22a" />
+									<attribute id="EndTime" type="float" value="5.5000005" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<attribute id="AnimationSourceId" type="guid" value="e5813e5b-8848-de21-faed-8ac279ef635b" />
+									<attribute id="FadeIn" type="double" value="0" />
+									<attribute id="FadeOut" type="double" value="0" />
+									<attribute id="AnimationGroup" type="guid" value="e041e11f-6065-42fd-bac7-08d359fdf3bf" />
+									<attribute id="HoldAnimation" type="bool" value="True" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="474d8f7a-5580-40a4-bbad-97177a2d0a0e" />
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLAnimation" />
+									<attribute id="ID" type="guid" value="6d9393ca-a0b2-4d4d-a04e-635a0f84bae4" />
+									<attribute id="EndTime" type="float" value="5.5000005" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<attribute id="AnimationSourceId" type="guid" value="9a7beff9-4e1b-ff4d-722a-13fbd5542365" />
+									<attribute id="FadeIn" type="double" value="0" />
+									<attribute id="FadeOut" type="double" value="0" />
+									<attribute id="AnimationGroup" type="guid" value="c1358a55-b7b5-4407-8d7e-f809233d1ccf" />
+									<attribute id="HoldAnimation" type="bool" value="True" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="3ee29b86-8da1-43f2-a197-6ab50d4fab5a" />
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLTransform" />
+									<attribute id="ID" type="guid" value="82a9effd-2c32-4480-a9f0-098eb8124389" />
+									<attribute id="EndTime" type="float" value="5.5000005" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="44dd59fa-1f77-48d6-b937-e2d5a6fef993" />
+										</node>
+										<node id="TransformChannels">
+											<children>
+												<node id="TransformChannel" />
+												<node id="TransformChannel">
+													<children>
+														<node id="Keys">
+															<children>
+																<node id="Key">
+																	<attribute id="InterpolationType" type="uint8" value="2" />
+																	<attribute id="Value" type="float" value="0.4" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+												<node id="TransformChannel" />
+												<node id="TransformChannel" />
+												<node id="TransformChannel">
+													<children>
+														<node id="Keys">
+															<children>
+																<node id="Key">
+																	<attribute id="Time" type="float" value="0.02" />
+																	<attribute id="InterpolationType" type="uint8" value="0" />
+																	<attribute id="Value" type="float" value="0.8" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+												<node id="TransformChannel">
+													<children>
+														<node id="Keys">
+															<children>
+																<node id="Key">
+																	<attribute id="Time" type="float" value="0.02" />
+																	<attribute id="InterpolationType" type="uint8" value="0" />
+																	<children>
+																		<node id="Value">
+																			<children>
+																				<node id="frameOfReference">
+																					<attribute id="targetId" type="guid" value="474d8f7a-5580-40a4-bbad-97177a2d0a0e" />
+																					<attribute id="targetBone" type="FixedString" value="Root_M" />
+																					<attribute id="OneFrameOnly" type="bool" value="False" />
+																					<attribute id="KeepScale" type="bool" value="True" />
+																				</node>
+																			</children>
+																		</node>
+																	</children>
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLTransform" />
+									<attribute id="ID" type="guid" value="a02ff99d-a1da-4729-a9f0-8a512da56c97" />
+									<attribute id="EndTime" type="float" value="5.5000005" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="f2de6bd7-c85a-42c7-a4fb-449dd6241591" />
+										</node>
+										<node id="TransformChannels">
+											<children>
+												<node id="TransformChannel" />
+												<node id="TransformChannel" />
+												<node id="TransformChannel" />
+												<node id="TransformChannel" />
+												<node id="TransformChannel">
+													<children>
+														<node id="Keys">
+															<children>
+																<node id="Key">
+																	<attribute id="Time" type="float" value="0.02" />
+																	<attribute id="InterpolationType" type="uint8" value="0" />
+																	<attribute id="Value" type="float" value="0.8" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+												<node id="TransformChannel">
+													<children>
+														<node id="Keys">
+															<children>
+																<node id="Key">
+																	<attribute id="Time" type="float" value="0.02" />
+																	<attribute id="InterpolationType" type="uint8" value="0" />
+																	<children>
+																		<node id="Value">
+																			<children>
+																				<node id="frameOfReference">
+																					<attribute id="targetId" type="guid" value="474d8f7a-5580-40a4-bbad-97177a2d0a0e" />
+																					<attribute id="targetBone" type="FixedString" value="Root_M" />
+																					<attribute id="OneFrameOnly" type="bool" value="False" />
+																					<attribute id="KeepScale" type="bool" value="True" />
+																				</node>
+																			</children>
+																		</node>
+																	</children>
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+								<node id="EffectComponent">
+									<attribute id="Type" type="LSString" value="TLTransform" />
+									<attribute id="ID" type="guid" value="7a617dc4-550e-4c6c-a879-60ca6d98f939" />
+									<attribute id="EndTime" type="float" value="5.5000005" />
+									<attribute id="IsSnappedToEnd" type="bool" value="True" />
+									<children>
+										<node id="Actor">
+											<attribute id="UUID" type="guid" value="24b657df-a968-480e-a05e-fdd803638e73" />
+										</node>
+										<node id="TransformChannels">
+											<children>
+												<node id="TransformChannel">
+													<children>
+														<node id="Keys">
+															<children>
+																<node id="Key">
+																	<attribute id="InterpolationType" type="uint8" value="0" />
+																	<attribute id="Value" type="float" value="0.005173206" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+												<node id="TransformChannel">
+													<children>
+														<node id="Keys">
+															<children>
+																<node id="Key">
+																	<attribute id="InterpolationType" type="uint8" value="0" />
+																	<attribute id="Value" type="float" value="0.001557827" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+												<node id="TransformChannel">
+													<children>
+														<node id="Keys">
+															<children>
+																<node id="Key">
+																	<attribute id="InterpolationType" type="uint8" value="0" />
+																	<attribute id="Value" type="float" value="0.005901061" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+												<node id="TransformChannel">
+													<children>
+														<node id="Keys">
+															<children>
+																<node id="Key">
+																	<attribute id="InterpolationType" type="uint8" value="0" />
+																	<attribute id="Value" type="fvec4" value="-0.00464222 -0.0018817999 -0.025598787 0.99965984" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+												<node id="TransformChannel" />
+												<node id="TransformChannel">
+													<children>
+														<node id="Keys">
+															<children>
+																<node id="Key">
+																	<attribute id="InterpolationType" type="uint8" value="0" />
+																	<children>
+																		<node id="Value">
+																			<children>
+																				<node id="frameOfReference">
+																					<attribute id="targetId" type="guid" value="d0a6a915-3e27-4c28-97d5-17d42075adb7" />
+																					<attribute id="targetBone" type="FixedString" value="Dummy_R_Hand" />
+																					<attribute id="OneFrameOnly" type="bool" value="False" />
+																					<attribute id="KeepScale" type="bool" value="True" />
+																				</node>
+																			</children>
+																		</node>
+																	</children>
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="TimelineSpeakers">
+					<children>
+						<node id="Object" key="MapKey">
+							<attribute id="MapKey" type="int32" value="0" />
+							<attribute id="MapValue" type="guid" value="3ee29b86-8da1-43f2-a197-6ab50d4fab5a" />
+						</node>
+						<node id="Object" key="MapKey">
+							<attribute id="MapKey" type="int32" value="1" />
+							<attribute id="MapValue" type="guid" value="474d8f7a-5580-40a4-bbad-97177a2d0a0e" />
+						</node>
+						<node id="Object" key="MapKey">
+							<attribute id="MapKey" type="int32" value="2" />
+							<attribute id="MapValue" type="guid" value="d0a6a915-3e27-4c28-97d5-17d42075adb7" />
+						</node>
+					</children>
+				</node>
+				<node id="TimelineActorData">
+					<children>
+						<node id="TimelineActorData">
+							<children>
+								<node id="Object" key="MapKey">
+									<attribute id="MapKey" type="guid" value="d0a6a915-3e27-4c28-97d5-17d42075adb7" />
+									<children>
+										<node id="Value">
+											<attribute id="Speaker" type="int32" value="2" />
+											<attribute id="ActorTypeId" type="FixedString" value="character" />
+											<attribute id="ActorType" type="uint8" value="0" />
+											<attribute id="IsPlayer" type="bool" value="True" />
+											<attribute id="ShouldIgnoreForStaging" type="bool" value="True" />
+											<attribute id="DefaultStepOutDelay" type="float" value="0.09138463" />
+											<attribute id="AudienceSlot" type="uint8" value="16" />
+											<attribute id="SceneActorType" type="uint8" value="2" />
+											<attribute id="SceneActorIndex" type="int32" value="0" />
+											<children>
+												<node id="CompiledNodeSnapshots">
+													<children>
+														<node id="ComponentMap">
+															<children>
+																<node id="Object" key="MapKey">
+																	<attribute id="MapKey" type="uint64" value="0" />
+																	<children>
+																		<node id="ComponentMap">
+																			<children>
+																				<node id="Cache">
+																					<children>
+																						<node id="Object" key="MapKey">
+																							<attribute id="MapKey" type="uint32" value="24" />
+																							<children>
+																								<node id="Cache">
+																									<children>
+																										<node id="ComponentIndex">
+																											<attribute id="Object" type="int64" value="3" />
+																										</node>
+																										<node id="ComponentIndex">
+																											<attribute id="Object" type="int64" value="-1" />
+																										</node>
+																										<node id="ComponentIndex">
+																											<attribute id="Object" type="int64" value="-1" />
+																										</node>
+																										<node id="ComponentIndex">
+																											<attribute id="Object" type="int64" value="-1" />
+																										</node>
+																										<node id="ComponentIndex">
+																											<attribute id="Object" type="int64" value="-1" />
+																										</node>
+																										<node id="ComponentIndex">
+																											<attribute id="Object" type="int64" value="-1" />
+																										</node>
+																									</children>
+																								</node>
+																							</children>
+																						</node>
+																					</children>
+																				</node>
+																			</children>
+																		</node>
+																	</children>
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+								<node id="Object" key="MapKey">
+									<attribute id="MapKey" type="guid" value="3ee29b86-8da1-43f2-a197-6ab50d4fab5a" />
+									<children>
+										<node id="Value">
+											<attribute id="Speaker" type="int32" value="0" />
+											<attribute id="ActorTypeId" type="FixedString" value="character" />
+											<attribute id="ActorType" type="uint8" value="0" />
+											<attribute id="DefaultStepOutDelay" type="float" value="0.6402051" />
+											<attribute id="AudienceSlot" type="uint8" value="16" />
+											<attribute id="SceneActorType" type="uint8" value="8" />
+											<attribute id="SceneActorIndex" type="int32" value="0" />
+											<children>
+												<node id="CompiledNodeSnapshots">
+													<children>
+														<node id="ComponentMap">
+															<children>
+																<node id="Object" key="MapKey">
+																	<attribute id="MapKey" type="uint64" value="0" />
+																	<children>
+																		<node id="ComponentMap">
+																			<children>
+																				<node id="Cache">
+																					<children>
+																						<node id="Object" key="MapKey">
+																							<attribute id="MapKey" type="uint32" value="24" />
+																							<children>
+																								<node id="Cache">
+																									<children>
+																										<node id="ComponentIndex">
+																											<attribute id="Object" type="int64" value="5" />
+																										</node>
+																										<node id="ComponentIndex">
+																											<attribute id="Object" type="int64" value="-1" />
+																										</node>
+																										<node id="ComponentIndex">
+																											<attribute id="Object" type="int64" value="-1" />
+																										</node>
+																										<node id="ComponentIndex">
+																											<attribute id="Object" type="int64" value="-1" />
+																										</node>
+																										<node id="ComponentIndex">
+																											<attribute id="Object" type="int64" value="-1" />
+																										</node>
+																										<node id="ComponentIndex">
+																											<attribute id="Object" type="int64" value="-1" />
+																										</node>
+																									</children>
+																								</node>
+																							</children>
+																						</node>
+																					</children>
+																				</node>
+																			</children>
+																		</node>
+																	</children>
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+								<node id="Object" key="MapKey">
+									<attribute id="MapKey" type="guid" value="474d8f7a-5580-40a4-bbad-97177a2d0a0e" />
+									<children>
+										<node id="Value">
+											<attribute id="Speaker" type="int32" value="1" />
+											<attribute id="ActorTypeId" type="FixedString" value="character" />
+											<attribute id="ActorType" type="uint8" value="0" />
+											<attribute id="ShouldIgnoreForStaging" type="bool" value="True" />
+											<attribute id="DefaultStepOutDelay" type="float" value="0.3826777" />
+											<attribute id="AudienceSlot" type="uint8" value="16" />
+											<attribute id="SceneActorType" type="uint8" value="8" />
+											<attribute id="SceneActorIndex" type="int32" value="1" />
+											<children>
+												<node id="CompiledNodeSnapshots">
+													<children>
+														<node id="ComponentMap">
+															<children>
+																<node id="Object" key="MapKey">
+																	<attribute id="MapKey" type="uint64" value="0" />
+																	<children>
+																		<node id="ComponentMap">
+																			<children>
+																				<node id="Cache">
+																					<children>
+																						<node id="Object" key="MapKey">
+																							<attribute id="MapKey" type="uint32" value="24" />
+																							<children>
+																								<node id="Cache">
+																									<children>
+																										<node id="ComponentIndex">
+																											<attribute id="Object" type="int64" value="4" />
+																										</node>
+																										<node id="ComponentIndex">
+																											<attribute id="Object" type="int64" value="-1" />
+																										</node>
+																										<node id="ComponentIndex">
+																											<attribute id="Object" type="int64" value="-1" />
+																										</node>
+																										<node id="ComponentIndex">
+																											<attribute id="Object" type="int64" value="-1" />
+																										</node>
+																										<node id="ComponentIndex">
+																											<attribute id="Object" type="int64" value="-1" />
+																										</node>
+																										<node id="ComponentIndex">
+																											<attribute id="Object" type="int64" value="-1" />
+																										</node>
+																									</children>
+																								</node>
+																							</children>
+																						</node>
+																					</children>
+																				</node>
+																			</children>
+																		</node>
+																	</children>
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+								<node id="Object" key="MapKey">
+									<attribute id="MapKey" type="guid" value="24b657df-a968-480e-a05e-fdd803638e73" />
+									<children>
+										<node id="Value">
+											<attribute id="ActorTypeId" type="FixedString" value="item" />
+											<attribute id="ActorType" type="uint8" value="3" />
+											<attribute id="DefaultStepOutDelay" type="float" value="0.64279306" />
+											<children>
+												<node id="CompiledNodeSnapshots">
+													<children>
+														<node id="ComponentMap">
+															<children>
+																<node id="Object" key="MapKey">
+																	<attribute id="MapKey" type="uint64" value="0" />
+																	<children>
+																		<node id="ComponentMap">
+																			<children>
+																				<node id="Cache">
+																					<children>
+																						<node id="Object" key="MapKey">
+																							<attribute id="MapKey" type="uint32" value="7" />
+																							<children>
+																								<node id="Cache">
+																									<children>
+																										<node id="ComponentIndex">
+																											<attribute id="Object" type="int64" value="0" />
+																										</node>
+																									</children>
+																								</node>
+																							</children>
+																						</node>
+																					</children>
+																				</node>
+																			</children>
+																		</node>
+																	</children>
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+								<node id="Object" key="MapKey">
+									<attribute id="MapKey" type="guid" value="44dd59fa-1f77-48d6-b937-e2d5a6fef993" />
+									<children>
+										<node id="Value">
+											<attribute id="ActorTypeId" type="FixedString" value="effect" />
+											<attribute id="ActorType" type="uint8" value="4" />
+											<attribute id="DefaultStepOutDelay" type="float" value="0.43704948" />
+											<attribute id="ResourceId" type="guid" value="9571369e-6c85-32f0-804a-8bfe4bc74a30" />
+											<children>
+												<node id="CompiledNodeSnapshots">
+													<children>
+														<node id="ComponentMap" />
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+								<node id="Object" key="MapKey">
+									<attribute id="MapKey" type="guid" value="f2de6bd7-c85a-42c7-a4fb-449dd6241591" />
+									<children>
+										<node id="Value">
+											<attribute id="ActorTypeId" type="FixedString" value="effect" />
+											<attribute id="ActorType" type="uint8" value="4" />
+											<attribute id="DefaultStepOutDelay" type="float" value="0.2192694" />
+											<attribute id="ResourceId" type="guid" value="9ca4d668-d761-5447-1e21-ff93a20f0a75" />
+											<children>
+												<node id="CompiledNodeSnapshots">
+													<children>
+														<node id="ComponentMap" />
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="TimelinePhases">
+					<children>
+						<node id="Object">
+							<children>
+								<node id="Object" key="MapKey">
+									<attribute id="MapKey" type="guid" value="96b3ac6c-3f0d-4865-9ea7-963119651ae7" />
+									<attribute id="MapValue" type="uint64" value="0" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="PeanutSlotIdMap">
+					<children>
+						<node id="Object" />
+					</children>
+				</node>
+				<node id="TimelineSettings">
+					<attribute id="BodyPartForMocap" type="int32" value="3" />
+					<children>
+						<node id="FoleySettings" />
+						<node id="ExposureSettings" />
+						<node id="QuestionHoldAutomation">
+							<attribute id="IsEnabled" type="bool" value="False" />
+							<attribute id="CycleSpeed" type="float" value="0" />
+						</node>
+					</children>
+				</node>
+				<node id="AdditionalLocations" />
+				<node id="RequiredCinematicLevelTemplateIds" />
+				<node id="MaterialGroupLookup">
+					<children>
+						<node id="Object" />
+					</children>
+				</node>
+				<node id="CombatTimelineHandlers">
+					<children>
+						<node id="CombatTimelineHandler">
+							<attribute id="Priority" type="int32" value="0" />
+						</node>
+					</children>
+				</node>
+				<node id="WorldTimeline">
+					<children>
+						<node id="ActorEndStates">
+							<children>
+								<node id="ActorEndState">
+									<children>
+										<node id="Object" key="MapKey">
+											<attribute id="MapKey" type="guid" value="d0a6a915-3e27-4c28-97d5-17d42075adb7" />
+											<children>
+												<node id="ActorEndState" />
+											</children>
+										</node>
+										<node id="Object" key="MapKey">
+											<attribute id="MapKey" type="guid" value="3ee29b86-8da1-43f2-a197-6ab50d4fab5a" />
+											<children>
+												<node id="ActorEndState">
+													<attribute id="NewTemplateId" type="guid" value="335e0fc6-6d92-4ade-b730-b3ba1af2d18d" />
+													<attribute id="Show" type="bool" value="True" />
+												</node>
+											</children>
+										</node>
+										<node id="Object" key="MapKey">
+											<attribute id="MapKey" type="guid" value="474d8f7a-5580-40a4-bbad-97177a2d0a0e" />
+											<children>
+												<node id="ActorEndState">
+													<attribute id="Show" type="bool" value="True" />
+													<children>
+														<node id="SceneTransform">
+															<attribute id="Scale" type="float" value="1" />
+															<attribute id="Position" type="fvec3" value="0 0 1" />
+															<attribute id="RotationQuat" type="fvec4" value="0 0 0 1" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="ActorIdleOverrides">
+							<children>
+								<node id="ActorIdleOverride">
+									<children>
+										<node id="Object" key="MapKey">
+											<attribute id="MapKey" type="guid" value="d0a6a915-3e27-4c28-97d5-17d42075adb7" />
+											<children>
+												<node id="ActorIdleOverride" />
+											</children>
+										</node>
+										<node id="Object" key="MapKey">
+											<attribute id="MapKey" type="guid" value="3ee29b86-8da1-43f2-a197-6ab50d4fab5a" />
+											<children>
+												<node id="ActorIdleOverride" />
+											</children>
+										</node>
+										<node id="Object" key="MapKey">
+											<attribute id="MapKey" type="guid" value="474d8f7a-5580-40a4-bbad-97177a2d0a0e" />
+											<children>
+												<node id="ActorIdleOverride" />
+											</children>
+										</node>
+										<node id="Object" key="MapKey">
+											<attribute id="MapKey" type="guid" value="24b657df-a968-480e-a05e-fdd803638e73" />
+											<children>
+												<node id="ActorIdleOverride" />
+											</children>
+										</node>
+										<node id="Object" key="MapKey">
+											<attribute id="MapKey" type="guid" value="44dd59fa-1f77-48d6-b937-e2d5a6fef993" />
+											<children>
+												<node id="ActorIdleOverride" />
+											</children>
+										</node>
+										<node id="Object" key="MapKey">
+											<attribute id="MapKey" type="guid" value="f2de6bd7-c85a-42c7-a4fb-449dd6241591" />
+											<children>
+												<node id="ActorIdleOverride" />
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BehaviourActorStartConditions">
+							<children>
+								<node id="BehaviourActorStartCondition">
+									<children>
+										<node id="Object" key="MapKey">
+											<attribute id="MapKey" type="guid" value="d0a6a915-3e27-4c28-97d5-17d42075adb7" />
+											<children>
+												<node id="BehaviourActorStartCondition">
+													<attribute id="UseTransformation" type="bool" value="False" />
+													<children>
+														<node id="WorldTransform">
+															<attribute id="Scale" type="float" value="1" />
+															<attribute id="Position" type="fvec3" value="0 0 -2.29" />
+															<attribute id="RotationQuat" type="fvec4" value="-0 1 -0 -4.371139E-08" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+										<node id="Object" key="MapKey">
+											<attribute id="MapKey" type="guid" value="3ee29b86-8da1-43f2-a197-6ab50d4fab5a" />
+											<children>
+												<node id="BehaviourActorStartCondition">
+													<attribute id="UseTransformation" type="bool" value="False" />
+												</node>
+											</children>
+										</node>
+										<node id="Object" key="MapKey">
+											<attribute id="MapKey" type="guid" value="474d8f7a-5580-40a4-bbad-97177a2d0a0e" />
+											<children>
+												<node id="BehaviourActorStartCondition">
+													<attribute id="UseTransformation" type="bool" value="False" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="RootCompiledNodeSnapshots">
+					<children>
+						<node id="ComponentMap" />
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="EnterPhaseSoundEvents">
+		<node id="EnterPhaseSoundEvents">
+			<children>
+				<node id="SoundEventMap" />
+			</children>
+		</node>
+	</region>
+	<region id="ExitPhaseSoundEvents">
+		<node id="ExitPhaseSoundEvents">
+			<children>
+				<node id="SoundEventMap" />
+			</children>
+		</node>
+	</region>
+	<region id="EnterSoundEvents">
+		<node id="EnterSoundEvents" />
+	</region>
+	<region id="ExitSoundEvents">
+		<node id="ExitSoundEvents" />
+	</region>
+</save>

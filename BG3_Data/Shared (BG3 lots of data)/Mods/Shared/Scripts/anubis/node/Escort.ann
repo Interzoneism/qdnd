@@ -1,0 +1,79 @@
+game.states.GEN_Escort = State{function ()
+    description = [[A common script for a group of Flaming Fists with a Steel Watcher to patrol along a spline.
+Script contains both escort leader and escort following code.]]
+
+    modules = { }
+
+    params.Spline = { type = EParamType.String, required = true, help = [[Spline to follow]] }
+    params.Reverse = { type = EParamType.Bool, required = false, default = false, help = [[Reverse movement through spline]] }
+
+    local spline = Spline(params.Spline)
+    local reverse = params.Reverse
+
+    nodes.Escort = Selector{
+        Valid = function()
+            return me.Character.IsInEscort
+        end
+    }
+
+    nodes.Escort.Follower = Action {
+        Valid = function()
+            return me.Character.IsEscortFollower
+        end,
+
+        function()
+            DoEscortFollow()
+        end
+    }
+
+    nodes.Escort.Leader = Action {
+        Valid = function()
+            return me.Character.IsEscortLeader
+        end,
+
+        function()
+            DoEscortPatrol(spline, params.Reverse, MovementSpeed.Walk, -1)
+        end
+    }
+
+    nodes.Escort.Waiting = Action {
+        Valid = function()
+            return me.Character.IsEscortWaiting
+        end,
+
+        function()
+            Sleep(1.0)
+        end
+    }
+
+    nodes.Fallback = Action {
+        function()
+            Sleep(1.0)
+        end
+    }
+
+
+    events.EscortGroupLeaderChanged = function(ev)
+        if ev.NewLeader == me then
+            SendCaretSplineControlPointReachedEvents(me, true)
+        else
+            SendCaretSplineControlPointReachedEvents(me, false)
+        end
+    end
+
+    events.SplineControlPointReached = function(ev)
+        if ev.EndReached then
+            reverse = not reverse
+        elseif ev.Index == 0 then
+            reverse = not reverse
+        end
+    end
+
+    events.CaretSplineControlPointReached = function(ev)
+        if ev.EndReached then
+            reverse = not reverse
+        elseif ev.Index == 0 then
+            reverse = not reverse
+        end
+    end
+end}

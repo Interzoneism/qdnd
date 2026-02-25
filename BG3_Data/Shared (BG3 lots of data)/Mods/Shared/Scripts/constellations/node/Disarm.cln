@@ -1,0 +1,216 @@
+game.states.Disarm =  State{
+    function ()
+        description = [[Basic arming and disarming handling.
+                        Armed state will be enabled when changing config parameters.]]
+
+        inputs.Disarm = {help = [[Disarm the object.]]}
+        inputs.TryActivate = {help = [[Trap tries to activate. Is blocked if trap is disarmed.]]}
+        outputs.Activate = {help = [[Trap activates.]]}
+        outputs.Disarmed = {help = [[Object was disarmed.]]}
+        outputs.DisarmFailed = {help = [[Attempt to disarm object failed.]]}
+
+        params.TargetEntity = {type = EParamType.String, required = false, default = "me", help = "Item Disarmed"}
+        params.StartEnabled = {type=EParamType.Bool, default = true, help = "Does the trap start on?"}
+        params.DestroyOnDisarm = {type=EParamType.Bool, default = true, help = "Does the item break on Disarm?"}
+
+        helpers.Init = function()
+            local targetEntity
+            if params.TargetEntity == "me" then
+                targetEntity = me
+            else
+                targetEntity = FindEntity(params.TargetEntity)
+
+            end
+
+            me.Blackboard.SetFact("TargetEntity", targetEntity)
+
+            if
+                IsTrapArmed(targetEntity)
+            then
+                me.Blackboard.SetFact("Cnst.Disarm.IsTrap", 1)
+                if not params.StartEnabled then
+                    SetTrapArmed(targetEntity, false)
+                end
+            else
+                me.Blackboard.SetFact("Cnst.Disarm.IsTrap", 0)
+            end
+            me.Blackboard.SetFact("Cnst.Disarm.WasDisarmed", 0)
+        end
+
+        self.OnEditorChanges = function()
+            local targetEntity = me.Blackboard.GetFact("TargetEntity")
+
+            -- if targetEntity is nil, it means OnInit never got called yet
+            -- -> we never entered game mode and hence there's nothing we
+            -- need to reset
+            if targetEntity ~= nil then
+                helpers.Init()
+                -- if it's a trap, assume it should be armed for testing
+                if targetEntity.Item.IsTrap or
+                   me.Blackboard.GetFact("Cnst.Disarm.IsTrap") == 1 then
+                    SetTrapArmed(targetEntity, true)
+                end
+            end
+        end
+
+        self.OnInit = function()
+
+            if me.Blackboard.GetFact("Cnst.Disarm.IsTrap") == nil then
+                helpers.Init()
+            end
+
+        end
+
+        socketEvents.TryActivate = function(ev)
+            if me.Blackboard.GetFact("Cnst.Disarm.WasDisarmed") == 0 then
+                TriggerOutput(outputs.Activate, ev.Object, ev.Param)
+            end
+        end
+
+        events.AttemptedDisarm = function(ev)
+            if ev.Success then
+                me.Blackboard.SetFact("Cnst.Disarm.WasDisarmed", 1)
+                TriggerOutput(outputs.Disarmed, ev.Disarmer.EntityRef)
+                if params.DestroyOnDisarm then
+                    Die(me.Blackboard.GetFact("TargetEntity"), DeathType.PHYSICAL, ev.Disarmer)
+                end
+            else
+                TriggerOutput(outputs.DisarmFailed, ev.Disarmer.EntityRef)
+            end
+        end
+
+        socketEvents.Disarm = function(ev)
+            me.Blackboard.SetFact("Cnst.Disarm.WasDisarmed", 1)
+            SetTrapArmed(me.Blackboard.GetFact("TargetEntity"), false)
+            TriggerOutput(outputs.Disarmed, ev.Object, ev.Param)
+            if params.DestroyOnDisarm then
+                if ev.Object == nil then
+                    Die(me.Blackboard.GetFact("TargetEntity"), Deathtype.PHYSICAL, nil)
+                else
+                    Die(me.Blackboard.GetFact("TargetEntity"), Deathtype.PHYSICAL, Entity(ev.Object))
+                end
+            end
+        end
+
+    end
+}
+
+
+game.states.DisarmOnOff = State{
+    function()
+        modules = {"shared.items"}
+
+        inputs.Disarm = {help = [[Disarm the object.]]}
+        inputs.TryActivate = {help = [[Trap tries to activate. Is blocked if trap is disarmed or deactivated.]]}
+        inputs.Enable = {help =[[Trap turns on]]}
+        inputs.Disable = {help = [[Trap turns off]]}
+        outputs.Activate = {help = [[Trap activates.]]}
+        outputs.ActivateAttemptFailed = {help = [[Someone tried to activate trap while it was off.]]}
+        outputs.Disarmed = {help = [[Object was disarmed.]]}
+        outputs.DisarmFailed = {help = [[Attempt to disarm object failed.]]}
+        outputs.Enabled = {help = [[Object turned on.]]}
+        outputs.Disabled = {help = [[Object turned off.]]}
+
+        outputs.DisarmInt = {help = [[Disarm the object.]], internal = true}
+        outputs.TryActivateInt = {help = [[Trap tries to activate. Is blocked if trap is disarmed.]], internal = true}
+        outputs.Initialized = {help = [[Trap has been initialized for the first time]], internal = true}
+        inputs.ActivateInt = {help = [[Trap activates.]], internal = true}
+        inputs.DisarmedInt = {help = [[Object was disarmed.]], internal = true}
+        inputs.DisarmFailedInt = {help = [[Attempt to disarm object failed.]], internal = true}
+
+        params.TargetEntity = {type = EParamType.String, required = false, default = "me", help = "Item Disarmed"}
+
+        params.StartEnabled = {type=EParamType.Bool, default = true, help = "Does the trap start on?"}
+
+        params.DestroyOnDisarm = {type=EParamType.Bool, default = true, help = "Does the item break on Disarm?"}
+
+        params.DisarmOnDestroy = {type=EParamType.Bool, default = true, help = "Does the item stop working when destroyed (set to false if some logic needs to happen when the item is destroyed)."}
+
+        nodes.Disarm = Proxy{
+            game.states.Disarm,
+            params = {TargetEntity = params.TargetEntity,
+                      DestroyOnDisarm = params.DestroyOnDisarm},
+            inputs = {Disarm = {outputs.DisarmInt},
+                      TryActivate = {outputs.TryActivateInt}},
+            outputs = {Activate = {inputs.ActivateInt},
+                       Disarmed= {inputs.DisarmedInt},
+                       DisarmFailed = {inputs.DisarmFailedInt}},
+        }
+
+        helpers.Init = function()
+            if params.StartEnabled and
+               me.Blackboard.GetFact("On") == nil  then
+                me.Blackboard.SetFact("On", 1)
+            else
+                me.Blackboard.SetFact("On", 0)
+            end
+        end
+
+        self.OnEditorChanges = function()
+            helpers.Init()
+        end
+
+        events.Destroyed = function(ev)
+            if params.DisarmOnDestroy and
+               me.Blackboard.GetFact("Cnst.Disarm.WasDisarmed") == 0 and
+               ev.Entity == me.Blackboard.GetFact("TargetEntity") then
+                me.Blackboard.SetFact("On", 0)
+                TriggerOutput(outputs.Disabled, me.EntityRef)
+            end
+        end
+
+        self.OnInit = function()
+            if me.Blackboard.GetFact("On") ~= nil then
+                return
+            end
+
+            helpers.Init()
+        end
+
+        socketEvents.Enable = function(ev)
+            if me.Blackboard.GetFact("Cnst.Disarm.WasDisarmed") == 0 and
+               (not params.DisarmOnDestroy or 
+                not mod.items.SafeIsDestroyed(me))
+                 then
+                me.Blackboard.SetFact("On", 1)
+                TriggerOutput(outputs.Enabled, ev.Object, ev.Param)
+            end
+        end
+
+        socketEvents.Disable = function(ev)
+            if me.Blackboard.GetFact("Cnst.Disarm.WasDisarmed") == 0 or 
+                me.Blackboard.GetFact("Cnst.Disarm.WasDisarmed") == nil then
+                me.Blackboard.SetFact("On", 0)
+                TriggerOutput(outputs.Disabled, ev.Object, ev.Param)
+            end
+        end
+
+        socketEvents.TryActivate = function(ev)
+            if (not params.DisarmOnDestroy or 
+                not mod.items.SafeIsDestroyed(me)) then
+                TriggerOutput(outputs.TryActivateInt, ev.Object, ev.Param)
+            end 
+        end
+
+        socketEvents.Disarm = function(ev)
+            TriggerOutput(outputs.DisarmInt, ev.Object, ev.Param)
+        end
+
+        socketEvents.ActivateInt = function(ev)
+            if me.Blackboard.GetFact("On") == 1 then
+                TriggerOutput(outputs.Activate, ev.Object, ev.Param)
+            else
+                TriggerOutput(outputs.ActivateAttemptFailed, ev.Object, ev.Param)
+            end
+        end
+
+        socketEvents.DisarmedInt = function(ev)
+            TriggerOutput(outputs.Disarmed, ev.Object, ev.Param)
+        end
+
+        socketEvents.DisarmFailedInt = function(ev)
+            TriggerOutput(outputs.DisarmFailed, ev.Object, ev.Param)
+        end
+
+    end
+}

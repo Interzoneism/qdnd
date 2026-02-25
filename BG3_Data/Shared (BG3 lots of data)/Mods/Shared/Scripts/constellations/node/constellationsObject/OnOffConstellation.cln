@@ -1,0 +1,20 @@
+game.roots.OnOffConstellation = State{
+    function()
+
+        inputs.On = {help = "Enable Constellation"}
+        inputs.Off = {help = "Disable Constellation"}
+
+        outputs.On = {help = "Constellation needs to turn on"}
+        outputs.Off = {help = "Constellation needs to turn off"}
+
+        socketEvents.On = function(ev)
+            TriggerOutput(outputs.On, ev.Object, ev.Param)
+        end
+
+        socketEvents.Off = function(ev)
+            TriggerOutput(outputs.Off, ev.Object, ev.Param)
+        end
+
+    end
+
+}

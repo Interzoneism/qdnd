@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<save>
+    <version major="4" minor="4" revision="0" build="300"/>
+    <region id="MetaConditions">
+        <node id="root">
+            <children>
+                <node id="MetaCondition">
+                    <attribute id="AdditionalConditions" type="LSString" value="ResilientSphereCheck() and BlinkCheck()"/>
+                    <attribute id="ConditionType" type="FixedString" value="Target"/>
+                    <attribute id="Name" type="LSString" value="ResilientSphere"/>
+                    <attribute id="OverrideOriginalCondition" type="bool" value="false"/>
+                    <attribute id="UUID" type="guid" value="b6db067a-5b5e-48aa-84f9-50fca0c1d543"/>
+                </node>
+                <node id="MetaCondition">
+                    <attribute id="AdditionalConditions" type="LSString" value="ResilientSphereCheck()"/>
+                    <attribute id="ConditionType" type="FixedString" value="AoE"/>
+                    <attribute id="Filter" type="LSString" value="AreaRadiusGreaterThan(0) and HasAoEConditions()"/>
+                    <attribute id="Name" type="LSString" value="ResilientSphereAOE"/>
+                    <attribute id="OverrideOriginalCondition" type="bool" value="false"/>
+                    <attribute id="UUID" type="guid" value="17335717-6b80-4c3e-b879-b0f2cfa7e272"/>
+                </node>
+                <node id="MetaCondition">
+                    <attribute id="AdditionalConditions" type="LSString" value="not HasStatus(&apos;WYR_CIRCUS_STATUE_PETRIFIED&apos;)"/>
+                    <attribute id="ConditionType" type="FixedString" value="Target"/>
+                    <attribute id="Name" type="LSString" value="Statue"/>
+                    <attribute id="OverrideOriginalCondition" type="bool" value="false"/>
+                    <attribute id="UUID" type="guid" value="047fdbc4-1fe1-4dd4-8e57-7af5b8e31da1"/>
+                </node>
+            </children>
+        </node>
+    </region>
+</save>

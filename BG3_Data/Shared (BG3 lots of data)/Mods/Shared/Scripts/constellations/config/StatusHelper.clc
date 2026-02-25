@@ -1,0 +1,30 @@
+game.configs.StatusHelper = Config{
+    params={
+        Status = {
+            type = EParamType.String,
+            help = [[Status to apply]],
+            required = true,
+        },
+        TargetEntity = {
+            type = EParamType.String,
+            help = [[Object that gets the status]],
+            required = false,
+            default = [[me]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.StatusHelper,
+            Status = params.Status,
+            TargetEntity = params.TargetEntity,
+        },
+    },
+    inputs={
+        TurnOff=ExtSocket{description=[[Remove the given status from the entity]],{SocketRef{[[root.logic.inputs.TurnOff]]}}},
+        TurnOn=ExtSocket{description=[[Apply the given status to the entity]],{SocketRef{[[root.logic.inputs.TurnOn]]}}},
+        Toggle=ExtSocket{description=[[Toggle the given status from the entity]],{SocketRef{[[root.logic.inputs.Toggle]]}}},
+    },
+    outputs={
+        Off=ExtSocket{description=[[The status has been removed from the entity]],{SocketRef{[[root.logic.outputs.Off]]}}},
+        On=ExtSocket{description=[[The status has been activated on the entity]],{SocketRef{[[root.logic.outputs.On]]}}},
+    }
+}

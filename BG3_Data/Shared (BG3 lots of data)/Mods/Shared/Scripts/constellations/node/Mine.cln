@@ -1,0 +1,213 @@
+game.states.Mine = State{
+    function()
+
+        params.DC = {
+            type = EParamType.String,
+            default="HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f",
+            help=[[Perception check DC.]]
+        }
+
+        params.WeightLimit = {
+            type = EParamType.Number,
+            help = [[Max Weight]],
+            default = 50.0,
+        }
+
+
+        params.Inverted = {
+            type = EParamType.Bool,
+            help = [[Inverts the mine logic - it explodes when weight is taken off it.]],
+            default = false
+        }
+
+        params.DamageTypes = {
+            type = EParamType.String,
+            arrayRange="0..",
+            help = [[Types of damage that affect the mine]],
+            default = {},
+        }
+
+        params.AbsoluteValueThreshold = {
+            type = EParamType.Bool,
+            default = false,
+            help = "If true, treat the threshold as an absolute value rather than a medium value"
+        }
+
+        params.ExcludeDamageTypes = {
+            type = EParamType.Bool,
+            default = false,
+            help = "Instead of trying to match the damage types, ignore them"
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = "Does the trap start on?"
+        }
+
+        params.Projectile = {
+            type = EParamType.String,
+            default = "Projectile_Fireball_Trap",
+            help = [[The projectile that explodes]]
+        }
+
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            required=false,
+            default=6,
+            help=[[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]]
+        }
+
+        params.Skill = {
+            type = EParamType.String,
+            default="Perception",
+            help=[[The skill checked.]]
+        }
+
+        params.Type = {
+            type = EParamType.String,
+            default="Invisible",
+            help=[[
+            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]]
+        }
+
+        params.VFXOff = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = [[VFX while mine is disabled and has been spotted.]]
+        }
+
+        params.VFXOffBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = [[Bone on which the 'VFXOff' VFX is played.]]
+        }
+
+        params.VFXOn = {type = EParamType.String,
+            required = false,
+            default = "VFX_Script_Trap_Overlay_Red_01_a7361f25-e942-e071-7ce3-7a8182f4e0ef",
+            help = [[VFX while mine is enabled and has been spotted.]]
+        }
+
+        params.VFXOnBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = [[Bone on which the enabled-VFX is played.]]
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_Off",
+            help = "Sound when mine is disabled"
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_On",
+            help = "Sound when mine is enabled"
+        }
+
+        params.DamageThreshold = {type = EParamType.Number, default = 0.0, help = [[
+            Minimum damage that needs to be done to the the mine for it to explode. 
+            Percentage, so on a 0.0-1.0 range unless AbsoluteValueTreshold is true]]
+        }
+
+        
+        params.DestroyOnDisarm = {
+            type=EParamType.Bool,
+            default = true,
+            help = "Does the item break on Disarm?"
+        }
+
+
+        inputs.Enable = {help = "Turn mine on"}
+        inputs.Disable = {help = "Turn mine off"}
+        inputs.Explode = {help = "Makes mine explode"}
+
+        inputs.Reveal = {help = [[Reveals the mine. The Object will do an AD unless the Param is true.]]}
+
+        outputs.On = {internal = true}
+        outputs.Off = {internal = true}
+
+        inputs.Overweight = {internal = true}
+        inputs.Underweight = {internal = true}
+        inputs.Activate = {internal = true}
+
+        outputs.Explode = {internal=true}
+        outputs.Reveal = {internal=true}
+        outputs.TryActivate = {internal = true}
+
+        nodes.Explosive = Proxy{
+            game.states.Explosive,
+            params = {StartEnabled = params.StartEnabled,
+                      DC = params.DC,
+                      MinDistance = params.MinDistance,
+                      Skill = params.Skill,
+                      Type = params.Type,
+                      VFXOn= params.VFXOn,
+                      VFXOff = params.VFXOff,
+                      VFXOnBone = params.VFXOnBone,
+                      VFXOffBone = params.VFXOffBone,
+                      SoundOn = params.SoundOn,
+                      SoundOff = params.SoundOff,
+                      DamageTypes = params.DamageTypes,
+                      AbsoluteValueThreshold = params.AbsoluteValueThreshold,
+                      ExcludeDamageTypes = params.ExcludeDamageTypes,
+                      Threshold = params.DamageThreshold,
+                      Projectile = params.Projectile,
+                      DestroyOnDisarm = params.DestroyOnDisarm},
+            inputs = {TryExplode = {outputs.TryActivate},
+                      Explode = {outputs.Explode},
+                      Enable = {outputs.On},
+                      Disable = {outputs.Off},
+                      Reveal = {outputs.Reveal}},
+        }
+
+        nodes.WeightTrigger = Proxy{
+            game.states.WeightTrigger,
+            params = {WeightLimit = params.WeightLimit},
+            outputs = {Overweight = {inputs.Overweight},
+                       Underweight = {inputs.Underweight}}
+        }
+
+        socketEvents.Overweight = function(ev)
+            if not params.Inverted then
+                TriggerOutput(outputs.TryActivate, ev.Object)
+            end
+        end
+
+        socketEvents.Underweight = function(ev)
+            if params.Inverted then
+                TriggerOutput(outputs.TryActivate, ev.Object)
+            end
+        end
+
+        socketEvents.Activate = function(ev)
+            TriggerOutput(outputs.Explode, ev.Object)
+        end
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.On, ev.Object)
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.Off, ev.Object)
+        end
+
+        socketEvents.Explode = function(ev)
+            TriggerOutput(outputs.Explode, ev.Object)
+        end
+
+        socketEvents.Reveal = function(ev)
+            TriggerOutput(outputs.Reveal, ev.Object)
+        end
+
+    end
+}

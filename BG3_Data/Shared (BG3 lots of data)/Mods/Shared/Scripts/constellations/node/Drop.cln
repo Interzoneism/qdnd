@@ -1,0 +1,109 @@
+game.states.Drop = State{
+    function()
+
+        params.DropStartVFX = {
+            type = EParamType.String,
+            help = [[When the item starts falling, play this VFX.]],
+            required = false
+        }
+
+        params.DropStartSound = {
+            type = EParamType.String,
+            help = [[When the item starts falling, play this sound.]],
+            required = false
+        }
+
+        params.DropStopVFX = {
+            type = EParamType.String,
+            help = [[When the item stops falling/lands, play this VFX.]],
+            required = false
+        }
+
+        params.DropStopSound = {
+            type = EParamType.String,
+            help = [[When the item stops falling/lands, play this sound.
+                     Warning: will not work if the item gets destroyed at that point
+                     and has no destruct visual.]],
+            required = false
+        }
+
+        params.DestroyType = {
+            type = EParamType.String,
+            help = [[When explicitly destroying the item, use this death type. If not set, don't destroy after falling]],
+            required = false,
+            default_value_provider = [[deathtype]]
+        }
+
+        params.DestroyProjectileSpell = {
+            type = EParamType.String,
+            help = [[The projectile (if any) that explodes when the item destroys itself]],
+            default_value_provider = [[spell_projectile]],
+            required = false
+        }
+
+        inputs.Drop = {help = [[Object needs to begin falling and then explode.]]}
+
+        outputs.Dropped = {help = [[Object has dropped.]]}
+        outputs.Explode = {internal}
+
+        nodes.Explode = Proxy{
+            game.states.Explode,
+            params = {
+                TargetEntity = "me",
+                Projectile = params.DestroyProjectileSpell,
+                DestroyType = params.DestroyType
+            },
+            inputs = {Explode = {outputs.Explode}}
+        }
+
+        self.OnEditorChanges = function()
+            -- probably won't help since the item won't magically float up again
+            -- or be undestroyed, but shouldn't hurt either if the item can in
+            -- fact fall more than once without reloading the level
+            me.Blackboard.SetFact("Cnst.Drop.Dropped", 0)
+        end
+
+        socketEvents.Drop = function(ev)
+            if me.Blackboard.GetFact("Cnst.Drop.Dropped") == nil then
+                me.Blackboard.SetFact("Cnst.Drop.Dropped", 1)
+               local dropper = ev.Object and Entity(ev.Object) or me
+               SetGravity(me, true, dropper)
+               if (params.DropStartVFX ~= nil) and
+                  (params.DropStartVFX ~= "") then
+                   -- Use position so it doesn't move with the falling item
+                   PlayEffectAt(PrepareEffect(params.DropStartVFX), me.Position)
+               end
+               if (params.DropStartSound ~= nil) and
+                  (params.DropStartSound ~= "") then
+                   PlaySound(me, params.DropStartSound)
+               end
+            end
+        end
+
+        events.Fell = function(ev)
+            local cause = ev.Cause and ev.Cause.EntityRef or nil
+               if (params.DropStopVFX ~= nil) and
+                  (params.DropStopVFX ~= "") then
+                   -- Use position so it works even if there is no destruct visual
+                   PlayEffectAt(PrepareEffect(params.DropStopVFX), me.Position)
+               end
+               if (params.DropStopSound ~= nil) and
+                  (params.DropStopSound ~= "") then
+                   PlaySound(me, params.DropStopSound)
+               end
+            TriggerOutput(outputs.Dropped, me.EntityRef, cause)
+            if ((params.DestroyProjectileSpell ~= nil) and
+                (params.DestroyProjectileSpell ~= "")) then
+                TriggerOutput(outputs.Explode, cause or me.EntityRef)
+            elseif ((params.DestroyType ~= nil) and
+                 (params.DestroyType ~= "")) then
+                if cause ~= nil then
+                    Die(me, DeathType[params.DestroyType], Entity(cause))
+                else
+                    Die(me, DeathType[params.DestroyType], nil)
+                end
+            end
+        end
+
+    end
+}

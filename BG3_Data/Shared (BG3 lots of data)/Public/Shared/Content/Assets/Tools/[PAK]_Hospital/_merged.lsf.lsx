@@ -1,0 +1,352 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="VirtualTextureBank">
+		<node id="VirtualTextureBank">
+			<children>
+				<node id="Resource">
+					<attribute id="GTexFileName" type="FixedString" value="4f150c177ebaca949b5fa6aea9cc2de5" />
+					<attribute id="ID" type="FixedString" value="2c37a845-65c8-ee3e-3761-73af99673775" />
+					<attribute id="Name" type="LSString" value="CINE_TOOL_Hospital_Surgery_Scalpel_A" />
+					<attribute id="Prefetch" type="bool" value="False" />
+					<attribute id="PrefetchMipLevel" type="int8" value="-1" />
+					<attribute id="ReferencedColorSpaces" type="uint32" value="6" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="VirtualTextureLayerConfig" type="uint32" value="3" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209014" />
+				</node>
+				<node id="Resource">
+					<attribute id="GTexFileName" type="FixedString" value="550ca2f1dfa072c57e9cbd0850ef3fde" />
+					<attribute id="ID" type="FixedString" value="d0bd7657-6fa2-be31-9cd4-9c5bedb0522e" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_Hospital_Surgery_Kit_A" />
+					<attribute id="Prefetch" type="bool" value="False" />
+					<attribute id="PrefetchMipLevel" type="int8" value="-1" />
+					<attribute id="ReferencedColorSpaces" type="uint32" value="6" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="VirtualTextureLayerConfig" type="uint32" value="3" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115198813274313" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="PhysicsBank">
+		<node id="PhysicsBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="0e4769cf-7eae-7f42-613e-9afe78b1a54f" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_Hospital_Surgery_Kit_B" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Tools/Hospital/TOOL_Hospital_Surgery_Kit_ABC/TOOL_Hospital_Surgery_Kit_B.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Tools/Hospital/TOOL_Hospital_Surgery_Kit_ABC/TOOL_Hospital_Surgery_Kit_B" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855949" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="7948c351-5715-ca4f-9e2d-7b05c1d7b1d9" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_Hospital_Surgery_Kit_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Tools/Hospital/TOOL_Hospital_Surgery_Kit_ABC/TOOL_Hospital_Surgery_Kit_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Tools/Hospital/TOOL_Hospital_Surgery_Kit_ABC/TOOL_Hospital_Surgery_Kit_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855949" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="89a39044-f620-9076-46bf-c10fa463dd51" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_Hospital_Surgery_Scalpel_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Tools/Hospital/TOOL_Hospital_Surgery_Kit_ABC/TOOL_Hospital_Surgery_Scalpel_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Tools/Hospital/TOOL_Hospital_Surgery_Kit_ABC/TOOL_Hospital_Surgery_Scalpel_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241809" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="MaterialBank">
+		<node id="MaterialBank">
+			<children>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="732a485b-7dc0-1378-d687-94ad939289f3" />
+					<attribute id="MaterialType" type="uint8" value="22" />
+					<attribute id="Name" type="LSString" value="TOOL_Hospital_Surgery_Kit_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Base/Base_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="d0bd7657-6fa2-be31-9cd4-9c5bedb0522e" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="a036bb24-d530-dd2a-8626-ece71e9343db" />
+					<attribute id="MaterialType" type="uint8" value="4" />
+					<attribute id="Name" type="LSString" value="CINE_TOOL_Hospital_Surgery_Scalpel_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Base/Base_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="2c37a845-65c8-ee3e-3761-73af99673775" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.26977655 0.10019668 0.2945992" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.22784223 -0.0049259947 -0.22564697" />
+					<attribute id="Center" type="fvec3" value="0.020967163 0.047635343 0.034476116" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="26ea21db-2478-4bcc-2601-e88b169df29c" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="TOOL_Hospital_Surgery_Kit_B" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.3637758" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Tools/Hospital/TOOL_Hospital_Surgery_Kit_ABC/Resources/TOOL_Hospital_Surgery_Kit_B.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Tools/Hospital/TOOL_Hospital_Surgery_Kit_ABC/Resources/TOOL_Hospital_Surgery_Kit_B.Dummy_TOOL_Hospital_Surgery_Kit_B.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665791066" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="732a485b-7dc0-1378-d687-94ad939289f3" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Hospital_Surgery_Kit_B.TOOL_Hospital_Surgery_Kit_B_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="732a485b-7dc0-1378-d687-94ad939289f3" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Hospital_Surgery_Kit_B.TOOL_Hospital_Surgery_Kit_B_Mesh_LOD1.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.015727956 0.0034229038 0.05447931" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.03303466 -0.0029711484 -0.18679428" />
+					<attribute id="Center" type="fvec3" value="-0.008653352 0.00022587774 -0.06615749" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="4bd537fa-9685-3520-f709-4e69412e3704" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="CINE_TOOL_Hospital_Surgery_Scalpel_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.12311744" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Tools/Hospital/TOOL_Hospital_Surgery_Kit_ABC/Resources/CINE_TOOL_Hospital_Surgery_Scalpel_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Tools/Hospital/TOOL_Hospital_Surgery_Kit_ABC/Resources/CINE_TOOL_Hospital_Surgery_Scalpel_A.Dummy_CINE_TOOL_Hospital_Surgery_Scalpel_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241811" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="a036bb24-d530-dd2a-8626-ece71e9343db" />
+							<attribute id="ObjectID" type="FixedString" value="CINE_TOOL_Hospital_Surgery_Scalpel_A.CINE_TOOL_Hospital_Surgery_Scalpel_A_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="a036bb24-d530-dd2a-8626-ece71e9343db" />
+							<attribute id="ObjectID" type="FixedString" value="CINE_TOOL_Hospital_Surgery_Scalpel_A.CINE_TOOL_Hospital_Surgery_Scalpel_A_Mesh_LOD1.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.22958681 0.05132301 0.4625943" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.17331316 -0.0027065277 -0.4838748" />
+					<attribute id="Center" type="fvec3" value="0.028136827 0.024308242 -0.010640249" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="ba1c94a4-9059-d34a-050a-ee84e6ab4ba7" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="TOOL_Hospital_Surgery_Kit_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.5150367" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Tools/Hospital/TOOL_Hospital_Surgery_Kit_ABC/Resources/TOOL_Hospital_Surgery_Kit_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Tools/Hospital/TOOL_Hospital_Surgery_Kit_ABC/Resources/TOOL_Hospital_Surgery_Kit_A.Dummy_TOOL_Hospital_Surgery_Kit_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115196665791066" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="732a485b-7dc0-1378-d687-94ad939289f3" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Hospital_Surgery_Kit_A.TOOL_Hospital_Surgery_Kit_A_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="732a485b-7dc0-1378-d687-94ad939289f3" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Hospital_Surgery_Kit_A.TOOL_Hospital_Surgery_Kit_A_Mesh_LOD1.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="732a485b-7dc0-1378-d687-94ad939289f3" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Hospital_Surgery_Kit_A.TOOL_Hospital_Surgery_Kit_A_Mesh_LOD2.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.015138389 0.0025251757 0.058519367" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.032560576 -0.003829978 -0.1918664" />
+					<attribute id="Center" type="fvec3" value="-0.008711094 -0.0006524011 -0.06667352" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="eaef68f0-33d3-1d46-7bbb-3f7e160067d5" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="TOOL_Hospital_Surgery_Scalpel_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.12748393" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Tools/Hospital/TOOL_Hospital_Surgery_Kit_ABC/Resources/TOOL_Hospital_Surgery_Scalpel_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Tools/Hospital/TOOL_Hospital_Surgery_Kit_ABC/Resources/TOOL_Hospital_Surgery_Scalpel_A.Dummy_TOOL_Hospital_Surgery_Scalpel_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241809" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="732a485b-7dc0-1378-d687-94ad939289f3" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Hospital_Surgery_Scalpel_A.TOOL_Hospital_Surgery_Scalpel_A_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="732a485b-7dc0-1378-d687-94ad939289f3" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_Hospital_Surgery_Scalpel_A.TOOL_Hospital_Surgery_Scalpel_A_Mesh_LOD1.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

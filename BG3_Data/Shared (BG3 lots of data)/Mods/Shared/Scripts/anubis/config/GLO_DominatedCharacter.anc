@@ -1,0 +1,6 @@
+game.configs.GLO_DominatedCharacter = Config{
+    root=StateRef{game.roots.DefaultCharacter,
+        genericBehaviours = StateRef{game.states.CrimesHumanoid},
+        idle = StateRef{game.states.GLO_DominatedCharacter},
+    }
+}

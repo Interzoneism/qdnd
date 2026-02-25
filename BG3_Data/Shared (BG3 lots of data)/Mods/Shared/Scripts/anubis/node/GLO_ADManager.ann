@@ -1,0 +1,108 @@
+    game.states.GLO_ADManager = State{function ()
+
+        params.AD = {type = EParamType.String, required=false, default=nil, help=[[
+            The AD to play.
+        ]]}
+
+        params.regionBlockFlag = {type = EParamType.String,  required=false, default=nil, help=[[
+            Blocks the ADs for the entire group of characters (prevents overlap)
+        ]]}
+
+        params.dialogBlockFlag = {type = EParamType.String,  required=false, default=nil, help=[[
+            Blocks this specific AD from happening (prevents repetition)
+        ]]}
+
+        params.partners = {type = EParamType.String, arrayRange = "..", required = false, default = nil, help = [[
+            Dialog Partner list
+        ]]}
+
+        params.blocking = {type = EParamType.Bool,  required=false, default=true, help=[[
+            Whether the AD is blocking (waitForCompletion).
+        ]]}
+
+        local AD
+        local regionBlockFlag
+        local dialogBlockFlag
+        local partners = {}
+        local blocking
+        local didInit = false
+
+        helpers.IsAvailableForDialog = function(speaker)
+            if EntityExists(speaker) and
+               ((speaker.IsCharacter and
+                 not speaker.Character.IsDead and
+                 not speaker.IsInCombat and
+                 not IsInDialog(speaker, false) and
+                 not speaker.Character.IsInteractionDisabled) or
+                (speaker.IsItem and
+                 not speaker.Item.IsDestroyed)) and
+                (speaker == me or
+                 CanSee(me, speaker))
+            then
+                return true
+            else
+                return false
+            end
+        end
+
+        helpers.PartnersAvailable = function()
+            for _, partner in ipairs(partners) do
+                if not helpers.IsAvailableForDialog(partner) then
+                    return false
+                end
+            end
+            return true
+        end
+
+        helpers.Init = function()
+            if params.AD then
+                AD = Dialog(params.AD)
+                if AD == nil then
+                    DebugLog("Failed to find the automated dialog"..params.AD)
+                end
+            end
+
+            if params.regionBlockFlag then
+                regionBlockFlag = Flag(params.regionBlockFlag)
+            end
+            if params.dialogBlockFlag then
+                dialogBlockFlag = Flag(params.dialogBlockFlag)
+            end
+
+            if params.partners then
+                for _, partner in ipairs(params.partners) do
+                    table.insert(partners, FindEntity(partner))
+                end
+            end
+
+            blocking = params.blocking
+            didInit = true
+        end
+
+        self.CanEnter = function()
+            if  params.AD then
+                if not didInit then
+                    helpers.Init()
+                end
+                return (not regionBlockFlag or
+                        not GetFlag(regionBlockFlag, nil)) and
+                       (not dialogBlockFlag or
+                        not GetFlag(dialogBlockFlag, nil)) and
+                        helpers.PartnersAvailable() and
+                        helpers.IsAvailableForDialog(me)
+            else
+                return false
+            end
+
+        end
+
+        nodes.DoAD = Action
+        {
+            function()
+                StartAutomatedDialog(AD, blocking, me, table.unpack(partners))
+            end
+       }
+
+    end
+
+    }

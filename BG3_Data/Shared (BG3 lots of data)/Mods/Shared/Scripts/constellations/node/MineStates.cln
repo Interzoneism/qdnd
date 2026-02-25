@@ -1,0 +1,171 @@
+game.states.Explode = State{
+    function()
+
+        description = [[Destroy the TargetEntity, and cast a projectile spell at its location.
+                        The cause of death/explosion can be specified via the parameter of the
+                        Explode socket event.]]
+
+        inputs.Explode = {help = [[Make mine explode.]]}
+
+        params.Projectile = {
+            type = EParamType.String,
+            help = [[The projectile that explodes]],
+            default_value_provider = [[spell_projectile]],
+            default = [[Projectile_Fireball_Trap]]
+        }
+
+        params.DestroyType = {
+            type = EParamType.String,
+            help = [[When destroying the item, use this death type.]],
+            required = false,
+            default_value_provider = [[deathtype]],
+            default = [[PHYSICAL]]
+        }
+
+        params.TargetEntity = {type = EParamType.String, default = "me", help = "Object on which the weight is checked."}
+
+        socketEvents.Explode = function(ev)
+            local sourceEntity
+            if ev.Object ~= nil then
+                sourceEntity = Entity(ev.Object)
+            end
+            local targetEntity = (params.TargetEntity == "me") and me or Entity(params.TargetEntity)
+            if (params.Projectile ~= nil) and
+                (params.Projectile ~= "") then
+                if me.Blackboard.GetFact("Cnst.Explode.CastingSpell") ~= 1 then
+                    UseSpellImmediate(targetEntity, params.Projectile, targetEntity.Position, nil, nil, nil, true, false, sourceEntity)
+                    me.Blackboard.SetFact("Cnst.Explode.CastingSpell",1)
+                    if sourceEntity ~= nil then
+                        me.Blackboard.SetFact("Cnst.Explode.SourceEntity", sourceEntity)
+                    end
+                end
+            elseif params.DestroyType ~= "" then
+                Die(targetEntity, DeathType[params.DestroyType], sourceEntity)
+            end
+        end
+
+        events.SpellCastResult = function(ev)
+            if (me.Blackboard.GetFact("Cnst.Explode.CastingSpell") == 1) then
+                if params.DestroyType ~= "" then
+                    -- Regardless of whether or not the cast was successful, die
+                    local targetEntity = (params.TargetEntity == "me") and me or Entity(params.TargetEntity)
+                    local sourceEntity = me.Blackboard.GetFact("Cnst.Explode.SourceEntity")
+                    Die(targetEntity, DeathType[params.DestroyType], sourceEntity)
+                else
+                    me.Blackboard.SetFact("Cnst.Explode.CastingSpell",0)
+                end
+            end
+        end
+
+    end
+}
+
+
+game.states.WeightTrigger = State{
+    function()
+
+        modules = {"shared.items"}
+
+        params.WeightLimit = {type = EParamType.Number, default = 50.0, help = "Object's weight limit"
+        }
+
+        outputs.Overweight = {help = "Pressure plate was under the maximum weight and is now over it."}
+        outputs.Underweight = {help = "Pressure plate was over the maximum weight and is now under it."}
+        outputs.WeightChanged = {help = "The weight changed"}
+
+        params.TargetEntity = {type = EParamType.String, default = "me", help = "Object on which the weight is checked."}
+        params.HighPrecision = {type = EParamType.Bool, default = false, help = "Set to true for very thin items."}
+
+        helpers.Init = function(startTimer)
+            local targetEntity
+            if params.TargetEntity == "me" then
+                targetEntity = me
+            else
+                targetEntity = FindEntity(params.TargetEntity)
+            end
+
+            me.Blackboard.SetFact("TargetEntity", targetEntity)
+
+            if startTimer and
+               not mod.items.SafeIsDestroyed(targetEntity) then
+                StartRealtimeTimer(me, "Cnst.WeightTrigger.WeightCheck", params.HighPrecision and 0.1 or 0.5, -1.0)
+                me.Blackboard.SetFact("Cnst.WeightTrigger.TimerRunning", 1)
+            end
+        end
+
+        self.OnEditorChanges = function()
+            helpers.Init(false)
+
+            me.Blackboard.ClearFact("Cnst.WeightTrigger.Weight")
+        end
+
+        self.OnInit = function()
+            if me.Blackboard.GetFact("Cnst.WeightTrigger.TimerRunning") ~= nil then
+                return
+            end
+
+            helpers.Init(true)
+        end
+
+        events.TimerFinished = function(ev)
+            if ev.TimerName == "Cnst.WeightTrigger.WeightCheck" then
+                if not mod.items.SafeIsDestroyed(me.Blackboard.GetFact("TargetEntity")) then
+                    local weight = 0
+                    local objects = GetEntitiesOn(me.Blackboard.GetFact("TargetEntity"))
+                    for _, object in ipairs(objects) do
+                        if not object.IsFloating and
+                           (not object.IsItem or
+                            (not mod.items.SafeIsDestroyed(object) and
+                             not object.Item.IsFalling and
+                             not object.Item.IsMoving)) then
+                            weight = weight + object.Weight
+                            --DebugText(object,"Weight: [1]",object.Weight)
+                        end
+                    end
+                    if me.Blackboard.GetFact("Cnst.WeightTrigger.Weight") == nil then
+                        -- initialise initial weight (0, or maybe something different if e.g. a crate is placed on top in the editor)
+                        -- however, exclude any party members that may have teleported on top
+
+                        for _, object in ipairs(objects) do
+                            if not object.IsFloating and
+                               object.IsCharacter and
+                               object.Character.IsPartyMember then
+                                weight = weight - object.Weight
+                            end
+                        end
+
+                        me.Blackboard.SetFact("Cnst.WeightTrigger.Weight", weight)
+                        -- So other states know that they should not consider the
+                        -- over/underweight change as something that should disarm/
+                        -- activate/trigger them
+                        me.Blackboard.SetFact("Cnst.WeightTrigger.InitialWeightSet", 1)
+                    elseif weight ~= me.Blackboard.GetFact("Cnst.WeightTrigger.Weight") then
+                        me.Blackboard.SetFact("Cnst.WeightTrigger.Weight", weight)
+                        TriggerOutput(outputs.WeightChanged, nil)
+                        me.Blackboard.ClearFact("Cnst.WeightTrigger.InitialWeightSet")
+                    end
+
+                    local overweight = me.Blackboard.GetFact("Cnst.WeightTrigger.Overweight")
+                    if ((overweight == nil) or
+                        (overweight == 0)) and
+                       (weight >= params.WeightLimit)
+                    then
+                        me.Blackboard.SetFact("Cnst.WeightTrigger.Overweight", 1)
+                        TriggerOutput(outputs.Overweight, nil)
+                    elseif ((overweight == nil) or
+                            (overweight == 1)) and
+                           (weight < params.WeightLimit)
+                    then
+                        --TODO: add player/triggering object here.
+                        me.Blackboard.SetFact("Cnst.WeightTrigger.Overweight", 0)
+                        TriggerOutput(outputs.Underweight, nil)
+                    end
+                else
+                    StopTimer(me, "Cnst.WeightTrigger.WeightCheck")
+                    me.Blackboard.SetFact("Cnst.WeightTrigger.TimerRunning", 0)
+                end
+            end
+        end
+
+    end
+}

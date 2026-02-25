@@ -1,0 +1,30 @@
+game.configs.Drop_ThayanIncenseBurner = Config{
+    params={
+        DropStartVFX = {
+            type = EParamType.String,
+            help = [[When the item starts falling, play this VFX.]],
+            required = false
+        },
+        DropStopVFX = {
+            type = EParamType.String,
+            help = [[When the item stops falling/lands, play this VFX.]],
+            required = false
+        }
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.Drop,
+            DropStartVFX = params.DropStartVFX,
+            DropStartSound = nil,
+            DropStopVFX = params.DropStopVFX,
+            DropStopSound = nil,
+            DestroyType = "PHYSICAL",
+            DestroyProjectileSpell = "Projectile_Fireball_Trap_Thayan_Incense_Burner_Drop"
+        }
+    },
+    inputs={
+        Drop=ExtSocket{description=[[Make item fall. ev.Object is assumed to be the cause of falling]],{SocketRef{[[root.logic.inputs.Drop]]}}},
+    },
+    outputs={
+        Dropped=ExtSocket{description=[[Item fell (and is exploding)]],{SocketRef{[[root.logic.outputs.Dropped]]}}},
+    }
+}

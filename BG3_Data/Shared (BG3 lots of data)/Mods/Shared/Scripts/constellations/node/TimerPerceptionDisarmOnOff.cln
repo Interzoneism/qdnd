@@ -1,0 +1,243 @@
+game.states.TimerPerceptionDisarmOnOff = State{
+    function()
+
+        -- For any object that functions as a trigger by walking on, using, etc.
+
+        params.DC = {
+            type = EParamType.String,
+            default="DC_Legacy_15_bddbb9b8-a242-4c3e-a2eb-3fd274c0c539",
+            help=[[Perception check DC.]]
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = "Does the trap start on?"
+        }
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            required=false,
+            default=6.0,
+            help=[[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]]
+        }
+
+        params.Skill = {
+            type = EParamType.String,
+            default="Perception",
+            help=[[The skill checked.]]
+        }
+
+        params.IsTrap = {
+            type = EParamType.Bool,
+            default=true,
+            help=[[Is the object a trap?]]
+        }
+
+        params.TickLength = {
+            type = EParamType.Number,
+            default = 6.0,
+            help = [[Timer step duration.]]
+        }
+
+        params.Delay = {
+            type = EParamType.Number,
+            default = 0.0,
+            help = [[Delay added to extra tick.]]
+        }
+
+        params.Type = {
+            type = EParamType.String,
+            default="Invisible",
+            help=[[
+            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]]
+        }
+
+        params.VFXOn = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = "VFX while item is on."
+        }
+
+        params.VFXOnBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = "Bone on which the the VFX is played."
+        }
+
+        params.VFXOff = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = "VFX while item is off."
+        }
+
+        params.VFXOffBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = "Bone on which the the VFX is played."
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_On",
+            help = "Sound when trap is turned on"
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_Off",
+            help = "Sound when trap is turned off"
+        }
+
+        params.TargetEntity = {
+            type = EParamType.String,
+            required = false,
+            default = "me",
+            help = "Item Disarmed"
+        }
+
+        params.DestroyOnDisarm = {
+            type=EParamType.Bool,
+            default = true,
+            help = "Does the item break on Disarm?"
+        }
+
+        inputs.TryActivate = {help = [[Try to trigger the trap.]]}
+        outputs.TryActivate = {internal = true}
+
+        inputs.Enable = {help = "Turn pressure plate on"}
+        inputs.Disable = {help = "Turn pressure plate off"}
+
+        inputs.Reveal = {help = [[Reveals the mine. The Object will do an AD unless the Param is true.]]}
+        outputs.Reveal = {internal = true}
+
+        outputs.Enable = {internal = true}
+        outputs.Disable = {internal = true}
+
+        outputs.Start = {internal = true}
+        outputs.Stop = {internal = true}
+
+        outputs.Enabled = {help = "Was turned on"}
+        outputs.Disabled = {help = "Was turned off"}
+        inputs.Enabled = {internal = true}
+        inputs.Disabled = {internal = true}
+
+        inputs.DisarmFailed = {internal = true}
+        outputs.DisarmFailed = {help = "Trap disarm failed"}
+
+        inputs.Disarmed = {internal = true}
+        outputs.Disarmed = {help = "Trap was disabled"}
+
+        inputs.Activate = {internal = true}
+        outputs.Activate = {help = "Trigger has successfully activated"}
+
+        inputs.Revealed = {internal = true}
+        outputs.Revealed = {help = "Object was revealed"}
+
+        inputs.Disarm = {help = "Disarm the trap"}
+        outputs.Disarm = {internal=true}
+
+        inputs.Tick = {internal = true}
+
+        nodes.PerceptionDisarmOnOff = Proxy{
+            game.states.PerceptionDisarmOnOff,
+            params = {StartEnabled = params.StartEnabled,
+                      TargetEntity = params.TargetEntity,
+                      DC = params.DC,
+                      MinDistance = params.MinDistance,
+                      Skill = params.Skill,
+                      Type = params.Type,
+                      IsTrap = params.IsTrap,
+                      VFXOn = params.VFXOn,
+                      VFXOff = params.VFXOff,
+                      VFXOnBone = params.VFXOnBone,
+                      VFXOffBone = params.VFXOffBone,
+                      DestroyOnDisarm = params.DestroyOnDisarm},
+            inputs = {TryActivate = {outputs.TryActivate},
+                      Enable = {outputs.Enable},
+                      Disable = {outputs.Disable},
+                      Disarm = {outputs.Disarm},
+                      Reveal = {outputs.Reveal}},
+            outputs = {Activate = {inputs.Activate},
+                       DisarmFailed = {inputs.DisarmFailed},
+                       Enabled = {inputs.Enabled},
+                       Disabled = {inputs.Disabled},
+                       Disarmed = {inputs.Disarmed},
+                       Revealed = {inputs.Revealed}}
+        }
+
+        nodes.Timer = Proxy{
+            game.states.Timer,
+            params = {StartActive = params.StartEnabled,
+                      TickLength = params.TickLength,
+                      Delay = params.Delay,
+                      Repeats = -1,
+                      TargetEntity = params.TargetEntity},
+            outputs = {Tick = {inputs.Tick}},
+            inputs = {Start = {outputs.Start},
+                      Stop = {outputs.Stop}}
+        }
+
+        socketEvents.TryActivate = function(ev)
+            TriggerOutput(outputs.TryActivate, ev.Object, ev.Param)
+        end
+
+        socketEvents.Activate = function(ev)
+            TriggerOutput(outputs.Activate, ev.Object, ev.Param)
+        end
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.Enable, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.Disable, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disarm = function(ev)
+            TriggerOutput(outputs.Disarm, ev.Object, ev.Param)
+        end
+
+        socketEvents.Enabled = function(ev)
+            TriggerOutput(outputs.Enabled, ev.Object, ev.Param)
+            if params.TickLength > 0.0 then
+                TriggerOutput(outputs.Start, ev.Object, ev.Param)
+            end
+        end
+
+        socketEvents.Disabled = function(ev)
+            TriggerOutput(outputs.Disabled, ev.Object, ev.Param)
+            TriggerOutput(outputs.Stop, ev.Object, ev.Param)
+        end
+
+        socketEvents.DisarmFailed = function(ev)
+            TriggerOutput(outputs.DisarmFailed, ev.Object, ev.Param)
+            TriggerOutput(outputs.Start, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disarmed = function(ev)
+            TriggerOutput(outputs.Stop, ev.Object, ev.Param)
+            TriggerOutput(outputs.Disarmed, ev.Object, ev.Param)
+        end
+
+        socketEvents.Reveal = function(ev)
+            TriggerOutput(outputs.Reveal, ev.Object, ev.Param)
+        end
+
+        socketEvents.Tick = function(ev)
+            TriggerOutput(outputs.TryActivate, ev.Object, ev.Param)
+        end
+
+        socketEvents.Revealed = function(ev)
+            TriggerOutput(outputs.Revealed, ev.Object, ev.Param)
+        end
+
+    end
+
+}

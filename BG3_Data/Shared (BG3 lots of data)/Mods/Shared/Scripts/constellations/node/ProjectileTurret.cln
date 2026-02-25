@@ -1,0 +1,476 @@
+game.states.ProjectileTurret = State{
+    function()
+
+        description = "Shoots a projectile spell when triggered"
+
+        params.Spell = {type = EParamType.String, required=true, help = [[Spell cast.]], default_value_provider = [[spell_projectile]]}
+        params.VFX = {type = EParamType.String, required=false, help = [[VFX played when spell is cast.]]}
+        params.Offset = {type = EParamType.Vector3, required=false, default = Vector3(0,0,0), help = [[Offset from which the projectile will fire (world coordinates by default, set OffsetIsLocal to true for local coordinates).]]}
+        params.OffsetIsLocal = {type = EParamType.Bool, help = [[Interpret the Offset as relative to the forward direction of the turret]], required = false, default = false}
+        params.Rotation = {type = EParamType.Vector3, required=false, default = Vector3(0,0,0), help = [[Rotation relative to forward direction in which the projectile will fire.]]}
+        params.BeamVFXStartOn = {
+            type = EParamType.Bool,
+            default = false,
+            help = "Does the beam VFX start on (when a target is shown)"
+        }
+                                
+        params.BeamEffect = {
+            type = EParamType.String,
+            required = false,
+            default = nil,
+            help = [[Beam effect to connect to the target.]]
+        }
+
+        params.BeamEffectBone = {
+            type = EParamType.String,
+            required = false,
+            default = nil,
+            help = [[Bone where the beam connects.]]
+        }
+
+        params.TriggerDelay = {
+            type = EParamType.Number,
+            required = false,
+            default = 0.0,
+            help = "Delay before the socket is fired."
+        }
+
+        inputs.Trigger = {help = "Fires Projectile Spell"}
+        inputs.SetTarget = {help = "Set the override target of the spell using an output socket's Object parameter."}
+        inputs.ClearTarget = {help = "Clears the override target of the spell."}
+
+        inputs.BeamVFXOn = {help = "Turns beam VFX to target on"}
+        inputs.BeamVFXOff = {help = "Turns beam VFX to target on"}
+
+        outputs.TargetChanged = {help = "The Target has been changed"}
+
+        local BeamVFX
+        local preparedVFX
+        local playingBeamVFX
+
+        self.OnLoaded = function()
+            if params.BeamEffect ~= nil and 
+               params.BeamEffect ~= "" then
+                BeamVFX = PrepareEffect(params.BeamEffect)
+            end
+            if params.VFX ~= nil and 
+               params.VFX ~= "" then
+                preparedVFX = PrepareEffect(params.VFX)
+            end
+        end
+
+        self.OnInit = function()
+            if params.BeamEffect ~= nil and 
+               params.BeamEffect ~= "" then
+                BeamVFX = PrepareEffect(params.BeamEffect)
+            end
+            if params.VFX ~= nil and 
+                params.VFX ~= "" then
+                preparedVFX = PrepareEffect(params.VFX)
+            end
+            if me.Blackboard.GetFact("Cnst.ProjectileTurret.BeamVFXOn") == nil then
+                me.Blackboard.SetFact("Cnst.ProjectileTurret.BeamVFXOn", params.BeamVFXStartOn and 1 or 0)
+            end
+            me.Blackboard.ClearFact("Cnst.ProjectileTurret.PlayingVFX")
+            helpers.UpdateVFX()
+        end
+
+        socketEvents.Trigger = function(ev)
+            if params.TriggerDelay ~= nil and 
+               params.TriggerDelay ~= 0.0 then
+                helpers.fireProjectile()
+            else
+                StartRealtimeTimer(me, "Cnst.ProjectileTurret.DelayTimer", params.TriggerDelay, 0)
+            end
+            
+        end
+
+        events.TimerFinished = function(ev)
+            if ev.TimerName == "Cnst.ProjectileTurret.DelayTimer" then
+                helpers.fireProjectile()
+            end
+        end
+
+        helpers.fireProjectile = function()
+            local target = me.Blackboard.GetFact("Cnst.ProjectileTurret.Target") or nil
+            local targetDirection = nil
+            
+            if target ~= nil then
+                targetDirection = (target.Position) - (me.Position+params.Offset)
+            end
+
+            if targetDirection == nil then
+                targetDirection = (me.ForwardDirection + params.Rotation)
+            end
+
+            ShootProjectile(params.Spell, me, params.Offset, targetDirection, nil, params.OffsetIsLocal)
+    
+            if preparedVFX ~= nil then
+                PlayEffectAt(preparedVFX, me)
+            end
+        end
+        socketEvents.SetTarget = function(ev)
+            local target = ev.Object and Entity(ev.Object) or nil
+            local oldTarget = me.Blackboard.GetFact("Cnst.ProjectileTurret.Target")
+            if target ~= nil then
+                if (target.IsCharacter or 
+                    target.IsItem) then
+                    if target ~= oldTarget then
+                        --DebugText(me,"Setting target to [1]",target.Name)
+                        me.Blackboard.SetFact("Cnst.ProjectileTurret.Target",target)
+                        helpers.UpdateVFX()
+                        TriggerOutput(outputs.TargetChanged, ev.Object, ev.Param)
+                    end
+                else
+                    DebugLogCritical("Receiving an invalid SetTarget for Projectile Turret [1]: [2]", me.UUID, target.UUID)
+                end    
+            else
+                DebugLogCritical("Receiving a nil SetTarget for Projectile Turret [1]", me.UUID)
+            end
+        end
+
+        socketEvents.ClearTarget = function(ev)
+            if me.Blackboard.GetFact("Cnst.ProjectileTurret.Target") ~= nil then
+                me.Blackboard.ClearFact("Cnst.ProjectileTurret.Target")
+                helpers.UpdateVFX()
+                TriggerOutput(outputs.TargetChanged, ev.Object, ev.Param)
+            end
+        end
+
+        socketEvents.BeamVFXOn = function(ev)
+            if me.Blackboard.GetFact("Cnst.ProjectileTurret.BeamVFXOn") == 0 or 
+               me.Blackboard.GetFact("Cnst.ProjectileTurret.BeamVFXOn") == nil then
+                me.Blackboard.SetFact("Cnst.ProjectileTurret.BeamVFXOn", 1)
+                helpers.UpdateVFX()
+            end
+            helpers.UpdateVFX()
+        end
+
+        socketEvents.BeamVFXOff = function(ev)
+            if me.Blackboard.GetFact("Cnst.ProjectileTurret.BeamVFXOn") == 1 then
+                me.Blackboard.SetFact("Cnst.ProjectileTurret.BeamVFXOn", 0)
+                helpers.UpdateVFX()
+            end
+        end
+
+
+        helpers.UpdateVFX = function()
+            local target = me.Blackboard.GetFact("Cnst.ProjectileTurret.Target")
+            local on =  me.Blackboard.GetFact("Cnst.ProjectileTurret.BeamVFXOn") == 1                          
+            if playingBeamVFX ~= nil then
+                StopEffect(PlayingEffect(playingBeamVFX.Handle))
+                playingBeamVFX = nil
+            end
+            if target ~= nil and
+                on then
+                playingBeamVFX = PlayBeamEffectAt(BeamVFX, me, target, params.BeamEffectBone)
+            elseif playingBeamVFX ~= nil then
+                local playingVFX = me.Blackboard.GetFact("Cnst.ProjectileTurret.BeamVFX")
+                if playingVFX ~= nil then
+                    StopEffect(PlayingEffect(playingVFX.Handle))
+                    playingBeamVFX = nil
+                end
+            end
+        end
+
+    end
+}
+
+game.states.TimedProjectileTurret = State{
+    function()
+
+        -- For any object that functions as a trigger by walking on, using, etc.
+        params.Spell = {
+            type = EParamType.String,
+            help = [[Projectile Spell]],
+            default_value_provider = [[spell_projectile]],
+            required = true,
+        }
+
+        params.Period = {
+            type = EParamType.Number,
+            help = [[Delay between shots]],
+            required = true,
+        }
+
+        params.Delay = {
+            type = EParamType.Number,
+            default = 0.0,
+            help = [[Delay before first shot. Affects immediate shots as well.]],
+        }
+
+        params.VFX = {
+            type = EParamType.String,
+            help = [[VFX played when the projectile spell fires]],
+            required = false,
+        }
+
+        params.Offset = {
+            type = EParamType.Vector3,
+            required=false,
+            default = Vector3(0,0,0),
+            help = [[Offset from which the projectile will fire (world coordinates by default, set OffsetIsLocal to true for local coordinates).]]
+        }
+
+        params.OffsetIsLocal = {
+            type = EParamType.Bool,
+            help = [[Interpret the Offset as relative to the forward direction of the turret]],
+            required = false,
+            default = false
+        }
+
+        params.DC = {
+            type = EParamType.String,
+            default="HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f",
+            help=[[The skill DC used for the "Type" parameter check.]]
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = "Does the turret start enabled?"
+        }
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            required=false,
+            default=6.0,
+            help=[[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]]
+        }
+
+        params.Skill = {
+            type = EParamType.String,
+            default="Perception",
+            help=[[The skill checked.]]
+        }
+
+        params.IsTrap = {
+            type = EParamType.Bool,
+            default=true,
+            help=[[The skill checked.]]
+        }
+
+        params.Type = {
+            type = EParamType.String,
+            default="Interactable",
+            help=[[
+                Type of invisibility. Options:
+                None: No perception logic.
+                Invisible: Object is invisible until discovered
+                Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+                Trapped: Hides trapped state until discovered.
+                Highlight: Object is highlighted when noticed.
+            ]]
+        }
+
+        params.VFXOn = {type = EParamType.String,
+            required = true,
+            help = "VFX while item is on."
+        }
+
+
+        params.VFXOnBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = "Bone on which the the VFX is played."
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_On",
+            help = "Sound when turret is enabled"
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_Off",
+            help = "Sound when turret is disabled"
+        }
+
+        params.Immediate = {
+            type = EParamType.Bool,
+            default = false,
+            help = "Does the turret shoot the zone spell immediately when enabled instead of first going through a period?"
+        }
+
+        params.DestroyOnDisarm = {
+            type=EParamType.Bool,
+            default = true,
+            help = "Does the item break on Disarm?"
+        }
+
+        params.Rotation = {
+            type = EParamType.Vector3,
+            required=false,
+            default = Vector3(0,0,0),
+            help = [[Rotation relative to forward direction in which the projectile will fire.]]
+        }
+
+        params.BeamEffect = {
+            type = EParamType.String,
+            required = false,
+            default = nil,
+            help = [[Beam effect to connect to the target.]]
+        }
+
+        params.BeamEffectBone = {
+            type = EParamType.String,
+            required = false,
+            default = nil,
+            help = [[Bone where the beam connects.]]
+        }
+
+        inputs.Enable = {help = "Turn turret on"}
+        inputs.Disable = {help = "Turn turret off"}
+        outputs.EnableInt = {internal = true}
+        outputs.DisableInt = {internal = true}
+
+        inputs.Reveal = {help = [[Reveals the turret]]}
+        outputs.Reveal = {internal = true}
+
+        inputs.RevealedInt = {internal = true}
+
+        inputs.Enabled = {internal = true}
+        inputs.Disabled = {internal = true}
+        outputs.Enabled = {help = "Turret has been enabled"}
+        outputs.Disabled = {help = "Turret as been disabled"}
+
+        inputs.Disarmed = {internal = true}
+        outputs.Disarmed = {help = [[Trap was disarmed]]}
+
+        inputs.DisarmFailed = {internal = true}
+        outputs.DisarmFailed = {help = "Failed to disarm trap"}
+
+        outputs.Trigger = {internal = true}
+        outputs.TryActivate = {internal = true}
+        inputs.Activated = {internal = true}
+
+        inputs.SetTarget = {help = "Set the override target of the spell using an output socket's Object parameter."}
+        inputs.ClearTarget = {help = "Clears the override target of the spell."}
+        outputs.SetTargetInt = {internal = true}
+        outputs.ClearTargetInt = {internal = true}
+
+        outputs.BeamVFXOnInt = {internal = true}
+        outputs.BeamVFXOffInt = {internal = true}
+
+        nodes.ProjectileTurret = Proxy{
+            game.states.ProjectileTurret,
+            params = {Spell = params.Spell,
+                      VFX = params.VFX,
+                      Offset = params.Offset,
+                      OffsetIsLocal = params.OffsetIsLocal,
+                      Rotation = params.Rotation,
+                      BeamVFXStartOn = (params.StartEnabled and (params.Type == "None")),
+                      BeamEffect = params.BeamEffect,
+                      BeamEffectBone = params.BeamEffectBone},
+            inputs = {Trigger = {outputs.Trigger},
+                      SetTarget = {outputs.SetTargetInt},
+                      ClearTarget = {outputs.ClearTargetInt},
+                      BeamVFXOn = {outputs.BeamVFXOnInt},
+                      BeamVFXOff = {outputs.BeamVFXOffInt},}
+        }
+
+        nodes.TimerPerceptionDisarmOnOff = Proxy{
+            game.states.TimerPerceptionDisarmOnOff,
+            params = {VFXOn = params.VFXOn,
+                      VFXOnBone = params.VFXOnBone,
+                      DC = params.DC,
+                      MinDistance = params.MinDistance,
+                      Skill = params.Skill,
+                      Type = params.Type,
+                      IsTrap = true,
+                      StartEnabled = params.StartEnabled,
+                      SoundOn = params.SoundOn,
+                      SoundOff = params.SoundOff,
+                      TickLength = params.Period,
+                      Delay = params.Delay,
+                      Repeats = -1,
+                      DestroyOnDisarm = params.DestroyOnDisarm},
+            outputs = {DisarmFailed = {inputs.DisarmFailed},
+                       Enabled = {inputs.Enabled},
+                       Disabled = {inputs.Disabled},
+                       Disarmed = {inputs.Disarmed},
+                       Activate = {inputs.Activated},
+                       Revealed = {inputs.RevealedInt}},
+            inputs = {Reveal = {outputs.Reveal},
+                      Enable = {outputs.EnableInt},
+                      Disable = {outputs.DisableInt},
+                      TryActivate = {outputs.TryActivate}}
+        }
+
+        self.OnInit = function()
+            helpers.UpdateVFX()
+        end
+
+        helpers.UpdateVFX = function(ev)
+            if (me.Blackboard.GetFact("Cnst.Perception.Discovered") == 1 or
+                (me.Blackboard.GetFact("Cnst.Perception.Discovered") == nil and
+                 params.Type == "None")) and
+               (me.Blackboard.GetFact("Cnst.Disarm.WasDisarmed") == 0 or 
+                me.Blackboard.GetFact("Cnst.Disarm.WasDisarmed") == nil) and
+               params.BeamEffect ~= nil and
+               params.BeamEffect ~= "" and
+               me.Blackboard.GetFact("On") == 1 then 
+                TriggerOutput(outputs.BeamVFXOnInt, ev and ev.Object or nil, ev and ev.Param or nil)
+            else
+                TriggerOutput(outputs.BeamVFXOffInt,  ev and ev.Object or nil, ev and ev.Param or nil)
+            end
+        end
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.EnableInt, ev.Object, ev.Param)
+            TriggerOutput(outputs.Reveal, ev.Object, ev.Param)
+            --DebugText(me,"Enabled")
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.DisableInt, ev.Object, ev.Param)
+            --DebugText(me,"Disabled")
+        end
+
+        socketEvents.Activated = function(ev)
+            TriggerOutput(outputs.Trigger, ev.Object, ev.Param)
+        end
+
+        socketEvents.Enabled = function(ev)
+            TriggerOutput(outputs.Enabled, ev.Object, ev.Param)
+            helpers.UpdateVFX(ev)
+            if params.Immediate then 
+                TriggerOutput(outputs.Trigger, ev.Object, ev.Param) 
+            end
+        end
+
+        socketEvents.Disabled = function(ev)
+            helpers.UpdateVFX(ev)
+            TriggerOutput(outputs.Disabled, ev.Object, ev.Param)
+        end
+
+        socketEvents.Reveal = function(ev)
+            helpers.UpdateVFX(ev)
+            TriggerOutput(outputs.Reveal, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disarmed = function(ev)
+            helpers.UpdateVFX(ev)
+            TriggerOutput(outputs.Disarmed, ev.Object, ev.Param)
+        end
+
+        socketEvents.DisarmFailed = function(ev)
+            TriggerOutput(outputs.TryActivate, ev.Object, ev.Param)
+            TriggerOutput(outputs.DisarmFailed, ev.Object, ev.Param)
+        end
+
+        socketEvents.SetTarget = function(ev)
+            TriggerOutput(outputs.SetTargetInt, ev.Object, ev.Param)
+        end
+
+        socketEvents.ClearTarget = function(ev)
+            TriggerOutput(outputs.ClearTargetInt, ev.Object, ev.Param)
+        end
+
+        socketEvents.RevealedInt = function(ev)
+            helpers.UpdateVFX(ev)
+        end
+
+    end
+}

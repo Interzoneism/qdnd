@@ -1,0 +1,268 @@
+game.states.Door = State{
+    function()
+
+        modules = {"shared.items"}
+
+        inputs.Open = {help = [[Open the door]]}
+        inputs.Close = {help = [[Close the door]]}
+        inputs.Lock = {help = [[Lock the door]]}
+        inputs.Unlock = {help = [[Unlock the door]]}
+
+        outputs.Opening = { help = [[The door is opening]]}
+        outputs.Closing = { help = [[The door is closing]]}
+        outputs.Opened = { help = [[The door opened]]}
+        outputs.Closed = { help = [[The door closed]]}
+
+        outputs.Lock = {internal = true}
+        outputs.Unlock = {internal = true}
+
+        inputs.Revealed = {internal = true}
+        outputs.Revealed = { help = [[The door's perception check was passed.]]}
+
+        params.Key = {
+            type = EParamType.String,
+            default="STORYLOCK",
+            help=[[Key]]
+        }
+
+        params.VFXOff = {
+            type = EParamType.String,
+            help = [[VFX while the trap is disabled and has been spotted.]],
+            required = false,
+            default = [[]]
+        }
+
+        params.VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOn' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        }
+
+        params.DC = {
+            type = EParamType.String,
+            help = [[The skill check DC.]],
+            required = false,
+            default = [[HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f]]
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the door start enabled? (will it trigger when using the item?)]],
+            required = false,
+            default = true
+        }
+
+        params.VFXOffBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOff' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when trap is turned on]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_On]]
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when trap is turned off]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_Off]]
+        }
+
+        params.Skill = {
+            type = EParamType.String,
+            help = [[The skill checked for discovering the container and/or its trapped nature if the 'Type' is not 'None'.]],
+            required = false,
+            default = [[Perception]]
+        }
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            help = [[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]],
+            required = false,
+            default = 6
+        }
+
+        params.OneShot = {
+            type = EParamType.Bool,
+            help = [[The trap activates only the first time on use (e.g. explodes chest), rather than every time (e.g. a chest with spikes that come out)]],
+            required = false,
+            default = true
+        }
+
+        params.VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while the trap is enabled and has been spotted.]],
+            required = false,
+            default = [[VFX_Script_Trap_Overlay_Red_01_a7361f25-e942-e071-7ce3-7a8182f4e0ef]]
+        }
+
+        params.Type = {
+            type = EParamType.String,
+            help = [[            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[None]]
+        }
+
+        --TODO: on level start, try to retrieve key name.
+
+        inputs.Enable = {help = "Enable door usage"}
+        inputs.Disable = {help = "Disable door usage"}
+
+        outputs.Enable = {internal = true}
+        outputs.Disable = {internal = true}
+        outputs.Activate = {help = [[The door has been activated (while enabled)]]}
+
+        inputs.Reveal = {help = [[Reveals the container]]}
+        outputs.Reveal = {internal = true}
+
+        inputs.Activate = {internal = true}
+
+        outputs.Opened = { help = "The door has opened"}
+        outputs.Closed = { help = "The door has closed"}
+
+        inputs.UseBlockedFromStory = {help = [[Door use was blocked from story (because it was not enabled)]]}
+        outputs.UseBlockedFromStoryInt = {internal = true}
+
+        outputs.ActivateAttemptFailed = {help = [[Door was used while disabled]]}
+        inputs.ActivateAttemptFailedInt = {internal = true}
+
+        outputs.Destroyed = {help = "Door was destroyed"}
+        inputs.Destroyed = {internal = true}
+
+        nodes.TrappedUsable = Proxy{
+        game.states.TrappedUsable,
+            params = {
+                DC = params.DC,
+                MinDistance = params.MinDistance,
+                OneShot = params.OneShot,
+                Skill = params.Skill,
+                SoundOff = params.SoundOff,
+                SoundOn = params.SoundOn,
+                StartEnabled = params.StartEnabled,
+                Type = params.Type,
+                Key = params.Key,
+                VFXOff = params.VFXOff,
+                VFXOffBone = params.VFXOffBone,
+                VFXOn = params.VFXOn,
+                VFXOnBone = params.VFXOnBone,
+            },
+            inputs = {
+                Enable = {outputs.Enable},
+                Disable = {outputs.Disable},
+                Reveal = {outputs.Reveal},
+                Lock = {outputs.Lock},
+                Unlock = {outputs.Unlock}            },
+            outputs = {
+                Activate = {inputs.Activate},
+                ActivateAttemptFailed = {inputs.ActivateAttemptFailedInt},
+                Revealed = {inputs.Revealed},
+                Destroyed = {inputs.Destroyed}
+            }
+        }
+
+        nodes.StoryInteractionFilter = Proxy{
+            game.states.StoryInteractionFilter,
+            params = {StartUseEnabled = params.StartEnabled},
+            inputs = {EnableStoryItemUse = {outputs.Enable},
+                      DisableStoryItemUse = {outputs.Disable},
+                      UseBlockedFromStory = {outputs.UseBlockedFromStoryInt}},
+            outputs = {UseBlockedFromStory = {inputs.ActivateAttemptFailedInt}}
+        }
+
+        socketEvents.Revealed = function(ev)
+            TriggerOutput(outputs.Revealed, ev.Object, ev.Param)
+        end
+        
+        socketEvents.Destroyed = function(ev)
+            TriggerOutput(outputs.Destroyed, ev.Object, ev.Param)
+        end
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.Enable, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.Disable, ev.Object, ev.Param)
+        end
+
+        socketEvents.UseBlockedFromStory = function(ev)
+            TriggerOutput(outputs.UseBlockedFromStoryInt, ev.Object, ev.Param)
+        end
+
+        socketEvents.ActivateAttemptFailedInt = function(ev)
+            TriggerOutput(outputs.ActivateAttemptFailed, ev.Object, ev.Param)
+        end
+
+        socketEvents.Reveal = function(ev)
+            TriggerOutput(outputs.Reveal, ev.Object, ev.Param)
+        end
+
+        socketEvents.Activate = function(ev)
+            TriggerOutput(outputs.Activate, ev.Object, ev.Param)
+        end
+
+        socketEvents.Open = function(ev)
+            --DebugText(me, "Open")
+            if not mod.items.SafeIsDestroyed(me) then
+                Open(me)
+            end
+        end
+
+        socketEvents.Close = function(ev)
+            --DebugText(me, "Close")
+            if not mod.items.SafeIsDestroyed(me) then
+                Close(me)
+            end
+        end
+
+        socketEvents.Lock = function(ev)
+            TriggerOutput(outputs.Lock, ev.Object, ev.Param)
+        end
+
+        socketEvents.Unlock = function(ev)
+            TriggerOutput(outputs.Unlock, ev.Object, ev.Param)
+        end
+
+        events.Opening = function(ev)
+            --DebugText(me, "Opening, cause = [1]", ev.Cause and ev.Cause.Name or "nil")
+            local causeEntityRef = ev.Cause and ev.Cause.EntityRef or nil
+            me.Blackboard.SetFact("Cnst.Door.User", ev.Cause)
+            TriggerOutput(outputs.Opening, causeEntityRef)
+        end
+
+        events.Opened = function(ev)
+            local causeEntity = me.Blackboard.GetFact("Cnst.Door.User")
+            --DebugText(me, "Opened, cause = [1]", causeEntity and causeEntity.Name or "nil")
+            local causeEntityRef = causeEntity and causeEntity.EntityRef or nil
+            me.Blackboard.ClearFact("Cnst.Door.User")
+            TriggerOutput(outputs.Opened, causeEntityRef)
+        end
+
+        events.DoorClosing = function(ev)
+            --DebugText(me, "DoorClosing, cause = [1]", ev.Cause and ev.Cause.Name or "nil")
+            local causeEntityRef = ev.Cause and ev.Cause.EntityRef or nil
+            me.Blackboard.SetFact("Cnst.Door.User", ev.Cause)
+            TriggerOutput(outputs.Closing, causeEntityRef)
+        end
+
+        events.Closed = function(ev)
+            local causeEntity = me.Blackboard.GetFact("Cnst.Door.User")
+            --DebugText(me, "Closed, cause = [1]", causeEntity and causeEntity.Name or "nil")
+            local causeEntityRef = causeEntity and causeEntity.EntityRef or nil
+            me.Blackboard.ClearFact("Cnst.Door.User")
+            TriggerOutput(outputs.Closed, causeEntityRef)
+        end
+    end
+}

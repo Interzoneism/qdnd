@@ -1,0 +1,54 @@
+game.states.Pump = State{
+    function()
+
+        params.MaxSize = {
+            type = EParamType.Number,
+            required=false,
+            default=30,
+            help=[[Maximum approximate diameter of the surface.]]
+        }
+
+        params.SizeStep = {
+            type = EParamType.Number,
+            required=false,
+            default=5,
+            help=[[Approximate radius growth of the surface per.]]
+        }
+
+        params.Status = {
+            type = EParamType.String,
+            required = false,
+            help = [[Status applied when object is used]]
+            }
+
+        params.SurfaceType = {
+            type = EParamType.String,
+            required = true,
+            help = [[Surface type]],
+            default_value_provider = [[surfacetype]]
+        }
+
+        params.OffSet = {
+            type = EParamType.Vector3,
+            required = false,
+            default = Vector3(0.0, 0.0, 0.0)
+        }
+
+        events.UseFinished = function(e)
+            if not e.Success then
+                return
+            end
+            if e.User ~= nil and
+               params.Status ~= "" and
+               params.Status ~= nil then
+                ApplyStatus(e.User, "WET", false, 3.0, me)
+            end
+            local puddlePos = me.ForwardDirection*(params.OffSet.X) + me.RightDirection*(params.OffSet.Y) + me.UpDirection*(params.OffSet.Z) + me.Position
+            if not FindSurface(me, 0.0, 0.7, SurfaceType[string.upper(params.SurfaceType)], params.MaxSize) then
+                CreatePuddleAt(puddlePos, SurfaceType[string.upper(params.SurfaceType)], 0, params.SizeStep, params.SizeStep, params.SizeStep, 0.1, 30.0, e.User)
+            end
+        end
+    
+
+    end
+}

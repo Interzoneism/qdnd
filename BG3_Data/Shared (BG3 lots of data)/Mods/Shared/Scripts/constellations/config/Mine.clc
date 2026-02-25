@@ -1,0 +1,148 @@
+game.configs.Mine = Config{
+    params={
+        VFXOff = {
+            type = EParamType.String,
+            help = [[VFX while mine is disabled and has been spotted.]],
+            required = false,
+            default = [[]]
+        },
+        WeightLimit = {
+            type = EParamType.Number,
+            help = [[Max Weight]],
+            required = false,
+            default = 50
+        },
+        MinDistance = {
+            type = EParamType.Number,
+            help = [[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]],
+            required = false,
+            default = 6
+        },
+        VFXOffBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOff' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the trap start on?]],
+            required = false,
+            default = true
+        },
+        VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the enabled-VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        DestroyOnDisarm = {
+            type = EParamType.Bool,
+            help = [[Does the item break on Disarm?]],
+            required = false,
+            default = true
+        },
+        ExcludeDamageTypes = {
+            type = EParamType.Bool,
+            help = [[Instead of trying to match the damage types, ignore them]],
+            required = false,
+            default = false
+        },
+        DamageTypes = {
+            type = EParamType.String,
+            help = [[Damage Types]],
+            required = false,
+            arrayRange=[[0..2147483647]],
+            default = {
+            }
+        },
+        Type = {
+            type = EParamType.String,
+            help = [[            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[Invisible]]
+        },
+        AbsoluteValueThreshold = {
+            type = EParamType.Bool,
+            help = [[If true, treat the threshold as an absolute value rather than a medium value]],
+            required = false,
+            default = false
+        },
+        VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while mine is enabled and has been spotted.]],
+            required = false,
+            default = [[VFX_Script_Trap_Overlay_Red_01_a7361f25-e942-e071-7ce3-7a8182f4e0ef]]
+        },
+        SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when mine is disabled]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_Off]]
+        },
+        DC = {
+            type = EParamType.String,
+            help = [[The skill check DC.]],
+            required = false,
+            default = [[HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f]]
+        },
+        Inverted = {
+            type = EParamType.Bool,
+            help = [[Inverts the mine logic - it explodes when weight is taken off it.]],
+            required = false,
+            default = false
+        },
+        Skill = {
+            type = EParamType.String,
+            help = [[The skill checked.]],
+            required = false,
+            default = [[Perception]]
+        },
+        SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when mine is enabled]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_On]]
+        },
+        Projectile = {
+            type = EParamType.String,
+            help = [[The projectile that explodes]],
+            required = false,
+            default = [[Projectile_Fireball_Trap]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.Mine,
+            AbsoluteValueThreshold = params.AbsoluteValueThreshold,
+            DamageTypes = params.DamageTypes,
+            DC = params.DC,
+            DestroyOnDisarm = params.DestroyOnDisarm,
+            ExcludeDamageTypes = params.ExcludeDamageTypes,
+            Inverted = params.Inverted,
+            MinDistance = params.MinDistance,
+            Projectile = params.Projectile,
+            Skill = params.Skill,
+            SoundOff = params.SoundOff,
+            SoundOn = params.SoundOn,
+            StartEnabled = params.StartEnabled,
+            Type = params.Type,
+            VFXOff = params.VFXOff,
+            VFXOffBone = params.VFXOffBone,
+            VFXOn = params.VFXOn,
+            VFXOnBone = params.VFXOnBone,
+            WeightLimit = params.WeightLimit,
+        },
+    },
+    inputs={
+        Disable=ExtSocket{description=[[Turns mine off]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+        Enable=ExtSocket{description=[[Turns mine on]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+        Explode=ExtSocket{description=[[Explodes the mine (reveals it first)]],{SocketRef{[[root.logic.inputs.Reveal]]}, SocketRef{[[root.logic.inputs.Explode]]}}},
+        Reveal=ExtSocket{description=[[Reveals the mine]],{SocketRef{[[root.logic.inputs.Reveal]]}}},
+    }
+}

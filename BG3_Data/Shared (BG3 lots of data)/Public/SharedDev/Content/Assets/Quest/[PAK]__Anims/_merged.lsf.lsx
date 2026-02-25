@@ -1,0 +1,607 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="AnimationBlueprintBank">
+		<node id="AnimationBlueprintBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="6d88284f-dbd4-89ee-b940-aabdccfbed2d" />
+					<attribute id="Name" type="LSString" value="Objects_Common" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="bb14d419-0508-c900-1ddf-f3baa654cea4" />
+					<attribute id="SourceFile" type="LSString" value="Editor/Mods/Shared/Assets/Blueprints/Objects_Common.lsabp" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403208908" />
+					<children>
+						<node id="Params" />
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="ea81be83-e7bc-f4ac-1462-b141e4a115b0" />
+					<attribute id="Name" type="LSString" value="QUEST_Deadman_Switch_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="1a1a7099-9c46-4d5f-8f00-a249af1dc519" />
+					<attribute id="SourceFile" type="LSString" value="Editor/Mods/Shared/Assets/Blueprints/Objects_Common.lsabp" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209012" />
+					<children>
+						<node id="Params" />
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="SkeletonBank">
+		<node id="SkeletonBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="DynamicPhysicsResourceID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="13eb865a-c441-0702-53d7-bc70f4823b15" />
+					<attribute id="IKRigResourceID" type="FixedString" value="" />
+					<attribute id="Name" type="LSString" value="QUEST_Deadman_Switch_Base" />
+					<attribute id="PreviewAnimationResource" type="FixedString" value="" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RagdollResourceID" type="FixedString" value="" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/_PROP_ANIM/_Anims/Quest/QUEST_Deadman_Switch_Base.GR2" />
+					<attribute id="SpringResourceID" type="FixedString" value="" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/_PROP_ANIM/_Anims/Quest/QUEST_Deadman_Switch_Base.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+					<children>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_R_HandFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_L_HandFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="2" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_MouthFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="4" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_BodyFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="3" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationSetBank">
+		<node id="AnimationSetBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="48e1d930-9aa7-babc-5a65-2b1923bbc694" />
+					<attribute id="Name" type="LSString" value="QUEST_Deadman_Switch_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="FallBackAnimation" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets">
+											<children>
+												<node id="Object">
+													<attribute id="FallBackSubSet" type="FixedString" value="" />
+													<attribute id="MapKey" type="FixedString" value="" />
+													<children>
+														<node id="Animation">
+															<children>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="705f243e-e21b-71fe-1f86-4223779c4ca4" />
+																	<attribute id="MapKey" type="FixedString" value="bb1e8405-8773-46d1-92c8-9f42d900922b" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="581b1c02-1a85-954e-f0d9-8cc8170411f6" />
+																	<attribute id="MapKey" type="FixedString" value="8be9179a-3dc5-4a35-bd61-33af16176cf4" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="320db27f-6c11-0d52-74a5-c54108630c37" />
+																	<attribute id="MapKey" type="FixedString" value="85397535-5cc7-4dd3-9dca-277e73f405ce" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="d0dafa5a-95d2-4092-34c5-571e2e56b199" />
+																	<attribute id="MapKey" type="FixedString" value="42c02cc0-0503-4ca9-9ea0-45564bd0e5d4" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="d7bd204e-e9ee-f016-9fc3-d2d6360517e8" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725057" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="FallBackAnimation" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets" />
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationBank">
+		<node id="AnimationBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="33.233337" />
+					<attribute id="ID" type="FixedString" value="01b15ed5-ea5d-b284-5d9d-51c2c225a101" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_AstralPrison_Entering_ArtifactTransformation_LOOP" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="5a636390-a888-5982-9520-92f303236ed2" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="26b354e2-ccb8-f60e-008a-5cdbf02c1f3b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/CRE/CRE_AstralPrison_Entering/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_AstralPrison_Entering_ArtifactTransformation_LOOP.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/CRE/CRE_AstralPrison_Entering/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_AstralPrison_Entering_ArtifactTransformation_LOOP.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725658" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="9.233335" />
+					<attribute id="ID" type="FixedString" value="1b14159f-4033-321c-2736-584a74e66800" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Mysterious_Puzzlebox_SCENE_MOO_Audience_Altar_AttackAtAltar_IN" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="5a636390-a888-5982-9520-92f303236ed2" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="26b354e2-ccb8-f60e-008a-5cdbf02c1f3b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Audience_Altar/QUEST_Mysterious_Puzzlebox_SCENE_MOO_Audience_Altar_AttackAtAltar_IN.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Audience_Altar/QUEST_Mysterious_Puzzlebox_SCENE_MOO_Audience_Altar_AttackAtAltar_IN.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.3333334" />
+					<attribute id="ID" type="FixedString" value="320db27f-6c11-0d52-74a5-c54108630c37" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Deadman_Switch_A_Rig_Idle_Deactivated_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="95330e8b-f89c-5e4a-8678-323e638c097f" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/_PROP_ANIM/_Anims/Quest/QUEST_Deadman_Switch_A_Rig/QUEST_Deadman_Switch_A_Rig_Idle_Deactivated_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/_PROP_ANIM/_Anims/Quest/QUEST_Deadman_Switch_A_Rig/QUEST_Deadman_Switch_A_Rig_Idle_Deactivated_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="8.333334" />
+					<attribute id="ID" type="FixedString" value="3ca66d22-7ac2-8d75-62d6-103eebef687d" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Mysterious_Puzzlebox_SCENE_MOO_Audience_Altar_AttackAtAltar_LOOP" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="5a636390-a888-5982-9520-92f303236ed2" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="26b354e2-ccb8-f60e-008a-5cdbf02c1f3b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Audience_Altar/QUEST_Mysterious_Puzzlebox_SCENE_MOO_Audience_Altar_AttackAtAltar_LOOP.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Audience_Altar/QUEST_Mysterious_Puzzlebox_SCENE_MOO_Audience_Altar_AttackAtAltar_LOOP.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725656" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.1000004" />
+					<attribute id="ID" type="FixedString" value="3f05aa28-810f-4329-3bd3-349738648e1d" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_MOO_Aslt_BFI_BoxFloat_Long_IN" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_MOO_Aslt_BFI_BoxFloat_Long_IN.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_MOO_Aslt_BFI_BoxFloat_Long_IN.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725658" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.9333336" />
+					<attribute id="ID" type="FixedString" value="40ddcdb3-f71e-0b53-ca51-442b146003cd" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_MOO_Aslt_BFI_BoxFloat_Short_LOOP" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_MOO_Aslt_BFI_BoxFloat_Short_LOOP.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_MOO_Aslt_BFI_BoxFloat_Short_LOOP.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725658" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="8.666668" />
+					<attribute id="ID" type="FixedString" value="57f51bd8-bdb5-0bc0-18d5-442d1789ca8f" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_AstralPrison_Entering_ArtifactTransformation_OUT" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="5a636390-a888-5982-9520-92f303236ed2" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="26b354e2-ccb8-f60e-008a-5cdbf02c1f3b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/CRE/CRE_AstralPrison_Entering/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_AstralPrison_Entering_ArtifactTransformation_OUT.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/CRE/CRE_AstralPrison_Entering/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_AstralPrison_Entering_ArtifactTransformation_OUT.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725658" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2" />
+					<attribute id="ID" type="FixedString" value="581b1c02-1a85-954e-f0d9-8cc8170411f6" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Deadman_Switch_A_Rig_Idle_Active_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="95330e8b-f89c-5e4a-8678-323e638c097f" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/_PROP_ANIM/_Anims/Quest/QUEST_Deadman_Switch_A_Rig/QUEST_Deadman_Switch_A_Rig_Idle_Active_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/_PROP_ANIM/_Anims/Quest/QUEST_Deadman_Switch_A_Rig/QUEST_Deadman_Switch_A_Rig_Idle_Active_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="9.100001" />
+					<attribute id="ID" type="FixedString" value="65f0680d-d3b2-91dd-6cd3-750f6e253631" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_MOO_Audience_Altar_AttackAtAltar" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="5a636390-a888-5982-9520-92f303236ed2" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Audience_Altar/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_MOO_Audience_Altar_AttackAtAltar.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Audience_Altar/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_MOO_Audience_Altar_AttackAtAltar.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725059" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2" />
+					<attribute id="ID" type="FixedString" value="67648d39-eaee-9a81-a862-2baf06f64849" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Deadman_Switch_A_Rig_CINE_Idle_Active_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="95330e8b-f89c-5e4a-8678-323e638c097f" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/_PROP_ANIM/_Anims/Quest/QUEST_Deadman_Switch_A_Rig/QUEST_Deadman_Switch_A_Rig_CINE_Idle_Active_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/_PROP_ANIM/_Anims/Quest/QUEST_Deadman_Switch_A_Rig/QUEST_Deadman_Switch_A_Rig_CINE_Idle_Active_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209031" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1" />
+					<attribute id="ID" type="FixedString" value="705f243e-e21b-71fe-1f86-4223779c4ca4" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Deadman_Switch_A_Rig_Deactivate_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="95330e8b-f89c-5e4a-8678-323e638c097f" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/_PROP_ANIM/_Anims/Quest/QUEST_Deadman_Switch_A_Rig/QUEST_Deadman_Switch_A_Rig_Deactivate_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/_PROP_ANIM/_Anims/Quest/QUEST_Deadman_Switch_A_Rig/QUEST_Deadman_Switch_A_Rig_Deactivate_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.9333336" />
+					<attribute id="ID" type="FixedString" value="81fd47fc-71b6-e3d4-d42e-9fbc9e78e182" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_MOO_Aslt_BFI_BoxFloat_Long_LOOP" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_MOO_Aslt_BFI_BoxFloat_Long_LOOP.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_MOO_Aslt_BFI_BoxFloat_Long_LOOP.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725658" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.1000004" />
+					<attribute id="ID" type="FixedString" value="8e475bc9-5b66-2d81-b618-cea041442c63" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_AstralPrison_Entering_ArtifactTransformation_IN" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="5a636390-a888-5982-9520-92f303236ed2" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="26b354e2-ccb8-f60e-008a-5cdbf02c1f3b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/CRE/CRE_AstralPrison_Entering/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_AstralPrison_Entering_ArtifactTransformation_IN.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/CRE/CRE_AstralPrison_Entering/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_AstralPrison_Entering_ArtifactTransformation_IN.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725658" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="8.766667" />
+					<attribute id="ID" type="FixedString" value="acfd62f4-8b18-102c-1c52-af2236d9ed58" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Mysterious_Puzzlebox_SCENE_MOO_Assault_FirstKethericInterruption_Emerge" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="5a636390-a888-5982-9520-92f303236ed2" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="26b354e2-ccb8-f60e-008a-5cdbf02c1f3b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/QUEST_Mysterious_Puzzlebox_SCENE_MOO_Assault_FirstKethericInterruption_Emerge.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_FirstKethericInterruption/QUEST_Mysterious_Puzzlebox_SCENE_MOO_Assault_FirstKethericInterruption_Emerge.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.9333336" />
+					<attribute id="ID" type="FixedString" value="bb7a037e-c3ba-8bf1-b4c1-5faea0b98cd0" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_ChainOfCommand_Captain_Shocks" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="5a636390-a888-5982-9520-92f303236ed2" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="26b354e2-ccb8-f60e-008a-5cdbf02c1f3b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/CRE/CRE_ChainOfCommand_Captain/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_ChainOfCommand_Captain_Shocks.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/CRE/CRE_ChainOfCommand_Captain/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_ChainOfCommand_Captain_Shocks.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725659" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4.0000005" />
+					<attribute id="ID" type="FixedString" value="c89356b9-3b13-e817-625c-b029550cfc46" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_ChainOfCommand_Captain_PsionicPulled" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="5a636390-a888-5982-9520-92f303236ed2" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="26b354e2-ccb8-f60e-008a-5cdbf02c1f3b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/CRE/CRE_ChainOfCommand_Captain/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_ChainOfCommand_Captain_PsionicPulled.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/CRE/CRE_ChainOfCommand_Captain/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_ChainOfCommand_Captain_PsionicPulled.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725659" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.5" />
+					<attribute id="ID" type="FixedString" value="d0dafa5a-95d2-4092-34c5-571e2e56b199" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Deadman_Switch_A_Rig_Activate_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="95330e8b-f89c-5e4a-8678-323e638c097f" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/_PROP_ANIM/_Anims/Quest/QUEST_Deadman_Switch_A_Rig/QUEST_Deadman_Switch_A_Rig_Activate_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/_PROP_ANIM/_Anims/Quest/QUEST_Deadman_Switch_A_Rig/QUEST_Deadman_Switch_A_Rig_Activate_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.1000004" />
+					<attribute id="ID" type="FixedString" value="d972fa41-ad0d-1349-3054-6f2760bcc305" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_MOO_Aslt_BFI_BoxFloat_Short_IN" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_MOO_Aslt_BFI_BoxFloat_Short_IN.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/MOO/MOO_Assault_BossFightIntro/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_MOO_Aslt_BFI_BoxFloat_Short_IN.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725658" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="22.500002" />
+					<attribute id="ID" type="FixedString" value="e0b2de4d-6e75-de69-a0ec-e1d4d765db9f" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_INT_EmperorRevealed_Awaken" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/INT/INT_EmperorRevealed_WokenUpAtNight_SCO/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_INT_EmperorRevealed_Awaken.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/INT/INT_EmperorRevealed_WokenUpAtNight_SCO/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_INT_EmperorRevealed_Awaken.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725668" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="10.200001" />
+					<attribute id="ID" type="FixedString" value="ecdf8e19-1cec-e4c9-4090-a5f4c1382366" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_ChainOfCommand_Captain_Inspected_LOOP" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="5a636390-a888-5982-9520-92f303236ed2" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="26b354e2-ccb8-f60e-008a-5cdbf02c1f3b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/CRE/CRE_ChainOfCommand_Captain/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_ChainOfCommand_Captain_Inspected_LOOP.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/CRE/CRE_ChainOfCommand_Captain/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_ChainOfCommand_Captain_Inspected_LOOP.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725659" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.3000004" />
+					<attribute id="ID" type="FixedString" value="f2353d4c-7baf-d611-394e-59dfd7ed08a3" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_AstralPrison_Entering_ArtifactTransformation" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="5a636390-a888-5982-9520-92f303236ed2" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="26b354e2-ccb8-f60e-008a-5cdbf02c1f3b" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/CRE/CRE_AstralPrison_Entering/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_AstralPrison_Entering_ArtifactTransformation.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Cinematic/Act02/CRE/CRE_AstralPrison_Entering/QUEST_Mysterious_Puzzlebox_ABC_Cinematic_Rig_SCENE_CRE_AstralPrison_Entering_ArtifactTransformation.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.005555556" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725657" />
+				</node>
+			</children>
+		</node>
+	</region>
+</save>
