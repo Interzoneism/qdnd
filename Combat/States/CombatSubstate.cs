@@ -10,6 +10,7 @@ namespace QDND.Combat.States
     {
         None,
         TargetSelection,
+        MultiTargetPicking,
         AoEPlacement,
         MovementPreview,
         ReactionPrompt,

@@ -679,6 +679,8 @@ namespace QDND.Combat.AI
                     case TargetType.Circle:
                     case TargetType.Cone:
                     case TargetType.Line:
+                    case TargetType.Charge:
+                    case TargetType.WallSegment:
                     {
                         // Target nearest enemy position
                         var nearestEnemy = enemies.OrderBy(e => actor.Position.DistanceTo(e.Position)).FirstOrDefault();
@@ -1138,6 +1140,8 @@ namespace QDND.Combat.AI
                     case TargetType.Cone:
                     case TargetType.Line:
                     case TargetType.Point:
+                    case TargetType.Charge:
+                    case TargetType.WallSegment:
                         // Directional AoE - cast towards enemy clusters
                         foreach (var target in GetEnemies(actor).Take(4))
                         {
@@ -1295,6 +1299,8 @@ namespace QDND.Combat.AI
                     case TargetType.Cone:
                     case TargetType.Line:
                     case TargetType.Point:
+                    case TargetType.Charge:
+                    case TargetType.WallSegment:
                         foreach (var target in GetEnemies(actor).Take(3))
                         {
                             // Range check - bypass for test abilities
@@ -2567,7 +2573,7 @@ namespace QDND.Combat.AI
             bool isStatus = actionDef.Effects.Any(e => e.Type == "apply_status");
             bool isAoE = actionDef.AreaRadius > 0 || actionDef.TargetType == TargetType.Circle || 
                          actionDef.TargetType == TargetType.Cone || actionDef.TargetType == TargetType.Line ||
-                         actionDef.TargetType == TargetType.Point;
+                         actionDef.TargetType == TargetType.Point || actionDef.TargetType == TargetType.WallSegment;
             
             // Get target combatant if targeting a unit
             Combatant target = null;

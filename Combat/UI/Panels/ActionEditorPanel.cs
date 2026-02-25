@@ -115,7 +115,8 @@ namespace QDND.Combat.UI.Panels
 
         // ── Enum value arrays ──────────────────────────────────────────────────
         private static readonly string[] TargetTypes =
-            { "Self", "SingleUnit", "MultiUnit", "Point", "Cone", "Line", "Circle", "All", "None" };
+            { "Self", "SingleUnit", "MultiUnit", "Point", "Cone", "Line", "Circle",
+              "Charge", "WallSegment", "All", "None" };
         private static readonly string[] TargetFilters =
             { "None", "Self", "Allies", "Enemies", "Neutrals", "All" };
         private static readonly string[] CastingTimes =

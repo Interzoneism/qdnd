@@ -133,6 +133,9 @@ namespace QDND.Data.Spells
         /// <summary>Minimum height above ground for targeting.</summary>
         public string TargetFloor { get; set; }
         
+        /// <summary>Maximum distance between wall start and end (for Wall-type spells).</summary>
+        public string MaxDistance { get; set; }
+        
         // --- Projectile-Specific ---
         
         /// <summary>Number of projectiles spawned.</summary>

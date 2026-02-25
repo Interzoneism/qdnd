@@ -2015,9 +2015,10 @@
       "name": "Magic Missile",
       "description": "Launch three unerring missiles of magical force.",
       "icon": "res://assets/Images/Icons Spells/Magic_Missile_Unfaded_Icon.png",
-      "targetType": "singleUnit",
+      "targetType": "multiUnit",
       "targetFilter": "enemies",
       "range": 18,
+      "maxTargets": 3,
       "projectileCount": 3,
       "cost": {
         "usesAction": true
@@ -2026,7 +2027,8 @@
       "upcastScaling": {
         "perLevel": 1,
         "scalesDamage": false,
-        "projectilesPerLevel": 1
+        "projectilesPerLevel": 1,
+        "targetIncrease": 1
       },
       "effects": [
         {

@@ -47,6 +47,7 @@ namespace QDND.Data.Actions
                 AreaRadius = ParseAreaRadius(spell.AreaRadius),
                 ConeAngle = ParseConeAngle(spell),
                 LineWidth = ParseLineWidth(spell),
+                MaxWallLength = ParseAreaRadius(spell.MaxDistance),
                 ProjectileCount = spell.ProjectileCount,
 
                 // Costs
@@ -165,9 +166,9 @@ namespace QDND.Data.Actions
             {
                 BG3SpellType.Target => TargetType.SingleUnit,
                 BG3SpellType.Multicast => TargetType.MultiUnit,
-                BG3SpellType.Rush => TargetType.Point,
+                BG3SpellType.Rush => TargetType.Charge,
                 BG3SpellType.Teleportation => TargetType.Point,
-                BG3SpellType.Wall => TargetType.Line,
+                BG3SpellType.Wall => TargetType.WallSegment,
                 BG3SpellType.Cone => TargetType.Cone,
                 _ => TargetType.SingleUnit
             };

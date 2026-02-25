@@ -525,14 +525,7 @@ namespace QDND.Combat.UI.Screens
 
         private static string ResolveFeatureIconPath(string featureName)
         {
-            if (string.IsNullOrWhiteSpace(featureName)) return null;
-            string normalized = featureName.Replace(" ", "_").Replace("'", "-").Replace(":", "");
-            string path = $"res://assets/Images/Icons Passive Features/{normalized}_Unfaded_Icon.png";
-            if (ResourceLoader.Exists(path)) return path;
-            // Try _passive_feature_ variant
-            string altPath = $"res://assets/Images/Icons Passive Features/{normalized}_passive_feature_Unfaded_Icon.png";
-            if (ResourceLoader.Exists(altPath)) return altPath;
-            return "res://assets/Images/Icons General/Generic_Utility_Unfaded_Icon.png";
+            return HudIcons.ResolvePassiveFeatureIcon(null, featureName, null);
         }
 
         private HBoxContainer CreateFeatureRow(string featureName, int fontSize, Color textColor, string iconPathOverride = null)

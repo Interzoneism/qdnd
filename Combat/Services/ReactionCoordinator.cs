@@ -170,6 +170,8 @@ namespace QDND.Combat.Services
                 case TargetType.Cone:
                 case TargetType.Line:
                 case TargetType.Point:
+                case TargetType.Charge:
+                case TargetType.WallSegment:
                 {
                     if (_targetValidator == null || triggerContext == null)
                         return new List<Combatant>();

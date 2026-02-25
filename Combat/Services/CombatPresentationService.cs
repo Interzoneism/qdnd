@@ -42,6 +42,9 @@ namespace QDND.Combat.Services
         private AttackTargetingLine _attackTargetingLine;
         private AoEIndicator _aoeIndicator;
         private JumpTrajectoryPreview _jumpTrajectoryPreview;
+        private PointReticle _pointReticle;
+        private ChargePathPreview _chargePathPreview;
+        private WallSegmentPreview _wallSegmentPreview;
 
         public PresentationRequestBus PresentationBus => _presentationBus;
         public IReadOnlyList<ActionTimeline> ActiveTimelines => _activeTimelines.AsReadOnly();
@@ -538,7 +541,10 @@ namespace QDND.Combat.Services
             TargetValidator targetValidator,
             AttackTargetingLine attackTargetingLine,
             AoEIndicator aoeIndicator,
-            JumpTrajectoryPreview jumpTrajectoryPreview)
+            JumpTrajectoryPreview jumpTrajectoryPreview,
+            PointReticle pointReticle,
+            ChargePathPreview chargePathPreview,
+            WallSegmentPreview wallSegmentPreview)
         {
             _combatContext = combatContext;
             _effectPipeline = effectPipeline;
@@ -547,11 +553,20 @@ namespace QDND.Combat.Services
             _attackTargetingLine = attackTargetingLine;
             _aoeIndicator = aoeIndicator;
             _jumpTrajectoryPreview = jumpTrajectoryPreview;
+            _pointReticle = pointReticle;
+            _chargePathPreview = chargePathPreview;
+            _wallSegmentPreview = wallSegmentPreview;
+            _pointReticle?.Hide();
+            _chargePathPreview?.Hide();
+            _wallSegmentPreview?.Hide();
         }
 
         private void ClearTargetHighlights()
         {
             _attackTargetingLine?.Hide();
+            _pointReticle?.Hide();
+            _chargePathPreview?.Hide();
+            // Don't hide _wallSegmentPreview here — it has two-click state that shouldn't be cleared on hover changes
             foreach (var visual in _combatantVisuals.Values)
             {
                 visual.SetValidTarget(false);
@@ -801,6 +816,112 @@ namespace QDND.Combat.Services
 
             float jumpDistanceLimit = getJumpDistanceLimit(actor);
             _jumpTrajectoryPreview.Update(path.Waypoints, path.TotalLength, jumpDistanceLimit);
+        }
+
+        /// <summary>
+        /// Update point-targeting preview (teleport/summon placement).
+        /// Shows a ground marker at the cursor position.
+        /// </summary>
+        public void UpdatePointPreview(string selectedCombatantId, string selectedAbilityId, Vector3 cursorPosition)
+        {
+            if (_pointReticle == null || string.IsNullOrEmpty(selectedAbilityId) || string.IsNullOrEmpty(selectedCombatantId))
+                return;
+
+            var actor = _combatContext.GetCombatant(selectedCombatantId);
+            var action = _effectPipeline.GetAction(selectedAbilityId);
+            if (actor == null || action == null) return;
+            if (action.TargetType != TargetType.Point) return;
+
+            float dist = actor.Position.DistanceTo(cursorPosition);
+            bool isValid = dist <= action.Range;
+
+            var cursorWorldPos = CombatantPositionToWorld(cursorPosition);
+            _pointReticle.Show(cursorWorldPos, isValid);
+        }
+
+        /// <summary>
+        /// Update charge-targeting preview (Rush Attack).
+        /// Shows a path line from actor to destination with landing marker.
+        /// </summary>
+        public void UpdateChargePreview(string selectedCombatantId, string selectedAbilityId, Vector3 cursorPosition)
+        {
+            if (_chargePathPreview == null || string.IsNullOrEmpty(selectedAbilityId) || string.IsNullOrEmpty(selectedCombatantId))
+                return;
+
+            var actor = _combatContext.GetCombatant(selectedCombatantId);
+            var action = _effectPipeline.GetAction(selectedAbilityId);
+            if (actor == null || action == null) return;
+            if (action.TargetType != TargetType.Charge) return;
+
+            float dist = actor.Position.DistanceTo(cursorPosition);
+            bool isValid = dist <= action.Range;
+
+            var actorWorldPos = CombatantPositionToWorld(actor.Position);
+            var cursorWorldPos = CombatantPositionToWorld(cursorPosition);
+            _chargePathPreview.Show(actorWorldPos, cursorWorldPos, isValid);
+        }
+
+        /// <summary>
+        /// Update wall segment preview. If start point is not yet set, shows single-point preview.
+        /// If start is set, shows the two-point wall line preview.
+        /// </summary>
+        public void UpdateWallSegmentPreview(string selectedCombatantId, string selectedAbilityId, Vector3 cursorPosition)
+        {
+            if (_wallSegmentPreview == null || string.IsNullOrEmpty(selectedAbilityId) || string.IsNullOrEmpty(selectedCombatantId))
+                return;
+
+            var actor = _combatContext.GetCombatant(selectedCombatantId);
+            var action = _effectPipeline.GetAction(selectedAbilityId);
+            if (actor == null || action == null) return;
+            if (action.TargetType != TargetType.WallSegment) return;
+
+            float dist = actor.Position.DistanceTo(cursorPosition);
+            bool isValid = dist <= action.Range;
+
+            if (_wallSegmentPreview.HasStartPoint && isValid && action.MaxWallLength > 0f)
+            {
+                // Wall start is in world space; cursorPosition is in grid units.
+                // Convert wall start to grid units to compare with MaxWallLength.
+                var startWorld = _wallSegmentPreview.StartPoint;
+                var startGrid = new Vector3(startWorld.X / _tileSize, startWorld.Y, startWorld.Z / _tileSize);
+                float wallLengthGrid = startGrid.DistanceTo(cursorPosition);
+                if (wallLengthGrid > action.MaxWallLength)
+                    isValid = false;
+            }
+
+            var cursorWorldPos = CombatantPositionToWorld(cursorPosition);
+
+            if (_wallSegmentPreview.HasStartPoint)
+            {
+                _wallSegmentPreview.ShowPreview(cursorWorldPos, isValid);
+            }
+            else
+            {
+                _wallSegmentPreview.ShowSinglePoint(cursorWorldPos, isValid);
+            }
+        }
+
+        /// <summary>
+        /// Set the start point for wall segment targeting. Called on first click.
+        /// </summary>
+        public void SetWallSegmentStart(Vector3 worldPosition)
+        {
+            _wallSegmentPreview?.SetStartPoint(worldPosition);
+        }
+
+        /// <summary>
+        /// Whether the wall segment has its start point placed (waiting for end point).
+        /// </summary>
+        public bool IsWallSegmentStartSet => _wallSegmentPreview?.HasStartPoint ?? false;
+
+        /// <summary>
+        /// Returns the wall segment start point in world space, or null if not set.
+        /// </summary>
+        public Vector3? GetWallSegmentStartPoint()
+        {
+            if (_wallSegmentPreview != null && _wallSegmentPreview.HasStartPoint)
+                return _wallSegmentPreview.StartPoint;
+            return null;
         }
 
         private Vector3 CombatantPositionToWorld(Vector3 gridPos)

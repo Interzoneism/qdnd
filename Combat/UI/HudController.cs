@@ -13,6 +13,9 @@ using QDND.Combat.UI.Panels;
 using QDND.Combat.UI.Overlays;
 using QDND.Combat.UI.Screens;
 using QDND.Combat.Rules;
+using QDND.Combat.Statuses;
+using QDND.Data.CharacterModel;
+using QDND.Data.Passives;
 
 namespace QDND.Combat.UI
 {
@@ -45,6 +48,7 @@ namespace QDND.Combat.UI
         private CharacterInventoryScreen _characterInventoryScreen;
         private HudWindowManager _windowManager;
         private TurnAnnouncementOverlay _turnAnnouncement;
+        private MultiTargetPromptOverlay _multiTargetPrompt;
 
         // ── Tooltip ────────────────────────────────────────────────
         private PanelContainer _tooltipPanel;
@@ -66,6 +70,20 @@ namespace QDND.Combat.UI
         // ── Hit Chance ─────────────────────────────────────────────
         private PanelContainer _hitChancePanel;
         private Label _hitChanceLabel;
+
+        // ── Hover Info Panel ────────────────────────────────────────
+        private PanelContainer _hoverInfoPanel;
+        private Label _hoverNameLabel;
+        private ProgressBar _hoverHpBar;
+        private Label _hoverHpText;
+        private HBoxContainer _hoverConditionsRow;
+        private TextureRect _hoverActionIcon;
+        private Label _hoverActionChance;
+        private HBoxContainer _hoverTargetingRow;
+
+        // ── AI Action Banner ────────────────────────────────────────
+        private AIActionBannerOverlay _aiActionBanner;
+        private CommandService _commandService;
 
         // ── Variant popup ──────────────────────────────────────────
         private PopupMenu _variantPopup;
@@ -143,6 +161,7 @@ namespace QDND.Combat.UI
             CreateTooltip();
             CreateVariantPopup();
             CreateHitChanceDisplay();
+            CreateHoverInfoPanel();
             InitializeLayoutPersistence(); // Must be after all panels/overlays are created
             SubscribeToEvents();
             InitialSync();
@@ -294,7 +313,19 @@ namespace QDND.Combat.UI
 
             _turnAnnouncement = new TurnAnnouncementOverlay();
             AddChild(_turnAnnouncement);
+
+            _aiActionBanner = new AIActionBannerOverlay();
+            AddChild(_aiActionBanner);
+
+            _multiTargetPrompt = new MultiTargetPromptOverlay();
+            AddChild(_multiTargetPrompt);
         }
+
+        public void ShowMultiTargetPrompt(string abilityName, int pickedSoFar, int totalNeeded)
+            => _multiTargetPrompt?.Show(abilityName, pickedSoFar, totalNeeded);
+
+        public void HideMultiTargetPrompt()
+            => _multiTargetPrompt?.Hide();
 
         private void CreateTooltip()
         {
@@ -408,6 +439,85 @@ namespace QDND.Combat.UI
                 (screenSize.X - 100) / 2, screenSize.Y * 0.35f);
         }
 
+        private void CreateHoverInfoPanel()
+        {
+            _hoverInfoPanel = new PanelContainer();
+            _hoverInfoPanel.Visible = false;
+            _hoverInfoPanel.MouseFilter = MouseFilterEnum.Ignore;
+            _hoverInfoPanel.AddThemeStyleboxOverride("panel",
+                HudTheme.CreatePanelStyle(
+                    new Color(12f / 255f, 10f / 255f, 18f / 255f, 0.92f),
+                    HudTheme.PanelBorderBright, 6, 1, 8));
+            AddChild(_hoverInfoPanel);
+
+            var vbox = new VBoxContainer();
+            vbox.AddThemeConstantOverride("separation", 4);
+            vbox.MouseFilter = MouseFilterEnum.Ignore;
+            _hoverInfoPanel.AddChild(vbox);
+
+            // Name + Level line
+            _hoverNameLabel = new Label();
+            _hoverNameLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            HudTheme.StyleLabel(_hoverNameLabel, HudTheme.FontMedium, HudTheme.Gold);
+            _hoverNameLabel.MouseFilter = MouseFilterEnum.Ignore;
+            vbox.AddChild(_hoverNameLabel);
+
+            // HP bar container (300px wide)
+            var hpContainer = new CenterContainer();
+            hpContainer.MouseFilter = MouseFilterEnum.Ignore;
+            vbox.AddChild(hpContainer);
+
+            var hpStack = new Control();
+            hpStack.CustomMinimumSize = new Vector2(300, 20);
+            hpStack.MouseFilter = MouseFilterEnum.Ignore;
+            hpContainer.AddChild(hpStack);
+
+            _hoverHpBar = new ProgressBar();
+            _hoverHpBar.CustomMinimumSize = new Vector2(300, 20);
+            _hoverHpBar.SetAnchorsPreset(LayoutPreset.FullRect);
+            _hoverHpBar.ShowPercentage = false;
+            _hoverHpBar.MaxValue = 100;
+            _hoverHpBar.AddThemeStyleboxOverride("background", HudTheme.CreateProgressBarBg());
+            _hoverHpBar.AddThemeStyleboxOverride("fill", HudTheme.CreateProgressBarFill(HudTheme.HealthGreen));
+            _hoverHpBar.MouseFilter = MouseFilterEnum.Ignore;
+            hpStack.AddChild(_hoverHpBar);
+
+            _hoverHpText = new Label();
+            _hoverHpText.SetAnchorsPreset(LayoutPreset.FullRect);
+            _hoverHpText.HorizontalAlignment = HorizontalAlignment.Center;
+            _hoverHpText.VerticalAlignment = VerticalAlignment.Center;
+            HudTheme.StyleLabel(_hoverHpText, HudTheme.FontSmall, HudTheme.WarmWhite);
+            _hoverHpText.MouseFilter = MouseFilterEnum.Ignore;
+            hpStack.AddChild(_hoverHpText);
+
+            // Conditions row
+            _hoverConditionsRow = new HBoxContainer();
+            _hoverConditionsRow.AddThemeConstantOverride("separation", 6);
+            _hoverConditionsRow.Alignment = BoxContainer.AlignmentMode.Center;
+            _hoverConditionsRow.MouseFilter = MouseFilterEnum.Ignore;
+            vbox.AddChild(_hoverConditionsRow);
+
+            // Targeting info row (action icon + success chance)
+            _hoverTargetingRow = new HBoxContainer();
+            _hoverTargetingRow.AddThemeConstantOverride("separation", 6);
+            _hoverTargetingRow.Alignment = BoxContainer.AlignmentMode.Center;
+            _hoverTargetingRow.MouseFilter = MouseFilterEnum.Ignore;
+            _hoverTargetingRow.Visible = false;
+            vbox.AddChild(_hoverTargetingRow);
+
+            _hoverActionIcon = new TextureRect();
+            _hoverActionIcon.CustomMinimumSize = new Vector2(24, 24);
+            _hoverActionIcon.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+            _hoverActionIcon.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
+            _hoverActionIcon.MouseFilter = MouseFilterEnum.Ignore;
+            _hoverTargetingRow.AddChild(_hoverActionIcon);
+
+            _hoverActionChance = new Label();
+            HudTheme.StyleLabel(_hoverActionChance, HudTheme.FontMedium, HudTheme.WarmWhite);
+            _hoverActionChance.MouseFilter = MouseFilterEnum.Ignore;
+            _hoverTargetingRow.AddChild(_hoverActionChance);
+        }
+
         private void InitializeLayoutPersistence()
         {
             // Build panel dictionary for layout persistence (must include all draggable panels)
@@ -509,6 +619,15 @@ namespace QDND.Combat.UI
                 }
             }
 
+            if (_commandService == null)
+            {
+                _commandService = Arena.Context.GetService<CommandService>();
+                if (_commandService != null)
+                {
+                    boundNew = true;
+                }
+            }
+
             if (_combatLog != null && !_combatLogBackfilled)
             {
                 foreach (var entry in _combatLog.GetRecentEntries(100))
@@ -538,6 +657,8 @@ namespace QDND.Combat.UI
                 Arena.TurnTrackerModel.ActiveCombatantChanged += OnActiveCombatantChanged;
                 Arena.TurnTrackerModel.EntryUpdated += OnTurnEntryUpdated;
                 Arena.TurnTrackerModel.RoundChanged += OnRoundChanged;
+                Arena.CombatantHoverChanged += OnCombatantHoverChanged;
+                Arena.OnAIAbilityUsed += OnAIAbilityUsed;
                 _turnTrackerSubscribed = true;
                 boundNew = true;
             }
@@ -571,6 +692,8 @@ namespace QDND.Combat.UI
 
             if (Arena != null)
             {
+                Arena.CombatantHoverChanged -= OnCombatantHoverChanged;
+                Arena.OnAIAbilityUsed -= OnAIAbilityUsed;
                 if (Arena.TurnTrackerModel != null)
                 {
                     Arena.TurnTrackerModel.TurnOrderChanged -= OnTurnOrderChanged;
@@ -879,6 +1002,7 @@ namespace QDND.Combat.UI
         {
             if (_disposed || !IsInstanceValid(this) || !IsInsideTree()) return;
 
+            HideMultiTargetPrompt();
             bool isPlayerDecision = evt.ToState == CombatState.PlayerDecision;
 
             _actionBarPanel?.SetVisible(isPlayerDecision);
@@ -892,6 +1016,7 @@ namespace QDND.Combat.UI
         {
             if (_disposed || !IsInstanceValid(this) || !IsInsideTree()) return;
 
+            HideMultiTargetPrompt();
             // Update initiative ribbon
             if (Arena != null)
             {
@@ -1288,6 +1413,7 @@ namespace QDND.Combat.UI
             };
 
             var rc = combatant.ResolvedCharacter;
+            var passiveRegistry = Arena?.Context?.GetService<PassiveRegistry>();
             if (rc?.Sheet != null)
             {
                 data.Race = rc.Sheet.RaceId ?? "Unknown";
@@ -1337,7 +1463,13 @@ namespace QDND.Combat.UI
                 }
 
                 // Features
-                data.Features = rc.Features?.Select(f => f.Name ?? "Unnamed").ToList()
+                data.Features = rc.Features?
+                    .Select(f =>
+                    {
+                        var passiveData = ResolvePassiveForFeature(passiveRegistry, f);
+                        return ResolveFeatureDisplayName(f, passiveData);
+                    })
+                    .ToList()
                     ?? new List<string>();
 
                 // Resources — convert from Dictionary<string, int> (max) to (current, max) tuples
@@ -1406,17 +1538,150 @@ namespace QDND.Combat.UI
             if (rc2?.Features != null)
             {
                 data.NotableFeatures = rc2.Features
-                    .Select(f => new FeatureDisplayData
+                    .Select(f =>
                     {
-                        Name = f.Name ?? "Unnamed",
-                        Description = f.Description ?? "",
-                        IconPath = ""
+                        var passiveData = ResolvePassiveForFeature(passiveRegistry, f);
+                        string name = ResolveFeatureDisplayName(f, passiveData);
+                        return new FeatureDisplayData
+                        {
+                            Name = name,
+                            Description = ResolveFeatureDescription(f, passiveData),
+                            IconPath = HudIcons.ResolvePassiveFeatureIcon(f.Id, name, passiveData?.Icon)
+                        };
                     })
                     .Take(8) // Show top 8 features
                     .ToList();
             }
 
             return data;
+        }
+
+        private static BG3PassiveData ResolvePassiveForFeature(PassiveRegistry passiveRegistry, Feature feature)
+        {
+            if (passiveRegistry == null || feature == null)
+                return null;
+
+            foreach (var candidate in EnumeratePassiveCandidates(feature))
+            {
+                var passive = passiveRegistry.GetPassive(candidate);
+                if (passive != null)
+                    return passive;
+            }
+
+            return null;
+        }
+
+        private static IEnumerable<string> EnumeratePassiveCandidates(Feature feature)
+        {
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            void AddCandidate(string value)
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                    seen.Add(value.Trim());
+            }
+
+            void AddDerived(string raw)
+            {
+                if (string.IsNullOrWhiteSpace(raw))
+                    return;
+
+                string trimmed = raw.Trim();
+                AddCandidate(trimmed);
+                AddCandidate(trimmed.Replace("_", string.Empty).Replace("-", string.Empty).Replace(" ", string.Empty));
+                AddCandidate(ToPascalIdentifier(trimmed));
+                AddCandidate(ToPascalIdentifier(RemoveFeatureSuffix(trimmed)));
+            }
+
+            AddDerived(feature.Id);
+            AddDerived(feature.Name);
+            return seen;
+        }
+
+        private static string ResolveFeatureDisplayName(Feature feature, BG3PassiveData passiveData)
+        {
+            if (!string.IsNullOrWhiteSpace(feature?.Name))
+                return feature.Name;
+            if (!string.IsNullOrWhiteSpace(passiveData?.DisplayName))
+                return passiveData.DisplayName;
+            if (!string.IsNullOrWhiteSpace(feature?.Id))
+                return HumanizeIdentifier(feature.Id);
+            return "Unnamed";
+        }
+
+        private static string ResolveFeatureDescription(Feature feature, BG3PassiveData passiveData)
+        {
+            if (!string.IsNullOrWhiteSpace(feature?.Description))
+                return feature.Description;
+            return passiveData?.Description ?? string.Empty;
+        }
+
+        private static string RemoveFeatureSuffix(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return string.Empty;
+
+            string[] suffixes =
+            {
+                "_feature", "_passive", "_ability", "_resource", "_toggle",
+                "Feature", "Passive", "Ability", "Resource", "Toggle"
+            };
+
+            foreach (var suffix in suffixes)
+            {
+                if (value.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+                    return value[..^suffix.Length];
+            }
+
+            return value;
+        }
+
+        private static string ToPascalIdentifier(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return string.Empty;
+
+            var sb = new System.Text.StringBuilder(value.Length);
+            bool capNext = true;
+            foreach (char c in value)
+            {
+                if (!char.IsLetterOrDigit(c))
+                {
+                    capNext = true;
+                    continue;
+                }
+
+                sb.Append(capNext ? char.ToUpperInvariant(c) : c);
+                capNext = false;
+            }
+
+            return sb.ToString();
+        }
+
+        private static string HumanizeIdentifier(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return string.Empty;
+
+            var sb = new System.Text.StringBuilder(value.Length + 8);
+            char prev = '\0';
+            foreach (char c in value)
+            {
+                if (c == '_' || c == '-')
+                {
+                    if (sb.Length > 0 && sb[^1] != ' ')
+                        sb.Append(' ');
+                    prev = c;
+                    continue;
+                }
+
+                if (char.IsUpper(c) && sb.Length > 0 && prev != ' ' && prev != '_' && prev != '-' && char.IsLower(prev))
+                    sb.Append(' ');
+
+                sb.Append(c);
+                prev = c;
+            }
+
+            return sb.ToString().Trim();
         }
 
         // ── Tooltip ────────────────────────────────────────────────
@@ -1652,6 +1917,204 @@ namespace QDND.Combat.UI
             if (string.IsNullOrWhiteSpace(activeId)) return null;
             var combatant = Arena.Context?.GetCombatant(activeId);
             return combatant?.IsPlayerControlled == true ? combatant : null;
+        }
+
+        // ════════════════════════════════════════════════════════════
+        //  HOVER INFO PANEL (Features 2 & 3)
+        // ════════════════════════════════════════════════════════════
+
+        private void OnCombatantHoverChanged(string combatantId)
+        {
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree()) return;
+
+            if (string.IsNullOrEmpty(combatantId))
+            {
+                if (_hoverInfoPanel != null) _hoverInfoPanel.Visible = false;
+                return;
+            }
+
+            var combatant = Arena?.GetCombatants()?.FirstOrDefault(c => c.Id == combatantId);
+            if (combatant == null)
+            {
+                if (_hoverInfoPanel != null) _hoverInfoPanel.Visible = false;
+                return;
+            }
+
+            UpdateHoverInfoPanel(combatant);
+        }
+
+        private void UpdateHoverInfoPanel(Combatant combatant)
+        {
+            if (_hoverInfoPanel == null) return;
+
+            // Name + Level
+            int level = combatant.ResolvedCharacter?.Sheet?.TotalLevel ?? 1;
+            _hoverNameLabel.Text = $"{combatant.Name}  Lv {level}";
+
+            // HP bar
+            int currentHp = combatant.Resources.CurrentHP;
+            int maxHp = combatant.Resources.MaxHP;
+            float hpPercent = maxHp > 0 ? (float)currentHp / maxHp * 100f : 0f;
+            _hoverHpBar.Value = hpPercent;
+            _hoverHpBar.AddThemeStyleboxOverride("fill",
+                HudTheme.CreateProgressBarFill(HudTheme.GetHealthColor(hpPercent)));
+            _hoverHpText.Text = $"{currentHp}/{maxHp}";
+
+            // Conditions
+            foreach (var child in _hoverConditionsRow.GetChildren())
+                child.QueueFree();
+
+            var statusManager = Arena?.Context?.GetService<StatusManager>();
+            if (statusManager != null)
+            {
+                var statuses = statusManager.GetStatuses(combatant.Id);
+                foreach (var status in statuses)
+                {
+                    var conditionBox = new HBoxContainer();
+                    conditionBox.AddThemeConstantOverride("separation", 2);
+                    conditionBox.MouseFilter = MouseFilterEnum.Ignore;
+
+                    if (!string.IsNullOrWhiteSpace(status.Definition.Icon) &&
+                        ResourceLoader.Exists(status.Definition.Icon))
+                    {
+                        var iconTex = ResourceLoader.Load<Texture2D>(status.Definition.Icon);
+                        if (iconTex != null)
+                        {
+                            var iconRect = new TextureRect();
+                            iconRect.CustomMinimumSize = new Vector2(16, 16);
+                            iconRect.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+                            iconRect.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
+                            iconRect.Texture = iconTex;
+                            iconRect.MouseFilter = MouseFilterEnum.Ignore;
+                            conditionBox.AddChild(iconRect);
+                        }
+                    }
+
+                    var condLabel = new Label();
+                    condLabel.Text = status.Definition.Name ?? status.Definition.Id;
+                    HudTheme.StyleLabel(condLabel, HudTheme.FontTiny, HudTheme.MutedBeige);
+                    condLabel.MouseFilter = MouseFilterEnum.Ignore;
+                    conditionBox.AddChild(condLabel);
+                    _hoverConditionsRow.AddChild(conditionBox);
+                }
+            }
+            _hoverConditionsRow.Visible = _hoverConditionsRow.GetChildCount() > 0;
+
+            // Targeting info (Feature 3)
+            UpdateHoverTargetingInfo(combatant);
+
+            // Position centered below initiative ribbon, deferred so panel is sized
+            CallDeferred(nameof(PositionHoverInfoPanel));
+            _hoverInfoPanel.Visible = true;
+        }
+
+        private void UpdateHoverTargetingInfo(Combatant target)
+        {
+            if (_hoverTargetingRow == null) return;
+
+            var selectedAbilityId = Arena?.SelectedAbilityId;
+            var selectedCombatantId = Arena?.SelectedCombatantId;
+
+            if (string.IsNullOrEmpty(selectedAbilityId) || string.IsNullOrEmpty(selectedCombatantId))
+            {
+                _hoverTargetingRow.Visible = false;
+                return;
+            }
+
+            var action = Arena?.GetActionById(selectedAbilityId);
+            var actor = Arena?.GetCombatants()?.FirstOrDefault(c => c.Id == selectedCombatantId);
+            if (action == null || actor == null)
+            {
+                _hoverTargetingRow.Visible = false;
+                return;
+            }
+
+            // Load action icon at 50% size (24×24 instead of 48×48)
+            _hoverActionIcon.Texture = null;
+            if (!string.IsNullOrWhiteSpace(action.Icon) && ResourceLoader.Exists(action.Icon))
+                _hoverActionIcon.Texture = ResourceLoader.Load<Texture2D>(action.Icon);
+
+            string chanceText = "";
+            if (action.AttackType.HasValue)
+            {
+                var rulesEngine = Arena?.Context?.GetService<RulesEngine>();
+                if (rulesEngine != null)
+                {
+                    var effectPipeline = Arena?.Context?.GetService<EffectPipeline>();
+                    int attackBonus = effectPipeline?.GetAttackBonus(actor, action) ?? 0;
+                    int heightMod = effectPipeline?.Heights?.GetAttackModifier(actor, target) ?? 0;
+
+                    var hitQuery = new QueryInput
+                    {
+                        Type = QueryType.AttackRoll,
+                        Source = actor,
+                        Target = target,
+                        BaseValue = attackBonus + heightMod
+                    };
+                    var result = rulesEngine.CalculateHitChance(hitQuery);
+                    int hitChance = (int)result.FinalValue;
+                    chanceText = $"{hitChance}% Hit";
+                    _hoverActionChance.AddThemeColorOverride("font_color",
+                        hitChance >= 70 ? HudTheme.ActionGreen :
+                        hitChance >= 40 ? HudTheme.MoveYellow : HudTheme.HealthRed);
+                }
+            }
+            else if (!string.IsNullOrEmpty(action.SaveType))
+            {
+                var rulesEngine = Arena?.Context?.GetService<RulesEngine>();
+                var effectPipeline = Arena?.Context?.GetService<EffectPipeline>();
+                if (rulesEngine != null && effectPipeline != null)
+                {
+                    int saveDC = effectPipeline.GetSaveDC(actor, action);
+                    int saveBonus = effectPipeline.GetSaveBonus(target, action.SaveType);
+                    var saveQuery = new QueryInput
+                    {
+                        Type = QueryType.SavingThrow,
+                        Source = actor,
+                        Target = target,
+                        DC = saveDC,
+                        BaseValue = saveBonus
+                    };
+                    var result = rulesEngine.CalculateSaveFailChance(saveQuery);
+                    int failChance = (int)result.FinalValue;
+                    chanceText = $"{failChance}% Fail";
+                    _hoverActionChance.AddThemeColorOverride("font_color",
+                        failChance >= 70 ? HudTheme.ActionGreen :
+                        failChance >= 40 ? HudTheme.MoveYellow : HudTheme.HealthRed);
+                }
+            }
+
+            _hoverActionChance.Text = chanceText;
+            _hoverTargetingRow.Visible = !string.IsNullOrEmpty(chanceText);
+        }
+
+        private void PositionHoverInfoPanel()
+        {
+            if (_hoverInfoPanel == null || _initiativeRibbon == null) return;
+            if (!IsInstanceValid(_hoverInfoPanel) || !IsInstanceValid(_initiativeRibbon)) return;
+
+            var ribbonPos = _initiativeRibbon.GlobalPosition;
+            var ribbonSize = _initiativeRibbon.Size;
+
+            float panelWidth = _hoverInfoPanel.Size.X;
+            float ribbonCenterX = ribbonPos.X + ribbonSize.X / 2f;
+            float panelX = ribbonCenterX - panelWidth / 2f;
+            float panelY = ribbonPos.Y + ribbonSize.Y + 4f;
+
+            _hoverInfoPanel.GlobalPosition = new Vector2(panelX, panelY);
+        }
+
+        // ════════════════════════════════════════════════════════════
+        //  AI ACTION BANNER (Feature 4)
+        // ════════════════════════════════════════════════════════════
+
+        private void OnAIAbilityUsed(Combatant actor, ActionDefinition action)
+        {
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree()) return;
+            if (actor == null || actor.IsPlayerControlled) return;
+            if (action == null) return;
+
+            _aiActionBanner?.Show(action.Name ?? action.Id, action.Icon);
         }
     }
 }

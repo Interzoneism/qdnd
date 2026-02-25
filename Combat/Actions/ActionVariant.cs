@@ -238,6 +238,11 @@ namespace QDND.Combat.Actions
         public QDND.Combat.Reactions.ReactionTriggerContext TriggerContext { get; set; }
 
         /// <summary>
+        /// Secondary target position for two-point abilities (e.g., WallSegment start point).
+        /// </summary>
+        public Vector3? SecondaryTargetPosition { get; set; }
+
+        /// <summary>
         /// Create default options (no variant, no upcast).
         /// </summary>
         public static ActionExecutionOptions Default => new()
