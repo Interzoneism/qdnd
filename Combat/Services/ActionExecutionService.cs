@@ -969,7 +969,7 @@ namespace QDND.Combat.Services
             var timeline = _presentationService.BuildTimelineForAbility(action, actor, presentationTarget, primaryResult);
             timeline.OnComplete(() => ResumeDecisionStateIfExecuting("Ability timeline completed", thisActionId));
             timeline.TimelineCancelled += () => ResumeDecisionStateIfExecuting("Ability timeline cancelled", thisActionId);
-            _presentationService.SubscribeToTimelineMarkers(timeline, action, actor, targets, primaryResult);
+            _presentationService.SubscribeToTimelineMarkers(timeline, action, actor, targets, primaryResult, options);
 
             _presentationService.AddTimeline(timeline);
             timeline.Play();

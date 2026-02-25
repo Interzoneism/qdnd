@@ -25,6 +25,7 @@ using QDND.Data.Statuses;
 using QDND.Data.Passives;
 using QDND.Data.Interrupts;
 using QDND.Tools.AutoBattler;
+using QDND.Combat.VFX;
 
 namespace QDND.Combat.Arena
 {
@@ -140,6 +141,7 @@ namespace QDND.Combat.Arena
 
         // Timeline and presentation
         private CombatPresentationService _presentationService;
+        private IVfxPlaybackService _vfxPlaybackService;
         private CombatCameraService _cameraService;
 
         // Camera orbit state — forwarded to CombatCameraService (public for CombatInputHandler access)
@@ -1056,9 +1058,22 @@ namespace QDND.Combat.Arena
 
             // CombatPresentationService — owns PresentationRequestBus, active timelines, and all VFX/marker logic.
             _presentationService = new CombatPresentationService(
-                _combatantVisuals, _vfxManager, _pendingJumpWorldPaths,
+                _combatantVisuals, _pendingJumpWorldPaths,
                 _turnQueue, _cameraService, _turnTrackerModel, TileSize);
             _combatContext.RegisterService(_presentationService.PresentationBus);
+
+            var vfxConfig = VfxConfigLoader.LoadDefault();
+            _vfxManager.ConfigureRuntimeCaps(vfxConfig.ActiveCap, vfxConfig.InitialPoolSize);
+            var vfxResolver = new VfxRuleResolver(vfxConfig);
+            _vfxPlaybackService = new VfxPlaybackService(
+                _presentationService.PresentationBus,
+                _vfxManager,
+                _combatContext,
+                TileSize,
+                vfxResolver);
+            _combatContext.RegisterService<IVfxRuleResolver>(vfxResolver);
+            _combatContext.RegisterService<IVfxPlaybackService>(_vfxPlaybackService);
+
             _presentationService.SetPreviewDependencies(
                 _combatContext, _effectPipeline, _rulesEngine, _targetValidator,
                 _attackTargetingLine, _aoeIndicator, _jumpTrajectoryPreview,
@@ -1511,8 +1526,8 @@ namespace QDND.Combat.Arena
         private ActionTimeline BuildTimelineForAbility(ActionDefinition action, Combatant actor, Combatant target, ActionExecutionResult result)
             => _presentationService.BuildTimelineForAbility(action, actor, target, result);
 
-        private void SubscribeToTimelineMarkers(ActionTimeline timeline, ActionDefinition action, Combatant actor, List<Combatant> targets, ActionExecutionResult result)
-            => _presentationService.SubscribeToTimelineMarkers(timeline, action, actor, targets, result);
+        private void SubscribeToTimelineMarkers(ActionTimeline timeline, ActionDefinition action, Combatant actor, List<Combatant> targets, ActionExecutionResult result, ActionExecutionOptions options = null)
+            => _presentationService.SubscribeToTimelineMarkers(timeline, action, actor, targets, result, options);
 
         public void EndCurrentTurn()
             => _turnLifecycleService.EndCurrentTurn();
@@ -1543,14 +1558,46 @@ namespace QDND.Combat.Arena
             if (_combatantVisuals.TryGetValue(status.TargetId, out var visual))
             {
                 visual.ShowStatusApplied(status.Definition.Name);
+            }
 
-                // VFX for buff/debuff application
-                var worldPos = visual.GlobalPosition;
-                bool isBeneficial = status.SourceId == status.TargetId ||
-                                    status.Definition.IsBuff;
-                _vfxManager?.SpawnEffect(
-                    isBeneficial ? CombatVFXType.BuffApplied : CombatVFXType.DebuffApplied,
-                    worldPos);
+            bool isBeneficial = status.SourceId == status.TargetId || status.Definition.IsBuff;
+            var targetCombatant = _combatContext?.GetCombatant(status.TargetId);
+            var sourceCombatant = !string.IsNullOrWhiteSpace(status.SourceId)
+                ? _combatContext?.GetCombatant(status.SourceId)
+                : null;
+
+            if (_presentationService?.PresentationBus != null)
+            {
+                string correlationId = $"status_{status.InstanceId}";
+                var statusRequest = new VfxRequest(correlationId, VfxEventPhase.Status)
+                {
+                    PresetId = isBeneficial ? "status_buff_apply" : "status_debuff_apply",
+                    SourceId = status.SourceId,
+                    PrimaryTargetId = status.TargetId,
+                    SourcePosition = sourceCombatant != null
+                        ? new System.Numerics.Vector3(sourceCombatant.Position.X, sourceCombatant.Position.Y, sourceCombatant.Position.Z)
+                        : targetCombatant != null
+                            ? new System.Numerics.Vector3(targetCombatant.Position.X, targetCombatant.Position.Y, targetCombatant.Position.Z)
+                            : null,
+                    TargetPosition = targetCombatant != null
+                        ? new System.Numerics.Vector3(targetCombatant.Position.X, targetCombatant.Position.Y, targetCombatant.Position.Z)
+                        : null,
+                    CastPosition = targetCombatant != null
+                        ? new System.Numerics.Vector3(targetCombatant.Position.X, targetCombatant.Position.Y, targetCombatant.Position.Z)
+                        : null,
+                    Pattern = VfxTargetPattern.TargetAura,
+                    Magnitude = 1f
+                };
+                statusRequest.TargetIds.Add(status.TargetId);
+                if (targetCombatant != null)
+                {
+                    statusRequest.TargetPositions.Add(new System.Numerics.Vector3(
+                        targetCombatant.Position.X,
+                        targetCombatant.Position.Y,
+                        targetCombatant.Position.Z));
+                }
+
+                _presentationService.PresentationBus.Publish(statusRequest);
             }
 
             var target = _combatContext?.GetCombatant(status.TargetId);

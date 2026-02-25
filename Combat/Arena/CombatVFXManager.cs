@@ -1,48 +1,23 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using QDND.Combat.VFX;
 using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Arena
 {
-    /// <summary>
-    /// Type of combat visual effect.
-    /// </summary>
-    public enum CombatVFXType
-    {
-        MeleeImpact,
-        RangedProjectile,
-        SpellCast,
-        SpellImpact,
-        AoEBlast,
-        HealingShimmer,
-        CriticalHit,
-        DeathBurst,
-        BuffApplied,
-        DebuffApplied,
-        // Damage-type specific impacts
-        FireImpact,
-        ColdImpact,
-        LightningImpact,
-        PoisonImpact,
-        AcidImpact,
-        NecroticImpact,
-        RadiantImpact,
-        ForceImpact,
-        PsychicImpact,
-    }
-
     /// <summary>
     /// Manages combat visual effects: particles, flashes, projectiles.
     /// Attach as a child of CombatArena.
     /// </summary>
     public partial class CombatVFXManager : Node3D
     {
-        // Pool of reusable particle emitters to avoid allocation during combat.
         private readonly Queue<GpuParticles3D> _particlePool = new();
-        private const int InitialPoolSize = 8;
-        private const int MaxActiveEffects = 20;
         private readonly List<ActiveEffect> _activeEffects = new();
+
+        private int _initialPoolSize = 12;
+        private int _maxActiveEffects = 48;
 
         private struct ActiveEffect
         {
@@ -50,10 +25,15 @@ namespace QDND.Combat.Arena
             public double ExpiresAt;
         }
 
+        public void ConfigureRuntimeCaps(int activeCap, int initialPoolSize)
+        {
+            _maxActiveEffects = Mathf.Clamp(activeCap, 1, 256);
+            _initialPoolSize = Mathf.Clamp(initialPoolSize, 1, 128);
+        }
+
         public override void _Ready()
         {
-            // Pre-warm pool
-            for (int i = 0; i < InitialPoolSize; i++)
+            for (int i = 0; i < _initialPoolSize; i++)
             {
                 _particlePool.Enqueue(CreateParticleEmitter());
             }
@@ -72,85 +52,175 @@ namespace QDND.Combat.Arena
             }
         }
 
-        // =====================================================================
-        //  PUBLIC API
-        // =====================================================================
-
-        /// <summary>
-        /// Spawn a visual effect at a world position.
-        /// </summary>
-        public void SpawnEffect(CombatVFXType type, Vector3 worldPosition, Vector3? direction = null)
+        public void Spawn(VfxResolvedSpec spec)
         {
-            if (_activeEffects.Count >= MaxActiveEffects) return;
+            if (spec == null || _activeEffects.Count >= _maxActiveEffects)
+                return;
 
-            switch (type)
+            string recipe = !string.IsNullOrWhiteSpace(spec.Preset?.ParticleRecipe)
+                ? spec.Preset.ParticleRecipe
+                : spec.PresetId;
+
+            if (string.IsNullOrWhiteSpace(recipe))
+                return;
+
+            if (recipe.StartsWith("proj_", StringComparison.OrdinalIgnoreCase))
             {
-                case CombatVFXType.MeleeImpact:
-                    SpawnMeleeImpact(worldPosition);
-                    break;
-                case CombatVFXType.RangedProjectile:
-                    SpawnRangedTrail(worldPosition, direction ?? Vector3.Forward);
-                    break;
-                case CombatVFXType.SpellCast:
-                    SpawnSpellCast(worldPosition);
-                    break;
-                case CombatVFXType.SpellImpact:
-                    SpawnSpellImpact(worldPosition);
-                    break;
-                case CombatVFXType.AoEBlast:
-                    SpawnAoEBlast(worldPosition);
-                    break;
-                case CombatVFXType.HealingShimmer:
-                    SpawnHealingShimmer(worldPosition);
-                    break;
-                case CombatVFXType.CriticalHit:
-                    SpawnCriticalHit(worldPosition);
-                    break;
-                case CombatVFXType.DeathBurst:
-                    SpawnDeathBurst(worldPosition);
-                    break;
-                case CombatVFXType.BuffApplied:
-                    SpawnBuff(worldPosition);
-                    break;
-                case CombatVFXType.DebuffApplied:
-                    SpawnDebuff(worldPosition);
-                    break;
-                case CombatVFXType.FireImpact:
-                    SpawnTypedImpact(worldPosition, new Color(1.0f, 0.42f, 0.0f), velocity: 5.0f);
-                    break;
-                case CombatVFXType.ColdImpact:
-                    SpawnTypedImpact(worldPosition, new Color(0.45f, 0.75f, 0.99f), velocity: 3.0f);
-                    break;
-                case CombatVFXType.LightningImpact:
-                    SpawnTypedImpact(worldPosition, new Color(1.0f, 0.88f, 0.40f), velocity: 9.0f);
-                    break;
-                case CombatVFXType.PoisonImpact:
-                    SpawnTypedImpact(worldPosition, new Color(0.51f, 0.79f, 0.12f), velocity: 2.5f);
-                    break;
-                case CombatVFXType.AcidImpact:
-                    SpawnTypedImpact(worldPosition, new Color(0.66f, 0.89f, 0.29f), velocity: 2.0f);
-                    break;
-                case CombatVFXType.NecroticImpact:
-                    SpawnTypedImpact(worldPosition, new Color(0.48f, 0.18f, 0.75f), velocity: 2.0f);
-                    break;
-                case CombatVFXType.RadiantImpact:
-                    SpawnTypedImpact(worldPosition, new Color(1.0f, 0.83f, 0.23f), velocity: 6.0f);
-                    break;
-                case CombatVFXType.ForceImpact:
-                    SpawnTypedImpact(worldPosition, new Color(0.77f, 0.96f, 0.98f), velocity: 7.0f);
-                    break;
-                case CombatVFXType.PsychicImpact:
-                    SpawnTypedImpact(worldPosition, new Color(0.94f, 0.40f, 0.58f), velocity: 3.5f);
-                    break;
+                var source = spec.SourcePosition ?? spec.CastPosition ?? spec.EmissionPoints.FirstOrDefault();
+                var target = spec.TargetPosition
+                    ?? (spec.EmissionPoints.Count > 1 ? spec.EmissionPoints[^1] : source + Normalize(spec.Direction ?? new System.Numerics.Vector3(0, 0, 1)) * Math.Max(spec.Magnitude, 1f));
+
+                var originWorld = ToGodot(source) + Vector3.Up * 1.2f;
+                var targetWorld = ToGodot(target) + Vector3.Up * 1.0f;
+                float speed = spec.Preset?.ProjectileSpeed > 0f ? spec.Preset.ProjectileSpeed : 15f;
+                float duration = Mathf.Clamp(originWorld.DistanceTo(targetWorld) / speed, 0.12f, 1.2f);
+                var color = ResolveRecipeColor(recipe, spec);
+                SpawnProjectile(originWorld, targetWorld, duration, color, spec.Preset?.Lifetime ?? 0.8f);
+                return;
+            }
+
+            var points = spec.EmissionPoints != null && spec.EmissionPoints.Count > 0
+                ? spec.EmissionPoints
+                : BuildFallbackPointList(spec);
+
+            foreach (var point in points)
+            {
+                SpawnRecipeAtPoint(recipe, ToGodot(point), spec);
             }
         }
 
-        /// <summary>
-        /// Spawn a projectile that travels from origin to target over a duration.
-        /// Calls onHit when it arrives.
-        /// </summary>
-        public void SpawnProjectile(Vector3 origin, Vector3 target, float duration, Color color, Action onHit = null)
+        private IReadOnlyList<System.Numerics.Vector3> BuildFallbackPointList(VfxResolvedSpec spec)
         {
+            if (spec.TargetPosition.HasValue)
+                return new[] { spec.TargetPosition.Value };
+            if (spec.CastPosition.HasValue)
+                return new[] { spec.CastPosition.Value };
+            if (spec.SourcePosition.HasValue)
+                return new[] { spec.SourcePosition.Value };
+            return Array.Empty<System.Numerics.Vector3>();
+        }
+
+        private void SpawnRecipeAtPoint(string recipe, Vector3 worldPosition, VfxResolvedSpec spec)
+        {
+            if (_activeEffects.Count >= _maxActiveEffects)
+                return;
+
+            var color = ResolveRecipeColor(recipe, spec);
+            switch (recipe.ToLowerInvariant())
+            {
+                case "cast_arcane_generic":
+                    SpawnSpellCast(worldPosition, new Color(0.45f, 0.62f, 1.0f));
+                    break;
+                case "cast_divine_generic":
+                    SpawnSpellCast(worldPosition, new Color(1.0f, 0.88f, 0.55f));
+                    break;
+                case "cast_martial_generic":
+                    SpawnMeleeImpact(worldPosition, new Color(0.95f, 0.84f, 0.58f));
+                    break;
+
+                case "impact_fire":
+                case "impact_cold":
+                case "impact_lightning":
+                case "impact_poison":
+                case "impact_acid":
+                case "impact_necrotic":
+                case "impact_radiant":
+                case "impact_force":
+                case "impact_psychic":
+                case "impact_physical":
+                    SpawnTypedImpact(worldPosition, color, velocity: 5.0f);
+                    break;
+
+                case "area_circle_blast":
+                    SpawnAoEBlast(worldPosition, new Color(1.0f, 0.58f, 0.25f));
+                    break;
+                case "area_cone_sweep":
+                    SpawnAoEBlast(worldPosition, new Color(1.0f, 0.77f, 0.35f));
+                    break;
+                case "area_line_surge":
+                    SpawnAoEBlast(worldPosition, new Color(0.45f, 0.86f, 1.0f));
+                    break;
+
+                case "status_buff_apply":
+                    SpawnBuff(worldPosition);
+                    break;
+                case "status_debuff_apply":
+                    SpawnDebuff(worldPosition);
+                    break;
+                case "status_heal":
+                    SpawnHealingShimmer(worldPosition);
+                    break;
+                case "status_death_burst":
+                    SpawnDeathBurst(worldPosition);
+                    break;
+
+                case "impact_critical":
+                    SpawnCriticalHit(worldPosition);
+                    break;
+
+                default:
+                    SpawnTypedImpact(worldPosition, color, velocity: 5.0f);
+                    break;
+            }
+
+            if (spec.IsCritical && recipe.StartsWith("impact_", StringComparison.OrdinalIgnoreCase))
+            {
+                SpawnCriticalHit(worldPosition);
+            }
+
+            if (spec.DidKill)
+            {
+                SpawnDeathBurst(worldPosition);
+            }
+        }
+
+        private Color ResolveRecipeColor(string recipe, VfxResolvedSpec spec)
+        {
+            if (spec.DamageType.HasValue)
+                return DamageTypeToColor(spec.DamageType.Value);
+
+            return recipe.ToLowerInvariant() switch
+            {
+                "proj_fire" => new Color(1.0f, 0.42f, 0.0f),
+                "proj_lightning" => new Color(1.0f, 0.88f, 0.40f),
+                "proj_arcane_generic" => new Color(0.50f, 0.60f, 1.0f),
+                "proj_physical_generic" => new Color(0.80f, 0.70f, 0.50f),
+                "impact_fire" => new Color(1.0f, 0.42f, 0.0f),
+                "impact_cold" => new Color(0.45f, 0.75f, 0.99f),
+                "impact_lightning" => new Color(1.0f, 0.88f, 0.40f),
+                "impact_poison" => new Color(0.51f, 0.79f, 0.12f),
+                "impact_acid" => new Color(0.66f, 0.89f, 0.29f),
+                "impact_necrotic" => new Color(0.48f, 0.18f, 0.75f),
+                "impact_radiant" => new Color(1.0f, 0.83f, 0.23f),
+                "impact_force" => new Color(0.77f, 0.96f, 0.98f),
+                "impact_psychic" => new Color(0.94f, 0.40f, 0.58f),
+                _ => new Color(0.85f, 0.75f, 0.95f)
+            };
+        }
+
+        private static Color DamageTypeToColor(DamageType dt)
+        {
+            return dt switch
+            {
+                DamageType.Fire => new Color(1.0f, 0.42f, 0.0f),
+                DamageType.Cold => new Color(0.45f, 0.75f, 0.99f),
+                DamageType.Lightning => new Color(1.0f, 0.88f, 0.40f),
+                DamageType.Poison => new Color(0.51f, 0.79f, 0.12f),
+                DamageType.Acid => new Color(0.66f, 0.89f, 0.29f),
+                DamageType.Necrotic => new Color(0.48f, 0.18f, 0.75f),
+                DamageType.Radiant => new Color(1.0f, 0.83f, 0.23f),
+                DamageType.Force => new Color(0.77f, 0.96f, 0.98f),
+                DamageType.Psychic => new Color(0.94f, 0.40f, 0.58f),
+                DamageType.Thunder => new Color(0.62f, 0.78f, 1.0f),
+                _ => new Color(0.9f, 0.9f, 0.9f)
+            };
+        }
+
+        private void SpawnProjectile(Vector3 origin, Vector3 target, float duration, Color color, float lifetime)
+        {
+            if (!IsInsideTree() || _activeEffects.Count >= _maxActiveEffects)
+                return;
+
             var particle = GetFromPool();
             ConfigureProjectileParticles(particle, color);
             particle.GlobalPosition = origin;
@@ -163,11 +233,10 @@ namespace QDND.Combat.Arena
             tween.TweenCallback(Callable.From(() =>
             {
                 particle.Emitting = false;
-                SpawnEffect(CombatVFXType.SpellImpact, target);
-                onHit?.Invoke();
+                SpawnTypedImpact(target, color, velocity: 6.0f);
             }));
 
-            TrackEffect(particle, duration + 0.5f);
+            TrackEffect(particle, duration + Mathf.Max(0.3f, lifetime));
         }
 
         /// <summary>
@@ -175,7 +244,6 @@ namespace QDND.Combat.Arena
         /// </summary>
         public void FlashAtPosition(Vector3 position, Color color, float intensity = 3.0f, float duration = 0.15f)
         {
-            // Guard against being called before entering the scene tree
             if (!IsInsideTree())
                 return;
 
@@ -185,8 +253,7 @@ namespace QDND.Combat.Arena
             light.OmniRange = 4.0f;
             light.ShadowEnabled = false;
             AddChild(light);
-            
-            // Set position after adding to tree to avoid "not in tree" error
+
             light.GlobalPosition = position + Vector3.Up * 1.0f;
 
             var tween = CreateTween();
@@ -194,20 +261,13 @@ namespace QDND.Combat.Arena
             tween.TweenCallback(Callable.From(() => light.QueueFree()));
         }
 
-        // =====================================================================
-        //  SPECIFIC EFFECTS
-        // =====================================================================
-
-        private void SpawnMeleeImpact(Vector3 position)
+        private void SpawnMeleeImpact(Vector3 position, Color color)
         {
             if (!IsInsideTree())
                 return;
 
             var particle = GetFromPool();
-            var mat = CreateParticleMaterial(
-                new Color(1.0f, 0.85f, 0.4f),  // Warm spark color
-                0.08f, 0.15f                     // Small sparks
-            );
+            var mat = CreateParticleMaterial(color, 0.08f, 0.15f);
             particle.ProcessMaterial = CreateProcessMaterial(
                 velocity: 4.0f,
                 spread: 60.0f,
@@ -222,51 +282,21 @@ namespace QDND.Combat.Arena
             particle.GlobalPosition = position + Vector3.Up * 1.0f;
             particle.Emitting = true;
 
-            FlashAtPosition(position, new Color(1.0f, 0.9f, 0.6f), 2.0f, 0.1f);
+            FlashAtPosition(position, color, 2.0f, 0.1f);
             TrackEffect(particle, 0.6f);
         }
 
-        private void SpawnRangedTrail(Vector3 position, Vector3 direction)
+        private void SpawnSpellCast(Vector3 position, Color color)
         {
             if (!IsInsideTree())
                 return;
 
             var particle = GetFromPool();
-            var mat = CreateParticleMaterial(
-                new Color(0.8f, 0.9f, 1.0f),  // Cool white-blue
-                0.03f, 0.06f
-            );
-            particle.ProcessMaterial = CreateProcessMaterial(
-                velocity: 1.0f,
-                spread: 5.0f,
-                gravity: Vector3.Zero,
-                lifetime: 0.4f
-            );
-            particle.DrawPass1 = CreateQuadMesh(mat);
-            particle.Amount = 12;
-            particle.Lifetime = 0.4;
-            particle.Explosiveness = 0.0f;
-            particle.OneShot = false;
-            particle.GlobalPosition = position + Vector3.Up * 1.2f;
-            particle.Emitting = true;
-
-            TrackEffect(particle, 1.5f);
-        }
-
-        private void SpawnSpellCast(Vector3 position)
-        {
-            if (!IsInsideTree())
-                return;
-
-            var particle = GetFromPool();
-            var mat = CreateParticleMaterial(
-                new Color(0.4f, 0.6f, 1.0f),  // Arcane blue
-                0.05f, 0.12f
-            );
+            var mat = CreateParticleMaterial(color, 0.05f, 0.12f);
             particle.ProcessMaterial = CreateProcessMaterial(
                 velocity: 2.0f,
-                spread: 180.0f,               // Spherical emission
-                gravity: new Vector3(0, 2, 0), // Float upward
+                spread: 180.0f,
+                gravity: new Vector3(0, 2, 0),
                 lifetime: 0.8f
             );
             particle.DrawPass1 = CreateQuadMesh(mat);
@@ -277,48 +307,17 @@ namespace QDND.Combat.Arena
             particle.GlobalPosition = position + Vector3.Up * 1.0f;
             particle.Emitting = true;
 
-            FlashAtPosition(position, new Color(0.5f, 0.6f, 1.0f), 1.5f, 0.3f);
+            FlashAtPosition(position, color, 1.5f, 0.3f);
             TrackEffect(particle, 1.2f);
         }
 
-        private void SpawnSpellImpact(Vector3 position)
+        private void SpawnAoEBlast(Vector3 position, Color color)
         {
             if (!IsInsideTree())
                 return;
 
             var particle = GetFromPool();
-            var mat = CreateParticleMaterial(
-                new Color(0.6f, 0.4f, 1.0f),  // Purple impact
-                0.06f, 0.14f
-            );
-            particle.ProcessMaterial = CreateProcessMaterial(
-                velocity: 5.0f,
-                spread: 90.0f,
-                gravity: new Vector3(0, -3, 0),
-                lifetime: 0.5f
-            );
-            particle.DrawPass1 = CreateQuadMesh(mat);
-            particle.Amount = 20;
-            particle.Lifetime = 0.5;
-            particle.Explosiveness = 0.9f;
-            particle.OneShot = true;
-            particle.GlobalPosition = position + Vector3.Up * 1.0f;
-            particle.Emitting = true;
-
-            FlashAtPosition(position, new Color(0.7f, 0.4f, 1.0f), 2.5f, 0.15f);
-            TrackEffect(particle, 0.8f);
-        }
-
-        private void SpawnAoEBlast(Vector3 position)
-        {
-            if (!IsInsideTree())
-                return;
-
-            var particle = GetFromPool();
-            var mat = CreateParticleMaterial(
-                new Color(1.0f, 0.5f, 0.2f),  // Fire orange
-                0.1f, 0.25f
-            );
+            var mat = CreateParticleMaterial(color, 0.1f, 0.25f);
             particle.ProcessMaterial = CreateProcessMaterial(
                 velocity: 6.0f,
                 spread: 180.0f,
@@ -333,7 +332,7 @@ namespace QDND.Combat.Arena
             particle.GlobalPosition = position + Vector3.Up * 0.3f;
             particle.Emitting = true;
 
-            FlashAtPosition(position, new Color(1.0f, 0.6f, 0.2f), 4.0f, 0.25f);
+            FlashAtPosition(position, color, 4.0f, 0.25f);
             TrackEffect(particle, 1.2f);
         }
 
@@ -344,13 +343,14 @@ namespace QDND.Combat.Arena
 
             var particle = GetFromPool();
             var mat = CreateParticleMaterial(
-                new Color(0.3f, 1.0f, 0.5f),  // Healing green
-                0.04f, 0.09f
+                new Color(0.3f, 1.0f, 0.5f),
+                0.04f,
+                0.09f
             );
             particle.ProcessMaterial = CreateProcessMaterial(
                 velocity: 1.5f,
                 spread: 30.0f,
-                gravity: new Vector3(0, 3, 0),  // Float up gently
+                gravity: new Vector3(0, 3, 0),
                 lifetime: 1.0f
             );
             particle.DrawPass1 = CreateQuadMesh(mat);
@@ -372,8 +372,9 @@ namespace QDND.Combat.Arena
 
             var particle = GetFromPool();
             var mat = CreateParticleMaterial(
-                new Color(1.0f, 0.9f, 0.0f),  // Bright gold
-                0.1f, 0.2f
+                new Color(1.0f, 0.9f, 0.0f),
+                0.1f,
+                0.2f
             );
             particle.ProcessMaterial = CreateProcessMaterial(
                 velocity: 8.0f,
@@ -389,14 +390,13 @@ namespace QDND.Combat.Arena
             particle.GlobalPosition = position + Vector3.Up * 1.0f;
             particle.Emitting = true;
 
-            // Extra bright flash for crits
             FlashAtPosition(position, new Color(1.0f, 1.0f, 0.8f), 5.0f, 0.2f);
 
-            // Secondary ring of particles (slower, larger)
             var particle2 = GetFromPool();
             var mat2 = CreateParticleMaterial(
-                new Color(1.0f, 0.7f, 0.1f),  // Orange-gold
-                0.08f, 0.16f
+                new Color(1.0f, 0.7f, 0.1f),
+                0.08f,
+                0.16f
             );
             particle2.ProcessMaterial = CreateProcessMaterial(
                 velocity: 3.0f,
@@ -423,8 +423,9 @@ namespace QDND.Combat.Arena
 
             var particle = GetFromPool();
             var mat = CreateParticleMaterial(
-                new Color(0.3f, 0.0f, 0.0f),  // Dark red
-                0.08f, 0.18f
+                new Color(0.3f, 0.0f, 0.0f),
+                0.08f,
+                0.18f
             );
             particle.ProcessMaterial = CreateProcessMaterial(
                 velocity: 3.0f,
@@ -451,8 +452,9 @@ namespace QDND.Combat.Arena
 
             var particle = GetFromPool();
             var mat = CreateParticleMaterial(
-                new Color(0.9f, 0.9f, 1.0f),  // White-blue shimmer
-                0.03f, 0.07f
+                new Color(0.9f, 0.9f, 1.0f),
+                0.03f,
+                0.07f
             );
             particle.ProcessMaterial = CreateProcessMaterial(
                 velocity: 1.0f,
@@ -478,8 +480,9 @@ namespace QDND.Combat.Arena
 
             var particle = GetFromPool();
             var mat = CreateParticleMaterial(
-                new Color(0.6f, 0.0f, 0.8f),  // Purple debuff
-                0.04f, 0.08f
+                new Color(0.6f, 0.0f, 0.8f),
+                0.04f,
+                0.08f
             );
             particle.ProcessMaterial = CreateProcessMaterial(
                 velocity: 1.5f,
@@ -498,32 +501,10 @@ namespace QDND.Combat.Arena
             TrackEffect(particle, 1.1f);
         }
 
-        // =====================================================================
-        //  DAMAGE-TYPE MAPPING
-        // =====================================================================
-
-        /// <summary>Map a DamageType to its corresponding typed VFX, or SpellImpact for unknowns.</summary>
-        public static CombatVFXType DamageTypeToVFX(DamageType dt)
-        {
-            return dt switch
-            {
-                DamageType.Fire        => CombatVFXType.FireImpact,
-                DamageType.Cold        => CombatVFXType.ColdImpact,
-                DamageType.Lightning   => CombatVFXType.LightningImpact,
-                DamageType.Poison      => CombatVFXType.PoisonImpact,
-                DamageType.Acid        => CombatVFXType.AcidImpact,
-                DamageType.Necrotic    => CombatVFXType.NecroticImpact,
-                DamageType.Radiant     => CombatVFXType.RadiantImpact,
-                DamageType.Force       => CombatVFXType.ForceImpact,
-                DamageType.Psychic     => CombatVFXType.PsychicImpact,
-                DamageType.Thunder     => CombatVFXType.LightningImpact, // closest match
-                _                      => CombatVFXType.MeleeImpact,
-            };
-        }
-
         private void SpawnTypedImpact(Vector3 position, Color color, float velocity)
         {
-            if (!IsInsideTree()) return;
+            if (!IsInsideTree())
+                return;
 
             var particle = GetFromPool();
             var mat = CreateParticleMaterial(color, 0.06f, 0.14f);
@@ -544,10 +525,6 @@ namespace QDND.Combat.Arena
             FlashAtPosition(position, color, 2.5f, 0.15f);
             TrackEffect(particle, 0.8f);
         }
-
-        // =====================================================================
-        //  HELPERS
-        // =====================================================================
 
         private ParticleProcessMaterial CreateProcessMaterial(float velocity, float spread, Vector3 gravity, float lifetime)
         {
@@ -654,6 +631,16 @@ namespace QDND.Combat.Arena
                 Particles = particle,
                 ExpiresAt = Time.GetTicksMsec() / 1000.0 + duration
             });
+        }
+
+        private static Vector3 ToGodot(System.Numerics.Vector3 value)
+            => new(value.X, value.Y, value.Z);
+
+        private static System.Numerics.Vector3 Normalize(System.Numerics.Vector3 value)
+        {
+            if (value.LengthSquared() <= 1e-8f)
+                return System.Numerics.Vector3.UnitZ;
+            return System.Numerics.Vector3.Normalize(value);
         }
     }
 }

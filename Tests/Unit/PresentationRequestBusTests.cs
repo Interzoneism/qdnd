@@ -17,7 +17,11 @@ namespace QDND.Tests.Unit
 
             bus.OnRequestPublished += req => receivedRequests.Add(req);
 
-            var request = new VfxRequest("action_123", "vfx_fireball", new Vector3(1, 2, 3));
+            var request = new VfxRequest("action_123", VfxEventPhase.Impact)
+            {
+                PresetId = "impact_fire",
+                TargetPosition = new Vector3(1, 2, 3)
+            };
             bus.Publish(request);
 
             Assert.Single(receivedRequests);
@@ -51,7 +55,7 @@ namespace QDND.Tests.Unit
 
             bus.OnRequestPublished += req => receivedRequests.Add(req);
 
-            var req1 = new VfxRequest("action_1", "vfx_1", new Vector3(0, 0, 0));
+            var req1 = new VfxRequest("action_1", VfxEventPhase.Start) { PresetId = "cast_arcane_generic" };
             var req2 = new SfxRequest("action_1", "sfx_1");
             var req3 = new CameraFocusRequest("action_1", "target_1");
 
@@ -70,7 +74,7 @@ namespace QDND.Tests.Unit
         {
             var bus = new PresentationRequestBus();
 
-            var req1 = new VfxRequest("action_1", "vfx_1", new Vector3(0, 0, 0));
+            var req1 = new VfxRequest("action_1", VfxEventPhase.Start) { PresetId = "cast_arcane_generic" };
             var req2 = new SfxRequest("action_1", "sfx_1");
 
             bus.Publish(req1);
@@ -84,23 +88,36 @@ namespace QDND.Tests.Unit
         [Fact]
         public void VfxRequest_StoresRequiredData()
         {
-            var position = new Vector3(10, 20, 30);
-            var request = new VfxRequest("correlation_123", "vfx_explosion", position);
+            var request = new VfxRequest("correlation_123", VfxEventPhase.Projectile)
+            {
+                PresetId = "proj_arcane_generic",
+                SourcePosition = new Vector3(0, 0, 0),
+                TargetPosition = new Vector3(10, 0, 0),
+                Pattern = VfxTargetPattern.Path,
+                Seed = 99
+            };
 
             Assert.Equal(PresentationRequestType.VFX, request.Type);
             Assert.Equal("correlation_123", request.CorrelationId);
-            Assert.Equal("vfx_explosion", request.EffectId);
-            Assert.Equal(position, request.Position);
+            Assert.Equal(VfxEventPhase.Projectile, request.Phase);
+            Assert.Equal("proj_arcane_generic", request.PresetId);
+            Assert.Equal(VfxTargetPattern.Path, request.Pattern);
+            Assert.Equal(99, request.Seed);
         }
 
         [Fact]
         public void SfxRequest_StoresRequiredData()
         {
-            var request = new SfxRequest("correlation_456", "sfx_thunder");
+            var request = new SfxRequest("correlation_456", "sfx_thunder")
+            {
+                Phase = VfxEventPhase.Impact,
+                Pattern = VfxTargetPattern.Point
+            };
 
             Assert.Equal(PresentationRequestType.SFX, request.Type);
             Assert.Equal("correlation_456", request.CorrelationId);
             Assert.Equal("sfx_thunder", request.SoundId);
+            Assert.Equal(VfxEventPhase.Impact, request.Phase);
         }
 
         [Fact]
@@ -127,9 +144,9 @@ namespace QDND.Tests.Unit
         {
             var bus = new PresentationRequestBus();
 
-            bus.Publish(new VfxRequest("action_1", "vfx_1", Vector3.Zero));
+            bus.Publish(new VfxRequest("action_1", VfxEventPhase.Impact));
             bus.Publish(new SfxRequest("action_1", "sfx_1"));
-            bus.Publish(new VfxRequest("action_2", "vfx_2", Vector3.Zero));
+            bus.Publish(new VfxRequest("action_2", VfxEventPhase.Impact));
             bus.Publish(new SfxRequest("action_2", "sfx_2"));
 
             var action1Requests = bus.GetRequestsByCorrelation("action_1");
@@ -146,9 +163,9 @@ namespace QDND.Tests.Unit
         {
             var bus = new PresentationRequestBus();
 
-            bus.Publish(new VfxRequest("action_1", "vfx_1", Vector3.Zero));
+            bus.Publish(new VfxRequest("action_1", VfxEventPhase.Start));
             bus.Publish(new SfxRequest("action_1", "sfx_1"));
-            bus.Publish(new VfxRequest("action_1", "vfx_2", Vector3.Zero));
+            bus.Publish(new VfxRequest("action_1", VfxEventPhase.Impact));
             bus.Publish(new CameraFocusRequest("action_1", "target_1"));
 
             var vfxRequests = bus.GetRequestsByType(PresentationRequestType.VFX);
@@ -165,7 +182,7 @@ namespace QDND.Tests.Unit
         {
             var bus = new PresentationRequestBus();
 
-            bus.Publish(new VfxRequest("action_1", "vfx_1", Vector3.Zero));
+            bus.Publish(new VfxRequest("action_1", VfxEventPhase.Impact));
             bus.Publish(new SfxRequest("action_1", "sfx_1"));
 
             Assert.Equal(2, bus.AllRequests.Count);
@@ -181,7 +198,7 @@ namespace QDND.Tests.Unit
             var bus = new PresentationRequestBus();
             var before = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-            var request = new VfxRequest("action_1", "vfx_1", Vector3.Zero);
+            var request = new VfxRequest("action_1", VfxEventPhase.Impact);
             bus.Publish(request);
 
             var after = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -191,28 +208,33 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
-        public void VfxRequest_CanHaveOptionalTargetId()
+        public void VfxRequest_CanTrackMultipleTargets()
         {
-            var requestWithTarget = new VfxRequest("action_1", "vfx_buff", Vector3.Zero, "target_123");
+            var request = new VfxRequest("action_1", VfxEventPhase.Impact);
+            request.TargetIds.Add("target_1");
+            request.TargetIds.Add("target_2");
+            request.TargetPositions.Add(new Vector3(1, 0, 1));
+            request.TargetPositions.Add(new Vector3(2, 0, 2));
 
-            Assert.Equal("target_123", requestWithTarget.TargetId);
-
-            var requestWithoutTarget = new VfxRequest("action_2", "vfx_aoe", new Vector3(5, 0, 5));
-
-            Assert.Null(requestWithoutTarget.TargetId);
+            Assert.Equal(2, request.TargetIds.Count);
+            Assert.Equal(2, request.TargetPositions.Count);
         }
 
         [Fact]
-        public void SfxRequest_CanHaveOptionalPosition()
+        public void SfxRequest_CanHaveOptionalSpatialContext()
         {
-            var position = new Vector3(1, 2, 3);
-            var requestWithPosition = new SfxRequest("action_1", "sfx_footstep", position);
+            var requestWithPosition = new SfxRequest("action_1", "sfx_footstep")
+            {
+                SourcePosition = new Vector3(1, 2, 3),
+                TargetPosition = new Vector3(4, 5, 6)
+            };
 
-            Assert.Equal(position, requestWithPosition.Position);
+            Assert.Equal(new Vector3(1, 2, 3), requestWithPosition.SourcePosition);
+            Assert.Equal(new Vector3(4, 5, 6), requestWithPosition.TargetPosition);
 
             var requestWithoutPosition = new SfxRequest("action_2", "sfx_music");
-
-            Assert.Null(requestWithoutPosition.Position);
+            Assert.Null(requestWithoutPosition.SourcePosition);
+            Assert.Null(requestWithoutPosition.TargetPosition);
         }
 
         [Fact]

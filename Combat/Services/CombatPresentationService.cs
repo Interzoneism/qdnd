@@ -25,7 +25,6 @@ namespace QDND.Combat.Services
     {
         private readonly PresentationRequestBus _presentationBus;
         private readonly Dictionary<string, CombatantVisual> _combatantVisuals;
-        private readonly CombatVFXManager _vfxManager;
         private readonly Dictionary<string, List<Vector3>> _pendingJumpWorldPaths;
         private readonly TurnQueueService _turnQueue;
         private readonly CombatCameraService _cameraService;
@@ -52,7 +51,6 @@ namespace QDND.Combat.Services
 
         public CombatPresentationService(
             Dictionary<string, CombatantVisual> combatantVisuals,
-            CombatVFXManager vfxManager,
             Dictionary<string, List<Vector3>> pendingJumpWorldPaths,
             TurnQueueService turnQueue,
             CombatCameraService cameraService,
@@ -60,7 +58,6 @@ namespace QDND.Combat.Services
             float tileSize)
         {
             _combatantVisuals = combatantVisuals;
-            _vfxManager = vfxManager;
             _pendingJumpWorldPaths = pendingJumpWorldPaths;
             _turnQueue = turnQueue;
             _cameraService = cameraService;
@@ -172,7 +169,13 @@ namespace QDND.Combat.Services
             return timeline;
         }
 
-        public void SubscribeToTimelineMarkers(ActionTimeline timeline, ActionDefinition action, Combatant actor, List<Combatant> targets, ActionExecutionResult result)
+        public void SubscribeToTimelineMarkers(
+            ActionTimeline timeline,
+            ActionDefinition action,
+            Combatant actor,
+            List<Combatant> targets,
+            ActionExecutionResult result,
+            ActionExecutionOptions options = null)
         {
             string correlationId = $"{action.Id}_{actor.Id}_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
 
@@ -180,20 +183,29 @@ namespace QDND.Combat.Services
             {
                 // Look up marker to access Data, TargetId, Position fields
                 var marker = timeline.Markers.FirstOrDefault(m => m.Id == markerId);
-                EmitPresentationRequestForMarker(marker, markerType, correlationId, action, actor, targets, result);
+                EmitPresentationRequestForMarker(marker, markerType, correlationId, action, actor, targets, result, options);
             };
         }
 
-        private void EmitPresentationRequestForMarker(TimelineMarker marker, MarkerType markerType, string correlationId, ActionDefinition action, Combatant actor, List<Combatant> targets, ActionExecutionResult result)
+        private void EmitPresentationRequestForMarker(
+            TimelineMarker marker,
+            MarkerType markerType,
+            string correlationId,
+            ActionDefinition action,
+            Combatant actor,
+            List<Combatant> targets,
+            ActionExecutionResult result,
+            ActionExecutionOptions options)
         {
-            var primaryTarget = targets.FirstOrDefault() ?? actor;
+            var targetList = targets ?? new List<Combatant>();
+            var primaryTarget = targetList.FirstOrDefault() ?? actor;
 
             switch (markerType)
             {
                 case MarkerType.Start:
                     // Keep actor + targets in frame, but never force an auto-zoom-in.
                     _cameraService?.FrameCombatantsInView(
-                        _cameraService.BuildCameraFocusParticipants(actor, targets), 0.35f, 3.0f, allowZoomIn: false);
+                        _cameraService.BuildCameraFocusParticipants(actor, targetList), 0.35f, 3.0f, allowZoomIn: false);
                     _presentationBus.Publish(new CameraFocusRequest(correlationId, actor.Id));
 
                     if (_combatantVisuals.TryGetValue(actor.Id, out var actorStartVisual))
@@ -202,75 +214,52 @@ namespace QDND.Combat.Services
                         {
                             bool playedJumpStart = actorStartVisual.PlayJumpStartAnimation();
                             if (!playedJumpStart)
-                                actorStartVisual.PlayAbilityAnimation(action, targets?.Count ?? 0);
+                                actorStartVisual.PlayAbilityAnimation(action, targetList.Count);
                         }
                         else
                         {
-                            actorStartVisual.PlayAbilityAnimation(action, targets?.Count ?? 0);
+                            actorStartVisual.PlayAbilityAnimation(action, targetList.Count);
                         }
                     }
 
-                    // Spell cast VFX at caster
-                    if (action.AttackType == AttackType.RangedSpell || action.AttackType == AttackType.MeleeSpell)
-                    {
-                        var casterWorldPos = CombatantPositionToWorld(actor.Position);
-                        _vfxManager?.SpawnEffect(CombatVFXType.SpellCast, casterWorldPos);
-                    }
+                    var startVfx = BuildVfxRequest(correlationId, action, actor, primaryTarget, targetList, options, VfxEventPhase.Start, VfxTargetPattern.Point);
+                    if (!string.IsNullOrWhiteSpace(marker?.Data))
+                        startVfx.PresetId = marker.Data;
+                    _presentationBus.Publish(startVfx);
                     break;
 
                 case MarkerType.Projectile:
-                    // Spawn projectile VFX from caster to target
                     if (primaryTarget != null)
                     {
-                        var projOrigin = CombatantPositionToWorld(actor.Position) + Vector3.Up * 1.2f;
-                        var projTarget = CombatantPositionToWorld(primaryTarget.Position) + Vector3.Up * 1.0f;
-                        var projColor = (action.AttackType == AttackType.RangedSpell)
-                            ? new Color(0.5f, 0.6f, 1.0f)   // Blue for spells
-                            : new Color(0.8f, 0.7f, 0.5f);  // Brown for ranged weapons
-                        float projDuration = Mathf.Clamp(projOrigin.DistanceTo(projTarget) / 15f, 0.15f, 0.8f);
-                        _vfxManager?.SpawnProjectile(projOrigin, projTarget, projDuration, projColor);
-                    }
-
-                    // Legacy VFX bus request
-                    if (marker != null)
-                    {
-                        string vfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : action.VfxId;
-                        if (!string.IsNullOrEmpty(vfxId))
-                        {
-                            var actorPos = new System.Numerics.Vector3(actor.Position.X, actor.Position.Y, actor.Position.Z);
-                            _presentationBus.Publish(new VfxRequest(correlationId, vfxId, actorPos, actor.Id));
-                        }
+                        var projVfx = BuildVfxRequest(correlationId, action, actor, primaryTarget, targetList, options, VfxEventPhase.Projectile, VfxTargetPattern.Path);
+                        projVfx.TargetPosition = ToNumeric(primaryTarget.Position);
+                        projVfx.Direction = SafeNormalize(ToNumeric(primaryTarget.Position) - ToNumeric(actor.Position));
+                        projVfx.Magnitude = actor.Position.DistanceTo(primaryTarget.Position);
+                        if (!string.IsNullOrWhiteSpace(marker?.Data))
+                            projVfx.PresetId = marker.Data;
+                        _presentationBus.Publish(projVfx);
                     }
                     break;
 
                 case MarkerType.Hit:
                     // Keep the attacker and everyone affected in view at impact time.
                     _cameraService?.FrameCombatantsInView(
-                        _cameraService.BuildCameraFocusParticipants(actor, targets), 0.22f, 2.5f, allowZoomIn: false);
+                        _cameraService.BuildCameraFocusParticipants(actor, targetList), 0.22f, 2.5f, allowZoomIn: false);
                     if (primaryTarget != null)
                         _presentationBus.Publish(new CameraFocusRequest(correlationId, primaryTarget.Id));
-
-                    // Emit VFX for ability at primary target
-                    if (!string.IsNullOrEmpty(action.VfxId) && primaryTarget != null)
-                    {
-                        var targetPos = new System.Numerics.Vector3(primaryTarget.Position.X, primaryTarget.Position.Y, primaryTarget.Position.Z);
-                        _presentationBus.Publish(new VfxRequest(correlationId, action.VfxId, targetPos, primaryTarget.Id));
-                    }
 
                     // Emit SFX for ability at primary target
                     if (!string.IsNullOrEmpty(action.SfxId) && primaryTarget != null)
                     {
-                        var targetPos = new System.Numerics.Vector3(primaryTarget.Position.X, primaryTarget.Position.Y, primaryTarget.Position.Z);
-                        _presentationBus.Publish(new SfxRequest(correlationId, action.SfxId, targetPos));
+                        var hitSfx = BuildSfxRequest(correlationId, action, actor, primaryTarget, targetList, options, action.SfxId, VfxEventPhase.Impact, VfxTargetPattern.Point);
+                        _presentationBus.Publish(hitSfx);
                     }
 
                     // Show damage/healing for ALL targets with VFX
-                    foreach (var t in targets)
+                    foreach (var t in targetList)
                     {
                         if (!_combatantVisuals.TryGetValue(t.Id, out var visual))
                             continue;
-
-                        var tWorldPos = CombatantPositionToWorld(t.Position);
 
                         if (result.AttackResult != null && !result.AttackResult.IsSuccess)
                         {
@@ -286,26 +275,30 @@ namespace QDND.Combat.Services
                                 if (effect.EffectType == "damage")
                                 {
                                     // Parse damage type from effect data for coloring and VFX
-                                    DamageType dt = DamageType.Slashing;
-                                    if (effect.Data.TryGetValue("damageType", out var dtObj) && dtObj is string dtStr)
-                                        Enum.TryParse<DamageType>(dtStr, ignoreCase: true, out dt);
+                                    var dt = ParseDamageType(effect);
 
                                     visual.ShowDamage((int)effect.Value, isCritical, dt);
 
-                                    // VFX: critical always wins; otherwise use damage-type-specific impact
-                                    if (isCritical)
-                                        _vfxManager?.SpawnEffect(CombatVFXType.CriticalHit, tWorldPos);
-                                    else
-                                        _vfxManager?.SpawnEffect(CombatVFXManager.DamageTypeToVFX(dt), tWorldPos);
+                                    var impactRequest = BuildVfxRequest(correlationId, action, actor, t, new List<Combatant> { t }, options, VfxEventPhase.Impact, VfxTargetPattern.Point);
+                                    impactRequest.DamageType = dt;
+                                    impactRequest.IsCritical = isCritical;
+                                    impactRequest.Magnitude = effect.Value;
+                                    impactRequest.DidKill = !t.IsActive;
+                                    _presentationBus.Publish(impactRequest);
 
-                                    // Check for death
                                     if (!t.IsActive)
-                                        _vfxManager?.SpawnEffect(CombatVFXType.DeathBurst, tWorldPos);
+                                    {
+                                        var deathRequest = BuildVfxRequest(correlationId, action, actor, t, new List<Combatant> { t }, options, VfxEventPhase.Death, VfxTargetPattern.Point);
+                                        deathRequest.DidKill = true;
+                                        _presentationBus.Publish(deathRequest);
+                                    }
                                 }
                                 else if (effect.EffectType == "heal")
                                 {
                                     visual.ShowHealing((int)effect.Value);
-                                    _vfxManager?.SpawnEffect(CombatVFXType.HealingShimmer, tWorldPos);
+                                    var healRequest = BuildVfxRequest(correlationId, action, actor, t, new List<Combatant> { t }, options, VfxEventPhase.Heal, VfxTargetPattern.Point);
+                                    healRequest.Magnitude = effect.Value;
+                                    _presentationBus.Publish(healRequest);
                                 }
                             }
                         }
@@ -392,7 +385,7 @@ namespace QDND.Combat.Services
                         }
 
                         // Only show save text for single-target effects (AoE per-target saves need SaveResultByTarget)
-                        if (result.SaveResult != null && !string.IsNullOrEmpty(action?.SaveType) && targets.Count == 1)
+                        if (result.SaveResult != null && !string.IsNullOrEmpty(action?.SaveType) && targetList.Count == 1)
                         {
                             int saveDC = result.SaveResult.Input?.DC ?? 0;
                             int saveRoll = (int)result.SaveResult.FinalValue;
@@ -415,24 +408,33 @@ namespace QDND.Combat.Services
                     bool isAreaAbility = action.TargetType == TargetType.Circle ||
                                          action.TargetType == TargetType.Cone ||
                                          action.TargetType == TargetType.Line;
-                    if (isAreaAbility && targets.Count > 1 && primaryTarget != null)
+                    if (isAreaAbility && targetList.Count > 1 && primaryTarget != null)
                     {
-                        var aoeCenterWorld = CombatantPositionToWorld(primaryTarget.Position);
-                        _vfxManager?.SpawnEffect(CombatVFXType.AoEBlast, aoeCenterWorld);
+                        var areaRequest = BuildVfxRequest(
+                            correlationId,
+                            action,
+                            actor,
+                            primaryTarget,
+                            targetList,
+                            options,
+                            VfxEventPhase.Area,
+                            ResolvePattern(action.TargetType));
+                        areaRequest.Magnitude = ResolveAreaMagnitude(action);
+                        _presentationBus.Publish(areaRequest);
                     }
                     break;
 
                 case MarkerType.VFX:
-                    // Additional VFX marker (e.g., spell cast start)
-                    // Use marker.Data with fallback to action.VfxId
-                    if (marker != null)
+                    // Additional VFX marker uses explicit marker preset only.
+                    if (!string.IsNullOrWhiteSpace(marker?.Data))
                     {
-                        string vfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : action.VfxId;
-                        if (!string.IsNullOrEmpty(vfxId))
-                        {
-                            var actorPos = new System.Numerics.Vector3(actor.Position.X, actor.Position.Y, actor.Position.Z);
-                            _presentationBus.Publish(new VfxRequest(correlationId, vfxId, actorPos, actor.Id));
-                        }
+                        var markerVfx = BuildVfxRequest(correlationId, action, actor, primaryTarget, targetList, options, VfxEventPhase.Custom, VfxTargetPattern.Point);
+                        markerVfx.PresetId = marker.Data;
+                        if (marker.Position.HasValue)
+                            markerVfx.TargetPosition = ToNumeric(marker.Position.Value);
+                        if (!string.IsNullOrWhiteSpace(marker.TargetId))
+                            markerVfx.PrimaryTargetId = marker.TargetId;
+                        _presentationBus.Publish(markerVfx);
                     }
                     break;
 
@@ -444,8 +446,10 @@ namespace QDND.Combat.Services
                         string sfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : action.SfxId;
                         if (!string.IsNullOrEmpty(sfxId))
                         {
-                            var actorPos = new System.Numerics.Vector3(actor.Position.X, actor.Position.Y, actor.Position.Z);
-                            _presentationBus.Publish(new SfxRequest(correlationId, sfxId, actorPos));
+                            var sfxRequest = BuildSfxRequest(correlationId, action, actor, primaryTarget, targetList, options, sfxId, VfxEventPhase.Custom, VfxTargetPattern.Point);
+                            if (marker.Position.HasValue)
+                                sfxRequest.TargetPosition = ToNumeric(marker.Position.Value);
+                            _presentationBus.Publish(sfxRequest);
                         }
                     }
                     break;
@@ -483,6 +487,172 @@ namespace QDND.Combat.Services
                     // Explicit camera release marker
                     _presentationBus.Publish(new CameraReleaseRequest(correlationId));
                     break;
+            }
+        }
+
+        private VfxRequest BuildVfxRequest(
+            string correlationId,
+            ActionDefinition action,
+            Combatant actor,
+            Combatant primaryTarget,
+            List<Combatant> targets,
+            ActionExecutionOptions options,
+            VfxEventPhase phase,
+            VfxTargetPattern pattern)
+        {
+            var request = new VfxRequest(correlationId, phase)
+            {
+                ActionId = action?.Id,
+                VariantId = options?.VariantId,
+                SourceId = actor?.Id,
+                PrimaryTargetId = primaryTarget?.Id,
+                SourcePosition = actor != null ? ToNumeric(actor.Position) : null,
+                TargetPosition = primaryTarget != null ? ToNumeric(primaryTarget.Position) : null,
+                CastPosition = options?.TargetPosition.HasValue == true
+                    ? ToNumeric(options.TargetPosition.Value)
+                    : actor != null ? ToNumeric(actor.Position) : null,
+                Direction = actor != null && primaryTarget != null
+                    ? SafeNormalize(ToNumeric(primaryTarget.Position) - ToNumeric(actor.Position))
+                    : null,
+                AttackType = action?.AttackType,
+                TargetType = action?.TargetType,
+                Intent = action?.Intent,
+                Pattern = pattern,
+                Magnitude = ResolveAreaMagnitude(action),
+                Seed = ComputeStableSeed(correlationId, action?.Id, actor?.Id, phase.ToString(), options?.VariantId)
+            };
+
+            if (targets != null)
+            {
+                foreach (var target in targets)
+                {
+                    if (target == null)
+                        continue;
+
+                    request.TargetIds.Add(target.Id);
+                    request.TargetPositions.Add(ToNumeric(target.Position));
+                }
+            }
+
+            return request;
+        }
+
+        private SfxRequest BuildSfxRequest(
+            string correlationId,
+            ActionDefinition action,
+            Combatant actor,
+            Combatant primaryTarget,
+            List<Combatant> targets,
+            ActionExecutionOptions options,
+            string soundId,
+            VfxEventPhase phase,
+            VfxTargetPattern pattern)
+        {
+            var request = new SfxRequest(correlationId, soundId)
+            {
+                ActionId = action?.Id,
+                VariantId = options?.VariantId,
+                SourceId = actor?.Id,
+                PrimaryTargetId = primaryTarget?.Id,
+                SourcePosition = actor != null ? ToNumeric(actor.Position) : null,
+                TargetPosition = primaryTarget != null ? ToNumeric(primaryTarget.Position) : null,
+                CastPosition = options?.TargetPosition.HasValue == true
+                    ? ToNumeric(options.TargetPosition.Value)
+                    : actor != null ? ToNumeric(actor.Position) : null,
+                Direction = actor != null && primaryTarget != null
+                    ? SafeNormalize(ToNumeric(primaryTarget.Position) - ToNumeric(actor.Position))
+                    : null,
+                AttackType = action?.AttackType,
+                TargetType = action?.TargetType,
+                Intent = action?.Intent,
+                Phase = phase,
+                Pattern = pattern,
+                Magnitude = ResolveAreaMagnitude(action),
+                Seed = ComputeStableSeed(correlationId, action?.Id, actor?.Id, phase.ToString(), "sfx")
+            };
+
+            if (targets != null)
+            {
+                foreach (var target in targets)
+                {
+                    if (target == null)
+                        continue;
+
+                    request.TargetIds.Add(target.Id);
+                }
+            }
+
+            return request;
+        }
+
+        private static DamageType ParseDamageType(EffectResult effect)
+        {
+            if (effect?.Data != null &&
+                effect.Data.TryGetValue("damageType", out var dtObj) &&
+                dtObj is string dtStr &&
+                Enum.TryParse<DamageType>(dtStr, ignoreCase: true, out var parsed))
+            {
+                return parsed;
+            }
+
+            return DamageType.Slashing;
+        }
+
+        private static VfxTargetPattern ResolvePattern(TargetType targetType)
+        {
+            return targetType switch
+            {
+                TargetType.SingleUnit => VfxTargetPattern.PerTarget,
+                TargetType.MultiUnit => VfxTargetPattern.PerTarget,
+                TargetType.Circle => VfxTargetPattern.Circle,
+                TargetType.Cone => VfxTargetPattern.Cone,
+                TargetType.Line => VfxTargetPattern.Line,
+                TargetType.Point => VfxTargetPattern.Point,
+                _ => VfxTargetPattern.Point
+            };
+        }
+
+        private static float ResolveAreaMagnitude(ActionDefinition action)
+        {
+            if (action == null)
+                return 1f;
+
+            return action.TargetType switch
+            {
+                TargetType.Circle => Math.Max(0.5f, action.AreaRadius),
+                TargetType.Cone => Math.Max(1f, action.Range),
+                TargetType.Line => Math.Max(1f, action.Range),
+                _ => 1f
+            };
+        }
+
+        private static System.Numerics.Vector3 ToNumeric(Vector3 value)
+            => new(value.X, value.Y, value.Z);
+
+        private static System.Numerics.Vector3 SafeNormalize(System.Numerics.Vector3 value)
+        {
+            if (value.LengthSquared() <= 1e-8f)
+                return System.Numerics.Vector3.UnitZ;
+            return System.Numerics.Vector3.Normalize(value);
+        }
+
+        private static int ComputeStableSeed(params string[] parts)
+        {
+            unchecked
+            {
+                int hash = (int)2166136261;
+                foreach (var part in parts)
+                {
+                    if (string.IsNullOrEmpty(part))
+                        continue;
+
+                    for (int i = 0; i < part.Length; i++)
+                    {
+                        hash ^= part[i];
+                        hash *= 16777619;
+                    }
+                }
+                return hash;
             }
         }
 

@@ -109,7 +109,7 @@ namespace QDND.Tests.Integration
             {
                 var vfxRequests = requests.OfType<VfxRequest>().ToList();
                 Assert.NotEmpty(vfxRequests);
-                Assert.Contains(vfxRequests, r => r.EffectId == action.VfxId);
+                Assert.Contains(vfxRequests, r => r.Phase == VfxEventPhase.Impact);
             }
 
             if (!string.IsNullOrEmpty(action.SfxId))
@@ -175,9 +175,9 @@ namespace QDND.Tests.Integration
                         int vfxCountAfter = requests.OfType<VfxRequest>().Count();
                         Assert.True(vfxCountAfter > vfxCountBefore, "Projectile marker should emit VfxRequest");
 
-                        // Assert the new VfxRequest has EffectId == action.VfxId
+                        // Assert the new VfxRequest maps to projectile phase.
                         var newVfxRequest = requests.OfType<VfxRequest>().Last();
-                        Assert.Equal(action.VfxId, newVfxRequest.EffectId);
+                        Assert.Equal(VfxEventPhase.Projectile, newVfxRequest.Phase);
                     }
                     else
                     {
@@ -415,28 +415,42 @@ namespace QDND.Tests.Integration
                     break;
 
                 case MarkerType.Projectile:
-                    // Emit VFX for projectile using marker.Data, fallback to action.VfxId
+                    // Emit projectile VFX request (preset override only if marker data is present)
                     {
-                        string vfxId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : action.VfxId;
-                        if (!string.IsNullOrEmpty(vfxId))
+                        var actorPos = new System.Numerics.Vector3(attacker.Position.X, attacker.Position.Y, attacker.Position.Z);
+                        var targetPos = new System.Numerics.Vector3(target.Position.X, target.Position.Y, target.Position.Z);
+                        _bus.Publish(new VfxRequest(correlationId, VfxEventPhase.Projectile)
                         {
-                            var actorPos = new System.Numerics.Vector3(attacker.Position.X, attacker.Position.Y, attacker.Position.Z);
-                            _bus.Publish(new VfxRequest(correlationId, vfxId, actorPos, attacker.Id));
-                        }
+                            PresetId = !string.IsNullOrEmpty(marker.Data) ? marker.Data : null,
+                            SourceId = attacker.Id,
+                            PrimaryTargetId = target.Id,
+                            SourcePosition = actorPos,
+                            TargetPosition = targetPos,
+                            Pattern = VfxTargetPattern.Path
+                        });
                     }
                     break;
 
                 case MarkerType.Hit:
                     // Emit VFX/SFX at hit time
-                    if (!string.IsNullOrEmpty(action.VfxId))
+                    var impactPos = new System.Numerics.Vector3(target.Position.X, target.Position.Y, target.Position.Z);
+                    _bus.Publish(new VfxRequest(correlationId, VfxEventPhase.Impact)
                     {
-                        var targetPos = new System.Numerics.Vector3(target.Position.X, target.Position.Y, target.Position.Z);
-                        _bus.Publish(new VfxRequest(correlationId, action.VfxId, targetPos, target.Id));
-                    }
+                        SourceId = attacker.Id,
+                        PrimaryTargetId = target.Id,
+                        SourcePosition = new System.Numerics.Vector3(attacker.Position.X, attacker.Position.Y, attacker.Position.Z),
+                        TargetPosition = impactPos,
+                        Pattern = VfxTargetPattern.Point
+                    });
                     if (!string.IsNullOrEmpty(action.SfxId))
                     {
-                        var targetPos = new System.Numerics.Vector3(target.Position.X, target.Position.Y, target.Position.Z);
-                        _bus.Publish(new SfxRequest(correlationId, action.SfxId, targetPos));
+                        _bus.Publish(new SfxRequest(correlationId, action.SfxId)
+                        {
+                            SourceId = attacker.Id,
+                            PrimaryTargetId = target.Id,
+                            TargetPosition = impactPos,
+                            Phase = VfxEventPhase.Impact
+                        });
                     }
                     // Focus camera on target during hit
                     _bus.Publish(new CameraFocusRequest(correlationId, target.Id));
@@ -447,23 +461,31 @@ namespace QDND.Tests.Integration
                     {
                         var pos = marker.Position ?? new Godot.Vector3(target.Position.X, target.Position.Y, target.Position.Z);
                         var numPos = new System.Numerics.Vector3(pos.X, pos.Y, pos.Z);
-                        _bus.Publish(new VfxRequest(correlationId, marker.Data, numPos, marker.TargetId ?? target.Id));
-                    }
-                    else if (!string.IsNullOrEmpty(action.VfxId))
-                    {
-                        var targetPos = new System.Numerics.Vector3(target.Position.X, target.Position.Y, target.Position.Z);
-                        _bus.Publish(new VfxRequest(correlationId, action.VfxId, targetPos, target.Id));
+                        _bus.Publish(new VfxRequest(correlationId, VfxEventPhase.Custom)
+                        {
+                            PresetId = marker.Data,
+                            SourceId = attacker.Id,
+                            PrimaryTargetId = marker.TargetId ?? target.Id,
+                            TargetPosition = numPos,
+                            Pattern = VfxTargetPattern.Point
+                        });
                     }
                     break;
 
                 case MarkerType.Sound:
                     if (!string.IsNullOrEmpty(marker.Data))
                     {
-                        _bus.Publish(new SfxRequest(correlationId, marker.Data));
+                        _bus.Publish(new SfxRequest(correlationId, marker.Data)
+                        {
+                            Phase = VfxEventPhase.Custom
+                        });
                     }
                     else if (!string.IsNullOrEmpty(action.SfxId))
                     {
-                        _bus.Publish(new SfxRequest(correlationId, action.SfxId));
+                        _bus.Publish(new SfxRequest(correlationId, action.SfxId)
+                        {
+                            Phase = VfxEventPhase.Custom
+                        });
                     }
                     break;
 
