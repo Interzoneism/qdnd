@@ -142,6 +142,12 @@ namespace QDND.Combat.Services
         /// <summary>Increment the action counter, mark it as executing, and return the new ID.</summary>
         public long AllocateActionId() => _executingActionId = ++_currentActionId;
 
+        /// <summary>
+        /// Optional callback fired when an AI combatant uses an Attack or UseAbility action.
+        /// Set by CombatArena to propagate the event to the HUD.
+        /// </summary>
+        public Action<Combatant, ActionDefinition> OnAIAbilityNotify { get; set; }
+
         // ────────────────────────────────────────────────────────────────────
         // Safety timeout (called from CombatArena._Process)
         // ────────────────────────────────────────────────────────────────────
@@ -216,6 +222,9 @@ namespace QDND.Combat.Services
                     if (actionDef == null)
                         return false;
 
+                    // Notify HUD of AI ability usage (for banner display)
+                    OnAIAbilityNotify?.Invoke(actor, actionDef);
+
                     var options = new ActionExecutionOptions
                     {
                         VariantId = action.VariantId,
@@ -234,7 +243,9 @@ namespace QDND.Combat.Services
                     bool isArea = actionDef.TargetType == TargetType.Circle ||
                                   actionDef.TargetType == TargetType.Cone ||
                                   actionDef.TargetType == TargetType.Line ||
-                                  actionDef.TargetType == TargetType.Point;
+                                  actionDef.TargetType == TargetType.Point ||
+                                  actionDef.TargetType == TargetType.Charge ||
+                                  actionDef.TargetType == TargetType.WallSegment;
                     if (isArea && action.TargetPosition.HasValue)
                     {
                         ExecuteAbilityAtPosition(actor.Id, actionId, action.TargetPosition.Value, options);
@@ -456,6 +467,57 @@ namespace QDND.Combat.Services
             ExecuteResolvedAction(actor, action, new List<Combatant> { target }, target.Name, null, options);
         }
 
+        /// <summary>Execute a MultiUnit ability against a pre-collected list of target IDs.</summary>
+        public void ExecuteAction(string actorId, string actionId, List<string> targetIds, ActionExecutionOptions options = null)
+        {
+            _log($"ExecuteAction (multi-target): {actorId} -> {actionId} -> [{string.Join(", ", targetIds)}]");
+
+            var actor = _combatContext.GetCombatant(actorId);
+            if (actor?.IsPlayerControlled == true && !_canPlayerControl(actorId))
+            {
+                _log($"Cannot execute ability: player cannot control {actorId}");
+                return;
+            }
+            if (actor == null) return;
+
+            var action = _effectPipeline.GetAction(actionId);
+            if (action == null)
+            {
+                _log($"Action not found: {actionId}");
+                return;
+            }
+
+            var targets = new List<Combatant>();
+            foreach (var id in targetIds)
+            {
+                var t = _combatContext.GetCombatant(id);
+                if (t != null) targets.Add(t);
+            }
+
+            if (targets.Count == 0)
+            {
+                _log("No valid targets for multi-target execution");
+                return;
+            }
+
+            // Filter to only valid targets (faction/range validation)
+            if (_targetValidator != null)
+            {
+                var validIds = _targetValidator.GetValidTargets(action, actor, _combatants)
+                                               .Select(c => c.Id)
+                                               .ToHashSet();
+                targets = targets.Where(t => validIds.Contains(t.Id)).ToList();
+            }
+            if (targets.Count == 0)
+            {
+                _log("No valid targets in multi-target execution");
+                return;
+            }
+
+            _faceCombatantTowardsGridPoint(actor.Id, targets[0].Position, DebugFlags.SkipAnimations);
+            ExecuteResolvedAction(actor, action, targets, $"multi:{string.Join(",", targetIds)}", null, options);
+        }
+
         /// <summary>Execute a target-less ability (self/all/none target types).</summary>
         public void ExecuteAction(string actorId, string actionId)
         {
@@ -555,7 +617,9 @@ namespace QDND.Combat.Services
             if (action.TargetType != TargetType.Circle &&
                 action.TargetType != TargetType.Cone &&
                 action.TargetType != TargetType.Line &&
-                action.TargetType != TargetType.Point)
+                action.TargetType != TargetType.Point &&
+                action.TargetType != TargetType.Charge &&
+                action.TargetType != TargetType.WallSegment)
             {
                 _log($"Action {actionId} does not support point targeting ({action.TargetType})");
                 return;
@@ -597,11 +661,38 @@ namespace QDND.Combat.Services
                 else
                 {
                     // Validate static range for non-jump point/AoE abilities.
-                    float distanceToCastPoint = actor.Position.DistanceTo(targetPosition);
-                    if (distanceToCastPoint > action.Range)
+                    if (action.TargetType == TargetType.WallSegment)
                     {
-                        _log($"Cast point {targetPosition} out of range: {distanceToCastPoint:F2} > {action.Range:F2}");
-                        return;
+                        // For wall spells, validate: start point in range, wall length within max
+                        var startPos = options?.SecondaryTargetPosition;
+                        if (startPos.HasValue)
+                        {
+                            float startDist = actor.Position.DistanceTo(startPos.Value);
+                            if (startDist > action.Range)
+                            {
+                                _log($"Wall start out of range: {startDist:F2} > {action.Range:F2}");
+                                return;
+                            }
+                            if (action.MaxWallLength > 0f)
+                            {
+                                float wallLen = startPos.Value.DistanceTo(targetPosition);
+                                if (wallLen > action.MaxWallLength)
+                                {
+                                    _log($"Wall too long: {wallLen:F2} > {action.MaxWallLength:F2}");
+                                    return;
+                                }
+                            }
+                        }
+                        // If no start point in options, fall through (first-click case is handled in input handler)
+                    }
+                    else
+                    {
+                        float distanceToCastPoint = actor.Position.DistanceTo(targetPosition);
+                        if (distanceToCastPoint > action.Range)
+                        {
+                            _log($"Cast point {targetPosition} out of range: {distanceToCastPoint:F2} > {action.Range:F2}");
+                            return;
+                        }
                     }
                 }
             }
@@ -635,8 +726,11 @@ namespace QDND.Combat.Services
             else if (_targetValidator != null)
             {
                 Vector3 GetPosition(Combatant c) => c.Position;
+                Vector3? wallStartParam = (action.TargetType == TargetType.WallSegment)
+                    ? options?.SecondaryTargetPosition
+                    : null;
                 resolvedTargets = _targetValidator.ResolveAreaTargets(
-                    action, actor, targetPosition, _combatants, GetPosition);
+                    action, actor, targetPosition, _combatants, GetPosition, wallStartParam);
             }
 
             _faceCombatantTowardsGridPoint(actor.Id, targetPosition, DebugFlags.SkipAnimations);

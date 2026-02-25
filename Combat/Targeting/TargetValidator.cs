@@ -324,7 +324,8 @@ namespace QDND.Combat.Targeting
             Combatant source,
             Godot.Vector3 targetPoint,
             List<Combatant> allCombatants,
-            Func<Combatant, Godot.Vector3> getPosition)
+            Func<Combatant, Godot.Vector3> getPosition,
+            Godot.Vector3? wallStart = null)
         {
             var targets = new List<Combatant>();
 
@@ -344,6 +345,7 @@ namespace QDND.Combat.Targeting
                     Actions.TargetType.Circle => distance <= action.AreaRadius,
                     Actions.TargetType.Cone => IsInCone(getPosition(source), targetPoint, pos, action.ConeAngle, action.Range),
                     Actions.TargetType.Line => IsOnLine(getPosition(source), targetPoint, pos, action.LineWidth),
+                    Actions.TargetType.WallSegment => wallStart.HasValue && IsOnLine(wallStart.Value, targetPoint, pos, action.LineWidth),
                     _ => false
                 };
 

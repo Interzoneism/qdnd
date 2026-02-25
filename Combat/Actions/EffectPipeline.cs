@@ -391,6 +391,16 @@ namespace QDND.Combat.Actions
         }
 
         /// <summary>
+        /// Get the total attack roll bonus for a combatant using a specific action.
+        /// Public wrapper for hover UI hit chance display.
+        /// </summary>
+        public int GetAttackBonus(Combatant source, ActionDefinition action)
+        {
+            var tags = action.Tags ?? new HashSet<string>();
+            return GetAttackRollBonus(source, action, tags);
+        }
+
+        /// <summary>
         /// Check if an ability can be used.
         /// </summary>
         public (bool CanUse, string Reason) CanUseAbility(string actionId, Combatant source)

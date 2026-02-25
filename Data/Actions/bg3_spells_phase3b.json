@@ -102,9 +102,11 @@
       "name": "Blade Barrier",
       "description": "You create a vertical wall of whirling, razor-sharp blades made of magical energy. The wall appears within range and lasts for the duration. Creatures take 6d10 slashing damage on a failed Dexterity save.",
       "icon": "res://assets/Images/Icons Spells/Blade_Barrier_Unfaded_Icon.png",
-      "targetType": "point",
+      "targetType": "wallSegment",
       "targetFilter": "All",
       "range": 90,
+      "lineWidth": 3,
+      "maxWallLength": 36,
       "cost": {
         "usesAction": true,
         "resourceCosts": {

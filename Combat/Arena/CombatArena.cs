@@ -61,6 +61,9 @@ namespace QDND.Combat.Arena
         private AoEIndicator _aoeIndicator;
         private ReactionPromptUI _reactionPromptUI;
         private CombatVFXManager _vfxManager;
+        private PointReticle _pointReticle;
+        private ChargePathPreview _chargePathPreview;
+        private WallSegmentPreview _wallSegmentPreview;
 
         // Combat backend
         private CombatContext _combatContext;
@@ -215,6 +218,21 @@ namespace QDND.Combat.Arena
         /// </summary>
         public string ActiveCombatantId => _turnQueue?.CurrentCombatant?.Id;
 
+        // ── Hover tracking ────────────────────────────────────────────────
+        /// <summary>Fired when the player's mouse hover target changes (null = no hover).</summary>
+        public event Action<string> CombatantHoverChanged;
+        public string HoveredCombatantId { get; private set; }
+
+        public void NotifyHoverChanged(string combatantId)
+        {
+            HoveredCombatantId = combatantId;
+            CombatantHoverChanged?.Invoke(combatantId);
+        }
+
+        // ── AI ability notification ───────────────────────────────────────
+        /// <summary>Fired when an AI combatant uses an Attack or UseAbility action.</summary>
+        public event Action<Combatant, ActionDefinition> OnAIAbilityUsed;
+
         /// <summary>
         /// Check if a combatant can be controlled by the player right now.
         /// Phase 2: Only the active combatant during player turn in PlayerDecision state.
@@ -272,6 +290,15 @@ namespace QDND.Combat.Arena
 
             _attackTargetingLine = new AttackTargetingLine { Name = "AttackTargetingLine" };
             AddChild(_attackTargetingLine);
+
+            _pointReticle = new PointReticle { Name = "PointReticle" };
+            AddChild(_pointReticle);
+
+            _chargePathPreview = new ChargePathPreview { Name = "ChargePathPreview" };
+            AddChild(_chargePathPreview);
+
+            _wallSegmentPreview = new WallSegmentPreview { Name = "WallSegmentPreview" };
+            AddChild(_wallSegmentPreview);
 
             // Create and add reaction prompt UI to HUD layer
             _reactionPromptUI = new ReactionPromptUI { Name = "ReactionPromptUI" };
@@ -1034,7 +1061,8 @@ namespace QDND.Combat.Arena
             _combatContext.RegisterService(_presentationService.PresentationBus);
             _presentationService.SetPreviewDependencies(
                 _combatContext, _effectPipeline, _rulesEngine, _targetValidator,
-                _attackTargetingLine, _aoeIndicator, _jumpTrajectoryPreview);
+                _attackTargetingLine, _aoeIndicator, _jumpTrajectoryPreview,
+                _pointReticle, _chargePathPreview, _wallSegmentPreview);
 
             Log($"UI Models initialized");
 
@@ -1091,6 +1119,7 @@ namespace QDND.Combat.Arena
                 secs => GetTree().CreateTimer(secs),
                 Log);
             _effectPipeline.OnAbilityExecuted += _actionExecutionService.OnAbilityExecuted;
+            _actionExecutionService.OnAIAbilityNotify = (actor, actionDef) => OnAIAbilityUsed?.Invoke(actor, actionDef);
 
             Log($"Services registered: {_combatContext.GetRegisteredServices().Count}");
 
@@ -1355,13 +1384,16 @@ namespace QDND.Combat.Arena
                     return;
                 }
 
-                // For AoE abilities, prepare AoE indicator (will be shown on mouse move).
+                // Ground-targeted abilities (AoE, Point, Charge, WallSegment) are preview-driven on mouse move.
                 // For single-target abilities, highlight valid targets.
                 if (action.TargetType == TargetType.Circle ||
                     action.TargetType == TargetType.Cone ||
-                    action.TargetType == TargetType.Line)
+                    action.TargetType == TargetType.Line ||
+                    action.TargetType == TargetType.Point ||
+                    action.TargetType == TargetType.Charge ||
+                    action.TargetType == TargetType.WallSegment)
                 {
-                    Log($"AoE action selected: {action.TargetType}");
+                    Log($"Ground-targeted action selected: {action.TargetType}");
                 }
                 else
                 {
@@ -1390,6 +1422,42 @@ namespace QDND.Combat.Arena
         {
             _presentationService.UpdateAoEPreview(_selectionService?.SelectedCombatantId, _selectionService?.SelectedAbilityId, cursorPosition, _combatants);
         }
+
+        public void UpdatePointPreview(Vector3 cursorPosition)
+        {
+            _presentationService.UpdatePointPreview(_selectionService?.SelectedCombatantId, _selectionService?.SelectedAbilityId, cursorPosition);
+        }
+
+        public void UpdateChargePreview(Vector3 cursorPosition)
+        {
+            _presentationService.UpdateChargePreview(_selectionService?.SelectedCombatantId, _selectionService?.SelectedAbilityId, cursorPosition);
+        }
+
+        public void UpdateWallSegmentPreview(Vector3 cursorPosition)
+        {
+            _presentationService.UpdateWallSegmentPreview(_selectionService?.SelectedCombatantId, _selectionService?.SelectedAbilityId, cursorPosition);
+        }
+
+        public bool IsWallSegmentStartSet()
+        {
+            return _presentationService.IsWallSegmentStartSet;
+        }
+
+        public void SetWallSegmentStart(Vector3 worldPosition)
+        {
+            _presentationService.SetWallSegmentStart(worldPosition);
+        }
+
+        public Vector3? GetWallSegmentStartPoint()
+        {
+            return _presentationService.GetWallSegmentStartPoint();
+        }
+
+        public void ResetWallSegmentStart()
+        {
+            _wallSegmentPreview?.Hide();
+        }
+
         public void UpdateJumpPreview(Vector3 cursorWorldPosition)
         {
             _presentationService.UpdateJumpPreview(_selectionService?.SelectedCombatantId, _selectionService?.SelectedAbilityId, cursorWorldPosition, BuildJumpPath, GetJumpDistanceLimit);
@@ -1425,6 +1493,10 @@ namespace QDND.Combat.Arena
 
         public void ExecuteAction(string actorId, string actionId, ActionExecutionOptions options)
             => _actionExecutionService.ExecuteAction(actorId, actionId, options);
+
+        /// <summary>Execute a MultiUnit ability against a pre-collected list of target IDs.</summary>
+        public void ExecuteAction(string actorId, string actionId, List<string> targetIds, ActionExecutionOptions options = null)
+            => _actionExecutionService.ExecuteAction(actorId, actionId, targetIds, options);
 
         /// <summary>Execute an ability targeted at a world/grid point (Circle/Cone/Line/Point).</summary>
         public void ExecuteAbilityAtPosition(string actorId, string actionId, Vector3 targetPosition)
@@ -1832,6 +1904,9 @@ namespace QDND.Combat.Arena
             _rangeIndicator?.Hide();
             _aoeIndicator?.Hide();
             _jumpTrajectoryPreview?.Clear();
+            _pointReticle?.Hide();
+            _chargePathPreview?.Hide();
+            _wallSegmentPreview?.Hide();
             ClearTargetHighlights();
         }
 

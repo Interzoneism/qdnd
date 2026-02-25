@@ -272,6 +272,8 @@ namespace QDND.Data.Parsers
                 spell.ZoneFrontOffset = parent.ZoneFrontOffset;
             if (string.IsNullOrEmpty(spell.ZoneRange) && !string.IsNullOrEmpty(parent.ZoneRange))
                 spell.ZoneRange = parent.ZoneRange;
+            if (string.IsNullOrEmpty(spell.MaxDistance) && !string.IsNullOrEmpty(parent.MaxDistance))
+                spell.MaxDistance = parent.MaxDistance;
             
             if (string.IsNullOrEmpty(spell.TargetConditions) && !string.IsNullOrEmpty(parent.TargetConditions))
                 spell.TargetConditions = parent.TargetConditions;
@@ -502,6 +504,9 @@ namespace QDND.Data.Parsers
                     break;
                 case "Range":
                     spell.ZoneRange = value;
+                    break;
+                case "MaxDistance":
+                    spell.MaxDistance = value;
                     break;
             }
         }

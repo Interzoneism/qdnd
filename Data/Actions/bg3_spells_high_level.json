@@ -54,10 +54,11 @@
       "name": "Wall of Fire",
       "description": "Create a wall of roaring flames that burns those who approach.",
       "icon": "res://assets/Images/Icons Spells/Wall_of_Fire_Unfaded_Icon.png",
-      "targetType": "line",
+      "targetType": "wallSegment",
       "targetFilter": "all",
       "range": 36,
-      "areaRadius": 12,
+      "lineWidth": 3,
+      "maxWallLength": 36,
       "cost": {
         "usesAction": true,
         "resourceCosts": {

@@ -809,7 +809,9 @@ namespace QDND.Tools.AutoBattler
                         return actionDef.TargetType == TargetType.Circle ||
                                actionDef.TargetType == TargetType.Cone ||
                                actionDef.TargetType == TargetType.Line ||
-                               actionDef.TargetType == TargetType.Point;
+                               actionDef.TargetType == TargetType.Point ||
+                               actionDef.TargetType == TargetType.Charge ||
+                               actionDef.TargetType == TargetType.WallSegment;
                     }
 
                     return actionDef.TargetType == TargetType.All ||

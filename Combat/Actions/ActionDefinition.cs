@@ -8,14 +8,16 @@ namespace QDND.Combat.Actions
     /// </summary>
     public enum TargetType
     {
-        Self,           // Targets the caster
-        SingleUnit,     // Targets one unit
-        MultiUnit,      // Targets multiple specific units
-        Point,          // Targets a location
-        Cone,           // Cone AoE from caster
-        Line,           // Line AoE from caster
-        Circle,         // Circle AoE around point
-        All,            // All units (allies/enemies)
+        Self,           // No external target; fires immediately (Mirror Image, Blur)
+        SingleUnit,     // Click one creature (Guiding Bolt, Hold Person, melee attacks)
+        MultiUnit,      // Pick N separate targets sequentially (Magic Missile, Scorching Ray)
+        Point,          // Click ground point, no AoE footprint (Misty Step, Conjure Elemental)
+        Circle,         // Circle/radius AoE centered on point or target (Fireball, Shatter)
+        Cone,           // Cone wedge from caster toward cursor (Burning Hands, Cleave)
+        Line,           // Line/beam from caster toward cursor (Lightning Bolt, Gust of Wind)
+        Charge,         // Move-to targeting with path preview (Rush Attack)
+        WallSegment,    // Two-click start+end line placement (Wall of Fire)
+        All,            // All units (Thunderwave self-centered variants)
         None            // No target (passive, aura)
     }
 
@@ -145,6 +147,7 @@ namespace QDND.Combat.Actions
         public float AreaRadius { get; set; }               // AoE radius
         public float ConeAngle { get; set; } = 60f;         // Cone angle in degrees
         public float LineWidth { get; set; } = 1f;          // Line width in units
+        public float MaxWallLength { get; set; }            // Max distance between wall start and end (0 = unlimited)
         public int MaxTargets { get; set; } = 1;            // Max targets for multi
 
         /// <summary>

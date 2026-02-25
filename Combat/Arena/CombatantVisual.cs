@@ -302,6 +302,7 @@ namespace QDND.Combat.Arena
             nameBg.RenderPriority = 4;
             nameBg.Position = new Vector3(0, BaseNameYOffset * ModelScale, 0.001f); // Same as name label, slightly behind
             AddChild(nameBg);
+            nameBg.Visible = false;
 
             // Name label with outline for readability
             _nameLabel = GetNodeOrNull<Label3D>("NameLabel");
@@ -320,6 +321,7 @@ namespace QDND.Combat.Arena
             _nameLabel.PixelSize = 0.001f;
             _nameLabel.OutlineSize = 3;
             _nameLabel.FixedSize = true;
+            _nameLabel.Visible = false;
 
             // Active status display (persistent, above HP bar)
             _activeStatusLabel = GetNodeOrNull<Label3D>("ActiveStatusLabel");
@@ -338,6 +340,7 @@ namespace QDND.Combat.Arena
             _activeStatusLabel.PixelSize = 0.001f;
             _activeStatusLabel.OutlineSize = 2;
             _activeStatusLabel.FixedSize = true;
+            _activeStatusLabel.Visible = false;
 
             // Float pool (6 independently-tweened Label3D slots for overlapping popups)
             if (_floatPool.Count == 0)
@@ -426,6 +429,7 @@ namespace QDND.Combat.Arena
                 hpText.Modulate = Colors.White;
                 hpText.Text = "HP";
                 group.AddChild(hpText);
+                group.Visible = false;
             }
         }
 
@@ -544,16 +548,16 @@ namespace QDND.Combat.Arena
             UpdateHPBar(hpPercent);
 
             bool isAlive = _entity.IsActive;
-            _nameLabel.Visible = isAlive;
+            _nameLabel.Visible = false;
             var nameBg = GetNodeOrNull<Sprite3D>("NameLabelBg");
             if (nameBg != null)
             {
-                nameBg.Visible = isAlive;
+                nameBg.Visible = false;
             }
             var hpBarGroup = GetNodeOrNull<Node3D>("HPBarGroup");
             if (hpBarGroup != null)
             {
-                hpBarGroup.Visible = isAlive;
+                hpBarGroup.Visible = false;
             }
 
             if (_capsuleMesh != null)
@@ -892,7 +896,9 @@ namespace QDND.Combat.Arena
                 action.TargetType == TargetType.Point ||
                 action.TargetType == TargetType.Cone ||
                 action.TargetType == TargetType.Line ||
-                action.TargetType == TargetType.Circle;
+                action.TargetType == TargetType.Circle ||
+                action.TargetType == TargetType.Charge ||
+                action.TargetType == TargetType.WallSegment;
 
             if (requiresTargetSelection || resolvedTargetCount > 0)
             {
@@ -1384,21 +1390,19 @@ namespace QDND.Combat.Arena
 
         /// <summary>
         /// Show hit chance percentage when targeting.
+        /// Overhead label is hidden; targeting info appears in the HUD hover panel.
         /// </summary>
         public void ShowHitChance(int percentage)
         {
-            _nameLabel.Text = $"{_entity?.Name ?? "Unknown"} ({percentage}%)";
+            // No-op: hit chance is now shown in the HUD hover info panel.
         }
 
         /// <summary>
-        /// Clear hit chance display and restore normal name.
+        /// Clear hit chance display.
         /// </summary>
         public void ClearHitChance()
         {
-            if (_entity != null)
-            {
-                _nameLabel.Text = _entity.Name;
-            }
+            // No-op: hit chance is now shown in the HUD hover info panel.
         }
 
         /// <summary>

@@ -1393,9 +1393,10 @@
       "name": "Scorching Ray",
       "description": "Hurl 3 rays of fire. Each ray deals 2d6 fire damage",
       "icon": "res://assets/Images/Icons Spells/Scorching_Ray_Unfaded_Icon.png",
-      "targetType": "singleUnit",
+      "targetType": "multiUnit",
       "targetFilter": "enemies",
       "range": 18,
+      "maxTargets": 3,
       "cost": {
         "usesAction": true,
         "resourceCosts": {
