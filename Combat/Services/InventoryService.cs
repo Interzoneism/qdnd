@@ -511,9 +511,9 @@ namespace QDND.Combat.Services
 
         /// <summary>
         /// Initialize a combatant's inventory from their current equipment loadout.
-        /// Populates equipment slots and fills the bag with starter items from BG3 stats.
+        /// Populates equipment slots and fills the bag with starter items.
         /// </summary>
-        public void InitializeFromCombatant(Combatant combatant)
+        public void InitializeFromCombatant(Combatant combatant, bool includeExtendedStarterGear = true)
         {
             if (combatant == null)
                 return;
@@ -537,7 +537,7 @@ namespace QDND.Combat.Services
             if (combatant.EquippedArmor != null)
                 inv.EquippedItems[EquipSlot.Armor] = CreateArmorItem(combatant.EquippedArmor, ItemCategory.Armor);
 
-            AddStarterBagItems(combatant, inv);
+            AddStarterBagItems(combatant, inv, includeExtendedStarterGear);
             ApplyEquipment(combatant, inv);
             OnInventoryChanged?.Invoke(combatant.Id);
         }
@@ -1065,11 +1065,12 @@ namespace QDND.Combat.Services
         }
 
         /// <summary>
-        /// Add starter items for a combatant. Prioritizes parsed BG3 items if available.
+        /// Add starter items for a combatant.
+        /// Core consumables are always granted. Extended starter gear is optional.
         /// </summary>
-        private void AddStarterBagItems(Combatant combatant, Inventory inv)
+        private void AddStarterBagItems(Combatant combatant, Inventory inv, bool includeExtendedStarterGear)
         {
-            bool addedBg3 = AddStarterBagItemsFromBG3(combatant, inv);
+            bool addedBg3 = includeExtendedStarterGear && AddStarterBagItemsFromBG3(combatant, inv);
 
             // Core consumables are guaranteed regardless of data source.
             inv.AddItem(CreateConsumableItem(
@@ -1103,8 +1104,8 @@ namespace QDND.Combat.Services
                     iconPath: "res://assets/Images/Icons Spells/Revivify_Unfaded_Icon.png"));
             }
 
-            // Legacy fallback if BG3 catalog isn't available.
-            if (!addedBg3 && _charRegistry != null)
+            // Legacy fallback if extended catalog is enabled but unavailable.
+            if (includeExtendedStarterGear && !addedBg3 && _charRegistry != null)
             {
                 var dagger = _charRegistry.GetWeapon("dagger");
                 if (dagger != null)

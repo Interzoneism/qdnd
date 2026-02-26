@@ -558,6 +558,15 @@ namespace QDND.Combat.Actions.Effects
                     finalDamage = Math.Max(1, finalDamage / 2);  // Normal: successful save = half damage
                 }
 
+                int currentHpBeforeDamage = target.Resources.CurrentHP;
+                int tempHpBeforeDamage = target.Resources.TemporaryHP;
+
+                // Massive damage uses uncapped incoming damage that reaches real HP (after temp HP absorption),
+                // then checks overflow past 0 HP against max HP.
+                int damageAppliedToRealHp = Math.Max(0, finalDamage - tempHpBeforeDamage);
+                int overflowDamagePastZero = Math.Max(0, damageAppliedToRealHp - currentHpBeforeDamage);
+                bool massiveDamageInstantDeath = overflowDamagePastZero >= target.Resources.MaxHP;
+
                 // Apply damage to target (TakeDamage handles temp HP layering automatically)
                 int actualDamageDealt = target.Resources.TakeDamage(finalDamage);
                 bool killed = target.Resources.IsDowned;
@@ -634,8 +643,8 @@ namespace QDND.Combat.Actions.Effects
                                 context.Statuses.ApplyStatus("prone", context.Source.Id, target.Id, duration: null, stacks: 1);
                         }
 
-                        // Massive damage check: if damage dealt exceeds max HP, instant death
-                        if (actualDamageDealt > target.Resources.MaxHP)
+                        // Massive damage check: overflow damage after dropping to 0 is >= max HP.
+                        if (massiveDamageInstantDeath)
                         {
                             target.LifeState = CombatantLifeState.Dead;
                         }

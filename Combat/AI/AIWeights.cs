@@ -39,7 +39,7 @@ namespace QDND.Combat.AI
         public const float ShoveLedgeFallBonus = 5f;   // Per unit of expected fall damage
         public const float ShoveNearLedgeBonus = 2f;   // Target is near ledge
         public const float ShoveIntoHazardBonus = 3f;  // Push into surface/hazard
-        public const float ShoveBaseCost = 1f;         // Base cost since uses action
+        public const float ShoveBaseCost = 0.5f;       // Bonus action opportunity cost
 
         // Resource efficiency
         public const float LimitedUsePenalty = 0.7f;  // Multiplier for limited-use abilities

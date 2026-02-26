@@ -407,7 +407,7 @@ namespace QDND.Data
             }
 
             // Generate equipment
-            var equipment = GenerateDefaultEquipment(classDef.Id, level);
+            var equipment = GenerateDefaultEquipment(classDef, level);
 
             // Pick a random background
             var background = BackgroundData.All[_random.Next(BackgroundData.All.Count)];
@@ -654,71 +654,89 @@ namespace QDND.Data
         /// <summary>
         /// Generate appropriate starting equipment for a class.
         /// </summary>
-        private (string MainHandWeaponId, string OffHandWeaponId, string ArmorId, string ShieldId) GenerateDefaultEquipment(string classId, int level)
+        private (string MainHandWeaponId, string OffHandWeaponId, string ArmorId, string ShieldId) GenerateDefaultEquipment(ClassDefinition classDef, int level)
         {
             string mainHand = null, offHand = null, armor = null, shield = null;
-            string normalizedClass = classId?.ToLowerInvariant() ?? "";
+            string normalizedClass = classDef?.Id?.ToLowerInvariant() ?? "";
+
+            bool hasSimpleWeapons = HasWeaponCategory(classDef, "Simple");
+            bool hasMartialWeapons = HasWeaponCategory(classDef, "Martial");
+            bool hasShieldProficiency = HasArmorCategory(classDef, "Shield");
+            bool hasLightArmor = HasArmorCategory(classDef, "Light");
+            bool hasMediumArmor = HasArmorCategory(classDef, "Medium");
+            bool hasHeavyArmor = HasArmorCategory(classDef, "Heavy");
 
             switch (normalizedClass)
             {
                 case "fighter":
-                    mainHand = PickRandomWeapon(new[] { "longsword", "battleaxe", "warhammer", "morningstar", "greatsword", "halberd", "glaive", "rapier" });
+                    mainHand = hasMartialWeapons
+                        ? PickRandomWeapon(new[] { "longsword", "battleaxe", "warhammer", "morningstar", "greatsword", "halberd", "glaive", "rapier" })
+                        : PickRandomWeapon(new[] { "mace", "quarterstaff" });
                     if (IsTwoHandedWeapon(mainHand))
                     {
                         shield = null;
                     }
                     else
                     {
-                        shield = "shield";
+                        shield = hasShieldProficiency ? "shield" : null;
                     }
-                    armor = level >= 4 ? "splint" : "chain_mail";
+                    armor = SelectArmorByProficiency(level, hasHeavyArmor, hasMediumArmor, hasLightArmor, preferHeavyAtHigherLevels: true);
                     break;
                 case "barbarian":
                     mainHand = PickRandomWeapon(new[] { "greataxe", "greatsword", "maul", "halberd", "glaive" });
                     // No armor - use Unarmored Defence
                     break;
                 case "paladin":
-                    mainHand = PickRandomWeapon(new[] { "longsword", "battleaxe", "warhammer", "morningstar", "greatsword", "maul" });
+                    mainHand = hasMartialWeapons
+                        ? PickRandomWeapon(new[] { "longsword", "battleaxe", "warhammer", "morningstar", "greatsword", "maul" })
+                        : PickRandomWeapon(new[] { "mace", "quarterstaff" });
                     if (IsTwoHandedWeapon(mainHand))
                     {
                         shield = null;
                     }
                     else
                     {
-                        shield = "shield";
+                        shield = hasShieldProficiency ? "shield" : null;
                     }
-                    armor = level >= 4 ? "splint" : "chain_mail";
+                    armor = SelectArmorByProficiency(level, hasHeavyArmor, hasMediumArmor, hasLightArmor, preferHeavyAtHigherLevels: true);
                     break;
                 case "ranger":
-                    mainHand = PickRandomWeapon(new[] { "longbow", "shortbow", "shortsword" });
-                    if (mainHand == "shortsword")
+                    mainHand = hasMartialWeapons
+                        ? PickRandomWeapon(new[] { "longbow", "shortbow", "shortsword" })
+                        : "shortbow";
+                    if (mainHand == "shortsword" && hasMartialWeapons)
                     {
                         offHand = "shortsword";
                     }
-                    armor = "studded_leather";
+                    armor = hasMediumArmor ? "scale_mail" : (hasLightArmor ? "studded_leather" : null);
                     break;
                 case "rogue":
-                    mainHand = PickRandomWeapon(new[] { "rapier", "shortsword" });
+                    mainHand = hasMartialWeapons ? PickRandomWeapon(new[] { "rapier", "shortsword" }) : "dagger";
                     if (mainHand == "shortsword")
                         offHand = "dagger";
-                    armor = "leather";
+                    armor = hasLightArmor ? "leather" : null;
                     break;
                 case "monk":
-                    mainHand = "quarterstaff";
+                    mainHand = hasSimpleWeapons ? "quarterstaff" : "club";
                     // No armor - use Unarmored Defence
                     break;
                 case "cleric":
-                    mainHand = PickRandomWeapon(new[] { "mace", "morningstar", "flail" });
-                    shield = "shield";
-                    armor = "chain_mail";
+                    // Keep clerics on proficiencies unless subclass features explicitly add more later.
+                    mainHand = hasMartialWeapons
+                        ? PickRandomWeapon(new[] { "mace", "morningstar", "flail", "warhammer" })
+                        : PickRandomWeapon(new[] { "mace", "quarterstaff" });
+                    shield = hasShieldProficiency ? "shield" : null;
+                    armor = hasMediumArmor ? "scale_mail" : (hasLightArmor ? "leather" : (hasHeavyArmor ? "chain_mail" : null));
                     break;
                 case "druid":
-                    mainHand = "scimitar";
-                    shield = "shield";
-                    armor = "leather";
+                    mainHand = hasMartialWeapons || HasSpecificWeaponProficiency(classDef, "Scimitar")
+                        ? "scimitar"
+                        : "quarterstaff";
+                    shield = hasShieldProficiency ? "shield" : null;
+                    armor = hasLightArmor ? "leather" : null;
                     break;
                 case "wizard":
-                    mainHand = "quarterstaff";
+                    mainHand = hasSimpleWeapons ? "quarterstaff" : "club";
                     // No armor
                     break;
                 case "sorcerer":
@@ -726,19 +744,66 @@ namespace QDND.Data
                     // No armor (relies on Mage Armor or Draconic Resilience)
                     break;
                 case "warlock":
-                    mainHand = "light_crossbow";
-                    armor = "leather";
+                    mainHand = hasSimpleWeapons ? "light_crossbow" : "dagger";
+                    armor = hasLightArmor ? "leather" : null;
                     break;
                 case "bard":
-                    mainHand = "rapier";
-                    armor = "leather";
+                    mainHand = hasMartialWeapons || HasSpecificWeaponProficiency(classDef, "Rapier")
+                        ? "rapier"
+                        : "dagger";
+                    armor = hasLightArmor ? "leather" : null;
                     break;
                 default:
-                    mainHand = "club";
+                    mainHand = hasSimpleWeapons ? "mace" : "club";
                     break;
             }
 
             return (mainHand, offHand, armor, shield);
+        }
+
+        private static bool HasWeaponCategory(ClassDefinition classDef, string category)
+        {
+            if (classDef?.StartingProficiencies?.WeaponCategories == null)
+                return false;
+
+            return classDef.StartingProficiencies.WeaponCategories.Any(value =>
+                string.Equals(value, category, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private static bool HasArmorCategory(ClassDefinition classDef, string category)
+        {
+            if (classDef?.StartingProficiencies?.ArmorCategories == null)
+                return false;
+
+            return classDef.StartingProficiencies.ArmorCategories.Any(value =>
+                string.Equals(value, category, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private static bool HasSpecificWeaponProficiency(ClassDefinition classDef, string weaponName)
+        {
+            if (classDef?.StartingProficiencies?.Weapons == null)
+                return false;
+
+            return classDef.StartingProficiencies.Weapons.Any(value =>
+                string.Equals(value, weaponName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private static string SelectArmorByProficiency(int level, bool hasHeavyArmor, bool hasMediumArmor, bool hasLightArmor, bool preferHeavyAtHigherLevels)
+        {
+            if (hasHeavyArmor)
+            {
+                if (preferHeavyAtHigherLevels && level >= 4)
+                    return "splint";
+                return "chain_mail";
+            }
+
+            if (hasMediumArmor)
+                return "scale_mail";
+
+            if (hasLightArmor)
+                return "leather";
+
+            return null;
         }
 
         private string PickRandomWeapon(string[] options)

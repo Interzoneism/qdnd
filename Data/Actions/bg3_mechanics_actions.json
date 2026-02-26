@@ -178,8 +178,8 @@
       "icon": "res://assets/Images/Icons Spells/Spike_Growth_Unfaded_Icon.png",
       "targetType": "circle",
       "targetFilter": "all",
-      "range": 18,
-      "areaRadius": 3,
+      "range": 45,
+      "areaRadius": 6,
       "cost": {
         "usesAction": true
       },
@@ -188,7 +188,7 @@
       "effects": [
         {
           "type": "spawn_surface",
-          "value": 3,
+          "value": 6,
           "statusDuration": 3,
           "parameters": {
             "surface_type": "spike_growth"
@@ -240,6 +240,7 @@
       "targetType": "self",
       "targetFilter": "Self",
       "range": 0,
+      "areaRadius": 4.5,
       "cost": {
         "usesAction": true
       },

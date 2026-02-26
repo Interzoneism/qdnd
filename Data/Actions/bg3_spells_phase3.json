@@ -5,7 +5,7 @@
       "name": "Acid Splash",
       "description": "Hurl a bubble of acid that damages each creature it hits.",
       "icon": "res://assets/Images/Icons Spells/Acid_Splash_Unfaded_Icon.png",
-      "targetType": "singleUnit",
+      "targetType": "circle",
       "targetFilter": "enemies",
       "range": 18,
       "areaRadius": 1.5,
@@ -224,8 +224,8 @@
       "icon": "res://assets/Images/Icons Spells/Fog_Cloud_Unfaded_Icon.png",
       "targetType": "circle",
       "targetFilter": "all",
-      "range": 18,
-      "areaRadius": 4.5,
+      "range": 36,
+      "areaRadius": 6,
       "cost": {
         "usesAction": true,
         "resourceCosts": {
@@ -236,7 +236,7 @@
       "effects": [
         {
           "type": "spawn_surface",
-          "value": 4.5,
+          "value": 6,
           "statusDuration": 100,
           "parameters": {
             "surface_type": "fog"
@@ -563,7 +563,7 @@
       "name": "Entangle",
       "description": "Vines sprout from the ground, turning the area into Difficult Terrain and possibly Restraining creatures.",
       "icon": "res://assets/Images/Icons Spells/Entangle_Unfaded_Icon.png",
-      "targetType": "singleUnit",
+      "targetType": "circle",
       "targetFilter": "Enemies",
       "range": 27,
       "areaRadius": 6,
@@ -881,7 +881,7 @@
       "name": "Gust of Wind",
       "description": "Create a blast of wind that pushes creatures 5m and disperses gas or vapour.",
       "icon": "res://assets/Images/Icons Spells/Gust_of_Wind_Unfaded_Icon.png",
-      "targetType": "singleUnit",
+      "targetType": "line",
       "targetFilter": "Enemies",
       "range": 18,
       "areaRadius": 18,
@@ -1105,7 +1105,7 @@
       "name": "Calm Emotions",
       "description": "Suppress strong emotions to end Charmed and Frightened conditions, or make hostile creatures indifferent.",
       "icon": "res://assets/Images/Icons Spells/Calm_Emotions_Unfaded_Icon.png",
-      "targetType": "singleUnit",
+      "targetType": "circle",
       "targetFilter": "Enemies",
       "range": 18,
       "areaRadius": 6,
@@ -1333,7 +1333,7 @@
       "name": "Fear",
       "description": "Project a phantasmal image of a creature's worst fears, causing targets to become Frightened and drop everything they're holding.",
       "icon": "res://assets/Images/Icons Spells/Fear_Unfaded_Icon.png",
-      "targetType": "singleUnit",
+      "targetType": "cone",
       "targetFilter": "Enemies",
       "range": 9,
       "areaRadius": 9,
@@ -1459,7 +1459,7 @@
       "name": "Glyph of Warding",
       "description": "Inscribe a circle of arcane glyphs on the ground that triggers when entered by an enemy.",
       "icon": "res://assets/Images/Icons Spells/Glyph_of_Warding_Unfaded_Icon.png",
-      "targetType": "singleUnit",
+      "targetType": "circle",
       "targetFilter": "Enemies",
       "range": 9,
       "areaRadius": 3,
@@ -1552,7 +1552,7 @@
       "name": "Stinking Cloud",
       "description": "Create a cloud of gas so nauseating it prevents creatures within from taking Actions.",
       "icon": "res://assets/Images/Icons Spells/Stinking_Cloud_Unfaded_Icon.png",
-      "targetType": "singleUnit",
+      "targetType": "circle",
       "targetFilter": "Enemies",
       "range": 27,
       "areaRadius": 6,
@@ -1626,7 +1626,7 @@
       "name": "Conjure Barrage",
       "description": "Hurl an arc of spectral weapons at all enemies in a 60-foot cone.",
       "icon": "res://assets/Images/Icons Spells/Conjure_Barrage_Unfaded_Icon.png",
-      "targetType": "singleUnit",
+      "targetType": "cone",
       "targetFilter": "Enemies",
       "range": 18,
       "areaRadius": 18,
@@ -1789,7 +1789,7 @@
       "targetType": "circle",
       "targetFilter": "all",
       "range": 45,
-      "areaRadius": 30,
+      "areaRadius": 9,
       "cost": {
         "usesAction": true,
         "resourceCosts": {
@@ -1799,7 +1799,7 @@
       "effects": [
         {
           "type": "spawn_surface",
-          "value": 30,
+          "value": 9,
           "statusDuration": 100,
           "parameters": {
             "surface_type": "plant_growth"
@@ -1819,10 +1819,10 @@
       "name": "Sleet Storm",
       "description": "Call forth a storm of ice that turns the ground into Difficult Terrain. Creatures inside can slip and fall Prone.",
       "icon": "res://assets/Images/Icons Spells/Sleet_Storm_Unfaded_Icon.png",
-      "targetType": "singleUnit",
+      "targetType": "circle",
       "targetFilter": "Enemies",
       "range": 45,
-      "areaRadius": 12,
+      "areaRadius": 6,
       "cost": {
         "usesAction": true,
         "resourceCosts": {
@@ -1840,7 +1840,7 @@
         },
         {
           "type": "spawn_surface",
-          "value": 12,
+          "value": 6,
           "statusDuration": 100,
           "parameters": {
             "surface_type": "ice"
@@ -1890,7 +1890,7 @@
       "name": "Confusion",
       "description": "Befuddle a group of creatures, causing them to attack random targets, wander aimlessly, or stand dazed.",
       "icon": "res://assets/Images/Icons Spells/Confusion_Unfaded_Icon.png",
-      "targetType": "singleUnit",
+      "targetType": "circle",
       "targetFilter": "Enemies",
       "range": 27,
       "areaRadius": 3,
@@ -1993,7 +1993,7 @@
       "name": "Evard's Black Tentacles",
       "description": "Conjure dark tendrils from the ground that deal 3d6 Bludgeoning damage and Restrain creatures.",
       "icon": "res://assets/Images/Icons Spells/Evard-s_Black_Tentacles_Unfaded_Icon.png",
-      "targetType": "singleUnit",
+      "targetType": "circle",
       "targetFilter": "Enemies",
       "range": 27,
       "areaRadius": 6,
@@ -2423,7 +2423,7 @@
       "name": "Circle of Death",
       "description": "A sphere of negative energy expands from a point, dealing 8d6 Necrotic damage.",
       "icon": "res://assets/Images/Icons Spells/Circle_of_Death_Unfaded_Icon.png",
-      "targetType": "singleUnit",
+      "targetType": "circle",
       "targetFilter": "Enemies",
       "range": 45,
       "areaRadius": 18,
@@ -2488,7 +2488,7 @@
       "name": "Wall of Ice",
       "description": "Raise a wall of ice that blocks movement. Breaking through deals 10d6 Cold damage.",
       "icon": "res://assets/Images/Icons Spells/Wall_of_Ice_Unfaded_Icon.png",
-      "targetType": "singleUnit",
+      "targetType": "wallSegment",
       "targetFilter": "Enemies",
       "range": 36,
       "areaRadius": 9,
@@ -2614,7 +2614,7 @@
       "name": "Spirit Guardians",
       "description": "Call forth spirits that deal 3d8 Radiant damage to enemies within 15 feet.",
       "icon": "res://assets/Images/Icons Spells/Spirit_Guardians_Unfaded_Icon.png",
-      "targetType": "singleUnit",
+      "targetType": "self",
       "targetFilter": "Enemies",
       "range": 0,
       "areaRadius": 4.5,

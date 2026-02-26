@@ -82,9 +82,14 @@ namespace QDND.Combat.Statuses
                 finalDamage = System.Math.Max(0, (int)dmgResult.FinalValue);
             }
 
+            int currentHpBeforeDamage = target.Resources.CurrentHP;
+            int tempHpBeforeDamage = target.Resources.TemporaryHP;
+            int damageAppliedToRealHp = Math.Max(0, finalDamage - tempHpBeforeDamage);
+            int overflowDamagePastZero = Math.Max(0, damageAppliedToRealHp - currentHpBeforeDamage);
+            bool massiveDamageInstantDeath = overflowDamagePastZero >= target.Resources.MaxHP;
+
             int dealt = target.Resources.TakeDamage(finalDamage);
             string sourceName = status.Definition?.Name ?? "Status";
-
             _combatLog?.LogDamage(
                 status.SourceId,
                 sourceName,
@@ -134,8 +139,8 @@ namespace QDND.Combat.Statuses
                     if (_statusManager?.GetDefinition("prone") != null)
                         _statusManager.ApplyStatus("prone", status.SourceId, target.Id);
 
-                    // Massive damage check
-                    if (dealt > target.Resources.MaxHP)
+                    // Massive damage check: overflow damage after dropping to 0 is >= max HP.
+                    if (massiveDamageInstantDeath)
                     {
                         target.LifeState = CombatantLifeState.Dead;
                         Log?.Invoke($"{target.Name} killed outright by massive damage from {sourceName}!");

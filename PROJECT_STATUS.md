@@ -50,12 +50,15 @@ CombatArena (scene root)
 | Area | Parity | Notes |
 |---|---|---|
 | Core Engine | 96% | Combat loop, turns, initiative, death saves |
-| Spells | 97% | 200+ spells converted from BG3 data |
-| Statuses | 85% | Boost/functor pipeline operational |
-| Passives | 90% | Registry → BoostApplicator pipeline |
-| Class Features | 55% | Major gap — multiclass, subclass features |
-| Reactions | 70% | System exists, coverage incomplete |
-| **Overall** | **~84%** | Per `docs/BG3_COMBAT_PARITY_AUDIT.md` |
+| Spells (definitions) | 95% | 201/205 spells defined with metadata |
+| Spells (AOE/targeting) | 75% | 14 AOE spells have broken targetType, 7 wrong radii |
+| Statuses | 85% | 267 statuses, 261 with mechanics |
+| Passives | 82% | BoostConditions skipped; racial advantage tags dead code |
+| Class Features | 55% | Major gap — metamagic, Wild Shape, invocations |
+| Common Actions | 70% | Shove broken (wrong mechanic + AI dead); others OK |
+| Reactions | 70% | 13 wired, ~6 remaining |
+| Surfaces/Obscurity | 40% | Obscurity dead code; Ice/Grease no Prone |
+| **Overall** | **~76%** | Per `docs/BG3_COMBAT_PARITY_AUDIT_2026.md` |
 
 ---
 
@@ -88,8 +91,9 @@ scripts/ci-godot-log-check.sh  # Must: no ERROR/SCRIPT ERROR lines
 |---|---|
 | [AGENTS.md](AGENTS.md) | Agent rules, architecture constraints, build gates, gotchas |
 | [CODING_STANDARDS.md](CODING_STANDARDS.md) | Naming, namespaces, patterns, event policy |
+| [docs/BG3_COMBAT_PARITY_AUDIT_2026.md](docs/BG3_COMBAT_PARITY_AUDIT_2026.md) | **Current** comprehensive parity audit (Feb 2026) |
 | [docs/BG3_COMBAT_PARITY_AUDIT.md](docs/BG3_COMBAT_PARITY_AUDIT.md) | Living changelog of parity sessions |
-| [docs/BG3_FULL_GAP_ANALYSIS.md](docs/BG3_FULL_GAP_ANALYSIS.md) | Current gap analysis (supersedes 2025 version) |
+| [docs/BG3_FULL_GAP_ANALYSIS.md](docs/BG3_FULL_GAP_ANALYSIS.md) | Gap analysis with reviewer addendum |
 | [docs/action-registry.md](docs/action-registry.md) | ActionRegistry architecture |
 | [docs/bg3-status-system.md](docs/bg3-status-system.md) | Status pipeline architecture |
 | [docs/vfx-pipeline.md](docs/vfx-pipeline.md) | VFX pipeline architecture |

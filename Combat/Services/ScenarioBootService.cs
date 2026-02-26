@@ -170,7 +170,8 @@ namespace QDND.Combat.Services
 
             var scenarioGenerator = new ScenarioGenerator(charRegistry, seed);
             var scenario = scenarioGenerator.GenerateRandomScenario(2, 2);
-            LoadScenarioDefinition(scenario, "random scenario");
+            // Random 2v2 should use the baseline starter kit for fairness.
+            LoadScenarioDefinition(scenario, "random scenario", useBaseStarterKit: true);
         }
 
         /// <summary>
@@ -292,7 +293,7 @@ namespace QDND.Combat.Services
         /// Core boot routine: wires all combatant services and resolves seeds.
         /// Sets Combatants, Rng, ResolvedScenarioSeed.
         /// </summary>
-        public void LoadScenarioDefinition(ScenarioDefinition scenario, string sourceLabel)
+        public void LoadScenarioDefinition(ScenarioDefinition scenario, string sourceLabel, bool useBaseStarterKit = false)
         {
             if (scenario == null)
             {
@@ -405,7 +406,7 @@ namespace QDND.Combat.Services
             if (inventoryService != null)
             {
                 foreach (var c in Combatants)
-                    inventoryService.InitializeFromCombatant(c);
+                    inventoryService.InitializeFromCombatant(c, includeExtendedStarterGear: !useBaseStarterKit);
                 _log($"Initialized inventories for {Combatants.Count} combatants");
             }
 

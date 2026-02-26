@@ -263,6 +263,31 @@ namespace QDND.Combat.Services
                     }
                     return false;
 
+                case AIActionType.Shove:
+                    string shoveActionId = !string.IsNullOrEmpty(action.ActionId) ? action.ActionId : "shove";
+                    var shoveActionDef = _effectPipeline.GetAction(shoveActionId);
+                    if (shoveActionDef == null)
+                        return false;
+
+                    OnAIAbilityNotify?.Invoke(actor, shoveActionDef);
+
+                    var shoveOptions = new ActionExecutionOptions
+                    {
+                        VariantId = action.VariantId,
+                        UpcastLevel = action.UpcastLevel
+                    };
+
+                    if (!string.IsNullOrEmpty(action.TargetId))
+                    {
+                        var shoveTarget = _combatContext.GetCombatant(action.TargetId);
+                        if (shoveTarget != null)
+                        {
+                            ExecuteAction(actor.Id, shoveActionId, shoveTarget.Id, shoveOptions);
+                            return true;
+                        }
+                    }
+                    return false;
+
                 case AIActionType.UseItem:
                     if (!string.IsNullOrEmpty(action.ActionId))
                     {

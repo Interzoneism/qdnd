@@ -157,6 +157,10 @@ namespace QDND.Combat.Targeting
             if (!HasRequiredTags(action, target))
                 return TargetValidation.Invalid($"Target missing required tags: {string.Join(", ", action.RequiredTags)}");
 
+            // Shove size restriction: cannot shove a target more than one size larger.
+            if (IsShoveAction(action) && !IsValidShoveSize(source, target))
+                return TargetValidation.Invalid("Target is too large to shove");
+
             // Range check using position data
             // Melee attacks get a tolerance for character body radius positioning
             if (action.Range > 0)
@@ -200,9 +204,21 @@ namespace QDND.Combat.Targeting
                 .Where(c => IsTargetStateAllowed(action, c))
                 .Where(c => IsValidFaction(action.TargetFilter, source, c))
                 .Where(c => HasRequiredTags(action, c))
+                .Where(c => !IsShoveAction(action) || IsValidShoveSize(source, c))
                 .Where(c => HasLineOfSight(source, c))
                 .Where(c => IsInAbilityRange(source, c, action.Range))
                 .ToList();
+        }
+
+        /// <summary>
+        /// Shove can only target creatures up to one size category larger than the source.
+        /// </summary>
+        public static bool IsValidShoveSize(Combatant source, Combatant target)
+        {
+            if (source == null || target == null)
+                return false;
+
+            return (int)target.CreatureSize <= (int)source.CreatureSize + 1;
         }
 
         /// <summary>
@@ -216,6 +232,15 @@ namespace QDND.Combat.Targeting
 
             float distance = source.Position.DistanceTo(target.Position);
             return distance <= range;
+        }
+
+        private static bool IsShoveAction(Actions.ActionDefinition action)
+        {
+            if (action == null || string.IsNullOrWhiteSpace(action.Id))
+                return false;
+
+            return string.Equals(action.Id, "shove", StringComparison.OrdinalIgnoreCase) ||
+                   string.Equals(action.Id, "target_shove", StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>

@@ -499,17 +499,13 @@ namespace QDND.Combat.AI
                 
                 // Generate ability candidates (includes test bypass logic)
                 candidates.AddRange(GenerateAbilityCandidates(actor));
-
-                // Shove candidates - uses action
-                if (actor.ActionBudget?.HasAction == true)
-                {
-                    candidates.AddRange(GenerateShoveCandidates(actor));
-                }
             }
 
             // Bonus action candidates
             if (actor.ActionBudget?.HasBonusAction == true || isTestMode)
             {
+                                // Shove candidates - uses bonus action
+                                candidates.AddRange(GenerateShoveCandidates(actor));
                 candidates.AddRange(GenerateBonusActionCandidates(actor));
             }
 
@@ -1343,6 +1339,10 @@ namespace QDND.Combat.AI
                     actor.Position.Z - enemy.Position.Z
                 ).Length();
                 if (horizontalDistance > 5f) continue; // Shove requires melee range
+
+                // Shove size restriction: cannot shove target more than one size larger.
+                if (!TargetValidator.IsValidShoveSize(actor, enemy))
+                    continue;
 
                 // Calculate push direction (away from actor)
                 var pushDir = (enemy.Position - actor.Position).Normalized();

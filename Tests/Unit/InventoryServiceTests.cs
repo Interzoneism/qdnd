@@ -1,4 +1,7 @@
+using System;
 using System.Linq;
+using System.IO;
+using System.Collections.Generic;
 using QDND.Combat.Entities;
 using QDND.Combat.Services;
 using QDND.Data.CharacterModel;
@@ -364,6 +367,190 @@ namespace QDND.Tests.Unit
             var item = inv.BagItems.First(i => i.DefinitionId == "arm_leather_body");
 
             Assert.Contains("Icons Armour/Leather_Armour_Unfaded_Icon", item.IconPath);
+        }
+
+        [Fact]
+        public void InitializeFromCombatant_WithBaseStarterKitOnly_SkipsExtendedCatalogItems()
+        {
+            var stats = new StatsRegistry();
+            stats.RegisterWeapon(new BG3WeaponData
+            {
+                Name = "WPN_Longsword",
+                Damage = "1d8",
+                DamageType = "Slashing",
+                WeaponGroup = "MartialMeleeWeapon",
+                WeaponProperties = "Versatile;Melee",
+                WeaponRange = 150,
+                DamageRange = 300,
+                Weight = 1.3f,
+                InventoryTab = "Equipment",
+            });
+
+            var service = new InventoryService(new CharacterDataRegistry(), stats);
+            var actor = CreateCombatant();
+            actor.Tags = new List<string> { "caster" };
+
+            service.InitializeFromCombatant(actor, includeExtendedStarterGear: false);
+            var inv = service.GetInventory(actor.Id);
+
+            Assert.Equal(3, inv.BagItems.Count);
+            Assert.Contains(inv.BagItems, i => i.DefinitionId == "potion_healing");
+            Assert.Contains(inv.BagItems, i => i.DefinitionId == "alchemist_fire");
+            Assert.Contains(inv.BagItems, i => i.DefinitionId == "scroll_revivify");
+            Assert.DoesNotContain(inv.BagItems, i => i.DefinitionId == "wpn_longsword");
+        }
+
+        [Fact]
+        public void InitializeFromCombatant_WithBaseStarterKitOnly_ItemsHaveIconsAndTooltipData()
+        {
+            var service = new InventoryService(new CharacterDataRegistry());
+            var actor = CreateCombatant();
+            actor.Tags = new List<string> { "caster" };
+
+            service.InitializeFromCombatant(actor, includeExtendedStarterGear: false);
+            var inv = service.GetInventory(actor.Id);
+
+            Assert.All(inv.BagItems, item =>
+            {
+                AssertValidResIconPath(item.IconPath);
+                Assert.False(string.IsNullOrWhiteSpace(item.GetStatLine()));
+                Assert.False(string.IsNullOrWhiteSpace(item.UseActionId));
+                Assert.True(item.IsConsumable);
+            });
+
+            Assert.Contains(inv.BagItems, i => i.DefinitionId == "potion_healing" && i.GetStatLine().Contains("Heal 2d4+2 HP"));
+            Assert.Contains(inv.BagItems, i => i.DefinitionId == "alchemist_fire" && i.GetStatLine().Contains("1d4 fire damage"));
+            Assert.Contains(inv.BagItems, i => i.DefinitionId == "scroll_revivify" && i.GetStatLine().Contains("Revive a downed ally"));
+        }
+
+        [Fact]
+        public void InitializeFromCombatant_EquippedItemsHaveIconsAndTooltipStatLines()
+        {
+            var service = new InventoryService(new CharacterDataRegistry());
+            var actor = CreateCombatant();
+
+            actor.MainHandWeapon = new WeaponDefinition
+            {
+                Id = "longsword",
+                Name = "Longsword",
+                WeaponType = WeaponType.Longsword,
+                Category = WeaponCategory.Martial,
+                DamageType = DamageType.Slashing,
+                DamageDiceCount = 1,
+                DamageDieFaces = 8,
+                NormalRange = 5,
+                Weight = 3
+            };
+
+            actor.EquippedArmor = new ArmorDefinition
+            {
+                Id = "chain_mail",
+                Name = "Chain Mail",
+                Category = ArmorCategory.Heavy,
+                BaseAC = 16,
+                MaxDexBonus = 0,
+                Weight = 55
+            };
+
+            actor.EquippedShield = new ArmorDefinition
+            {
+                Id = "shield",
+                Name = "Shield",
+                Category = ArmorCategory.Shield,
+                BaseAC = 2,
+                MaxDexBonus = 0,
+                Weight = 6
+            };
+
+            service.InitializeFromCombatant(actor, includeExtendedStarterGear: false);
+            var inv = service.GetInventory(actor.Id);
+
+            var equippedItems = inv.EquippedItems.Values.Where(item => item != null).ToList();
+            Assert.NotEmpty(equippedItems);
+
+            Assert.All(equippedItems, item =>
+            {
+                AssertValidResIconPath(item.IconPath);
+                Assert.False(string.IsNullOrWhiteSpace(item.GetStatLine()));
+            });
+        }
+
+        [Fact]
+        public void CreateWeaponItem_BuildsTooltipStatLineWithDamageAndRange()
+        {
+            var shortbow = new WeaponDefinition
+            {
+                Id = "shortbow",
+                Name = "Shortbow",
+                WeaponType = WeaponType.Shortbow,
+                Category = WeaponCategory.Simple,
+                DamageType = DamageType.Piercing,
+                DamageDiceCount = 1,
+                DamageDieFaces = 6,
+                Properties = WeaponProperty.TwoHanded | WeaponProperty.Ammunition,
+                NormalRange = 60,
+                LongRange = 320,
+                Weight = 2
+            };
+
+            var item = InventoryService.CreateWeaponItem(shortbow);
+
+            AssertValidResIconPath(item.IconPath);
+            string statLine = item.GetStatLine();
+            Assert.Contains("1d6 Piercing", statLine);
+            Assert.Contains("Range: 60/320 ft", statLine);
+        }
+
+        [Fact]
+        public void CreateArmorItem_BuildsTooltipStatLineWithAcAndRequirements()
+        {
+            var heavyArmor = new ArmorDefinition
+            {
+                Id = "test_heavy_armor",
+                Name = "Test Heavy Armor",
+                Category = ArmorCategory.Heavy,
+                BaseAC = 16,
+                MaxDexBonus = 0,
+                StealthDisadvantage = true,
+                StrengthRequirement = 15,
+                Weight = 55
+            };
+
+            var item = InventoryService.CreateArmorItem(heavyArmor, ItemCategory.Armor);
+
+            AssertValidResIconPath(item.IconPath);
+            string statLine = item.GetStatLine();
+            Assert.Contains("AC 16 (no DEX bonus)", statLine);
+            Assert.Contains("Stealth Disadvantage", statLine);
+            Assert.Contains("Requires STR 15", statLine);
+        }
+
+        private static void AssertValidResIconPath(string iconPath)
+        {
+            Assert.False(string.IsNullOrWhiteSpace(iconPath));
+            Assert.StartsWith("res://", iconPath, StringComparison.Ordinal);
+            Assert.True(File.Exists(ToAbsoluteResPath(iconPath)), $"Missing icon asset: {iconPath}");
+        }
+
+        private static string ToAbsoluteResPath(string resPath)
+        {
+            string root = FindRepoRoot();
+            string relative = resPath["res://".Length..]
+                .Replace('/', Path.DirectorySeparatorChar);
+            return Path.Combine(root, relative);
+        }
+
+        private static string FindRepoRoot()
+        {
+            var dir = AppContext.BaseDirectory;
+            while (dir != null)
+            {
+                if (File.Exists(Path.Combine(dir, "project.godot")))
+                    return dir;
+                dir = Directory.GetParent(dir)?.FullName;
+            }
+
+            return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
         }
 
         private static Combatant CreateCombatant()
