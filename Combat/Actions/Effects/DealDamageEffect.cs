@@ -581,21 +581,30 @@ namespace QDND.Combat.Actions.Effects
                 // Handle damage to downed combatants
                 if (target.LifeState == CombatantLifeState.Downed && actualDamageDealt > 0)
                 {
-                    // Damage to a downed combatant is an automatic death save failure
-                    int failuresToAdd = 1;
-
-                    if (context.IsCritical)
-                    {
-                        failuresToAdd = 2;
-                    }
-
-                    target.DeathSaveFailures = Math.Min(3, target.DeathSaveFailures + failuresToAdd);
-
-                    // Check for instant death from accumulated failures
-                    if (target.DeathSaveFailures >= 3)
+                    if (massiveDamageInstantDeath)
                     {
                         target.LifeState = CombatantLifeState.Dead;
                         killed = true;
+                    }
+
+                    // Damage to a downed combatant is an automatic death save failure
+                    if (target.LifeState != CombatantLifeState.Dead)
+                    {
+                        int failuresToAdd = 1;
+
+                        if (context.IsCritical)
+                        {
+                            failuresToAdd = 2;
+                        }
+
+                        target.DeathSaveFailures = Math.Min(3, target.DeathSaveFailures + failuresToAdd);
+
+                        // Check for instant death from accumulated failures
+                        if (target.DeathSaveFailures >= 3)
+                        {
+                            target.LifeState = CombatantLifeState.Dead;
+                            killed = true;
+                        }
                     }
                 }
 

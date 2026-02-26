@@ -241,6 +241,15 @@ namespace QDND.Combat.Entities
         /// <summary>Get the proficiency bonus from resolved character or fallback.</summary>
         public int GetProficiencyBonus() => ResolvedCharacter?.Sheet?.ProficiencyBonus ?? ProficiencyBonus;
 
+        /// <summary>Get the skill check bonus, including proficiency/expertise if applicable.</summary>
+        public int GetSkillBonus(Data.CharacterModel.Skill skill)
+        {
+            if (ResolvedCharacter != null)
+                return ResolvedCharacter.GetSkillBonus(skill, GetProficiencyBonus());
+            // Fallback for units without ResolvedCharacter: use raw ability modifier
+            return GetAbilityModifier(Data.CharacterModel.ResolvedCharacter.GetSkillAbility(skill));
+        }
+
         /// <summary>
         /// Proficiency bonus from character level.
         /// </summary>

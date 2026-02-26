@@ -97,13 +97,18 @@ namespace QDND.Combat.AI
             var budget = actor.ActionBudget;
             if (budget != null)
             {
-                // Attack, Shove, Dash, Disengage, and action-consuming abilities require an action
+                // Attack, Dash, and Disengage require a main action
                 if (nextAction.ActionType == AIActionType.Attack || 
-                    nextAction.ActionType == AIActionType.Shove ||
                     nextAction.ActionType == AIActionType.Dash ||
                     nextAction.ActionType == AIActionType.Disengage)
                 {
                     if (!budget.HasAction) return false;
+                }
+
+                // Shove requires a bonus action
+                if (nextAction.ActionType == AIActionType.Shove)
+                {
+                    if (!budget.HasBonusAction) return false;
                 }
                 
                 // Movement requires remaining movement budget

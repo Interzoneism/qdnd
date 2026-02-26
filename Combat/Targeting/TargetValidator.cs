@@ -165,8 +165,23 @@ namespace QDND.Combat.Targeting
             // Melee attacks get a tolerance for character body radius positioning
             if (action.Range > 0)
             {
-                float distance = source.Position.DistanceTo(target.Position);
-                bool isMelee = action.AttackType == Actions.AttackType.MeleeWeapon || action.AttackType == Actions.AttackType.MeleeSpell;
+                float distance;
+                if (IsShoveAction(action))
+                {
+                    distance = new Vector3(
+                        source.Position.X - target.Position.X,
+                        0,
+                        source.Position.Z - target.Position.Z
+                    ).Length();
+                }
+                else
+                {
+                    distance = source.Position.DistanceTo(target.Position);
+                }
+
+                bool isMelee = IsShoveAction(action) ||
+                               action.AttackType == Actions.AttackType.MeleeWeapon ||
+                               action.AttackType == Actions.AttackType.MeleeSpell;
                 float tolerance = isMelee ? 0.75f : 0.5f;  // Body radius tolerance
                 if (distance > action.Range + tolerance)
                     return TargetValidation.Invalid($"Target out of range ({distance:F1}/{action.Range + tolerance:F1})");
@@ -239,8 +254,7 @@ namespace QDND.Combat.Targeting
             if (action == null || string.IsNullOrWhiteSpace(action.Id))
                 return false;
 
-            return string.Equals(action.Id, "shove", StringComparison.OrdinalIgnoreCase) ||
-                   string.Equals(action.Id, "target_shove", StringComparison.OrdinalIgnoreCase);
+            return action.Id.IndexOf("shove", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         /// <summary>
@@ -350,13 +364,17 @@ namespace QDND.Combat.Targeting
             Godot.Vector3? wallStart = null)
         {
             var targets = new List<Combatant>();
+            var sourcePosition = getPosition(source);
+            var lineOfEffectOrigin = ResolveLineOfEffectOrigin(action, sourcePosition, targetPoint, wallStart);
 
             foreach (var combatant in allCombatants.Where(c => IsTargetStateAllowed(action, c)))
             {
-                if (!IsValidFaction(action.TargetFilter, source, combatant))
+                bool validFaction = IsValidFaction(action.TargetFilter, source, combatant);
+                if (!validFaction)
                     continue;
 
-                if (!HasRequiredTags(action, combatant))
+                bool hasRequiredTags = HasRequiredTags(action, combatant);
+                if (!hasRequiredTags)
                     continue;
 
                 var pos = getPosition(combatant);
@@ -365,19 +383,21 @@ namespace QDND.Combat.Targeting
                 bool inArea = action.TargetType switch
                 {
                     Actions.TargetType.Circle => distance <= action.AreaRadius,
-                    Actions.TargetType.Cone => IsInCone(getPosition(source), targetPoint, pos, action.ConeAngle, action.Range),
-                    Actions.TargetType.Line => IsOnLine(getPosition(source), targetPoint, pos, action.LineWidth),
+                    Actions.TargetType.Cone => IsInCone(sourcePosition, targetPoint, pos, action.ConeAngle, action.Range),
+                    Actions.TargetType.Line => IsOnLine(sourcePosition, targetPoint, pos, action.LineWidth),
                     Actions.TargetType.WallSegment => wallStart.HasValue && IsOnLine(wallStart.Value, targetPoint, pos, action.LineWidth),
+                    Actions.TargetType.Point => distance <= Mathf.Max(0.25f, action.AreaRadius),
                     _ => false
                 };
 
-                if (inArea)
+                if (!inArea)
+                    continue;
+
+                // Circle/Point effects use cast point as center; Cone/Line should use source origin.
+                bool hasEffect = HasLineOfEffectFromPoint(lineOfEffectOrigin, combatant, getPosition);
+                if (hasEffect)
                 {
-                    // Check line of effect from target point to combatant
-                    if (HasLineOfEffectFromPoint(targetPoint, combatant, getPosition))
-                    {
-                        targets.Add(combatant);
-                    }
+                    targets.Add(combatant);
                 }
             }
 
@@ -417,8 +437,27 @@ namespace QDND.Combat.Targeting
                 return true;
 
             var targetPos = positionGetter(target);
+            if (point.DistanceSquaredTo(targetPos) <= 0.0001f)
+                return true;
+
             var result = _losService.CheckLOS(point, targetPos);
             return result.HasLineOfSight;
+        }
+
+        private static Vector3 ResolveLineOfEffectOrigin(
+            Actions.ActionDefinition action,
+            Vector3 sourcePosition,
+            Vector3 targetPoint,
+            Vector3? wallStart)
+        {
+            return action.TargetType switch
+            {
+                Actions.TargetType.Cone => sourcePosition,
+                Actions.TargetType.Line => sourcePosition,
+                Actions.TargetType.Charge => sourcePosition,
+                Actions.TargetType.WallSegment => wallStart ?? sourcePosition,
+                _ => targetPoint
+            };
         }
 
         /// <summary>

@@ -1208,7 +1208,11 @@ namespace QDND.Combat.Arena
         /// <summary>Syncs output state written by ScenarioBootService back to CombatArena fields.</summary>
         private void SyncFromBootService()
         {
-            _combatants = _scenarioBootService.Combatants;
+            _combatants.Clear();
+            if (_scenarioBootService.Combatants != null)
+            {
+                _combatants.AddRange(_scenarioBootService.Combatants);
+            }
             _rng = _scenarioBootService.Rng;
             _resolvedScenarioSeed = _scenarioBootService.ResolvedScenarioSeed;
             RandomSeed = _scenarioBootService.ResolvedRandomSeed;

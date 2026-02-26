@@ -2615,7 +2615,7 @@
       "description": "Call forth spirits that deal 3d8 Radiant damage to enemies within 15 feet.",
       "icon": "res://assets/Images/Icons Spells/Spirit_Guardians_Unfaded_Icon.png",
       "targetType": "self",
-      "targetFilter": "Enemies",
+      "targetFilter": "Self",
       "range": 0,
       "areaRadius": 4.5,
       "cost": {
@@ -2629,7 +2629,7 @@
       "effects": [
         {
           "type": "apply_status",
-          "statusId": "spirit_guardians_aura",
+          "statusId": "spirit_guardians",
           "statusDuration": 100,
           "condition": "always"
         }

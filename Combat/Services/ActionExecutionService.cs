@@ -466,6 +466,24 @@ namespace QDND.Combat.Services
                 return;
             }
 
+            // Defensive routing: if callers pass non-single-target actions through the
+            // single-target overload, redirect to the appropriate execution path.
+            if (action.TargetType == TargetType.MultiUnit)
+            {
+                ExecuteAction(actorId, actionId, new List<string> { targetId }, options);
+                return;
+            }
+            if (action.TargetType == TargetType.Circle ||
+                action.TargetType == TargetType.Cone ||
+                action.TargetType == TargetType.Line ||
+                action.TargetType == TargetType.Point ||
+                action.TargetType == TargetType.Charge ||
+                action.TargetType == TargetType.WallSegment)
+            {
+                ExecuteAbilityAtPosition(actorId, actionId, target.Position, options);
+                return;
+            }
+
             // Enforce single-target validity at execution time so AI/simulation paths
             // cannot bypass range/faction checks by calling ExecuteAction directly.
             // Skip validation for reaction-triggered abilities where range was already checked.

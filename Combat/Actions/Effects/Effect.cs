@@ -63,6 +63,10 @@ namespace QDND.Combat.Actions.Effects
         public StatusManager Statuses { get; set; }
         public QueryResult AttackResult { get; set; }
         public QueryResult SaveResult { get; set; }
+
+        /// <summary>Result of a contested check (e.g., shove). Null if no contest was used.</summary>
+        public QDND.Combat.Rules.ContestResult ContestResult { get; set; }
+
         public Random Rng { get; set; }
 
         /// <summary>

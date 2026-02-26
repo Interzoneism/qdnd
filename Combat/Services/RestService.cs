@@ -68,6 +68,23 @@ namespace QDND.Combat.Services
         }
         
         /// <summary>
+        /// Replenish per-turn resources (Action, Bonus Action, Reaction).
+        /// Delegates to ResourceManager.ReplenishTurnResources.
+        /// Hook this into CombatArena OnTurnStart.
+        /// </summary>
+        /// <param name="combatant">The combatant whose turn is starting</param>
+        public void ReplenishTurnResources(Combatant combatant)
+        {
+            if (combatant == null)
+                return;
+            
+            _resourceManager.ReplenishTurnResources(combatant);
+            
+            // Also reset ActionBudget flags
+            combatant.ActionBudget?.ResetForTurn();
+        }
+        
+        /// <summary>
         /// Replenish per-round resources (if any).
         /// Currently a placeholder - BG3 doesn't have distinct round-based resources.
         /// </summary>

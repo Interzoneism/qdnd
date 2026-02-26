@@ -178,6 +178,25 @@ namespace QDND.Combat.Actions
         public List<EffectDefinition> Effects { get; set; } = new();
 
         /// <summary>
+        /// How this action determines success/failure.
+        /// "save" (default): standard DC-based saving throw.
+        /// "contest": opposed skill check (e.g., shove: Athletics vs max(Athletics, Acrobatics)).
+        /// Null or empty defaults to "save" behavior.
+        /// </summary>
+        public string ResolutionType { get; set; }
+
+        /// <summary>
+        /// For contest resolution: attacker's skill (e.g., "athletics").
+        /// </summary>
+        public string ContestAttackerSkill { get; set; }
+
+        /// <summary>
+        /// For contest resolution: defender's skill(s). If multiple, defender uses the highest.
+        /// Comma-separated, e.g., "athletics,acrobatics".
+        /// </summary>
+        public string ContestDefenderSkills { get; set; }
+
+        /// <summary>
         /// Save/attack parameters.
         /// </summary>
         public AttackType? AttackType { get; set; }

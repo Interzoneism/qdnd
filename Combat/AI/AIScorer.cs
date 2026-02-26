@@ -443,7 +443,7 @@ namespace QDND.Combat.AI
                 0,
                 actor.Position.Z - target.Position.Z
             ).Length();
-            if (horizontalDistance > 5f) // Shove requires melee range
+            if (horizontalDistance > 2.25f) // 1.5m melee range + tolerance
             {
                 action.IsValid = false;
                 action.InvalidReason = "Target out of shove range";
@@ -462,6 +462,13 @@ namespace QDND.Combat.AI
             float baseValue = 1f;
             breakdown["base_shove_value"] = baseValue;
             score += baseValue;
+
+            if (string.Equals(action.VariantId, "shove_prone", StringComparison.OrdinalIgnoreCase))
+            {
+                float proneControlBonus = _weights.Get("control_status") * 0.35f * profile.GetWeight("control");
+                breakdown["prone_control"] = proneControlBonus;
+                score += proneControlBonus;
+            }
 
             // Evaluate ledge potential
             float fallDamage = 0;
@@ -502,10 +509,15 @@ namespace QDND.Combat.AI
             // Push into obstacle gives collision damage bonus
             // (would integrate with ForcedMovementService for full implementation)
 
-            // Opportunity cost: shove uses action
+            // Opportunity cost: shove uses bonus action
             float actionCost = _weights.Get("shove_base_cost");
             breakdown["action_cost"] = -actionCost;
             score -= actionCost;
+
+            // Contest success probability: attacker Athletics vs defender max(Athletics, Acrobatics)
+            float successProbability = EstimateContestProbability(actor, target);
+            breakdown["contest_probability"] = successProbability;
+            score *= successProbability;
 
             // Higher value on high-threat targets
             float targetThreat = EstimateTargetThreat(target);
@@ -518,6 +530,23 @@ namespace QDND.Combat.AI
 
             action.Score = Math.Max(0, score);
             action.ExpectedValue = fallDamage;
+        }
+
+        /// <summary>
+        /// Estimate probability of winning a Shove contest.
+        /// Attacker: d20 + Athletics vs Defender: d20 + max(Athletics, Acrobatics).
+        /// Approximation: P(win) ≈ 0.5 + (attackerMod - defenderMod) × 0.05, clamped [0.05, 0.95].
+        /// </summary>
+        private float EstimateContestProbability(Combatant attacker, Combatant target)
+        {
+            int atkBonus = attacker.GetSkillBonus(Data.CharacterModel.Skill.Athletics);
+            int defAthletics = target.GetSkillBonus(Data.CharacterModel.Skill.Athletics);
+            int defAcrobatics = target.GetSkillBonus(Data.CharacterModel.Skill.Acrobatics);
+            int defBonus = Math.Max(defAthletics, defAcrobatics);
+
+            float diff = atkBonus - defBonus;
+            float probability = 0.5f + diff * 0.05f;
+            return Math.Clamp(probability, 0.05f, 0.95f);
         }
 
         /// <summary>

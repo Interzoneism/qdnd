@@ -235,10 +235,10 @@ namespace QDND.Combat.AI
                 {
                     var nextAction = _currentPlan.GetNextAction();
                     
-                    // Extra safety: if the planned action requires a main action but budget is spent, skip it
+                    // Extra safety: if the planned action requires unavailable budget, skip it
                     if (nextAction != null && 
-                        (nextAction.ActionType == AIActionType.Attack || nextAction.ActionType == AIActionType.Shove) &&
-                        actor.ActionBudget?.HasAction == false)
+                        ((nextAction.ActionType == AIActionType.Attack && actor.ActionBudget?.HasAction == false) ||
+                         (nextAction.ActionType == AIActionType.Shove && actor.ActionBudget?.HasBonusAction == false)))
                     {
                         _currentPlan.Invalidate();
                         _currentPlan = null;
@@ -1338,7 +1338,7 @@ namespace QDND.Combat.AI
                     0,
                     actor.Position.Z - enemy.Position.Z
                 ).Length();
-                if (horizontalDistance > 5f) continue; // Shove requires melee range
+                if (horizontalDistance > 2.25f) continue; // 1.5m melee range + tolerance
 
                 // Shove size restriction: cannot shove target more than one size larger.
                 if (!TargetValidator.IsValidShoveSize(actor, enemy))
@@ -1351,16 +1351,28 @@ namespace QDND.Combat.AI
                     pushDir = new Vector3(1, 0, 0);
                 }
 
-                // Check if shove would have tactical value (near ledge, hazard, etc.)
+                // Always consider shove-prone for melee control value.
+                candidates.Add(new AIAction
+                {
+                    ActionType = AIActionType.Shove,
+                    ActionId = "shove",
+                    VariantId = "shove_prone",
+                    TargetId = enemy.Id,
+                    PushDirection = pushDir,
+                    ShoveExpectedFallDamage = 0f
+                });
+
+                // Consider shove-push when terrain creates tactical value (near ledge, hazard, etc.)
                 bool nearLedge = IsNearLedge(enemy.Position, pushDir);
                 float potentialFallDamage = CalculatePotentialFallDamage(enemy.Position, pushDir);
 
-                // Only consider shove if it has tactical value
                 if (nearLedge || potentialFallDamage > 0)
                 {
                     candidates.Add(new AIAction
                     {
                         ActionType = AIActionType.Shove,
+                        ActionId = "shove",
+                        VariantId = "shove_push",
                         TargetId = enemy.Id,
                         PushDirection = pushDir,
                         ShoveExpectedFallDamage = potentialFallDamage
@@ -2398,10 +2410,17 @@ namespace QDND.Combat.AI
                 0,
                 actor.Position.Z - target.Position.Z
             ).Length();
-            if (horizontalDistance > 5f)
+            if (horizontalDistance > 2.25f)
             {
                 action.IsValid = false;
                 action.InvalidReason = "Target out of shove range";
+                return;
+            }
+
+            if (!TargetValidator.IsValidShoveSize(actor, target))
+            {
+                action.IsValid = false;
+                action.InvalidReason = "Target too large to shove";
                 return;
             }
 
@@ -3091,12 +3110,12 @@ namespace QDND.Combat.AI
 
             // Categorize the primary action
             bool primaryUsesAction = primaryAction.ActionType == AIActionType.Attack || 
-                                     primaryAction.ActionType == AIActionType.Shove ||
                                      primaryAction.ActionType == AIActionType.Dash ||
                                      primaryAction.ActionType == AIActionType.Disengage ||
                                      (primaryAction.ActionType == AIActionType.UseAbility && IsActionAbility(primaryAction));
             
-            bool primaryUsesBonusAction = primaryAction.ActionType == AIActionType.UseAbility && IsBonusActionAbility(primaryAction);
+            bool primaryUsesBonusAction = primaryAction.ActionType == AIActionType.Shove ||
+                                          (primaryAction.ActionType == AIActionType.UseAbility && IsBonusActionAbility(primaryAction));
             bool primaryIsMovement = primaryAction.ActionType == AIActionType.Move || primaryAction.ActionType == AIActionType.Jump;
             bool primaryIsEndTurn = primaryAction.ActionType == AIActionType.EndTurn;
             
@@ -3111,7 +3130,9 @@ namespace QDND.Combat.AI
             if (!primaryUsesBonusAction && actor.ActionBudget?.HasBonusAction == true)
             {
                 bonusAction = allCandidates
-                    .Where(c => c.IsValid && c.ActionType == AIActionType.UseAbility && IsBonusActionAbility(c) && c.Score > 1f)
+                    .Where(c => c.IsValid && c.Score > 1f &&
+                           ((c.ActionType == AIActionType.UseAbility && IsBonusActionAbility(c)) ||
+                            c.ActionType == AIActionType.Shove))
                     .OrderByDescending(c => c.Score)
                     .FirstOrDefault();
             }

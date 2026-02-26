@@ -63,6 +63,9 @@ namespace QDND.Combat.Actions
         public QueryResult AttackResult { get; set; }
         public QueryResult SaveResult { get; set; }
 
+        /// <summary>Result of a contested check (e.g., shove).</summary>
+        public QDND.Combat.Rules.ContestResult ContestResult { get; set; }
+
         /// <summary>
         /// Per-projectile attack results for multi-projectile spells (Scorching Ray, Eldritch Blast, etc.).
         /// Null or empty for single-projectile/non-attack spells.
@@ -1006,8 +1009,55 @@ namespace QDND.Combat.Actions
                 }
             }
 
+            // --- Contested check resolution (e.g., Shove: Athletics vs max(Athletics, Acrobatics)) ---
+            if (string.Equals(action.ResolutionType, "contest", StringComparison.OrdinalIgnoreCase)
+                && targets.Count > 0)
+            {
+                foreach (var target in targets)
+                {
+                    int attackerMod = GetContestSkillBonus(source, action.ContestAttackerSkill);
+                    int defenderMod = GetBestContestSkillBonus(target, action.ContestDefenderSkills);
+
+                    string attackerSkillName = action.ContestAttackerSkill ?? "Athletics";
+                    string defenderSkillName = action.ContestDefenderSkills ?? "Athletics";
+
+                    var contestResult = Rules.Contest(
+                        source, target,
+                        attackerMod, defenderMod,
+                        attackerSkillName, defenderSkillName,
+                        TiePolicy.DefenderWins);
+
+                    result.ContestResult = contestResult;
+                    context.ContestResult = contestResult;
+
+                    // Synthesize a SaveResult so downstream on_save_fail conditions work unchanged.
+                    // If attacker won → defender failed the "save".
+                    var syntheticSave = new QueryResult
+                    {
+                        Input = new QueryInput
+                        {
+                            Type = QueryType.Contest,
+                            Source = source,
+                            Target = target,
+                            DC = contestResult.RollA,
+                            BaseValue = defenderMod
+                        },
+                        BaseValue = defenderMod,
+                        NaturalRoll = contestResult.NaturalRollB,
+                        FinalValue = contestResult.RollB,
+                        IsSuccess = contestResult.DefenderWon
+                    };
+
+                    context.SaveResult = syntheticSave;
+                    result.SaveResult = syntheticSave;
+                    context.PerTargetSaveResults[target.Id] = syntheticSave;
+                }
+            }
+
             // Roll save if needed
-            if (!string.IsNullOrEmpty(action.SaveType) && targets.Count > 0)
+            if (!string.IsNullOrEmpty(action.SaveType)
+                && !string.Equals(action.ResolutionType, "contest", StringComparison.OrdinalIgnoreCase)
+                && targets.Count > 0)
             {
                 // For actions with both attack roll and save: only roll save if attack hit,
                 // unless effects exist that need saves regardless of attack result (e.g., Ice Knife splash)
@@ -2303,6 +2353,43 @@ namespace QDND.Combat.Actions
             }
 
             return bonus;
+        }
+
+        /// <summary>
+        /// Get the skill check bonus for a contested check participant.
+        /// </summary>
+        private int GetContestSkillBonus(Combatant combatant, string skillName)
+        {
+            if (combatant == null || string.IsNullOrEmpty(skillName))
+                return 0;
+
+            if (Enum.TryParse<Data.CharacterModel.Skill>(skillName, true, out var skill))
+            {
+                return combatant.GetSkillBonus(skill);
+            }
+
+            // Fallback: treat as raw ability
+            var ability = ParseAbilityType(skillName);
+            return ability.HasValue ? combatant.GetAbilityModifier(ability.Value) : 0;
+        }
+
+        /// <summary>
+        /// Get the best skill bonus for the defender from a comma-separated list of skills.
+        /// BG3 Shove: defender uses max(Athletics, Acrobatics).
+        /// </summary>
+        private int GetBestContestSkillBonus(Combatant combatant, string skillNames)
+        {
+            if (combatant == null || string.IsNullOrEmpty(skillNames))
+                return 0;
+
+            int best = int.MinValue;
+            foreach (var name in skillNames.Split(','))
+            {
+                int bonus = GetContestSkillBonus(combatant, name.Trim());
+                if (bonus > best) best = bonus;
+            }
+
+            return best == int.MinValue ? 0 : best;
         }
 
         private int ComputeSaveDC(Combatant source, ActionDefinition action, HashSet<string> effectiveTags)

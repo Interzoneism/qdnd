@@ -108,10 +108,29 @@ namespace QDND.Combat.Statuses
                 status.Definition?.Id);
 
             // Handle life state transitions from tick damage
-            if (target.Resources.IsDowned)
+            if (target.Resources.IsDowned && dealt > 0)
             {
                 if (target.LifeState == CombatantLifeState.Downed)
                 {
+                    if (massiveDamageInstantDeath)
+                    {
+                        target.LifeState = CombatantLifeState.Dead;
+                        Log?.Invoke($"{target.Name} killed outright by massive damage from {sourceName}!");
+
+                        _rulesEngine?.Events.Dispatch(new RuleEvent
+                        {
+                            Type = RuleEventType.CombatantDied,
+                            TargetId = target.Id,
+                            Data = new Dictionary<string, object>
+                            {
+                                { "cause", "massive_damage_status_tick" },
+                                { "statusId", status.Definition?.Id }
+                            }
+                        });
+
+                        return;
+                    }
+
                     // Damage to an already-downed combatant = auto death save failure
                     target.DeathSaveFailures = System.Math.Min(3, target.DeathSaveFailures + 1);
                     if (target.DeathSaveFailures >= 3)

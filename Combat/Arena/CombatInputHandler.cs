@@ -86,6 +86,7 @@ namespace QDND.Combat.Arena
         {
             UpdateHover();
             ProcessCameraInput((float)delta);
+            SyncMultiTargetSelectionState();
 
             // Update AoE preview if ability selected
             if (!string.IsNullOrEmpty(Arena.SelectedAbilityId) && Camera != null && Arena != null)
@@ -828,9 +829,7 @@ namespace QDND.Combat.Arena
                                         // All targets picked — execute
                                         _hudController?.HideMultiTargetPrompt();
                                         Arena.ExecuteAction(_multiPickActorId, _multiPickAbilityId, new List<string>(_multiPickedTargets), Arena.GetSelectedAbilityOptions());
-                                        _multiPickedTargets.Clear();
-                                        _multiPickAbilityId = null;
-                                        _multiPickActorId = null;
+                                        ResetMultiTargetSelection();
                                     }
                                     else
                                     {
@@ -873,6 +872,37 @@ namespace QDND.Combat.Arena
                 // Clicked on empty space
                 Arena.ClearSelection();
             }
+        }
+
+        private void SyncMultiTargetSelectionState()
+        {
+            bool hasPendingMultiSelection = !string.IsNullOrEmpty(_multiPickAbilityId) ||
+                                            !string.IsNullOrEmpty(_multiPickActorId) ||
+                                            (_multiPickedTargets != null && _multiPickedTargets.Count > 0);
+            if (!hasPendingMultiSelection)
+                return;
+
+            if (Arena == null)
+            {
+                ResetMultiTargetSelection();
+                return;
+            }
+
+            bool staleSelection = string.IsNullOrEmpty(Arena.SelectedAbilityId) ||
+                                  !string.Equals(_multiPickAbilityId, Arena.SelectedAbilityId, StringComparison.Ordinal) ||
+                                  !string.Equals(_multiPickActorId, Arena.SelectedCombatantId, StringComparison.Ordinal);
+            if (staleSelection)
+            {
+                ResetMultiTargetSelection();
+            }
+        }
+
+        private void ResetMultiTargetSelection()
+        {
+            _multiPickedTargets?.Clear();
+            _multiPickAbilityId = null;
+            _multiPickActorId = null;
+            _hudController?.HideMultiTargetPrompt();
         }
 
         private bool TryGetWorldPointFromMouse(out Vector3 worldPoint, uint collisionMask = 1)
