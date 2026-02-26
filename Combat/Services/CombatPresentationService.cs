@@ -500,6 +500,7 @@ namespace QDND.Combat.Services
             VfxEventPhase phase,
             VfxTargetPattern pattern)
         {
+            var variantVfxId = ResolveVariantVfxId(action, options?.VariantId);
             var request = new VfxRequest(correlationId, phase)
             {
                 ActionId = action?.Id,
@@ -517,6 +518,11 @@ namespace QDND.Combat.Services
                 AttackType = action?.AttackType,
                 TargetType = action?.TargetType,
                 Intent = action?.Intent,
+                IsSpell = IsSpellAction(action),
+                SpellSchool = action?.School ?? QDND.Combat.Actions.SpellSchool.None,
+                SpellType = action?.BG3SpellType,
+                ActionVfxId = action?.VfxId,
+                VariantVfxId = variantVfxId,
                 Pattern = pattern,
                 Magnitude = ResolveAreaMagnitude(action),
                 Seed = ComputeStableSeed(correlationId, action?.Id, actor?.Id, phase.ToString(), options?.VariantId)
@@ -596,6 +602,48 @@ namespace QDND.Combat.Services
             }
 
             return DamageType.Slashing;
+        }
+
+        private static string ResolveVariantVfxId(ActionDefinition action, string variantId)
+        {
+            if (action?.Variants == null || action.Variants.Count == 0 || string.IsNullOrWhiteSpace(variantId))
+                return null;
+
+            var variant = action.Variants.FirstOrDefault(v =>
+                string.Equals(v?.VariantId, variantId, StringComparison.OrdinalIgnoreCase));
+            return variant?.VfxId;
+        }
+
+        private static bool IsSpellAction(ActionDefinition action)
+        {
+            if (action == null)
+                return false;
+
+            if (action.SpellLevel > 0 ||
+                action.AttackType == AttackType.MeleeSpell ||
+                action.AttackType == AttackType.RangedSpell ||
+                action.Components != SpellComponents.None ||
+                action.School != QDND.Combat.Actions.SpellSchool.None ||
+                !string.IsNullOrWhiteSpace(action.BG3SpellType))
+            {
+                return true;
+            }
+
+            if (action.Tags != null)
+            {
+                foreach (var rawTag in action.Tags)
+                {
+                    if (string.IsNullOrWhiteSpace(rawTag))
+                        continue;
+
+                    var tag = rawTag.Trim().ToLowerInvariant();
+                    if (tag == "spell" || tag == "cantrip" || tag == "magic")
+                        return true;
+                }
+            }
+
+            return action.Cost?.ResourceCosts?.Keys.Any(k =>
+                k.StartsWith("spell_slot", StringComparison.OrdinalIgnoreCase)) == true;
         }
 
         private static VfxTargetPattern ResolvePattern(TargetType targetType)

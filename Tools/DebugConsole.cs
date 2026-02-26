@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Tools;
+namespace QDND.Tools;
 
 /// <summary>
 /// Debug console for runtime command execution.

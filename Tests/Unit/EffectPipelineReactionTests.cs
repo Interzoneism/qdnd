@@ -131,7 +131,7 @@ namespace QDND.Tests.Unit
             pipeline.GetCombatants = () => allCombatants;
 
             ReactionTriggerEventArgs? receivedArgs = null;
-            pipeline.OnAbilityCastTrigger += (sender, args) => receivedArgs = args;
+            pipeline.OnAbilityCastTrigger += args => receivedArgs = args;
 
             // Act
             pipeline.ExecuteAction("test_spell", caster, new List<Combatant> { target });
@@ -166,7 +166,7 @@ namespace QDND.Tests.Unit
             pipeline.GetCombatants = () => allCombatants;
 
             ReactionTriggerEventArgs? receivedArgs = null;
-            pipeline.OnAbilityCastTrigger += (sender, args) => receivedArgs = args;
+            pipeline.OnAbilityCastTrigger += args => receivedArgs = args;
 
             // Act
             pipeline.ExecuteAction("test_spell", caster, new List<Combatant> { target });
@@ -196,7 +196,7 @@ namespace QDND.Tests.Unit
             pipeline.GetCombatants = () => allCombatants;
 
             ReactionTriggerEventArgs? receivedArgs = null;
-            pipeline.OnAbilityCastTrigger += (sender, args) => receivedArgs = args;
+            pipeline.OnAbilityCastTrigger += args => receivedArgs = args;
 
             // Act
             pipeline.ExecuteAction("test_melee", attacker, new List<Combatant> { target });
@@ -226,7 +226,7 @@ namespace QDND.Tests.Unit
             pipeline.GetCombatants = () => allCombatants;
 
             // Set up handler that cancels the ability
-            pipeline.OnAbilityCastTrigger += (sender, args) =>
+            pipeline.OnAbilityCastTrigger += args =>
             {
                 args.Cancel = true; // Counterspell!
             };
@@ -265,7 +265,7 @@ namespace QDND.Tests.Unit
             pipeline.GetCombatants = () => allCombatants;
 
             ReactionTriggerEventArgs? receivedArgs = null;
-            pipeline.OnDamageTrigger += (sender, args) => receivedArgs = args;
+            pipeline.OnDamageTrigger += args => receivedArgs = args;
 
             // Act
             pipeline.ExecuteAction("test_melee", attacker, new List<Combatant> { target });
@@ -300,7 +300,7 @@ namespace QDND.Tests.Unit
             pipeline.GetCombatants = () => allCombatants;
 
             ReactionTriggerEventArgs? receivedArgs = null;
-            pipeline.OnDamageTrigger += (sender, args) => receivedArgs = args;
+            pipeline.OnDamageTrigger += args => receivedArgs = args;
 
             // Act
             pipeline.ExecuteAction("test_melee", attacker, new List<Combatant> { target });
@@ -329,7 +329,7 @@ namespace QDND.Tests.Unit
             pipeline.GetCombatants = () => allCombatants;
 
             // Set up handler that reduces damage by half (shield effect)
-            pipeline.OnDamageTrigger += (sender, args) =>
+            pipeline.OnDamageTrigger += args =>
             {
                 args.DamageModifier = 0.5f; // Half damage
             };
@@ -361,7 +361,7 @@ namespace QDND.Tests.Unit
             pipeline.GetCombatants = () => allCombatants;
 
             // Set up handler that blocks all damage
-            pipeline.OnDamageTrigger += (sender, args) =>
+            pipeline.OnDamageTrigger += args =>
             {
                 args.DamageModifier = 0f; // Block all damage
             };
@@ -464,7 +464,7 @@ namespace QDND.Tests.Unit
             pipeline.GetCombatants = () => allCombatants;
 
             ReactionTriggerEventArgs? receivedArgs = null;
-            pipeline.OnAbilityCastTrigger += (sender, args) => receivedArgs = args;
+            pipeline.OnAbilityCastTrigger += args => receivedArgs = args;
 
             // Act
             pipeline.ExecuteAction("test_spell", caster, new List<Combatant> { target });
@@ -499,7 +499,7 @@ namespace QDND.Tests.Unit
             pipeline.GetCombatants = () => allCombatants;
 
             ReactionTriggerEventArgs? receivedArgs = null;
-            pipeline.OnAbilityCastTrigger += (sender, args) => receivedArgs = args;
+            pipeline.OnAbilityCastTrigger += args => receivedArgs = args;
 
             // Act
             pipeline.ExecuteAction("test_spell", caster, new List<Combatant> { target });
@@ -535,7 +535,7 @@ namespace QDND.Tests.Unit
             pipeline.GetCombatants = () => allCombatants;
 
             ReactionTriggerEventArgs? receivedArgs = null;
-            pipeline.OnAbilityCastTrigger += (sender, args) => receivedArgs = args;
+            pipeline.OnAbilityCastTrigger += args => receivedArgs = args;
 
             // Act
             pipeline.ExecuteAction("test_spell", caster, new List<Combatant> { target });
@@ -568,7 +568,7 @@ namespace QDND.Tests.Unit
             pipeline.GetCombatants = () => allCombatants;
 
             ReactionTriggerEventArgs? receivedArgs = null;
-            pipeline.OnDamageTrigger += (sender, args) => receivedArgs = args;
+            pipeline.OnDamageTrigger += args => receivedArgs = args;
 
             // Act
             pipeline.ExecuteAction("test_melee", attacker, new List<Combatant> { target });

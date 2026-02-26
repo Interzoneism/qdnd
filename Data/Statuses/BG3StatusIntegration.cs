@@ -30,10 +30,12 @@ namespace QDND.Data.Statuses
             var statusDef = new StatusDefinition
             {
                 Id = bg3Status.StatusId?.ToLowerInvariant() ?? "unknown",
-                Name = bg3Status.DisplayName ?? bg3Status.StatusId ?? "Unknown",
+                Name = StatusPresentationPolicy.ResolveDisplayName(bg3Status.DisplayName, bg3Status.StatusId),
                 Description = bg3Status.Description ?? "",
                 Icon = bg3Status.Icon ?? ""
             };
+
+            StatusPresentationPolicy.ApplyStatusPropertyFlags(statusDef, bg3Status.StatusPropertyFlags);
 
             // Determine if this is a buff (BOOST type with beneficial effects)
             statusDef.IsBuff = bg3Status.StatusType == BG3StatusType.BOOST;

@@ -10,7 +10,7 @@ The core of the project is a deterministic, turn-based combat system. Combatants
 
 **Key Technologies:**
 
-*   **Engine:** Godot 4.5
+*   **Engine:** Godot 4.6
 *   **Language:** C#
 *   **Testing:** xUnit
 *   **Editor:** Visual Studio Code is supported with an MCP configuration.

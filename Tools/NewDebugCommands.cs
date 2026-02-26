@@ -1,19 +1,20 @@
 #nullable enable
 using System;
 
-namespace Tools;
+namespace QDND.Tools;
 
 /// <summary>
-/// Combat debug commands for testing and development.
+/// Console-based debug commands for testing and development.
+/// Uses the registration pattern with DebugConsole.
 /// </summary>
-public class DebugCommands
+public class ConsoleDebugCommands
 {
     private readonly DebugConsole _console;
     private bool _godMode = false;
     private bool _fowEnabled = true;
     private bool _losDebug = false;
 
-    public DebugCommands(DebugConsole console)
+    public ConsoleDebugCommands(DebugConsole console)
     {
         _console = console;
         RegisterCommands();

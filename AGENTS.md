@@ -1,4 +1,9 @@
-# Agent Rules (Godot 4.5 C#)
+# Agent Rules (Godot 4.6 C#)
+
+## Governance
+- **[PROJECT_STATUS.md](PROJECT_STATUS.md)** — Single source of truth for project state, architecture, and technical debt
+- **[CODING_STANDARDS.md](CODING_STANDARDS.md)** — Mandatory coding standards (naming, namespaces, patterns, events, error handling)
+- All documentation referenced in `PROJECT_STATUS.md § Deprecated Documentation` is **banned** — do not follow those docs
 
 ## Scope & safety
 - Operate strictly within /workspace (repo root). Never write outside the repo.

@@ -1,9 +1,9 @@
 #nullable enable
-using Tools;
+using QDND.Tools;
 using Xunit;
 using System.Collections.Generic;
 
-namespace Tests.Unit;
+namespace QDND.Tests.Unit;
 
 public class DebugConsoleTests
 {
@@ -104,7 +104,7 @@ public class DebugCommandsTests
     public void AllCommands_Registered()
     {
         var console = new DebugConsole();
-        var commands = new DebugCommands(console);
+        var commands = new ConsoleDebugCommands(console);
 
         var names = console.GetCommandNames();
 
@@ -128,7 +128,7 @@ public class DebugCommandsTests
     public void GodMode_Toggle_ChangesState()
     {
         var console = new DebugConsole();
-        var commands = new DebugCommands(console);
+        var commands = new ConsoleDebugCommands(console);
 
         Assert.False(commands.IsGodMode);
         console.Execute("godmode on");
@@ -141,7 +141,7 @@ public class DebugCommandsTests
     public void Damage_InvalidArgs_ShowsError()
     {
         var console = new DebugConsole();
-        var commands = new DebugCommands(console);
+        var commands = new ConsoleDebugCommands(console);
         string? error = null;
         console.OnError += msg => error = msg;
 
@@ -155,7 +155,7 @@ public class DebugCommandsTests
     public void Spawn_InvalidCoords_ShowsError()
     {
         var console = new DebugConsole();
-        var commands = new DebugCommands(console);
+        var commands = new ConsoleDebugCommands(console);
         string? error = null;
         console.OnError += msg => error = msg;
 

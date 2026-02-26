@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using QDND.Combat.VFX;
 using QDND.Data.CharacterModel;
+using QDND.Tools;
 
 namespace QDND.Combat.Arena
 {
@@ -18,6 +19,9 @@ namespace QDND.Combat.Arena
 
         private int _initialPoolSize = 12;
         private int _maxActiveEffects = 48;
+        public int ActiveEffectCount => _activeEffects.Count;
+        public int TotalSpawnRequests { get; private set; }
+        public int TotalEmittersSpawned { get; private set; }
 
         private struct ActiveEffect
         {
@@ -57,6 +61,8 @@ namespace QDND.Combat.Arena
             if (spec == null || _activeEffects.Count >= _maxActiveEffects)
                 return;
 
+            TotalSpawnRequests++;
+
             string recipe = !string.IsNullOrWhiteSpace(spec.Preset?.ParticleRecipe)
                 ? spec.Preset.ParticleRecipe
                 : spec.PresetId;
@@ -75,6 +81,12 @@ namespace QDND.Combat.Arena
                 float speed = spec.Preset?.ProjectileSpeed > 0f ? spec.Preset.ProjectileSpeed : 15f;
                 float duration = Mathf.Clamp(originWorld.DistanceTo(targetWorld) / speed, 0.12f, 1.2f);
                 var color = ResolveRecipeColor(recipe, spec);
+                if (DebugFlags.VerboseVfx)
+                {
+                    GD.Print(
+                        $"[VFX] Spawn projectile recipe={recipe} preset={spec.PresetId} " +
+                        $"from={originWorld} to={targetWorld} active={_activeEffects.Count}/{_maxActiveEffects}");
+                }
                 SpawnProjectile(originWorld, targetWorld, duration, color, spec.Preset?.Lifetime ?? 0.8f);
                 return;
             }
@@ -86,6 +98,13 @@ namespace QDND.Combat.Arena
             foreach (var point in points)
             {
                 SpawnRecipeAtPoint(recipe, ToGodot(point), spec);
+            }
+
+            if (DebugFlags.VerboseVfx)
+            {
+                GD.Print(
+                    $"[VFX] Spawn recipe={recipe} preset={spec.PresetId} points={points.Count} " +
+                    $"active={_activeEffects.Count}/{_maxActiveEffects}");
             }
         }
 
@@ -237,6 +256,7 @@ namespace QDND.Combat.Arena
             }));
 
             TrackEffect(particle, duration + Mathf.Max(0.3f, lifetime));
+            TotalEmittersSpawned++;
         }
 
         /// <summary>
@@ -284,6 +304,7 @@ namespace QDND.Combat.Arena
 
             FlashAtPosition(position, color, 2.0f, 0.1f);
             TrackEffect(particle, 0.6f);
+            TotalEmittersSpawned++;
         }
 
         private void SpawnSpellCast(Vector3 position, Color color)
@@ -309,6 +330,7 @@ namespace QDND.Combat.Arena
 
             FlashAtPosition(position, color, 1.5f, 0.3f);
             TrackEffect(particle, 1.2f);
+            TotalEmittersSpawned++;
         }
 
         private void SpawnAoEBlast(Vector3 position, Color color)
@@ -334,6 +356,7 @@ namespace QDND.Combat.Arena
 
             FlashAtPosition(position, color, 4.0f, 0.25f);
             TrackEffect(particle, 1.2f);
+            TotalEmittersSpawned++;
         }
 
         private void SpawnHealingShimmer(Vector3 position)
@@ -363,6 +386,7 @@ namespace QDND.Combat.Arena
 
             FlashAtPosition(position, new Color(0.3f, 1.0f, 0.5f), 1.0f, 0.4f);
             TrackEffect(particle, 1.4f);
+            TotalEmittersSpawned++;
         }
 
         private void SpawnCriticalHit(Vector3 position)
@@ -414,6 +438,7 @@ namespace QDND.Combat.Arena
 
             TrackEffect(particle, 0.8f);
             TrackEffect(particle2, 1.0f);
+            TotalEmittersSpawned += 2;
         }
 
         private void SpawnDeathBurst(Vector3 position)
@@ -443,6 +468,7 @@ namespace QDND.Combat.Arena
 
             FlashAtPosition(position, new Color(0.5f, 0.0f, 0.0f), 2.0f, 0.3f);
             TrackEffect(particle, 1.5f);
+            TotalEmittersSpawned++;
         }
 
         private void SpawnBuff(Vector3 position)
@@ -471,6 +497,7 @@ namespace QDND.Combat.Arena
             particle.Emitting = true;
 
             TrackEffect(particle, 1.0f);
+            TotalEmittersSpawned++;
         }
 
         private void SpawnDebuff(Vector3 position)
@@ -499,6 +526,7 @@ namespace QDND.Combat.Arena
             particle.Emitting = true;
 
             TrackEffect(particle, 1.1f);
+            TotalEmittersSpawned++;
         }
 
         private void SpawnTypedImpact(Vector3 position, Color color, float velocity)
@@ -524,6 +552,7 @@ namespace QDND.Combat.Arena
 
             FlashAtPosition(position, color, 2.5f, 0.15f);
             TrackEffect(particle, 0.8f);
+            TotalEmittersSpawned++;
         }
 
         private ParticleProcessMaterial CreateProcessMaterial(float velocity, float spread, Vector3 gravity, float lifetime)

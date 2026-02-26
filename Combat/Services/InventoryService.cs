@@ -147,7 +147,59 @@ namespace QDND.Combat.Services
                     parts.Add($"Requires STR {ArmorDef.StrengthRequirement}");
             }
 
+            if (!string.IsNullOrWhiteSpace(BoostString))
+            {
+                foreach (var boost in BoostString.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                {
+                    // Skip IF-conditional boosts (too complex to humanize)
+                    if (boost.StartsWith("IF(", StringComparison.OrdinalIgnoreCase))
+                        continue;
+                    // Skip stealth disadvantage boost on armor — already shown via ArmorDef
+                    if (ArmorDef != null && boost.Contains("Disadvantage", StringComparison.OrdinalIgnoreCase)
+                        && boost.Contains("Stealth", StringComparison.OrdinalIgnoreCase))
+                        continue;
+                    parts.Add(HumanizeBoost(boost));
+                }
+            }
+
+            // For non-weapon/non-armor items, show Description as the stat line
+            if (parts.Count == 0 && !string.IsNullOrWhiteSpace(Description))
+                parts.Add(Description);
+
             return string.Join("\n", parts);
+        }
+
+        private static string HumanizeBoost(string boost)
+        {
+            if (string.IsNullOrWhiteSpace(boost))
+                return boost;
+            var match = System.Text.RegularExpressions.Regex.Match(boost, @"^(\w+)\((.+)\)$");
+            if (!match.Success)
+                return boost.Replace("_", " ");
+            string func = match.Groups[1].Value;
+            string[] args = match.Groups[2].Value.Split(',', StringSplitOptions.TrimEntries);
+            return func switch
+            {
+                "AbilityOverrideMinimum" when args.Length >= 2 => $"{args[0]} set to {args[1]}",
+                "AC" when args.Length >= 1 => $"+{args[0]} AC",
+                "Ability" when args.Length >= 2 => $"+{args[1]} {args[0]}",
+                "SavingThrow" when args.Length >= 2 => $"+{args[1]} {args[0]} Saves",
+                "Resistance" when args.Length >= 1 => $"Resistance to {args[0]}",
+                "SpellSaveDC" when args.Length >= 1 => $"+{args[0]} Spell Save DC",
+                "Initiative" when args.Length >= 1 => $"+{args[0]} Initiative",
+                "Movement" when args.Length >= 1 => $"+{args[0]} Movement",
+                "DamageBonus" when args.Length >= 1 => $"+{args[0]} Damage",
+                "Skill" when args.Length >= 2 => $"+{args[1]} {args[0]}",
+                "RollBonus" when args.Length >= 3
+                    && string.Equals(args[0], "SavingThrow", StringComparison.OrdinalIgnoreCase)
+                    => $"+{args[1]} {args[2]} Saves",
+                "RollBonus" when args.Length >= 2 => $"+{args[1]} {args[0]}",
+                "Disadvantage" when args.Length >= 2
+                    && string.Equals(args[0], "Skill", StringComparison.OrdinalIgnoreCase)
+                    => $"Disadvantage on {args[1]}",
+                "UnlockSpell" when args.Length >= 1 => $"Unlocks: {args[0].Replace("_", " ")}",
+                _ => boost.Replace("_", " "),
+            };
         }
     }
 
@@ -369,11 +421,12 @@ namespace QDND.Combat.Services
         private const string IconGenericHealing = "res://assets/Images/Icons General/Generic_Healing_Unfaded_Icon.png";
         private const string IconMeleeWeapon = "res://assets/Images/Icons Weapon Actions/Main_Hand_Attack_Unfaded_Icon.png";
         private const string IconRangedWeapon = "res://assets/Images/Icons Weapon Actions/Ranged_Attack_Unfaded_Icon.png";
-        private const string IconShield = "res://assets/Images/Icons Actions/Shield_Bash_Unfaded_Icon.png";
-        private const string IconBoots = "res://assets/Images/Icons Actions/Boot_of_the_Giants_Unfaded_Icon.png";
-        private const string IconCloak = "res://assets/Images/Icons Actions/Cloak_of_Shadows_Unfaded_Icon.png";
-        private const string IconAmulet = "res://assets/Images/Icons Actions/Talk_to_the_Sentient_Amulet_Unfaded_Icon.png";
+        private const string IconShield = "res://assets/Images/Icons Weapons and Other/Wooden_Shield_Unfaded_Icon.png";
+        private const string IconBoots = "res://assets/Images/Icons Boots/Boots_Leather_Unfaded_Icon.png";
+        private const string IconCloak = "res://assets/Images/Icons Cloaks/Cloak_Unfaded_Icon.png";
+        private const string IconAmulet = "res://assets/Images/Icons Amulets/Amulet_Necklace_A_Gold_A_Unfaded_Icon.png";
         private const string IconThrowable = "res://assets/Images/Icons Actions/Throw_Weapon_Unfaded_Icon.png";
+        private const string IconAlchemistFire = "res://assets/Images/Icons General/Generic_Fire_Unfaded_Icon.png";
         private const string IconWeaponDirectory = "assets/Images/Icons Weapons and Other";
         private const string IconArmorDirectory = "assets/Images/Icons Armour";
         private const string IconHelmetDirectory = "assets/Images/Icons Helmets";
@@ -417,8 +470,8 @@ namespace QDND.Combat.Services
             [WeaponType.Scimitar] = new[] { "Scimitar" },
             [WeaponType.Shortsword] = new[] { "Shortsword" },
             [WeaponType.Trident] = new[] { "Trident" },
-            [WeaponType.WarPick] = new[] { "War Pick", "Warpick" },
-            [WeaponType.Warhammer] = new[] { "Warhammer" },
+            [WeaponType.WarPick] = new[] { "War Pick", "Warpick", "Warpick PlusOne" },
+            [WeaponType.Warhammer] = new[] { "Warhammer", "Warhammer PlusOne" },
             [WeaponType.Whip] = new[] { "Whip" },
             [WeaponType.HandCrossbow] = new[] { "Hand Crossbow" },
         };
@@ -1035,7 +1088,7 @@ namespace QDND.Combat.Services
                 "1d4 fire damage, applies Burning",
                 1,
                 useActionId: "use_alchemist_fire",
-                iconPath: IconThrowable));
+                iconPath: IconAlchemistFire));
 
             bool isCaster = combatant.Tags?.Contains("caster") == true;
             if (isCaster)
@@ -1047,7 +1100,7 @@ namespace QDND.Combat.Services
                     "Revive a downed ally with 1 HP",
                     1,
                     useActionId: "use_scroll_revivify",
-                    iconPath: IconGenericMagical));
+                    iconPath: "res://assets/Images/Icons Spells/Revivify_Unfaded_Icon.png"));
             }
 
             // Legacy fallback if BG3 catalog isn't available.
@@ -1132,6 +1185,9 @@ namespace QDND.Combat.Services
                 if (string.IsNullOrWhiteSpace(entry.Name) || entry.Name.StartsWith("_", StringComparison.Ordinal))
                     continue;
 
+                if (entry.Name.Contains("DEBUG", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
                 if (string.Equals(entry.Name, "NoWeapon", StringComparison.OrdinalIgnoreCase) ||
                     string.Equals(entry.Name, "WPN_DummyForEquipment", StringComparison.OrdinalIgnoreCase))
                 {
@@ -1175,6 +1231,9 @@ namespace QDND.Combat.Services
                     continue;
 
                 if (string.IsNullOrWhiteSpace(entry.Name) || entry.Name.StartsWith("_", StringComparison.Ordinal))
+                    continue;
+
+                if (entry.Name.Contains("DEBUG", StringComparison.OrdinalIgnoreCase))
                     continue;
 
                 if (!TryMapArmorSlots(entry, out var slots, out var category))
@@ -1980,12 +2039,24 @@ namespace QDND.Combat.Services
                     break;
                 case ItemCategory.Headwear:
                     AddIconNameCandidates(candidates, "Helmet");
+                    AddIconNameCandidates(candidates, "Circlet");
                     break;
                 case ItemCategory.Handwear:
                     AddIconNameCandidates(candidates, "Gloves");
+                    AddIconNameCandidates(candidates, "Gloves Leather 1");
                     break;
                 case ItemCategory.Footwear:
                     AddIconNameCandidates(candidates, "Boots");
+                    AddIconNameCandidates(candidates, "Boots Leather");
+                    break;
+                case ItemCategory.Ring:
+                    AddIconNameCandidates(candidates, "Ring A Simple Gold");
+                    break;
+                case ItemCategory.Amulet:
+                    AddIconNameCandidates(candidates, "Amulet Necklace A Gold A");
+                    break;
+                case ItemCategory.Cloak:
+                    AddIconNameCandidates(candidates, "Cloak");
                     break;
             }
 

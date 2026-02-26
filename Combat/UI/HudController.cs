@@ -317,6 +317,7 @@ namespace QDND.Combat.UI
             AddChild(_turnAnnouncement);
 
             _multiTargetPrompt = new MultiTargetPromptOverlay();
+            _multiTargetPrompt.Visible = false;
             AddChild(_multiTargetPrompt);
         }
 
@@ -1853,6 +1854,16 @@ namespace QDND.Combat.UI
                 _tooltipPanel.Visible = false;
         }
 
+        public void ShowMultiTargetPrompt(string abilityName, int pickedSoFar, int totalNeeded)
+        {
+            _multiTargetPrompt?.Show(abilityName, pickedSoFar, totalNeeded);
+        }
+
+        public void HideMultiTargetPrompt()
+        {
+            _multiTargetPrompt?.Hide();
+        }
+
         // ════════════════════════════════════════════════════════════
         //  PER-FRAME UPDATE
         // ════════════════════════════════════════════════════════════
@@ -2153,6 +2164,9 @@ namespace QDND.Combat.UI
                 var statuses = statusManager.GetStatuses(combatant.Id);
                 foreach (var status in statuses)
                 {
+                    if (!StatusPresentationPolicy.ShowInPortraitIndicators(status.Definition))
+                        continue;
+
                     var conditionBox = new HBoxContainer();
                     conditionBox.AddThemeConstantOverride("separation", 2);
                     conditionBox.MouseFilter = MouseFilterEnum.Ignore;
@@ -2174,7 +2188,7 @@ namespace QDND.Combat.UI
                     }
 
                     var condLabel = new Label();
-                    condLabel.Text = status.Definition.Name ?? status.Definition.Id;
+                    condLabel.Text = StatusPresentationPolicy.GetDisplayName(status.Definition);
                     HudTheme.StyleLabel(condLabel, HudTheme.FontTiny, HudTheme.MutedBeige);
                     condLabel.MouseFilter = MouseFilterEnum.Ignore;
                     conditionBox.AddChild(condLabel);

@@ -12,7 +12,7 @@ namespace QDND.Combat.UI.Base
     /// </summary>
     public static class HudIcons
     {
-        private const string FallbackPassiveFeatureIcon = "res://assets/Images/Icons General/Generic_Utility_Unfaded_Icon.png";
+        private const string FallbackPassiveFeatureIcon = "res://assets/Images/Icons General/Generic_Feature_Unfaded_Icon.png";
         private const string PassiveFeatureFolder = "res://assets/Images/Icons Passive Features";
 
         private static readonly string[] IconSearchFolders = new[]
@@ -47,6 +47,55 @@ namespace QDND.Combat.UI.Base
             "bonusdamage",
         };
 
+        private static readonly Dictionary<string, string> FeatureKeywordIcons = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["darkvision"] = "res://assets/Images/Icons General/Generic_Darkness_Unfaded_Icon.png",
+            ["superior darkvision"] = "res://assets/Images/Icons General/Generic_Darkness_Unfaded_Icon.png",
+            ["rage"] = "res://assets/Images/Icons General/Generic_Damage_Unfaded_Icon.png",
+            ["sneak attack"] = "res://assets/Images/Icons General/Generic_Tactical_Unfaded_Icon.png",
+            ["fey ancestry"] = "res://assets/Images/Icons General/Generic_Magical_Unfaded_Icon.png",
+            ["brave"] = "res://assets/Images/Icons General/Generic_Buff_Unfaded_Icon.png",
+            ["lucky"] = "res://assets/Images/Icons General/Generic_Buff_Unfaded_Icon.png",
+            ["halfling nimbleness"] = "res://assets/Images/Icons General/Generic_Utility_Unfaded_Icon.png",
+            ["stonecunning"] = "res://assets/Images/Icons General/Generic_Nature_Unfaded_Icon.png",
+            ["dwarven resilience"] = "res://assets/Images/Icons General/Generic_Physical_Unfaded_Icon.png",
+            ["trance"] = "res://assets/Images/Icons General/Generic_Ethereal_Unfaded_Icon.png",
+            ["mask of the wild"] = "res://assets/Images/Icons General/Generic_Nature_Unfaded_Icon.png",
+            ["natural explorer"] = "res://assets/Images/Icons General/Generic_Nature_Unfaded_Icon.png",
+            ["favored enemy"] = "res://assets/Images/Icons General/Generic_Threat_Unfaded_Icon.png",
+            ["spellcasting"] = "res://assets/Images/Icons General/Generic_Magical_Unfaded_Icon.png",
+            ["unarmored defense"] = "res://assets/Images/Icons General/Generic_Physical_Unfaded_Icon.png",
+            ["unarmoured defense"] = "res://assets/Images/Icons General/Generic_Physical_Unfaded_Icon.png",
+            ["unarmored defence"] = "res://assets/Images/Icons General/Generic_Physical_Unfaded_Icon.png",
+            ["unarmoured defence"] = "res://assets/Images/Icons General/Generic_Physical_Unfaded_Icon.png",
+            ["fighting style"] = "res://assets/Images/Icons General/Generic_Physical_Unfaded_Icon.png",
+            ["martial arts"] = "res://assets/Images/Icons General/Generic_Physical_Unfaded_Icon.png",
+            ["ki"] = "res://assets/Images/Icons General/Generic_Radiant_Unfaded_Icon.png",
+            ["divine sense"] = "res://assets/Images/Icons General/Generic_Radiant_Unfaded_Icon.png",
+            ["lay on hands"] = "res://assets/Images/Icons General/Generic_Healing_Unfaded_Icon.png",
+            ["divine smite"] = "res://assets/Images/Icons General/Generic_Radiant_Unfaded_Icon.png",
+            ["channel divinity"] = "res://assets/Images/Icons General/Generic_Radiant_Unfaded_Icon.png",
+            ["wild shape"] = "res://assets/Images/Icons General/Generic_Wild_Animal_Unfaded_Icon.png",
+            ["metamagic"] = "res://assets/Images/Icons General/Generic_Magical_Unfaded_Icon.png",
+            ["eldritch invocation"] = "res://assets/Images/Icons General/Generic_Darkness_Unfaded_Icon.png",
+            ["bardic inspiration"] = "res://assets/Images/Icons General/Generic_Buff_Unfaded_Icon.png",
+            ["cunning action"] = "res://assets/Images/Icons General/Generic_Tactical_Unfaded_Icon.png",
+            ["uncanny dodge"] = "res://assets/Images/Icons General/Generic_Physical_Unfaded_Icon.png",
+            ["evasion"] = "res://assets/Images/Icons General/Generic_Physical_Unfaded_Icon.png",
+            ["action surge"] = "res://assets/Images/Icons General/Generic_Multiattack_Unfaded_Icon.png",
+            ["second wind"] = "res://assets/Images/Icons General/Generic_Healing_Unfaded_Icon.png",
+            ["extra attack"] = "res://assets/Images/Icons General/Generic_Multiattack_Unfaded_Icon.png",
+            ["hellish rebuke"] = "res://assets/Images/Icons General/Generic_Fire_Unfaded_Icon.png",
+            ["infernal legacy"] = "res://assets/Images/Icons General/Generic_Fire_Unfaded_Icon.png",
+            ["breath weapon"] = "res://assets/Images/Icons General/Generic_Damage_Unfaded_Icon.png",
+            ["draconic ancestry"] = "res://assets/Images/Icons General/Generic_Damage_Unfaded_Icon.png",
+            ["relentless endurance"] = "res://assets/Images/Icons General/Generic_Death_Unfaded_Icon.png",
+            ["savage attacks"] = "res://assets/Images/Icons General/Generic_Damage_Unfaded_Icon.png",
+            ["healing"] = "res://assets/Images/Icons General/Generic_Healing_Unfaded_Icon.png",
+            ["resistance"] = "res://assets/Images/Icons General/Generic_Physical_Unfaded_Icon.png",
+            ["proficiency"] = "res://assets/Images/Icons General/Generic_Buff_Unfaded_Icon.png",
+        };
+
         private static Dictionary<string, string> _passiveIconIndex;
         private static bool _passiveIconIndexBuilt;
 
@@ -61,12 +110,12 @@ namespace QDND.Combat.UI.Base
                 EquipSlot.RangedMainHand => "res://assets/Images/Icons Weapon Actions/Ranged_Attack_Unfaded_Icon.png",
                 EquipSlot.RangedOffHand => "res://assets/Images/Icons Weapon Actions/Ranged_Attack_Unfaded_Icon.png",
                 EquipSlot.Armor => "res://assets/Images/Icons General/Generic_Physical_Unfaded_Icon.png",
-                EquipSlot.Helmet => "res://assets/Images/Icons General/Generic_Utility_Unfaded_Icon.png",
-                EquipSlot.Gloves => "res://assets/Images/Icons General/Generic_Utility_Unfaded_Icon.png",
-                EquipSlot.Boots => "res://assets/Images/Icons Actions/Boot_of_the_Giants_Unfaded_Icon.png",
-                EquipSlot.Cloak => "res://assets/Images/Icons Actions/Cloak_of_Shadows_Unfaded_Icon.png",
-                EquipSlot.Amulet => "res://assets/Images/Icons Actions/Talk_to_the_Sentient_Amulet_Unfaded_Icon.png",
-                EquipSlot.Ring1 or EquipSlot.Ring2 => "res://assets/Images/Icons General/Generic_Magical_Unfaded_Icon.png",
+                EquipSlot.Helmet => "res://assets/Images/Icons Helmets/Circlet_Unfaded_Icon.png",
+                EquipSlot.Gloves => "res://assets/Images/Icons Gloves/Gloves_Leather_1_Unfaded_Icon.png",
+                EquipSlot.Boots => "res://assets/Images/Icons Boots/Boots_Leather_Unfaded_Icon.png",
+                EquipSlot.Cloak => "res://assets/Images/Icons Cloaks/Cloak_Unfaded_Icon.png",
+                EquipSlot.Amulet => "res://assets/Images/Icons Amulets/Amulet_Necklace_A_Gold_A_Unfaded_Icon.png",
+                EquipSlot.Ring1 or EquipSlot.Ring2 => "res://assets/Images/Icons Rings/Ring_A_Simple_Gold_Unfaded_Icon.png",
                 _ => "res://assets/Images/Icons General/Generic_Physical_Unfaded_Icon.png",
             };
         }
@@ -80,13 +129,13 @@ namespace QDND.Combat.UI.Base
                 ItemCategory.Weapon => "res://assets/Images/Icons Weapon Actions/Main_Hand_Attack_Unfaded_Icon.png",
                 ItemCategory.Armor => "res://assets/Images/Icons General/Generic_Physical_Unfaded_Icon.png",
                 ItemCategory.Clothing => "res://assets/Images/Icons General/Generic_Utility_Unfaded_Icon.png",
-                ItemCategory.Shield => "res://assets/Images/Icons Actions/Shield_Bash_Unfaded_Icon.png",
-                ItemCategory.Headwear => "res://assets/Images/Icons General/Generic_Utility_Unfaded_Icon.png",
-                ItemCategory.Handwear => "res://assets/Images/Icons General/Generic_Utility_Unfaded_Icon.png",
-                ItemCategory.Footwear => "res://assets/Images/Icons Actions/Boot_of_the_Giants_Unfaded_Icon.png",
-                ItemCategory.Cloak => "res://assets/Images/Icons Actions/Cloak_of_Shadows_Unfaded_Icon.png",
-                ItemCategory.Amulet => "res://assets/Images/Icons Actions/Talk_to_the_Sentient_Amulet_Unfaded_Icon.png",
-                ItemCategory.Ring => "res://assets/Images/Icons General/Generic_Magical_Unfaded_Icon.png",
+                ItemCategory.Shield => "res://assets/Images/Icons Weapons and Other/Wooden_Shield_Unfaded_Icon.png",
+                ItemCategory.Headwear => "res://assets/Images/Icons Helmets/Circlet_Unfaded_Icon.png",
+                ItemCategory.Handwear => "res://assets/Images/Icons Gloves/Gloves_Leather_1_Unfaded_Icon.png",
+                ItemCategory.Footwear => "res://assets/Images/Icons Boots/Boots_Leather_Unfaded_Icon.png",
+                ItemCategory.Cloak => "res://assets/Images/Icons Cloaks/Cloak_Unfaded_Icon.png",
+                ItemCategory.Amulet => "res://assets/Images/Icons Amulets/Amulet_Necklace_A_Gold_A_Unfaded_Icon.png",
+                ItemCategory.Ring => "res://assets/Images/Icons Rings/Ring_A_Simple_Gold_Unfaded_Icon.png",
                 ItemCategory.Potion => "res://assets/Images/Icons General/Generic_Healing_Unfaded_Icon.png",
                 ItemCategory.Scroll => "res://assets/Images/Icons General/Generic_Magical_Unfaded_Icon.png",
                 ItemCategory.Throwable => "res://assets/Images/Icons Actions/Throw_Weapon_Unfaded_Icon.png",
@@ -133,6 +182,22 @@ namespace QDND.Combat.UI.Base
             {
                 if (TryResolvePassiveIconFromIndex(token, out resolved))
                     return resolved;
+            }
+
+            // Try keyword-based mapping for common features
+            string lowerName = featureName?.Trim().ToLowerInvariant();
+            if (lowerName != null && FeatureKeywordIcons.TryGetValue(lowerName, out var keywordIcon))
+                return keywordIcon;
+
+            // Also try partial keyword matching (e.g., "Superior Darkvision" contains "darkvision")
+            if (lowerName != null)
+            {
+                foreach (var kvp in FeatureKeywordIcons)
+                {
+                    if (kvp.Key.Length < 4) continue;
+                    if (lowerName.Contains(kvp.Key, StringComparison.OrdinalIgnoreCase))
+                        return kvp.Value;
+                }
             }
 
             return ResourceLoader.Exists(FallbackPassiveFeatureIcon)
