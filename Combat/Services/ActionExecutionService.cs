@@ -1109,7 +1109,13 @@ namespace QDND.Combat.Services
                 _combatLog.LogAttackResolved(result.SourceId, sourceName, primaryTargetId, primaryTargetName, result.AttackResult);
             }
 
-            if (result.SaveResult != null && result.TargetIds.Count > 0)
+            if (result.ContestResult != null && result.TargetIds.Count > 0)
+            {
+                string contestTargetId = result.TargetIds[^1];
+                string contestTargetName = _combatContext?.GetCombatant(contestTargetId)?.Name ?? contestTargetId;
+                _combatLog.LogContestedCheck(result.SourceId, sourceName, contestTargetId, contestTargetName, result.ContestResult, "Athletics Contest");
+            }
+            else if (result.SaveResult != null && result.TargetIds.Count > 0)
             {
                 string saveTargetId = result.TargetIds[^1];
                 string saveTargetName = _combatContext?.GetCombatant(saveTargetId)?.Name ?? saveTargetId;

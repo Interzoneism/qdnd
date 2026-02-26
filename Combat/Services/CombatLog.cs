@@ -179,6 +179,32 @@ namespace QDND.Combat.Services
             LogEntry(entry);
         }
 
+        public void LogContestedCheck(string sourceId, string sourceName, string targetId, string targetName, QDND.Combat.Rules.ContestResult contestResult, string contestType = "Athletics Contest")
+        {
+            if (contestResult == null)
+                return;
+
+            bool attackerWon = contestResult.AttackerWon;
+            string message = $"{sourceName} {contestType}: {contestResult.BreakdownA} vs {targetName}: {contestResult.BreakdownB} -> {(attackerWon ? "SUCCESS" : "FAIL")}";
+
+            var entry = new CombatLogEntry
+            {
+                Type = CombatLogEntryType.ContestedCheck,
+                SourceId = sourceId,
+                SourceName = sourceName,
+                TargetId = targetId,
+                TargetName = targetName,
+                Message = message,
+                IsMiss = !attackerWon
+            };
+            entry.Data["contestType"] = contestType;
+            entry.Breakdown["rollTextA"] = contestResult.BreakdownA;
+            entry.Breakdown["rollTextB"] = contestResult.BreakdownB;
+            entry.Breakdown["rollText"] = $"{contestResult.BreakdownA} vs {contestResult.BreakdownB}";
+
+            LogEntry(entry);
+        }
+
         public void LogCombatantDowned(string sourceId, string sourceName, string targetId, string targetName)
         {
             LogEntry(new CombatLogEntry

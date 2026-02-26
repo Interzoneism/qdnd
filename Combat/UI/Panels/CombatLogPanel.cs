@@ -173,7 +173,7 @@ namespace QDND.Combat.UI.Panels
             {
                 bool matches = _currentFilter switch
                 {
-                    "rolls" => entry.Type == CombatLogEntryType.AttackResolved || entry.Type == CombatLogEntryType.SavingThrow,
+                    "rolls" => entry.Type == CombatLogEntryType.AttackResolved || entry.Type == CombatLogEntryType.SavingThrow || entry.Type == CombatLogEntryType.ContestedCheck,
                     "damage" => entry.Type == CombatLogEntryType.DamageDealt || entry.Type == CombatLogEntryType.HealingDone,
                     "conditions" => entry.Type == CombatLogEntryType.StatusApplied || entry.Type == CombatLogEntryType.StatusRemoved,
                     _ => true
@@ -197,6 +197,7 @@ namespace QDND.Combat.UI.Panels
                 CombatLogEntryType.AbilityUsed => FormatAbilityUsed(entry),
                 CombatLogEntryType.AttackResolved => FormatAttackResolved(entry),
                 CombatLogEntryType.SavingThrow => FormatSavingThrow(entry),
+                CombatLogEntryType.ContestedCheck => FormatContestedCheck(entry),
                 CombatLogEntryType.DamageDealt => FormatDamageDealt(entry),
                 CombatLogEntryType.HealingDone => FormatHealingDone(entry),
                 CombatLogEntryType.CombatantDowned => FormatCombatantDowned(entry),
@@ -324,6 +325,20 @@ namespace QDND.Combat.UI.Panels
             }
             string successHex = HudTheme.HealthGreen.ToHtml(false);
             return $"[color=#{dimHex}]{EscapeBbCode(saveType)}:[/color] {ColorName(entry.TargetName, false)} [color=#{successHex}](SUCCESS)[/color]";
+        }
+
+        private string FormatContestedCheck(CombatLogEntry entry)
+        {
+            string contestType = entry.Data.TryGetValue("contestType", out var ct) ? ct?.ToString() : "Contest";
+            string dimHex = HudTheme.MutedBeige.ToHtml(false);
+
+            if (!entry.IsMiss) // Attacker won
+            {
+                string successHex2 = HudTheme.HealthGreen.ToHtml(false);
+                return $"[color=#{dimHex}]{EscapeBbCode(contestType)}:[/color] {ColorName(entry.SourceName)} [color=#{successHex2}](WON)[/color] [color=#{dimHex}]vs[/color] {ColorName(entry.TargetName, false)}";
+            }
+            string failHex = HudTheme.EnemyRed.ToHtml(false);
+            return $"[color=#{dimHex}]{EscapeBbCode(contestType)}:[/color] {ColorName(entry.SourceName)} [color=#{failHex}](LOST)[/color] [color=#{dimHex}]vs[/color] {ColorName(entry.TargetName, false)}";
         }
 
         private string FormatDamageDealt(CombatLogEntry entry)

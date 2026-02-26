@@ -851,6 +851,19 @@ namespace QDND.Combat.Services
 
             if (!action.AttackType.HasValue)
             {
+                // Contest-based action (e.g., Shove): show contest win probability
+                if (string.Equals(action.ResolutionType, "contest", StringComparison.OrdinalIgnoreCase))
+                {
+                    int atkBonus = actor.GetSkillBonus(Data.CharacterModel.Skill.Athletics);
+                    int defAthletics = target.GetSkillBonus(Data.CharacterModel.Skill.Athletics);
+                    int defAcrobatics = target.GetSkillBonus(Data.CharacterModel.Skill.Acrobatics);
+                    int defBonus = Math.Max(defAthletics, defAcrobatics);
+                    float probability = 0.5f + (atkBonus - defBonus) * 0.05f;
+                    int chance = (int)Math.Clamp(probability * 100f, 5f, 95f);
+                    hoveredVisual.ShowHitChance(chance);
+                    return;
+                }
+
                 // Save-based spell: show failure chance instead of hit chance
                 if (!string.IsNullOrEmpty(action.SaveType))
                 {

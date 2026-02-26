@@ -48,7 +48,9 @@ namespace QDND.Tests.Integration
             // Assert
             Assert.NotNull(shove);
             Assert.Equal("Shove", shove.Name);
-            Assert.Equal("athletics", shove.SaveType);
+            Assert.Equal("contest", shove.ResolutionType);
+            Assert.Equal("athletics", shove.ContestAttackerSkill);
+            Assert.Equal("athletics,acrobatics", shove.ContestDefenderSkills);
             Assert.Empty(shove.Effects); // Base effects should be empty
             Assert.NotNull(shove.Variants);
             Assert.Equal(2, shove.Variants.Count);

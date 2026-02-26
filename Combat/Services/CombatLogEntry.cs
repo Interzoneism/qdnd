@@ -37,6 +37,9 @@ namespace QDND.Combat.Services
         ReactionUsed,
         ReactionDeclined,
 
+        // Contests
+        ContestedCheck,
+
         // Special
         SurfaceCreated,
         SurfaceEntered,
@@ -183,6 +186,9 @@ namespace QDND.Combat.Services
                 CombatLogEntryType.SavingThrow => IsMiss
                     ? $"{TargetName} fails {Data.GetValueOrDefault("saveType", "saving throw")}"
                     : $"{TargetName} succeeds {Data.GetValueOrDefault("saveType", "saving throw")}",
+                CombatLogEntryType.ContestedCheck => IsMiss
+                    ? $"{SourceName} loses {Data.GetValueOrDefault("contestType", "contest")} vs {TargetName}"
+                    : $"{SourceName} wins {Data.GetValueOrDefault("contestType", "contest")} vs {TargetName}",
                 CombatLogEntryType.AbilityUsed => $"{SourceName} uses {Data.GetValueOrDefault("actionName", "an ability")}",
                 CombatLogEntryType.RoundStarted => $"Round {Round} begins",
                 CombatLogEntryType.StatusApplied => $"{TargetName} is affected by {Data.GetValueOrDefault("statusId", "status")}",
