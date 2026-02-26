@@ -372,13 +372,22 @@ namespace QDND.Data
                         if (resolved.Features != null)
                         {
                             var specificStyle = ChooseFightingStyle(unit.MainHandWeaponId);
+                            var primaryClassForPassives = unit.ClassLevels?.FirstOrDefault()?.ClassId ?? "";
                             var passiveFeatureIds = resolved.Features
                                 .Where(f => f.IsPassive && !string.IsNullOrEmpty(f.Id))
                                 .Select(f => f.Id)
-                                .Select(id => string.Equals(id, "fighting_style", StringComparison.OrdinalIgnoreCase)
-                                           || string.Equals(id, "fighting_style_bard", StringComparison.OrdinalIgnoreCase)
-                                    ? specificStyle
-                                    : id)
+                                .Select(id =>
+                                {
+                                    if (string.Equals(id, "fighting_style", StringComparison.OrdinalIgnoreCase) ||
+                                        string.Equals(id, "fighting_style_bard", StringComparison.OrdinalIgnoreCase))
+                                        return specificStyle;
+                                    // Map feature ID to BG3 PassiveRegistry ID
+                                    if (string.Equals(id, "unarmoured_defence", StringComparison.OrdinalIgnoreCase))
+                                        return string.Equals(primaryClassForPassives, "barbarian", StringComparison.OrdinalIgnoreCase)
+                                            ? "UnarmouredDefence_Barbarian"
+                                            : id; // Monk variant has no BG3 registry entry; grant fails gracefully
+                                    return id;
+                                })
                                 .Distinct()
                                 .ToList();
                             combatant.PassiveIds.AddRange(passiveFeatureIds);

@@ -119,6 +119,31 @@ namespace QDND.Combat.Environment
 
             _activeSurfaces.Add(incoming);
             ResolveContactInteractionsFor(incoming);
+
+            // After contact interactions, a previously-absent merge candidate may now exist
+            // at the same position. Example: incoming Fire_B cast into Oil; Oil transforms
+            // into Fire_A, leaving Fire_B as a duplicate. Merge Fire_B into Fire_A instead
+            // of letting two identical surfaces deal double damage every turn.
+            if (_activeSurfaces.Contains(incoming))
+            {
+                var postMergeTarget = _activeSurfaces.FirstOrDefault(s =>
+                    s != incoming &&
+                    s.Definition.Id == incoming.Definition.Id &&
+                    s.Definition.Layer == incoming.Definition.Layer &&
+                    (s.Overlaps(incoming) ||
+                     s.Position.DistanceTo(incoming.Position) <= Mathf.Max(1.0f, incoming.Radius * 0.3f)));
+
+                if (postMergeTarget != null)
+                {
+                    postMergeTarget.MergeGeometryFrom(incoming);
+                    RefreshDuration(postMergeTarget, incoming.RemainingDuration);
+                    _activeSurfaces.Remove(incoming);
+                    OnSurfaceGeometryChanged?.Invoke(postMergeTarget);
+                    DispatchSurfaceGeometryChanged(postMergeTarget);
+                    return postMergeTarget;
+                }
+            }
+
             if (_activeSurfaces.Contains(incoming))
             {
                 OnSurfaceCreated?.Invoke(incoming);

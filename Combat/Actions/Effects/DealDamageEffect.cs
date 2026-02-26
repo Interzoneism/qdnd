@@ -486,6 +486,16 @@ namespace QDND.Combat.Actions.Effects
                     }
                 }
 
+                // Pass target's active condition statuses so RulesEngine can apply
+                // condition-based resistance (e.g., Petrified: resistance to all damage).
+                if (context.Statuses != null)
+                {
+                    damageQuery.Parameters["targetActiveStatuses"] = context.Statuses
+                        .GetStatuses(target.Id)
+                        .Select(s => s.Definition.Id)
+                        .ToList();
+                }
+
                 var damageResult = context.Rules.RollDamage(damageQuery);
                 int finalDamage = (int)damageResult.FinalValue;
 

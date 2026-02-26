@@ -733,6 +733,11 @@ namespace QDND.Combat.Rules
                 {
                     allDisSources.Add("Restrained (DEX save)");
                 }
+                // Disadvantage on all saving throws (Exhaustion L3+)
+                if (saveTargetEffects.HasDisadvantageOnSavingThrows)
+                {
+                    allDisSources.Add("Exhaustion (all saves)");
+                }
             }
 
             // BG3/5e: wearing armor without proficiency imposes disadvantage on STR/DEX saves.
@@ -787,7 +792,13 @@ namespace QDND.Combat.Rules
                 naturalRoll = reroll; // Must use the new roll
             }
 
+            // Enforce minimum roll result (e.g. Reliable Talent grants MinimumRollResult(SavingThrow, 10))
+            int saveMinRoll = Boosts.BoostEvaluator.GetMinimumRollResult(input.Target, Boosts.RollType.SavingThrow);
+            if (saveMinRoll > 0)
+                naturalRoll = Math.Max(naturalRoll, saveMinRoll);
+
             // Auto-fail saves (condition effects: Paralyzed, Petrified, Stunned, Unconscious auto-fail STR/DEX)
+            // Auto-fail overrides any minimum roll enforcement.
             bool saveAutoFailed = GetBoolParameter(input.Parameters, "autoFailSave");
             if (saveAutoFailed)
             {
@@ -905,6 +916,11 @@ namespace QDND.Combat.Rules
                 naturalRollA = _dice.RollD20();
             }
 
+            // Enforce minimum roll result for ability/skill checks (e.g. Reliable Talent)
+            int minRollA = Boosts.BoostEvaluator.GetMinimumRollResult(attacker, Boosts.RollType.SkillCheck);
+            if (minRollA > 0)
+                naturalRollA = Math.Max(naturalRollA, minRollA);
+
             float attackerBase = naturalRollA + attackerMod;
             var (attackerFinal, attackerAppliedMods) = attackerModStack.Apply(attackerBase, ModifierTarget.SkillCheck, attackerContext, _dice);
             var (attackerFinalGlobal, attackerGlobalMods) = _globalModifiers.Apply(attackerFinal, ModifierTarget.SkillCheck, attackerContext, _dice);
@@ -959,6 +975,11 @@ namespace QDND.Combat.Rules
             {
                 naturalRollB = _dice.RollD20();
             }
+
+            // Enforce minimum roll result for ability/skill checks (e.g. Reliable Talent)
+            int minRollB = Boosts.BoostEvaluator.GetMinimumRollResult(defender, Boosts.RollType.SkillCheck);
+            if (minRollB > 0)
+                naturalRollB = Math.Max(naturalRollB, minRollB);
 
             float defenderBase = naturalRollB + defenderMod;
             var (defenderFinal, defenderAppliedMods) = defenderModStack.Apply(defenderBase, ModifierTarget.SkillCheck, defenderContext, _dice);
@@ -1190,6 +1211,23 @@ namespace QDND.Combat.Rules
                         finalDamage = finalDamage * 2;
                         resistanceInfo = $" (Vulnerable to {damageType}: {damageBeforeResistance} → {finalDamage})";
                         break;
+                }
+
+                // Condition-based resistance to all damage (e.g., Petrified).
+                // Only apply when boost-based resistance hasn't already made the creature
+                // resistant or immune — multiple instances of resistance don't stack (5e PHB).
+                if (resistanceLevel != ResistanceLevel.Resistant &&
+                    resistanceLevel != ResistanceLevel.Immune &&
+                    input.Parameters.TryGetValue("targetActiveStatuses", out var dmgStatusObj) &&
+                    dmgStatusObj is IEnumerable<string> dmgTargetStatuses)
+                {
+                    var condEffects = ConditionEffects.GetAggregateEffects(dmgTargetStatuses);
+                    if (condEffects.HasResistanceToAllDamage && finalDamage > 0)
+                    {
+                        int beforeCondResist = finalDamage;
+                        finalDamage = finalDamage / 2;
+                        resistanceInfo += $" (Condition resistance: {beforeCondResist}→{finalDamage})";
+                    }
                 }
             }
 

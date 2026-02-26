@@ -479,6 +479,11 @@ namespace QDND.Combat.Rules.Boosts
                 bool matches = boostRollType.Equals(rollType.ToString(), StringComparison.OrdinalIgnoreCase);
                 if (!matches && rollType == Boosts.RollType.AttackRoll)
                     matches = boostRollType.Equals("Attack", StringComparison.OrdinalIgnoreCase);
+                // Weapon-attack-specific roll bonuses (e.g. Archery +2 stored as RangedWeaponAttack)
+                if (!matches && rollType == Boosts.RollType.AttackRoll)
+                    matches = boostRollType.Equals("RangedWeaponAttack", StringComparison.OrdinalIgnoreCase);
+                if (!matches && rollType == Boosts.RollType.AttackRoll)
+                    matches = boostRollType.Equals("MeleeWeaponAttack", StringComparison.OrdinalIgnoreCase);
                 if (!matches && rollType == Boosts.RollType.SavingThrow)
                     matches = boostRollType.Equals("SavingThrow", StringComparison.OrdinalIgnoreCase);
                 if (!matches && rollType == Boosts.RollType.DeathSave)
@@ -671,6 +676,28 @@ namespace QDND.Combat.Rules.Boosts
             foreach (var boost in relevantBoosts)
             {
                 // IncreaseMaxHP(value) — flat increase; percentage TBD
+                total += boost.Definition.GetIntParameter(0, 0);
+            }
+
+            return total;
+        }
+
+        /// <summary>
+        /// Gets the total temporary HP value from TemporaryHP boosts.
+        /// Note: the actual HP grant happens immediately in BoostApplicator.ApplyBoosts
+        /// (because TempHP is non-stacking — takes the higher value). This query method
+        /// allows other systems to inspect how much TempHP is sourced from boosts.
+        /// </summary>
+        public static int GetTemporaryHP(Combatant combatant)
+        {
+            if (combatant == null) return 0;
+
+            var query = new BoostQuery(BoostType.TemporaryHP);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            int total = 0;
+            foreach (var boost in relevantBoosts)
+            {
                 total += boost.Definition.GetIntParameter(0, 0);
             }
 

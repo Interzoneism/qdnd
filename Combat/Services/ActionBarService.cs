@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using QDND.Combat.Actions;
+using QDND.Combat.Entities;
 using QDND.Combat.UI;
 using QDND.Data;
 using QDND.Data.Passives;
@@ -520,7 +521,7 @@ namespace QDND.Combat.Services
                         _ => null
                     },
                     SaveType = def.SaveType,
-                    SaveDC = ComputeTooltipSaveDC(def, combatant?.ProficiencyBonus ?? 0),
+                    SaveDC = ComputeTooltipSaveDC(def, combatant?.ProficiencyBonus ?? 0, combatant),
                     SpellSchool = def.School != SpellSchool.None ? def.School.ToString() : null,
                     RequiresConcentration = def.RequiresConcentration,
                     DamageSummary = BuildDamageSummary(def),
@@ -888,13 +889,45 @@ namespace QDND.Combat.Services
             return isResourceFailure ? ActionUsability.NoResources : ActionUsability.Disabled;
         }
 
-        private static int ComputeTooltipSaveDC(ActionDefinition action, int proficiencyBonus)
+        private int ComputeTooltipSaveDC(ActionDefinition action, int proficiencyBonus, Combatant combatant)
         {
             if (action.SaveDC.HasValue)
                 return action.SaveDC.Value;
             if (string.IsNullOrEmpty(action.SaveType))
                 return 0;
-            return 8 + Math.Max(0, proficiencyBonus) + action.SaveDCBonus;
+            int spellcastingMod = GetTooltipSpellcastingMod(combatant);
+            return 8 + Math.Max(0, proficiencyBonus) + spellcastingMod + action.SaveDCBonus;
+        }
+
+        private int GetTooltipSpellcastingMod(Combatant combatant)
+        {
+            if (combatant?.ResolvedCharacter?.Sheet?.ClassLevels == null) return 0;
+            var registry = _combatContext?.GetService<QDND.Data.CharacterModel.CharacterDataRegistry>();
+            if (registry != null)
+            {
+                foreach (var cl in combatant.ResolvedCharacter.Sheet.ClassLevels)
+                {
+                    var classDef = registry.GetClass(cl.ClassId);
+                    if (!string.IsNullOrEmpty(classDef?.SpellcastingAbility) &&
+                        Enum.TryParse<QDND.Data.CharacterModel.AbilityType>(classDef.SpellcastingAbility, true, out var ability))
+                        return combatant.GetAbilityModifier(ability);
+                }
+                return 0;
+            }
+            // Fallback if registry unavailable
+            foreach (var cl in combatant.ResolvedCharacter.Sheet.ClassLevels)
+            {
+                string classId = cl.ClassId?.ToLowerInvariant();
+                switch (classId)
+                {
+                    case "wizard": return combatant.GetAbilityModifier(QDND.Data.CharacterModel.AbilityType.Intelligence);
+                    case "cleric": case "druid": case "ranger": case "monk":
+                        return combatant.GetAbilityModifier(QDND.Data.CharacterModel.AbilityType.Wisdom);
+                    case "bard": case "sorcerer": case "warlock": case "paladin":
+                        return combatant.GetAbilityModifier(QDND.Data.CharacterModel.AbilityType.Charisma);
+                }
+            }
+            return 0;
         }
 
         private static string BuildDamageSummary(ActionDefinition action)
