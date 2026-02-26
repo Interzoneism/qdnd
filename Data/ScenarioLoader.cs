@@ -246,6 +246,12 @@ namespace QDND.Data
         /// </summary>
         public List<Combatant> SpawnCombatants(ScenarioDefinition scenario, TurnQueueService turnQueue)
         {
+            // Always (re)seed from the scenario object so that seed overrides applied
+            // between LoadFromJson() and SpawnCombatants() are honoured, and so the
+            // method works for in-memory generated scenarios that bypass LoadFromJson().
+            CurrentSeed = scenario.Seed;
+            _rng = new Random(scenario.Seed);
+
             var combatants = new List<Combatant>();
             var actionIdResolver = new ActionIdResolver(
                 GetCanonicalDataActionIds(),
