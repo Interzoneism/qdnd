@@ -110,9 +110,17 @@ namespace QDND.Combat.Reactions
 
             try
             {
+                var consumedReactors = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 foreach (var (combatantId, reaction) in eligible)
                 {
+                    if (consumedReactors.Contains(combatantId))
+                        continue;
+
                     if (!reactorsById.TryGetValue(combatantId, out var reactor) || reactor == null)
+                        continue;
+
+                    // Re-check eligibility at resolve-time in case earlier reactions consumed state.
+                    if (!IsStillEligible(reactor, reaction, triggerContext))
                         continue;
 
                     if (!TryDecideReaction(reactor, reaction, triggerContext, options, out var useReaction, out var deferredPrompt))
@@ -147,6 +155,7 @@ namespace QDND.Combat.Reactions
                     // Inject reactor reference so effect handlers (e.g. BG3ReactionIntegration) can access the combatant
                     triggerContext.Data["reactor"] = reactor;
                     _reactions.UseReaction(reactor, reaction, triggerContext);
+                    consumedReactors.Add(reactor.Id);
 
                     bool cancelled = triggerContext.IsCancellable && triggerContext.WasCancelled;
                     float modifier = 1f;
@@ -193,6 +202,18 @@ namespace QDND.Combat.Reactions
             }
 
             return result;
+        }
+
+        private bool IsStillEligible(Combatant reactor, ReactionDefinition reaction, ReactionTriggerContext triggerContext)
+        {
+            if (reactor?.ActionBudget != null && !reactor.ActionBudget.HasReaction)
+                return false;
+
+            var granted = _reactions.GetReactions(reactor.Id);
+            if (!granted.Any(r => string.Equals(r.Id, reaction.Id, StringComparison.OrdinalIgnoreCase)))
+                return false;
+
+            return _reactions.CanTrigger(reaction, triggerContext, reactor);
         }
 
         private bool TryDecideReaction(

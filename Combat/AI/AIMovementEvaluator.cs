@@ -6,6 +6,7 @@ using QDND.Combat.Entities;
 using QDND.Combat.Services;
 using QDND.Combat.Environment;
 using QDND.Combat.Movement;
+using QDND.Combat.Rules;
 
 namespace QDND.Combat.AI
 {
@@ -65,7 +66,7 @@ namespace QDND.Combat.AI
         private readonly ThreatMap _threatMap;
         private readonly SpecialMovementService _specialMovement;
 
-        private const float MELEE_RANGE = 5f;
+        private const float MELEE_RANGE = CombatRules.DefaultMeleeReachMeters;
         private const float OPTIMAL_RANGED_MIN = 10f;
         private const float OPTIMAL_RANGED_MAX = 30f;
         private const float LEDGE_DETECTION_RADIUS = 10f;
@@ -88,7 +89,7 @@ namespace QDND.Combat.AI
             var enemies = GetEnemies(actor);
             var allies = GetAllies(actor);
 
-            float movementRange = actor.ActionBudget?.RemainingMovement ?? 30f;
+            float movementRange = actor.ActionBudget?.RemainingMovement ?? CombatRules.DefaultMovementBudgetMeters;
 
             // Build threat map
             _threatMap.Calculate(enemies, actor.Position, movementRange + 20f);
@@ -466,7 +467,7 @@ namespace QDND.Combat.AI
             // Movement cost (prefer efficient movement)
             float moveCost = actor.Position.DistanceTo(candidate.Position);
             candidate.MoveCost = moveCost;
-            float efficiency = (1f - (moveCost / 30f)) * 0.5f; // Small bonus for short moves
+            float efficiency = (1f - (moveCost / CombatRules.DefaultMovementBudgetMeters)) * 0.5f; // Small bonus for short moves
             breakdown["efficiency"] = efficiency;
             score += efficiency;
 

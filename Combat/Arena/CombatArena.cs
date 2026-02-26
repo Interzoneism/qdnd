@@ -47,7 +47,7 @@ namespace QDND.Combat.Arena
         [Export] public float RealtimeAIStartupDelaySeconds = 0.5f;
         [Export] public PackedScene CombatantVisualScene;
         [Export] public float TileSize = 1.0f; // World-space meters (1 Godot unit = 1 meter)
-        [Export] public float DefaultMovePoints = 10.0f;
+        [Export] public float DefaultMovePoints = QDND.Combat.Rules.CombatRules.DefaultMovementBudgetMeters;
 
         // Node references (set in _Ready or via editor)
         private Camera3D _camera;
@@ -824,7 +824,11 @@ namespace QDND.Combat.Arena
             var charRegistry = registries.CharRegistry;
 
             // Phase D: Wire reaction system
-            var reactionSystem = new ReactionSystem(_rulesEngine.Events);
+            var reactionAliasResolver = new ReactionAliasResolver();
+            var reactionSystem = new ReactionSystem(_rulesEngine.Events, reactionAliasResolver)
+            {
+                StrictGrantValidation = true
+            };
             _reactionSystem = reactionSystem; // Store reference
             _resolutionStack = new ResolutionStack();
 
@@ -851,33 +855,6 @@ namespace QDND.Combat.Arena
 
             // Inject resolver back into coordinator (breaks the construction cycle).
             _reactionCoordinator.SetReactionResolver(_reactionResolver);
-
-            // Register opportunity attack reaction
-            reactionSystem.RegisterReaction(new ReactionDefinition
-            {
-                Id = "opportunity_attack",
-                Name = "Opportunity Attack",
-                Description = "Strike when an enemy leaves your reach",
-                Triggers = new List<ReactionTriggerType> { ReactionTriggerType.EnemyLeavesReach },
-                Priority = 10,
-                Range = 5f, // Melee range (must match MovementService.MELEE_RANGE)
-                ActionId = "main_hand_attack" // Use canonical internal attack ID so OA uses full weapon stats/tags
-            });
-
-            // Shield reaction is now handled by BG3ReactionIntegration (BG3_Shield)
-            // with both YouAreAttacked and YouTakeDamage triggers.
-
-            reactionSystem.RegisterReaction(new ReactionDefinition
-            {
-                Id = "counterspell_reaction",
-                Name = "Counterspell",
-                Description = "Counter a nearby spell cast.",
-                Triggers = new List<ReactionTriggerType> { ReactionTriggerType.SpellCastNearby },
-                Priority = 5,
-                Range = 18f,
-                CanCancel = true,
-                ActionId = "counterspell"
-            });
 
             // Subscribe to reaction events
             reactionSystem.OnPromptCreated += _reactionCoordinator.OnReactionPrompt;
@@ -1600,8 +1577,11 @@ namespace QDND.Combat.Arena
                 _presentationService.PresentationBus.Publish(statusRequest);
             }
 
-            var target = _combatContext?.GetCombatant(status.TargetId);
-            _combatLog?.LogStatus(status.TargetId, target?.Name ?? status.TargetId, status.Definition.Name, applied: true);
+            if (!status.Definition.DisableCombatlog)
+            {
+                var target = _combatContext?.GetCombatant(status.TargetId);
+                _combatLog?.LogStatus(status.TargetId, target?.Name ?? status.TargetId, status.Definition.Name, applied: true);
+            }
 
             RefreshCombatantStatuses(status.TargetId);
             _actionBarService?.RefreshUsability(status.TargetId);
@@ -1615,8 +1595,11 @@ namespace QDND.Combat.Arena
                 visual.ShowStatusRemoved(status.Definition.Name);
             }
 
-            var target = _combatContext?.GetCombatant(status.TargetId);
-            _combatLog?.LogStatus(status.TargetId, target?.Name ?? status.TargetId, status.Definition.Name, applied: false);
+            if (!status.Definition.DisableCombatlog)
+            {
+                var target = _combatContext?.GetCombatant(status.TargetId);
+                _combatLog?.LogStatus(status.TargetId, target?.Name ?? status.TargetId, status.Definition.Name, applied: false);
+            }
 
             RefreshCombatantStatuses(status.TargetId);
             _actionBarService?.RefreshUsability(status.TargetId);

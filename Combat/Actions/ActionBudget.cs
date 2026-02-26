@@ -20,7 +20,7 @@ namespace QDND.Combat.Actions
     /// </summary>
     public class ActionBudget
     {
-        public const float DefaultMaxMovement = 30f;
+        public const float DefaultMaxMovement = QDND.Combat.Rules.CombatRules.DefaultMovementBudgetMeters;
         private int _actionCharges = 1;
         private int _bonusActionCharges = 1;
         private int _reactionCharges = 1;

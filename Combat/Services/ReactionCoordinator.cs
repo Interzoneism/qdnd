@@ -5,7 +5,6 @@ using Godot;
 using QDND.Combat.Actions;
 using QDND.Combat.Actions.Effects;
 using QDND.Combat.Arena;
-using QDND.Combat.Arena;
 using QDND.Combat.Entities;
 using QDND.Combat.Reactions;
 using QDND.Combat.States;
@@ -111,25 +110,90 @@ namespace QDND.Combat.Services
             if (_effectPipeline == null || reaction == null)
                 return;
 
-            if (string.IsNullOrWhiteSpace(reaction.ActionId))
-                return;
-
             var reactor = _combatContext.GetCombatant(reactorId);
             if (reactor == null)
                 return;
 
-            var action = _effectPipeline.GetAction(reaction.ActionId);
+            if (triggerContext == null)
+            {
+                _log($"Reaction {reaction.Id} has no trigger context; skipping execution.");
+                return;
+            }
+
+            // Explicit, deterministic reaction execution path for OA-like effects.
+            if (TryExecuteExplicitReaction(reaction, reactor, triggerContext))
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(reaction.ActionId))
+            {
+                return;
+            }
+
+            ExecuteReactionAction(reaction.ActionId, reaction.Id, reactor, triggerContext);
+        }
+
+        private bool TryExecuteExplicitReaction(
+            ReactionDefinition reaction,
+            Combatant reactor,
+            ReactionTriggerContext triggerContext)
+        {
+            if (triggerContext.Data == null)
+            {
+                return false;
+            }
+
+            if (triggerContext.Data.TryGetValue("executeAttack", out var attackObj)
+                && attackObj is bool shouldExecuteAttack
+                && shouldExecuteAttack)
+            {
+                string attackActionId = reaction.ActionId;
+                if (string.IsNullOrWhiteSpace(attackActionId))
+                {
+                    attackActionId = "main_hand_attack";
+                }
+
+                return ExecuteReactionAction(attackActionId, reaction.Id, reactor, triggerContext);
+            }
+
+            if (triggerContext.Data.TryGetValue("executeSpell", out var spellObj)
+                && spellObj is bool shouldExecuteSpell
+                && shouldExecuteSpell)
+            {
+                string spellId = triggerContext.Data.TryGetValue("spellId", out var spellIdObj)
+                    ? spellIdObj?.ToString()
+                    : null;
+                if (string.IsNullOrWhiteSpace(spellId))
+                {
+                    _log($"{reactor.Name}'s reaction {reaction.Id} requested executeSpell without spellId.");
+                    return false;
+                }
+
+                return ExecuteReactionAction(spellId, reaction.Id, reactor, triggerContext);
+            }
+
+            return false;
+        }
+
+        private bool ExecuteReactionAction(
+            string actionId,
+            string reactionId,
+            Combatant reactor,
+            ReactionTriggerContext triggerContext)
+        {
+            var action = _effectPipeline.GetAction(actionId);
             if (action == null)
             {
-                _log($"Reaction ability not found: {reaction.ActionId}");
-                return;
+                _log($"Reaction ability not found: {actionId} (reaction {reactionId})");
+                return false;
             }
 
             var targets = ResolveReactionTargets(reactor, action, triggerContext);
             if (action.TargetType == TargetType.SingleUnit && targets.Count == 0)
             {
                 _log($"No valid target for reaction ability {action.Id} from {reactor.Name}");
-                return;
+                return false;
             }
 
             var reactionOptions = new ActionExecutionOptions
@@ -143,10 +207,11 @@ namespace QDND.Combat.Services
             if (!result.Success)
             {
                 _log($"{reactor.Name}'s reaction ability {action.Id} failed: {result.ErrorMessage}");
-                return;
+                return false;
             }
 
             _log($"{reactor.Name} resolved reaction ability {action.Id}");
+            return true;
         }
 
         // ── Internal target resolution ────────────────────────────────────────
@@ -293,22 +358,12 @@ namespace QDND.Combat.Services
                     continue;
 
                 // Everyone in combat has baseline opportunity attack reaction.
-                _reactionSystem.GrantReaction(combatant.Id, "opportunity_attack");
+                // Uses alias resolution, so legacy IDs still normalize to canonical.
+                _reactionSystem.GrantReaction(combatant.Id, ReactionIds.OpportunityAttack);
 
                 if (combatant.IsPlayerControlled)
                 {
                     _reactionResolver?.SetPlayerDefaultPolicy(combatant.Id, PlayerReactionPolicy.AlwaysAsk);
-                }
-
-                // Grant specific spell reactions based on known abilities.
-                if (combatant.KnownActions?.Contains("shield") == true)
-                {
-                    _reactionSystem.GrantReaction(combatant.Id, "shield_reaction");
-                }
-
-                if (combatant.KnownActions?.Contains("counterspell") == true)
-                {
-                    _reactionSystem.GrantReaction(combatant.Id, "counterspell_reaction");
                 }
 
                 // Grant BG3 reactions based on known BG3 spell IDs
@@ -373,6 +428,18 @@ namespace QDND.Combat.Services
 
                     bg3Reactions.GrantCoreReactions(combatant, hasShield, hasCounterspell, hasUncannyDodge, hasDeflectMissiles,
                         hasHellishRebuke, hasCuttingWords, hasSentinel, hasMageSlayer, hasWarCaster, hasWardingFlare, hasDefensiveDuelist);
+                }
+                else
+                {
+                    if (combatant.KnownActions?.Contains("shield") == true)
+                    {
+                        _reactionSystem.GrantReaction(combatant.Id, ReactionIds.Shield);
+                    }
+
+                    if (combatant.KnownActions?.Contains("counterspell") == true)
+                    {
+                        _reactionSystem.GrantReaction(combatant.Id, ReactionIds.Counterspell);
+                    }
                 }
             }
         }

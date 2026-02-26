@@ -91,7 +91,8 @@ namespace QDND.Combat.Statuses
                 target.Id,
                 target.Name,
                 dealt,
-                message: $"{sourceName} deals {dealt} damage to {target.Name}");
+                message: $"{sourceName} deals {dealt} damage to {target.Name}",
+                damageType: tick.DamageType);
 
             // Dispatch DamageTaken event for concentration checks, triggered effects, etc.
             _rulesEngine?.Events.DispatchDamage(

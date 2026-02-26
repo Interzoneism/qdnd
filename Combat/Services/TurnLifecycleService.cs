@@ -648,7 +648,7 @@ namespace QDND.Combat.Services
             if (combatants == null || combatants.Count == 0)
                 return;
 
-            const float threatenedRange = 1.5f;
+            const float threatenedRange = CombatRules.DefaultMeleeReachMeters;
             var activeCombatants = combatants.Where(c => c != null && c.IsActive).ToList();
 
             foreach (var combatant in activeCombatants)

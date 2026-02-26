@@ -187,7 +187,7 @@ namespace QDND.Combat.Persistence
         /// <summary>
         /// Base movement speed.
         /// </summary>
-        public float Speed { get; set; } = 30f;
+        public float Speed { get; set; } = global::QDND.Combat.Actions.ActionBudget.DefaultMaxMovement;
 
         // --- Known Actions & Passives ---
 

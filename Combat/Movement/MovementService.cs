@@ -90,9 +90,9 @@ namespace QDND.Combat.Movement
     public class MovementService
     {
         /// <summary>
-        /// Standard melee reach in units.
+        /// Standard melee reach in meters.
         /// </summary>
-        public const float MELEE_RANGE = 5f;
+        public const float MELEE_RANGE = CombatRules.DefaultMeleeReachMeters;
         public const float COMBATANT_COLLISION_RADIUS = 0.9f;
         public const float COMBATANT_VERTICAL_TOLERANCE = 1.5f;
         private const float NAVIGATION_SAMPLE_STEP = 0.5f;
@@ -562,7 +562,7 @@ namespace QDND.Combat.Movement
         /// </summary>
         public float GetMaxMoveDistance(Combatant combatant)
         {
-            return combatant.ActionBudget?.RemainingMovement ?? 30f;
+            return combatant.ActionBudget?.RemainingMovement ?? CombatRules.DefaultMovementBudgetMeters;
         }
 
         private sealed class PathComputation

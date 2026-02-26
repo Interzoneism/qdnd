@@ -33,13 +33,13 @@ namespace QDND.Combat.Reactions
     public class BG3ReactionIntegration
     {
         /// <summary>Well-known reaction ID for Opportunity Attack.</summary>
-        public const string OpportunityAttackId = "BG3_OpportunityAttack";
+        public const string OpportunityAttackId = ReactionIds.OpportunityAttack;
 
         /// <summary>Well-known reaction ID for Shield spell reaction.</summary>
-        public const string ShieldId = "BG3_Shield";
+        public const string ShieldId = ReactionIds.Shield;
 
         /// <summary>Well-known reaction ID for Counterspell.</summary>
-        public const string CounterspellId = "BG3_Counterspell";
+        public const string CounterspellId = ReactionIds.Counterspell;
 
         /// <summary>Well-known reaction ID for Uncanny Dodge.</summary>
         public const string UncannyDodgeId = "BG3_UncannyDodge";
@@ -276,11 +276,12 @@ namespace QDND.Combat.Reactions
                 Description = bg3Data?.Description ?? "Attack an enemy moving out of your reach.",
                 Triggers = new List<ReactionTriggerType> { ReactionTriggerType.EnemyLeavesReach },
                 Priority = 10,
-                Range = 1.5f, // Melee reach
+                Range = CombatRules.OpportunityAttackRangeMeters,
                 CanCancel = false,
                 CanModify = false,
                 Tags = new HashSet<string> { "opportunity_attack", "melee", "bg3" },
-                AIPolicy = ReactionAIPolicy.Always
+                AIPolicy = ReactionAIPolicy.Always,
+                ActionId = "main_hand_attack"
             };
 
             _reactions.RegisterReaction(definition);
@@ -291,7 +292,7 @@ namespace QDND.Combat.Reactions
             // the handler here marks the context so the combat system knows to queue the attack).
             _effectHandlers[OpportunityAttackId] = (reactor, context) =>
             {
-                context.Data["executeAttack"] = true;
+                context.Data["executeAttack"] = true; // Backward compatibility marker
                 context.Data["attackType"] = "melee";
                 context.Data["interruptId"] = "Interrupt_AttackOfOpportunity";
             };
@@ -348,11 +349,12 @@ namespace QDND.Combat.Reactions
                 Description = bg3Data?.Description ?? "Stop a spell from being cast.",
                 Triggers = new List<ReactionTriggerType> { ReactionTriggerType.SpellCastNearby },
                 Priority = 5, // Highest priority — must resolve before the spell lands
-                Range = 18f, // 60 ft in D&D, ~18 Godot units
+                Range = CombatRules.CounterspellRangeMeters,
                 CanCancel = true,
                 CanModify = false,
                 Tags = new HashSet<string> { "counterspell", "spell", "cancel", "bg3" },
-                AIPolicy = ReactionAIPolicy.PriorityTargets
+                AIPolicy = ReactionAIPolicy.PriorityTargets,
+                ActionId = "counterspell"
             };
 
             _reactions.RegisterReaction(definition);
@@ -517,11 +519,12 @@ namespace QDND.Combat.Reactions
                 Description = "Your opportunity attacks reduce the target's speed to 0.",
                 Triggers = new List<ReactionTriggerType> { ReactionTriggerType.EnemyLeavesReach },
                 Priority = 9, // Before normal OA
-                Range = 1.5f,
+                Range = CombatRules.OpportunityAttackRangeMeters,
                 CanCancel = false,
                 CanModify = false,
                 Tags = new HashSet<string> { "sentinel", "oa_enhancement", "feat", "melee", "bg3" },
-                AIPolicy = ReactionAIPolicy.Always
+                AIPolicy = ReactionAIPolicy.Always,
+                ActionId = "main_hand_attack"
             };
 
             _reactions.RegisterReaction(definition);
@@ -544,11 +547,12 @@ namespace QDND.Combat.Reactions
                 Description = "When an enemy hits an ally within 5ft of you, make a melee attack reaction.",
                 Triggers = new List<ReactionTriggerType> { ReactionTriggerType.AllyTakesDamage },
                 Priority = 10,
-                Range = 1.5f,
+                Range = CombatRules.DefaultMeleeReachMeters,
                 CanCancel = false,
                 CanModify = false,
                 Tags = new HashSet<string> { "sentinel", "feat", "melee", "bg3" },
-                AIPolicy = ReactionAIPolicy.Always
+                AIPolicy = ReactionAIPolicy.Always,
+                ActionId = "main_hand_attack"
             };
 
             _reactions.RegisterReaction(definition);
@@ -570,11 +574,12 @@ namespace QDND.Combat.Reactions
                 Description = "When an enemy within melee range casts a spell, make a reaction melee attack.",
                 Triggers = new List<ReactionTriggerType> { ReactionTriggerType.SpellCastNearby },
                 Priority = 15,
-                Range = 1.5f,
+                Range = CombatRules.DefaultMeleeReachMeters,
                 CanCancel = false,
                 CanModify = false,
                 Tags = new HashSet<string> { "mage_slayer", "feat", "melee", "bg3" },
-                AIPolicy = ReactionAIPolicy.Always
+                AIPolicy = ReactionAIPolicy.Always,
+                ActionId = "main_hand_attack"
             };
 
             _reactions.RegisterReaction(definition);
@@ -596,7 +601,7 @@ namespace QDND.Combat.Reactions
                 Description = "Cast a cantrip instead of making a melee opportunity attack.",
                 Triggers = new List<ReactionTriggerType> { ReactionTriggerType.EnemyLeavesReach },
                 Priority = 8, // Higher priority than normal OA
-                Range = 1.5f,
+                Range = CombatRules.DefaultMeleeReachMeters,
                 CanCancel = false,
                 CanModify = false,
                 Tags = new HashSet<string> { "war_caster", "feat", "spell", "bg3" },

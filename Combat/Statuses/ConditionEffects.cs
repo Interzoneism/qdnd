@@ -313,6 +313,8 @@ namespace QDND.Combat.Statuses
                     CantMove = true,
                     SpeedZero = true,
                     AutoFailStrDexSaves = true,
+                    GrantsAdvantageToAttackers = true,
+                    MeleeAutocrits = true,
                 }
             },
         };

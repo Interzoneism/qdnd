@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using QDND.Combat.Entities;
+using QDND.Combat.Rules;
 
 namespace QDND.Combat.AI
 {
@@ -41,7 +42,7 @@ namespace QDND.Combat.AI
     {
         private readonly Dictionary<Vector3I, ThreatCell> _cells = new();
         private readonly float _cellSize;
-        private readonly float _meleeRange = 5f;
+        private readonly float _meleeRange = CombatRules.DefaultMeleeReachMeters;
         private readonly float _rangedRange = 30f;
 
         public ThreatMap(float cellSize = 5f)

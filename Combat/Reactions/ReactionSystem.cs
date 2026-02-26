@@ -15,8 +15,15 @@ namespace QDND.Combat.Reactions
         private readonly Dictionary<string, List<ReactionDefinition>> _combatantReactions = new();
         private readonly Dictionary<string, ReactionDefinition> _reactionDefinitions = new();
         private readonly RuleEventBus _events;
+        private readonly IReactionAliasResolver _aliasResolver;
 
         private readonly List<ReactionPrompt> _pendingPrompts = new();
+
+        /// <summary>
+        /// If true, grants to unknown reactions throw instead of being ignored.
+        /// Recommended in dev/test startup to catch bad IDs early.
+        /// </summary>
+        public bool StrictGrantValidation { get; set; }
 
         /// <summary>
         /// Fired when a reaction prompt is created (for UI).
@@ -28,9 +35,10 @@ namespace QDND.Combat.Reactions
         /// </summary>
         public event Action<string, ReactionDefinition, ReactionTriggerContext> OnReactionUsed;
 
-        public ReactionSystem(RuleEventBus events = null)
+        public ReactionSystem(RuleEventBus events = null, IReactionAliasResolver aliasResolver = null)
         {
             _events = events;
+            _aliasResolver = aliasResolver ?? new ReactionAliasResolver();
         }
 
         /// <summary>
@@ -38,7 +46,20 @@ namespace QDND.Combat.Reactions
         /// </summary>
         public void RegisterReaction(ReactionDefinition reaction)
         {
-            _reactionDefinitions[reaction.Id] = reaction;
+            if (reaction == null)
+                throw new ArgumentNullException(nameof(reaction));
+            if (string.IsNullOrWhiteSpace(reaction.Id))
+                throw new ArgumentException("Reaction ID is required.", nameof(reaction));
+
+            string canonicalId = _aliasResolver.Resolve(reaction.Id);
+            if (_reactionDefinitions.ContainsKey(canonicalId))
+            {
+                throw new InvalidOperationException(
+                    $"Duplicate reaction registration for semantic ID '{canonicalId}'.");
+            }
+
+            reaction.Id = canonicalId;
+            _reactionDefinitions[canonicalId] = reaction;
         }
 
         /// <summary>
@@ -46,8 +67,16 @@ namespace QDND.Combat.Reactions
         /// </summary>
         public void GrantReaction(string combatantId, string reactionId)
         {
-            if (!_reactionDefinitions.TryGetValue(reactionId, out var reaction))
+            string canonicalId = _aliasResolver.Resolve(reactionId);
+            if (!_reactionDefinitions.TryGetValue(canonicalId, out var reaction))
+            {
+                if (StrictGrantValidation)
+                {
+                    throw new InvalidOperationException(
+                        $"Reaction grant references unknown reaction '{reactionId}' (canonical '{canonicalId}').");
+                }
                 return;
+            }
 
             if (!_combatantReactions.TryGetValue(combatantId, out var list))
             {
@@ -64,9 +93,10 @@ namespace QDND.Combat.Reactions
         /// </summary>
         public void RevokeReaction(string combatantId, string reactionId)
         {
+            string canonicalId = _aliasResolver.Resolve(reactionId);
             if (_combatantReactions.TryGetValue(combatantId, out var list))
             {
-                list.RemoveAll(r => r.Id == reactionId);
+                list.RemoveAll(r => string.Equals(r.Id, canonicalId, StringComparison.OrdinalIgnoreCase));
             }
         }
 
@@ -78,6 +108,14 @@ namespace QDND.Combat.Reactions
             return _combatantReactions.TryGetValue(combatantId, out var list)
                 ? new List<ReactionDefinition>(list)
                 : new List<ReactionDefinition>();
+        }
+
+        /// <summary>
+        /// Get all registered canonical reaction IDs.
+        /// </summary>
+        public IReadOnlyCollection<string> GetRegisteredReactionIds()
+        {
+            return _reactionDefinitions.Keys.ToList();
         }
 
         /// <summary>

@@ -1445,7 +1445,7 @@ namespace QDND.Combat.Arena
 
         private int GetDefaultMovePoints()
         {
-            return Mathf.RoundToInt(Arena?.DefaultMovePoints ?? 10f);
+            return Mathf.RoundToInt(Arena?.DefaultMovePoints ?? global::QDND.Combat.Actions.ActionBudget.DefaultMaxMovement);
         }
 
         public void UpdateResources(int action, int maxAction, int bonus, int maxBonus, int move, int maxMove, int reaction, int maxReaction)
@@ -2252,11 +2252,16 @@ namespace QDND.Combat.Arena
                 return null;
 
             if (entry.Type == CombatLogEntryType.Debug ||
+                entry.Type == CombatLogEntryType.Error ||
                 entry.Type == CombatLogEntryType.TurnStarted ||
                 entry.Type == CombatLogEntryType.TurnEnded ||
                 entry.Type == CombatLogEntryType.RoundEnded ||
                 entry.Type == CombatLogEntryType.MovementStarted ||
                 entry.Type == CombatLogEntryType.MovementCompleted)
+            {
+                return null;
+            }
+            if (entry.Severity == LogSeverity.Verbose)
             {
                 return null;
             }
@@ -2266,6 +2271,7 @@ namespace QDND.Combat.Arena
                 CombatLogEntryType.RoundStarted => "#E1C46E",
                 CombatLogEntryType.AbilityUsed => "#8AC1E8",
                 CombatLogEntryType.AttackResolved => entry.IsMiss ? "#D38B8B" : "#8FCF8F",
+                CombatLogEntryType.SavingThrow => entry.IsMiss ? "#D38B8B" : "#8FCF8F",
                 CombatLogEntryType.DamageDealt => "#E86A6A",
                 CombatLogEntryType.HealingDone => "#6ABF6A",
                 CombatLogEntryType.CombatantDowned => "#FF8B6E",

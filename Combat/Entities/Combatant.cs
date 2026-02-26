@@ -232,7 +232,11 @@ namespace QDND.Combat.Entities
         public int GetArmorClass() => CurrentAC > 0 ? CurrentAC : 10;
 
         /// <summary>Get the base movement speed.</summary>
-        public float GetSpeed() => ResolvedCharacter?.Speed ?? 30f;
+        public float GetSpeed()
+        {
+            float rawSpeed = ResolvedCharacter?.Speed ?? global::QDND.Combat.Actions.ActionBudget.DefaultMaxMovement;
+            return QDND.Combat.Rules.CombatRules.NormalizeDistanceToMeters(rawSpeed);
+        }
 
         /// <summary>Get the proficiency bonus from resolved character or fallback.</summary>
         public int GetProficiencyBonus() => ResolvedCharacter?.Sheet?.ProficiencyBonus ?? ProficiencyBonus;

@@ -249,7 +249,7 @@ namespace QDND.Combat.Persistence
                     HasBonusAction = combatant.ActionBudget?.HasBonusAction ?? false,
                     HasReaction = combatant.ActionBudget?.HasReaction ?? false,
                     RemainingMovement = combatant.ActionBudget?.RemainingMovement ?? 0,
-                    MaxMovement = combatant.ActionBudget?.MaxMovement ?? 30f,
+                    MaxMovement = combatant.ActionBudget?.MaxMovement ?? global::QDND.Combat.Actions.ActionBudget.DefaultMaxMovement,
 
                     // Stats
                     Strength = combatant.GetAbilityScore(AbilityType.Strength),

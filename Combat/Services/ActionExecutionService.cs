@@ -1102,7 +1102,8 @@ namespace QDND.Combat.Services
                         damage,
                         breakdown: null,
                         isCritical: result.AttackResult?.IsCritical ?? false,
-                        message: damageMessage);
+                        message: damageMessage,
+                        damageType: damageType);
 
                     if (killed)
                         _combatLog.LogCombatantDowned(result.SourceId, sourceName, targetId, targetName);

@@ -35,7 +35,7 @@ namespace QDND.Combat.Services
             OnEntryAdded?.Invoke(entry);
         }
 
-        public void LogDamage(string sourceId, string sourceName, string targetId, string targetName, float damage, Dictionary<string, object> breakdown = null, bool isCritical = false, string message = null)
+        public void LogDamage(string sourceId, string sourceName, string targetId, string targetName, float damage, Dictionary<string, object> breakdown = null, bool isCritical = false, string message = null, string damageType = null)
         {
             var entry = new CombatLogEntry
             {
@@ -49,6 +49,8 @@ namespace QDND.Combat.Services
                 Severity = isCritical ? LogSeverity.Important : LogSeverity.Normal,
                 Message = message
             };
+            if (!string.IsNullOrEmpty(damageType))
+                entry.Data["damageType"] = damageType;
             if (breakdown != null)
                 foreach (var kvp in breakdown)
                     entry.Breakdown[kvp.Key] = kvp.Value;
@@ -162,12 +164,13 @@ namespace QDND.Combat.Services
 
             var entry = new CombatLogEntry
             {
-                Type = CombatLogEntryType.AttackResolved,
+                Type = CombatLogEntryType.SavingThrow,
                 TargetId = targetId,
                 TargetName = targetName,
                 Message = message,
                 IsMiss = !saveResult.IsSuccess
             };
+            entry.Data["saveType"] = saveLabel;
 
             entry.Breakdown["saveRoll"] = saveResult.ToBreakdownData();
             if (saveResult.Breakdown != null)
@@ -266,16 +269,24 @@ namespace QDND.Combat.Services
                 LogRoundStarted(evt.Round);
             }
 
-            var entry = new CombatLogEntry
+            // Avoid duplicate TurnStarted if LogTurnStart was already called for this combatant
+            string combatantId = evt.CurrentCombatant?.Id;
+            bool alreadyLogged = _entries.Count > 0 && _entries[^1].Type == CombatLogEntryType.TurnStarted
+                && _entries[^1].SourceId == combatantId;
+
+            if (!alreadyLogged)
             {
-                Type = CombatLogEntryType.TurnStarted,
-                Severity = LogSeverity.Verbose,
-                SourceId = evt.CurrentCombatant?.Id,
-                SourceName = evt.CurrentCombatant?.Name,
-                Message = $"{evt.CurrentCombatant?.Name ?? "None"} takes a turn"
-            };
-            entry.Data["previousCombatant"] = evt.PreviousCombatant?.Id;
-            LogEntry(entry);
+                var entry = new CombatLogEntry
+                {
+                    Type = CombatLogEntryType.TurnStarted,
+                    Severity = LogSeverity.Normal,
+                    SourceId = combatantId,
+                    SourceName = evt.CurrentCombatant?.Name,
+                    Message = $"{evt.CurrentCombatant?.Name ?? "None"}'s turn"
+                };
+                entry.Data["previousCombatant"] = evt.PreviousCombatant?.Id;
+                LogEntry(entry);
+            }
         }
 
         public void LogCommand(CommandExecutedEvent evt)

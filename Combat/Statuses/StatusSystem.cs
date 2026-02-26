@@ -125,6 +125,12 @@ namespace QDND.Combat.Statuses
         public int RemoveOnAttackCount { get; set; }
 
         /// <summary>
+        /// If true, suppress combat log entries for this status (BG3 StatusPropertyFlags: DisableCombatlog).
+        /// Used for internal/cosmetic statuses.
+        /// </summary>
+        public bool DisableCombatlog { get; set; }
+
+        /// <summary>
         /// Actions granted to the bearer while this status is active.
         /// </summary>
         public List<string> GrantedActions { get; set; } = new();

@@ -82,6 +82,12 @@ namespace QDND.Data
         public int Levels { get; set; } = 1;
     }
 
+    public enum InitiativeMode
+    {
+        RollAtCombatStart = 0,
+        UsePreset = 1
+    }
+
     /// <summary>
     /// Scenario definition loaded from JSON.
     /// </summary>
@@ -90,6 +96,9 @@ namespace QDND.Data
         public string Id { get; set; }
         public string Name { get; set; }
         public int Seed { get; set; }
+        public int SchemaVersion { get; set; } = 2;
+        public string UnitSystem { get; set; } = "m";
+        public InitiativeMode InitiativeMode { get; set; } = InitiativeMode.RollAtCombatStart;
         public List<ScenarioUnit> Units { get; set; } = new();
 
         [JsonPropertyName("combatants")]
@@ -108,6 +117,7 @@ namespace QDND.Data
         private QDND.Combat.Actions.ActionRegistry _actionRegistry;
         private HashSet<string> _cachedDataActionIds;
         private bool _cachedDataActionIdsLoaded;
+        private IScenarioMigrationService _scenarioMigrationService;
 
         /// <summary>
         /// Current RNG (seeded from scenario).
@@ -151,6 +161,14 @@ namespace QDND.Data
         public void SetActionRegistry(QDND.Combat.Actions.ActionRegistry registry)
         {
             _actionRegistry = registry;
+        }
+
+        /// <summary>
+        /// Set scenario migration service for schema upgrades on load.
+        /// </summary>
+        public void SetScenarioMigrationService(IScenarioMigrationService migrationService)
+        {
+            _scenarioMigrationService = migrationService;
         }
 
         /// <summary>
@@ -202,6 +220,20 @@ namespace QDND.Data
                 throw new InvalidOperationException("Failed to parse scenario JSON");
             }
 
+            _scenarioMigrationService ??= new ScenarioMigrationService();
+            if (_scenarioMigrationService.NeedsMigration(scenario))
+            {
+                scenario = _scenarioMigrationService.Migrate(scenario, out var report);
+                if (report != null && report.HasChanges)
+                {
+                    Console.WriteLine(
+                        $"[ScenarioMigration] v{report.FromSchemaVersion}->v{report.ToSchemaVersion}; " +
+                        $"distanceConversions={report.DistanceFieldsConverted}, " +
+                        $"reactionAliasRemaps={report.ReactionAliasesRemapped}, " +
+                        $"initiativeDefaults={report.InitiativeDefaultsApplied}");
+                }
+            }
+
             // Initialize RNG with scenario seed
             CurrentSeed = scenario.Seed;
             _rng = new Random(scenario.Seed);
@@ -221,6 +253,7 @@ namespace QDND.Data
 
             foreach (var unit in scenario.Units)
             {
+                bool initiativeResolved = false;
                 var faction = ParseFaction(unit.Faction);
                 var name = string.IsNullOrEmpty(unit.Name) ? unit.Id : unit.Name;
                 int maxHp = unit.MaxHp ?? unit.HP ?? 0;
@@ -396,8 +429,11 @@ namespace QDND.Data
                             }
                         }
                         
-                        // If unit has explicit initiative, use it; otherwise compute from character build
-                        if (unit.Initiative == 0)
+                        // Initiative mode:
+                        // - RollAtCombatStart (default): always roll
+                        // - UsePreset: respect preset initiative unless missing/zero
+                        bool shouldRollInitiative = scenario.InitiativeMode != InitiativeMode.UsePreset || unit.Initiative == 0;
+                        if (shouldRollInitiative)
                         {
                             int dexMod = resolved.GetModifier(AbilityType.Dexterity);
                             int initiativeBonus = 0;
@@ -423,7 +459,24 @@ namespace QDND.Data
 
                             combatant.Initiative = initRoll + dexMod + initiativeBonus;
                             combatant.InitiativeTiebreaker = resolved.AbilityScores[AbilityType.Dexterity];
+                            initiativeResolved = true;
                         }
+                    }
+                }
+
+                // Units without character build still respect scenario-level initiative mode.
+                if (!initiativeResolved)
+                {
+                    bool shouldRollInitiative = scenario.InitiativeMode != InitiativeMode.UsePreset || unit.Initiative == 0;
+                    if (shouldRollInitiative)
+                    {
+                        int dexScore = unit.BaseDexterity ?? 10;
+                        int dexMod = (dexScore - 10) / 2;
+                        int initRoll = Roll(1, 20);
+                        combatant.Initiative = initRoll + dexMod;
+                        combatant.InitiativeTiebreaker = unit.InitiativeTiebreaker != 0
+                            ? unit.InitiativeTiebreaker
+                            : dexScore;
                     }
                 }
                 

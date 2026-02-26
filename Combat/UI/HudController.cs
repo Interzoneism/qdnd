@@ -293,7 +293,7 @@ namespace QDND.Combat.UI
             _combatLogPanel.SetScreenPosition(new Vector2(screenSize.X - 320, 100));
 
             // Initialize resource bar with defaults
-            int maxMove = Mathf.RoundToInt(Arena?.DefaultMovePoints ?? 10f);
+            int maxMove = Mathf.RoundToInt(Arena?.DefaultMovePoints ?? global::QDND.Combat.Actions.ActionBudget.DefaultMaxMovement);
             _resourceBarPanel.InitializeDefaults(maxMove);
         }
 
@@ -625,6 +625,10 @@ namespace QDND.Combat.UI
             {
                 foreach (var entry in _combatLog.GetRecentEntries(100))
                 {
+                    if (entry.Type == CombatLogEntryType.Debug || entry.Type == CombatLogEntryType.Error)
+                        continue;
+                    if (entry.Severity == LogSeverity.Verbose)
+                        continue;
                     _combatLogPanel?.AddEntry(entry);
                 }
                 _syncedCombatLogEntries = _combatLog.Entries.Count;
@@ -1088,6 +1092,13 @@ namespace QDND.Combat.UI
         private void OnLogEntryAdded(CombatLogEntry entry)
         {
             if (_disposed || !IsInstanceValid(this) || !IsInsideTree()) return;
+
+            // Filter out debug/verbose entries — they're not player-facing feedback
+            if (entry.Type == CombatLogEntryType.Debug || entry.Type == CombatLogEntryType.Error)
+                return;
+            if (entry.Severity == LogSeverity.Verbose)
+                return;
+
             _combatLogPanel?.AddEntry(entry);
             _syncedCombatLogEntries = _combatLog?.Entries.Count ?? _syncedCombatLogEntries;
         }
@@ -1876,7 +1887,12 @@ namespace QDND.Combat.UI
             {
                 for (int i = _syncedCombatLogEntries; i < _combatLog.Entries.Count; i++)
                 {
-                    _combatLogPanel.AddEntry(_combatLog.Entries[i]);
+                    var entry = _combatLog.Entries[i];
+                    if (entry.Type == CombatLogEntryType.Debug || entry.Type == CombatLogEntryType.Error)
+                        continue;
+                    if (entry.Severity == LogSeverity.Verbose)
+                        continue;
+                    _combatLogPanel.AddEntry(entry);
                 }
                 _syncedCombatLogEntries = _combatLog.Entries.Count;
             }

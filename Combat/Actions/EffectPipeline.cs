@@ -863,7 +863,7 @@ namespace QDND.Combat.Actions
                     condDisadvantages.AddRange(srcEffects.AttackDisadvantageSources.Select(id => $"Attacker {id}"));
                     condAdvantages.AddRange(tgtEffects.DefenseAdvantageSources.Select(id => $"Target {id}"));
                     condDisadvantages.AddRange(tgtEffects.DefenseDisadvantageSources.Select(id => $"Target {id}"));
-                    if (tgtEffects.MeleeAutocrits && isMeleeAttack && attackDistance <= 3f)
+                    if (ShouldApplyMeleeAutoCrit(tgtEffects.MeleeAutocrits, isMeleeAttack, attackDistance))
                         autoCritOnHit = true;
                     if (Statuses.HasStatus(primaryTarget.Id, "dodging"))
                         condDisadvantages.Add("Target Dodging");
@@ -1693,7 +1693,7 @@ namespace QDND.Combat.Actions
                         condDisadvantages.AddRange(srcEffects.AttackDisadvantageSources.Select(id => $"Attacker {id}"));
                         condAdvantages.AddRange(tgtEffects.DefenseAdvantageSources.Select(id => $"Target {id}"));
                         condDisadvantages.AddRange(tgtEffects.DefenseDisadvantageSources.Select(id => $"Target {id}"));
-                        if (tgtEffects.MeleeAutocrits && isMeleeAttack && attackDistance <= 3f)
+                        if (ShouldApplyMeleeAutoCrit(tgtEffects.MeleeAutocrits, isMeleeAttack, attackDistance))
                             autoCritOnHit = true;
                         if (Statuses.HasStatus(targetForProjectile.Id, "dodging"))
                             condDisadvantages.Add("Target Dodging");
@@ -2415,7 +2415,7 @@ namespace QDND.Combat.Actions
             if (GetCombatants == null)
                 return false;
 
-            const float meleeRange = 1.5f;
+            const float meleeRange = CombatRules.DefaultMeleeReachMeters;
 
             foreach (var other in GetCombatants())
             {
@@ -2434,6 +2434,16 @@ namespace QDND.Combat.Actions
             }
 
             return false;
+        }
+
+        private static bool ShouldApplyMeleeAutoCrit(bool targetMeleeAutocritFlag, bool isMeleeAttack, float attackDistanceMeters)
+        {
+            if (!targetMeleeAutocritFlag || !isMeleeAttack)
+            {
+                return false;
+            }
+
+            return attackDistanceMeters <= CombatRules.MeleeAutocritRangeMeters;
         }
 
         private bool ShouldAutoFailSave(Combatant target, string saveType)

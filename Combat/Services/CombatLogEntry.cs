@@ -24,6 +24,7 @@ namespace QDND.Combat.Services
         AbilityUsed,
 
         // Outcomes
+        SavingThrow,
         DamageDealt,
         HealingDone,
         CombatantDowned,
@@ -179,6 +180,9 @@ namespace QDND.Combat.Services
                 CombatLogEntryType.AttackResolved => IsMiss
                     ? $"{SourceName} misses {TargetName}"
                     : $"{SourceName} hits {TargetName}",
+                CombatLogEntryType.SavingThrow => IsMiss
+                    ? $"{TargetName} fails {Data.GetValueOrDefault("saveType", "saving throw")}"
+                    : $"{TargetName} succeeds {Data.GetValueOrDefault("saveType", "saving throw")}",
                 CombatLogEntryType.AbilityUsed => $"{SourceName} uses {Data.GetValueOrDefault("actionName", "an ability")}",
                 CombatLogEntryType.RoundStarted => $"Round {Round} begins",
                 CombatLogEntryType.StatusApplied => $"{TargetName} is affected by {Data.GetValueOrDefault("statusId", "status")}",
