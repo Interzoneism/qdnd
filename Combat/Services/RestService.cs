@@ -68,25 +68,6 @@ namespace QDND.Combat.Services
         }
         
         /// <summary>
-        /// Replenish per-turn resources (ActionPoint, BonusActionPoint, ReactionActionPoint).
-        /// Call this at the start of each combatant's turn.
-        /// </summary>
-        /// <param name="combatant">The combatant starting their turn</param>
-        public void ReplenishTurnResources(Combatant combatant)
-        {
-            if (combatant == null)
-                return;
-
-            // Reset ActionBudget (action, bonus action — ActionBudget is canonical for these)
-            combatant.ActionBudget?.ResetForTurn();
-            // Reaction resets at the start of each combatant's own turn
-            combatant.ActionBudget?.ResetReactionForRound();
-
-            // Replenish BG3-style resources with ReplenishType.Turn (ki, channel divinity, etc.)
-            combatant.ActionResources?.ReplenishTurn();
-        }
-        
-        /// <summary>
         /// Replenish per-round resources (if any).
         /// Currently a placeholder - BG3 doesn't have distinct round-based resources.
         /// </summary>

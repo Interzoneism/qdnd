@@ -68,7 +68,7 @@
     {
       "id": "hideous_laughter",
       "name": "Hideous Laughter",
-      "description": "Overcome with laughter, knocked prone and incapacitated. Cannot take actions. Attacks within melee range have advantage. WIS save at end of each turn; also ends when taking damage.",
+      "description": "Overcome with laughter, knocked prone and incapacitated. Cannot take actions. Attacks within melee range have advantage. WIS save at end of each turn. Taking damage also triggers a WIS save to break free.",
       "icon": "hideous_laughter",
       "durationType": "turns",
       "defaultDuration": 10,
@@ -77,9 +77,11 @@
       "isBuff": false,
       "isDispellable": true,
       "isConcentration": true,
+      "removeOnDamage": true,
       "tags": ["debuff", "condition", "prone", "incapacitated", "hard_control", "spell", "enchantment", "concentration"],
       "blockedActions": ["action", "bonusAction", "reaction", "movement"],
       "repeatSave": { "save": "WIS", "dc": 13 },
+      "saveOnDamage": { "save": "WIS", "dc": 13 },
       "modifiers": [
         { "target": "savingThrow", "type": "disadvantage", "value": 1, "condition": "ability:strength" },
         { "target": "savingThrow", "type": "disadvantage", "value": 1, "condition": "ability:dexterity" },
@@ -156,7 +158,7 @@
     {
       "id": "frozen",
       "name": "Frozen",
-      "description": "Encased in ice. Cannot move or act. Vulnerable to Bludgeoning, Thunder, and Force damage. Resistant to Fire. Immune to Burning.",
+      "description": "Encased in ice. Cannot move or act. Vulnerable to Bludgeoning, Thunder, and Force damage. Resistant to Fire. Immune to Burning. Shatters when damaged — the ice breaks and the effect ends.",
       "icon": "frozen",
       "durationType": "turns",
       "defaultDuration": 2,
@@ -164,6 +166,7 @@
       "stacking": "refresh",
       "isBuff": false,
       "isDispellable": true,
+      "removeOnDamage": true,
       "tags": ["debuff", "condition", "incapacitated", "cold", "elemental"],
       "blockedActions": ["action", "bonusAction", "reaction", "movement"],
       "modifiers": [

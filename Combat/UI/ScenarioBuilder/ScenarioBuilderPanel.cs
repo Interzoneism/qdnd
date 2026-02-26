@@ -255,41 +255,23 @@ namespace QDND.Combat.UI.ScenarioBuilder
 
             var faction = isParty ? Faction.Player : Faction.Hostile;
             int index = slots.Count + 1;
-
-            // Create a random character using ScenarioGenerator pattern
-            var builder = new CharacterBuilder();
-            builder.SetName($"{(isParty ? "Hero" : "Foe")} {index}");
-            builder.SetLevel(_defaultLevel);
-
-            // Pick a random race & class
-            var races = _characterRegistry?.GetAllRaces()?.ToList();
-            var classes = _characterRegistry?.GetAllClasses()?.ToList();
-
-            if (races?.Count > 0)
+            int seed = unchecked((int)GD.Randi()) ^ System.Environment.TickCount;
+            var generator = new ScenarioGenerator(_characterRegistry, seed);
+            var generatedUnit = generator.GenerateRandomUnit(new CharacterGenerationOptions
             {
-                var race = races[GD.RandRange(0, races.Count - 1)];
-                string subraceId = null;
-                if (race.Subraces?.Count > 0)
-                    subraceId = race.Subraces[GD.RandRange(0, race.Subraces.Count - 1)].Id;
-                builder.SetRace(race.Id, subraceId);
-            }
-
-            if (classes?.Count > 0)
-            {
-                var cls = classes[GD.RandRange(0, classes.Count - 1)];
-                string subclassId = null;
-                if (cls.Subclasses?.Count > 0 && _defaultLevel >= cls.SubclassLevel)
-                    subclassId = cls.Subclasses[GD.RandRange(0, cls.Subclasses.Count - 1)].Id;
-                builder.SetClass(cls.Id, subclassId);
-            }
-
-            // Standard array-ish scores
-            builder.SetAbilityScores(15, 14, 13, 12, 10, 8);
+                UnitId = $"{(isParty ? "hero" : "foe")}_{index}",
+                DisplayName = $"{(isParty ? "Hero" : "Foe")} {index}",
+                Faction = faction,
+                Level = _defaultLevel,
+                X = 0f,
+                Y = 0f,
+                Z = 0f
+            });
 
             var slot = new ScenarioSlot
             {
-                Name = builder.Name,
-                Sheet = builder.Build(),
+                Name = generatedUnit.Name,
+                Sheet = CreateSheetFromScenarioUnit(generatedUnit),
                 Faction = faction,
                 IsPreset = false
             };
@@ -297,6 +279,49 @@ namespace QDND.Combat.UI.ScenarioBuilder
             slots.Add(slot);
             RefreshTeamList(isParty);
             UpdateStatus();
+        }
+
+        private static CharacterSheet CreateSheetFromScenarioUnit(ScenarioUnit unit)
+        {
+            var sheet = new CharacterSheet
+            {
+                Name = unit?.Name,
+                RaceId = unit?.RaceId,
+                SubraceId = unit?.SubraceId,
+                BaseStrength = unit?.BaseStrength ?? 10,
+                BaseDexterity = unit?.BaseDexterity ?? 10,
+                BaseConstitution = unit?.BaseConstitution ?? 10,
+                BaseIntelligence = unit?.BaseIntelligence ?? 10,
+                BaseWisdom = unit?.BaseWisdom ?? 10,
+                BaseCharisma = unit?.BaseCharisma ?? 10,
+                AbilityBonus2 = unit?.AbilityBonus2,
+                AbilityBonus1 = unit?.AbilityBonus1,
+                FeatIds = unit?.FeatIds != null ? new List<string>(unit.FeatIds) : new List<string>(),
+                FeatChoices = unit?.FeatChoices != null
+                    ? new Dictionary<string, Dictionary<string, string>>(unit.FeatChoices, StringComparer.OrdinalIgnoreCase)
+                    : new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase),
+                AbilityScoreImprovements = unit?.AbilityScoreImprovements != null
+                    ? new Dictionary<string, int>(unit.AbilityScoreImprovements, StringComparer.OrdinalIgnoreCase)
+                    : new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase),
+                MetamagicIds = unit?.MetamagicIds != null ? new List<string>(unit.MetamagicIds) : new List<string>(),
+                InvocationIds = unit?.InvocationIds != null ? new List<string>(unit.InvocationIds) : new List<string>(),
+                BackgroundId = unit?.BackgroundId,
+                BackgroundSkills = unit?.BackgroundSkills != null ? new List<string>(unit.BackgroundSkills) : new List<string>()
+            };
+
+            if (unit?.ClassLevels != null)
+            {
+                foreach (var classEntry in unit.ClassLevels)
+                {
+                    int levels = Math.Max(0, classEntry?.Levels ?? 0);
+                    for (int i = 0; i < levels; i++)
+                    {
+                        sheet.ClassLevels.Add(new ClassLevel(classEntry.ClassId, classEntry.SubclassId));
+                    }
+                }
+            }
+
+            return sheet;
         }
 
         /// <summary>
@@ -428,6 +453,10 @@ namespace QDND.Combat.UI.ScenarioBuilder
                 AbilityBonus2 = sheet?.AbilityBonus2,
                 AbilityBonus1 = sheet?.AbilityBonus1,
                 FeatIds = sheet?.FeatIds,
+                FeatChoices = sheet?.FeatChoices,
+                AbilityScoreImprovements = sheet?.AbilityScoreImprovements,
+                MetamagicIds = sheet?.MetamagicIds,
+                InvocationIds = sheet?.InvocationIds,
                 BackgroundId = sheet?.BackgroundId,
                 BackgroundSkills = sheet?.BackgroundSkills
             };

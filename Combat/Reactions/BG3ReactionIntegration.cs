@@ -670,7 +670,8 @@ namespace QDND.Combat.Reactions
                 if (attackTypeStr == null || !attackTypeStr.Contains("Melee", StringComparison.OrdinalIgnoreCase))
                     return;
 
-                int profBonus = reactor?.ProficiencyBonus ?? 3;
+                if (reactor == null) GD.PushWarning("[BG3ReactionIntegration] reactor is null — using fallback proficiency 2");
+                int profBonus = reactor?.ProficiencyBonus ?? 2;
                 context.Data["acModifier"] = profBonus;
                 context.Data["interruptId"] = "DefensiveDuelist";
             };

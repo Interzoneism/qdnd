@@ -550,12 +550,12 @@ namespace QDND.Combat.Actions.Effects
                     }
                     else
                     {
-                        finalDamage = Math.Max(1, finalDamage / 2); // Evasion: failed DEX save = half damage
+                        finalDamage = finalDamage / 2; // Evasion: failed DEX save = half damage
                     }
                 }
                 else if (applyHalfDamage)
                 {
-                    finalDamage = Math.Max(1, finalDamage / 2);  // Normal: successful save = half damage
+                    finalDamage = finalDamage / 2;  // Normal: successful save = half damage
                 }
 
                 int currentHpBeforeDamage = target.Resources.CurrentHP;

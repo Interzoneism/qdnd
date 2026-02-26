@@ -111,6 +111,12 @@ namespace QDND.Combat.Statuses
                 {
                     definition.RemoveOnEvent = RuleEventType.MovementCompleted;
                 }
+
+                // BG3: Statuses like FROZEN, SLEEP, HIDEOUS_LAUGHTER that break on damage
+                if (bg3Status.RemoveEvents.Contains("OnDamage"))
+                {
+                    definition.RemoveOnDamage = true;
+                }
             }
 
             // Parse RepeatSave from BG3 RemoveConditions

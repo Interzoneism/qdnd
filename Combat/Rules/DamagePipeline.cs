@@ -108,18 +108,65 @@ namespace QDND.Combat.Rules
             }
 
             // Stage 3: Multipliers from DamageTaken (resist/vuln/immunity)
+            // BG3 Rule: Multiple instances of resistance or vulnerability DON'T stack.
+            // If a creature has resistance to fire from two sources, it still only takes half damage.
+            // We deduplicate by grouping: only the strongest resistance and strongest vulnerability apply.
             var percentageTaken = modifiers
                 .Where(m => m.Target == ModifierTarget.DamageTaken && m.Type == ModifierType.Percentage)
                 .OrderBy(m => m.Priority)
                 .ToList();
 
+            // Separate resistances (negative values) from vulnerabilities (positive values)
+            // and immunities (exactly -100%). Keep only the strongest of each category.
+            float bestResistance = 0f; // Most negative = strongest resistance
+            float bestVulnerability = 0f; // Most positive = strongest vulnerability
+            string resistName = null;
+            string vulnName = null;
+
             foreach (var mod in percentageTaken)
             {
-                // Convert percentage to multiplier: -50% = 0.5x, +100% = 2x, -100% = 0x
-                float multiplier = 1.0f + (mod.Value / 100f);
+                if (mod.Value <= -100f)
+                {
+                    // Immunity (-100%) always wins over resistance
+                    bestResistance = Math.Min(bestResistance, mod.Value);
+                    resistName = mod.Name;
+                }
+                else if (mod.Value < 0f)
+                {
+                    // Resistance — keep the strongest (most negative)
+                    if (mod.Value < bestResistance)
+                    {
+                        bestResistance = mod.Value;
+                        resistName = mod.Name;
+                    }
+                }
+                else if (mod.Value > 0f)
+                {
+                    // Vulnerability — keep the strongest (most positive)
+                    if (mod.Value > bestVulnerability)
+                    {
+                        bestVulnerability = mod.Value;
+                        vulnName = mod.Name;
+                    }
+                }
+            }
+
+            // Apply the single strongest resistance/immunity
+            if (bestResistance < 0f)
+            {
+                float multiplier = 1.0f + (bestResistance / 100f);
                 float oldDamage = damage;
                 damage = (int)Math.Round(damage * multiplier);
-                result.Breakdown.Add($"  {mod.Name} (x{multiplier:F2}): {oldDamage} → {damage}");
+                result.Breakdown.Add($"  {resistName} (x{multiplier:F2}): {oldDamage} → {damage}");
+            }
+
+            // Apply the single strongest vulnerability
+            if (bestVulnerability > 0f)
+            {
+                float multiplier = 1.0f + (bestVulnerability / 100f);
+                float oldDamage = damage;
+                damage = (int)Math.Round(damage * multiplier);
+                result.Breakdown.Add($"  {vulnName} (x{multiplier:F2}): {oldDamage} → {damage}");
             }
 
             result.AfterMultipliers = damage;

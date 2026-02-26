@@ -1360,6 +1360,7 @@ namespace QDND.Combat.Rules
         /// <summary>
         /// Get a combatant's armor class with modifiers.
         /// Includes both modifier stack and boost-based AC bonuses.
+        /// BG3: Mage Armor sets base AC to 13 + DEX (override alone loses DEX).
         /// </summary>
         public float GetArmorClass(Combatant combatant)
         {
@@ -1368,7 +1369,16 @@ namespace QDND.Combat.Rules
 
             var context = new ModifierContext { DefenderId = combatant.Id };
             var mods = GetModifiers(combatant.Id);
-            var (finalAC, _) = mods.Apply(baseAC, ModifierTarget.ArmorClass, context, _dice);
+            var (finalAC, applied) = mods.Apply(baseAC, ModifierTarget.ArmorClass, context, _dice);
+
+            // BG3 Mage Armor fix: Override modifiers replace the entire base AC,
+            // but Mage Armor should be 13 + DEX modifier. When an AC override is applied,
+            // add DEX modifier back (matches BG3 formula: base_ac_override + DEX).
+            if (applied.Any(m => m.Type == ModifierType.Override && m.Target == ModifierTarget.ArmorClass))
+            {
+                int dexMod = combatant.GetAbilityModifier(AbilityType.Dexterity);
+                finalAC += dexMod;
+            }
 
             // Add boost-based AC bonus
             int boostACBonus = BoostEvaluator.GetACBonus(combatant);
