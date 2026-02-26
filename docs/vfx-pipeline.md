@@ -26,15 +26,23 @@ Resolution order is deterministic:
 2. `actionOverrides` matching `actionId + variantId + phase`
 3. `actionOverrides` matching `actionId + phase`
 4. `defaultRules` best-specificity match
-5. `fallbackRule` by phase
+5. Resolver hint mapping (`cast_start`, variant/action VFX IDs, spell type hints)
+6. `fallbackRule` by phase
 
 ## Request Contract
 `VfxRequest` now carries context needed for deterministic visual mapping:
 - Action/source/target IDs and positions
 - Optional `AttackType`, `TargetType`, `DamageType`, `Intent`
+- Spell metadata (`IsSpell`, `SpellSchool`, `SpellType`) and optional VFX hint IDs (`ActionVfxId`, `VariantVfxId`)
 - `Phase`, `Pattern`, `Magnitude`, `Seed`
 
 `SfxRequest` now mirrors the same context fields in its schema.
+
+## Spell Coverage
+- Spells no longer depend on `AttackType` being populated to get spell-looking visuals.
+- `defaultRules` can now match `isSpell: true` for generic spell coverage.
+- Resolver fallback also consumes spell metadata + VFX hints (`cast_start`, action/variant VFX IDs, BG3 spell type hints) before phase fallback.
+- Result: every spell request resolves to a valid preset, even when a spell lacks explicit action overrides.
 
 ## Validation Flow
 Recommended verification after VFX changes:

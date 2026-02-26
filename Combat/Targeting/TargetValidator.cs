@@ -168,18 +168,15 @@ namespace QDND.Combat.Targeting
                     return TargetValidation.Invalid($"Target out of range ({distance:F1}/{action.Range + tolerance:F1})");
             }
 
-            // Sanctuary check: if target is protected by Sanctuary and this is a hostile action,
-            // attacker must succeed on a Wisdom saving throw (DC 13) or cannot target them.
+            // Sanctuary check: BG3 Sanctuary is a hard targeting block via CannotHarmCauseEntity.
+            // The protected creature cannot be targeted by hostile actions at all.
+            // Sanctuary is removed when the protected creature attacks (handled by passive system).
             if (Statuses != null
                 && source.Id != target.Id
                 && source.Faction != target.Faction
                 && Statuses.HasStatus(target.Id, "sanctuary"))
             {
-                int wisdomMod = source.GetAbilityModifier(AbilityType.Wisdom);
-                int saveRoll = _rng.Next(1, 21) + wisdomMod;
-                const int sanctuaryDC = 13;
-                if (saveRoll < sanctuaryDC)
-                    return TargetValidation.Invalid($"Target is protected by Sanctuary (Wisdom save {saveRoll} vs DC {sanctuaryDC} failed)");
+                return TargetValidation.Invalid("Target is protected by Sanctuary");
             }
 
             return TargetValidation.Valid(new List<Combatant> { target });

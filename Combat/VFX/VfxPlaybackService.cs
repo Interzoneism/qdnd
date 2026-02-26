@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using QDND.Combat.Arena;
 using QDND.Combat.Services;
+using QDND.Tools;
 
 namespace QDND.Combat.VFX
 {
@@ -14,6 +15,7 @@ namespace QDND.Combat.VFX
         private readonly ICombatContext _combatContext;
         private readonly IVfxRuleResolver _resolver;
         private readonly float _tileSize;
+        public int RequestsHandledCount { get; private set; }
 
         public VfxPlaybackService(
             PresentationRequestBus presentationBus,
@@ -33,6 +35,7 @@ namespace QDND.Combat.VFX
 
         public void Handle(VfxRequest request)
         {
+            RequestsHandledCount++;
             var resolved = _resolver.Resolve(request);
             var targets = ResolveTargetPositions(request);
             var sampled = VfxPatternSampler.Sample(request, resolved.Preset, targets);
@@ -55,6 +58,13 @@ namespace QDND.Combat.VFX
                 Direction = resolved.Direction,
                 EmissionPoints = worldSampled
             };
+
+            if (DebugFlags.VerboseVfx)
+            {
+                Godot.GD.Print(
+                    $"[VFX] Resolve -> phase={request.Phase} pattern={request.Pattern} " +
+                    $"action={request.ActionId ?? "<none>"} preset={worldSpec.PresetId} points={worldSampled.Count}");
+            }
 
             _vfxManager.Spawn(worldSpec);
         }

@@ -24,6 +24,7 @@ using QDND.Data.Stats;
 using QDND.Data.Statuses;
 using QDND.Data.Passives;
 using QDND.Data.Interrupts;
+using QDND.Data.AI;
 using QDND.Tools.AutoBattler;
 using QDND.Combat.VFX;
 
@@ -87,6 +88,7 @@ namespace QDND.Combat.Arena
         private StatusInteractionRules _statusInteractionRules;
         private PassiveRegistry _passiveRegistry;
         private InterruptRegistry _interruptRegistry;
+        private BG3AIRegistry _bg3AiRegistry;
         private AIDecisionPipeline _aiPipeline;
         private MovementService _movementService;
         private CombatMovementCoordinator _movementCoordinator;
@@ -548,6 +550,8 @@ namespace QDND.Combat.Arena
             if (_autoBattleVerboseArenaLogs)
             {
                 Log("Auto-battle verbose arena logs: enabled");
+                QDND.Tools.DebugFlags.VerboseVfx = true;
+                Log("VFX verbose logs: enabled");
             }
             else
             {
@@ -821,7 +825,30 @@ namespace QDND.Combat.Arena
             _passiveRegistry = registries.PassiveRegistry;
             _interruptRegistry = registries.InterruptRegistry;
             _functorExecutor = registries.FunctorExecutor;
+            _bg3AiRegistry = new BG3AIRegistry();
             var charRegistry = registries.CharRegistry;
+
+            var bg3AiPath = Path.Combine(ProjectSettings.GlobalizePath("res://BG3_Data"), "AI");
+            if (_bg3AiRegistry.LoadFromDirectory(bg3AiPath))
+            {
+                Log($"BG3 AI Registry: {_bg3AiRegistry.Archetypes.Count} archetypes, {_bg3AiRegistry.SurfaceCombos.Count} combos loaded");
+            }
+            else
+            {
+                Log($"BG3 AI Registry load completed with {_bg3AiRegistry.Errors.Count} errors");
+            }
+
+            foreach (var warning in _bg3AiRegistry.Warnings.Take(10))
+            {
+                GD.PushWarning($"[BG3AI] {warning}");
+            }
+
+            foreach (var error in _bg3AiRegistry.Errors.Take(10))
+            {
+                GD.PushError($"[BG3AI] {error}");
+            }
+
+            _combatContext.RegisterService(_bg3AiRegistry);
 
             // Phase D: Wire reaction system
             var reactionAliasResolver = new ReactionAliasResolver();
@@ -1259,11 +1286,167 @@ namespace QDND.Combat.Arena
                 return;
             }
 
-            var archetype = AIProfile.DetermineArchetypeForCombatant(combatant);
-            var profile = AIProfile.CreateForArchetype(archetype, AIDifficulty.Normal);
+            var profile = BuildAIProfileForCombatant(combatant);
             var decision = _aiPipeline.MakeDecision(combatant, profile);
             bool actionExecuted = ExecuteAIDecisionAction(combatant, decision?.ChosenAction, decision?.AllCandidates);
             ScheduleAITurnEnd(actionExecuted ? 0.65f : 0.2f);
+        }
+
+        private AIProfile BuildAIProfileForCombatant(Combatant combatant)
+        {
+            var difficulty = RealtimeAIDifficulty;
+
+            if (_bg3AiRegistry != null && TryResolveBG3ArchetypeId(combatant, out var archetypeId))
+            {
+                var overlays = GetBG3DifficultyOverlays(difficulty);
+                if (_bg3AiRegistry.TryGetMergedSettings(archetypeId, out var mergedSettings, overlays))
+                {
+                    return BG3AIProfileFactory.CreateProfile(archetypeId, mergedSettings);
+                }
+            }
+
+            var fallbackArchetype = AIProfile.DetermineArchetypeForCombatant(combatant);
+            return AIProfile.CreateForArchetype(fallbackArchetype, difficulty);
+        }
+
+        private string[] GetBG3DifficultyOverlays(AIDifficulty difficulty)
+        {
+            return difficulty switch
+            {
+                AIDifficulty.Easy => new[] { "AILETHALITY_FORGIVING/base" },
+                AIDifficulty.Hard => new[] { "AILETHALITY_BRUTAL/base" },
+                AIDifficulty.Nightmare => new[] { "TACTICIAN/base", "AILETHALITY_BRUTAL/base" },
+                _ => Array.Empty<string>()
+            };
+        }
+
+        private bool TryResolveBG3ArchetypeId(Combatant combatant, out string archetypeId)
+        {
+            archetypeId = string.Empty;
+            var tags = combatant?.Tags ?? new List<string>();
+
+            // Explicit tag takes precedence.
+            foreach (var tag in tags)
+            {
+                if (string.IsNullOrWhiteSpace(tag))
+                {
+                    continue;
+                }
+
+                if (TryParseTaggedArchetype(tag, out var taggedId) && _bg3AiRegistry.HasArchetype(taggedId))
+                {
+                    archetypeId = taggedId;
+                    return true;
+                }
+            }
+
+            // Direct tag-to-archetype matching.
+            foreach (var tag in tags)
+            {
+                if (_bg3AiRegistry.HasArchetype(tag))
+                {
+                    archetypeId = tag;
+                    return true;
+                }
+            }
+
+            var smart = HasAnyTag(tags, "smart", "boss", "commander");
+            var ranged = HasAnyTag(tags, "ranged", "archer");
+            var healer = HasAnyTag(tags, "healer", "support");
+            var caster = HasAnyTag(tags, "wizard", "sorcerer", "warlock", "mage", "caster", "cleric", "druid");
+            var rogue = HasAnyTag(tags, "rogue");
+
+            var candidates = new List<string>();
+
+            if (healer)
+            {
+                candidates.Add(ranged ? "healer_ranged" : "healer_melee");
+            }
+
+            if (rogue)
+            {
+                candidates.Add(smart ? "rogue_smart" : "rogue");
+            }
+
+            if (caster)
+            {
+                candidates.Add(smart ? "mage_smart" : "mage");
+            }
+
+            if (ranged)
+            {
+                candidates.Add(smart ? "ranged_smart" : "ranged");
+            }
+            else
+            {
+                candidates.Add(smart ? "melee_smart" : "melee");
+            }
+
+            candidates.Add("base");
+
+            foreach (var candidate in candidates)
+            {
+                if (_bg3AiRegistry.HasArchetype(candidate))
+                {
+                    archetypeId = candidate;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool TryParseTaggedArchetype(string tag, out string archetypeId)
+        {
+            archetypeId = string.Empty;
+
+            const string AiPrefix = "ai:";
+            const string AiArchetypePrefix = "ai_archetype:";
+            const string Bg3Prefix = "bg3_ai:";
+
+            string raw = null;
+            if (tag.StartsWith(AiPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                raw = tag.Substring(AiPrefix.Length);
+            }
+            else if (tag.StartsWith(AiArchetypePrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                raw = tag.Substring(AiArchetypePrefix.Length);
+            }
+            else if (tag.StartsWith(Bg3Prefix, StringComparison.OrdinalIgnoreCase))
+            {
+                raw = tag.Substring(Bg3Prefix.Length);
+            }
+
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                return false;
+            }
+
+            archetypeId = raw.Trim();
+            return true;
+        }
+
+        private static bool HasAnyTag(IEnumerable<string> tags, params string[] expected)
+        {
+            if (tags == null || expected == null || expected.Length == 0)
+            {
+                return false;
+            }
+
+            var normalized = new HashSet<string>(tags
+                .Where(tag => !string.IsNullOrWhiteSpace(tag))
+                .Select(tag => tag.Trim()), StringComparer.OrdinalIgnoreCase);
+
+            foreach (var candidate in expected)
+            {
+                if (normalized.Contains(candidate))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private bool ExecuteAIDecisionAction(Combatant actor, AIAction action, List<AIAction> allCandidates = null)
@@ -1532,9 +1715,12 @@ namespace QDND.Combat.Arena
 
         private void OnStatusApplied(StatusInstance status)
         {
+            string statusName = StatusPresentationPolicy.GetDisplayName(status.Definition);
+
             if (_combatantVisuals.TryGetValue(status.TargetId, out var visual))
             {
-                visual.ShowStatusApplied(status.Definition.Name);
+                if (StatusPresentationPolicy.ShowInOverhead(status.Definition))
+                    visual.ShowStatusApplied(statusName);
             }
 
             bool isBeneficial = status.SourceId == status.TargetId || status.Definition.IsBuff;
@@ -1577,29 +1763,28 @@ namespace QDND.Combat.Arena
                 _presentationService.PresentationBus.Publish(statusRequest);
             }
 
-            if (!status.Definition.DisableCombatlog)
-            {
-                var target = _combatContext?.GetCombatant(status.TargetId);
-                _combatLog?.LogStatus(status.TargetId, target?.Name ?? status.TargetId, status.Definition.Name, applied: true);
-            }
+            var target = _combatContext?.GetCombatant(status.TargetId);
+            if (StatusPresentationPolicy.ShowInCombatLog(status.Definition))
+                _combatLog?.LogStatus(status.TargetId, target?.Name ?? status.TargetId, statusName, applied: true);
 
             RefreshCombatantStatuses(status.TargetId);
             _actionBarService?.RefreshUsability(status.TargetId);
-            Log($"[STATUS] {status.Definition.Name} applied to {status.TargetId}");
+            Log($"[STATUS] {statusName} applied to {status.TargetId}");
         }
 
         private void OnStatusRemoved(StatusInstance status)
         {
+            string statusName = StatusPresentationPolicy.GetDisplayName(status.Definition);
+
             if (_combatantVisuals.TryGetValue(status.TargetId, out var visual))
             {
-                visual.ShowStatusRemoved(status.Definition.Name);
+                if (StatusPresentationPolicy.ShowInOverhead(status.Definition))
+                    visual.ShowStatusRemoved(statusName);
             }
 
-            if (!status.Definition.DisableCombatlog)
-            {
-                var target = _combatContext?.GetCombatant(status.TargetId);
-                _combatLog?.LogStatus(status.TargetId, target?.Name ?? status.TargetId, status.Definition.Name, applied: false);
-            }
+            var target = _combatContext?.GetCombatant(status.TargetId);
+            if (StatusPresentationPolicy.ShowInCombatLog(status.Definition))
+                _combatLog?.LogStatus(status.TargetId, target?.Name ?? status.TargetId, statusName, applied: false);
 
             RefreshCombatantStatuses(status.TargetId);
             _actionBarService?.RefreshUsability(status.TargetId);
@@ -1609,7 +1794,10 @@ namespace QDND.Combat.Arena
         {
             if (!_combatantVisuals.TryGetValue(combatantId, out var visual)) return;
             var statuses = _statusManager.GetStatuses(combatantId);
-            var statusNames = statuses?.Select(s => s.Definition.Name) ?? Enumerable.Empty<string>();
+            var statusNames = statuses?
+                .Where(s => StatusPresentationPolicy.ShowInOverhead(s.Definition))
+                .Select(s => StatusPresentationPolicy.GetDisplayName(s.Definition))
+                ?? Enumerable.Empty<string>();
             visual.SetActiveStatuses(statusNames);
         }
 

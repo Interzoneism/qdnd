@@ -7,6 +7,7 @@ using QDND.Combat.States;
 using QDND.Combat.Entities;
 using QDND.Combat.UI;
 using QDND.Combat.Actions;
+using QDND.Combat.Statuses;
 
 namespace QDND.Combat.Arena
 {
@@ -2371,12 +2372,17 @@ namespace QDND.Combat.Arena
                 if (statusManager != null)
                 {
                     var statuses = statusManager.GetStatuses(combatant.Id);
-                    if (statuses != null && statuses.Count > 0)
+                    var visibleStatuses = statuses?
+                        .Where(s => StatusPresentationPolicy.ShowInPortraitIndicators(s.Definition))
+                        .ToList();
+
+                    if (visibleStatuses != null && visibleStatuses.Count > 0)
                     {
-                        foreach (var status in statuses)
+                        foreach (var status in visibleStatuses)
                         {
                             var statusLabel = new Label();
-                            statusLabel.Text = $"• {status.Definition.Name} ({status.RemainingDuration} turns)";
+                            string statusName = StatusPresentationPolicy.GetDisplayName(status.Definition);
+                            statusLabel.Text = $"• {statusName} ({status.RemainingDuration} turns)";
                             statusLabel.AddThemeFontSizeOverride("font_size", 11);
                             statusLabel.Modulate = new Color(0.8f, 0.6f, 1.0f);
                             _inspectStatusList.AddChild(statusLabel);

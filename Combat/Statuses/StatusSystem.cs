@@ -57,6 +57,12 @@ namespace QDND.Combat.Statuses
         public string Description { get; set; }
         public string Icon { get; set; }
 
+        /// <summary>
+        /// Raw BG3 status property flags (e.g., DisableOverhead, DisableCombatlog).
+        /// Used by presentation code to decide where a status should be shown.
+        /// </summary>
+        public HashSet<string> StatusPropertyFlags { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
         public DurationType DurationType { get; set; } = DurationType.Turns;
         public int DefaultDuration { get; set; } = 3;
         public int MaxStacks { get; set; } = 1;
@@ -134,6 +140,15 @@ namespace QDND.Combat.Statuses
         /// Actions granted to the bearer while this status is active.
         /// </summary>
         public List<string> GrantedActions { get; set; } = new();
+
+        /// <summary>
+        /// Check if this status has a specific status property flag.
+        /// Matching is case-insensitive.
+        /// </summary>
+        public bool HasStatusPropertyFlag(string flag)
+        {
+            return !string.IsNullOrWhiteSpace(flag) && StatusPropertyFlags.Contains(flag);
+        }
     }
 
     /// <summary>

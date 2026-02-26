@@ -91,6 +91,11 @@ namespace QDND.Combat.Services
         public TargetType? TargetType { get; set; }
         public DamageType? DamageType { get; set; }
         public VerbalIntent? Intent { get; set; }
+        public bool IsSpell { get; set; }
+        public QDND.Combat.Actions.SpellSchool SpellSchool { get; set; } = QDND.Combat.Actions.SpellSchool.None;
+        public string SpellType { get; set; }
+        public string ActionVfxId { get; set; }
+        public string VariantVfxId { get; set; }
         public bool IsCritical { get; set; }
         public bool DidKill { get; set; }
 

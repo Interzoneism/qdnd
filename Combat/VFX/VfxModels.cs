@@ -44,6 +44,7 @@ namespace QDND.Combat.VFX
         public string TargetType { get; set; }
         public string DamageType { get; set; }
         public string Intent { get; set; }
+        public bool? IsSpell { get; set; }
         public string PresetId { get; set; }
     }
 

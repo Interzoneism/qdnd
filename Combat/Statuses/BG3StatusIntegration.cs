@@ -70,7 +70,7 @@ namespace QDND.Combat.Statuses
             var definition = new StatusDefinition
             {
                 Id = bg3Status.StatusId,
-                Name = bg3Status.DisplayName ?? bg3Status.StatusId,
+                Name = StatusPresentationPolicy.ResolveDisplayName(bg3Status.DisplayName, bg3Status.StatusId),
                 Description = bg3Status.Description ?? "",
                 Icon = bg3Status.Icon ?? "",
                 DurationType = durationType,
@@ -80,6 +80,8 @@ namespace QDND.Combat.Statuses
                 IsBuff = IsBeneficialStatus(bg3Status),
                 IsDispellable = true
             };
+
+            StatusPresentationPolicy.ApplyStatusPropertyFlags(definition, bg3Status.StatusPropertyFlags);
 
             // Parse status groups for tags
             if (!string.IsNullOrEmpty(bg3Status.StatusGroups))

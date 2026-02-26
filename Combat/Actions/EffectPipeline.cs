@@ -18,7 +18,7 @@ namespace QDND.Combat.Actions
     /// <summary>
     /// Event args for reaction trigger events.
     /// </summary>
-    public class ReactionTriggerEventArgs : EventArgs
+    public class ReactionTriggerEventArgs
     {
         /// <summary>
         /// The trigger context with all details.
@@ -194,22 +194,22 @@ namespace QDND.Combat.Actions
         /// <summary>
         /// Fired before damage is dealt - allows reaction checks for shields/damage reduction.
         /// </summary>
-        public event EventHandler<ReactionTriggerEventArgs> OnDamageTrigger;
+        public event Action<ReactionTriggerEventArgs> OnDamageTrigger;
 
         /// <summary>
         /// Fired when an ability is cast - allows reaction checks for counterspell-type reactions.
         /// </summary>
-        public event EventHandler<ReactionTriggerEventArgs> OnAbilityCastTrigger;
+        public event Action<ReactionTriggerEventArgs> OnAbilityCastTrigger;
 
         /// <summary>
         /// Fired when a combatant is attacked (after attack roll, before effects) - allows reactions like Shield.
         /// </summary>
-        public event EventHandler<ReactionTriggerEventArgs> OnAttackTrigger;
+        public event Action<ReactionTriggerEventArgs> OnAttackTrigger;
 
         /// <summary>
         /// Fired when a combatant is hit (attack succeeded, before damage) - allows reactions like Uncanny Dodge.
         /// </summary>
-        public event EventHandler<ReactionTriggerEventArgs> OnHitTrigger;
+        public event Action<ReactionTriggerEventArgs> OnHitTrigger;
 
         public EffectPipeline()
         {
@@ -2469,19 +2469,20 @@ namespace QDND.Combat.Actions
                 var blocked = status.Definition.BlockedActions;
                 if (blocked == null || blocked.Count == 0)
                     continue;
+                string statusName = StatusPresentationPolicy.GetDisplayName(status.Definition);
 
                 if (blocked.Contains("*"))
-                    return $"{status.Definition.Name} prevents acting";
+                    return $"{statusName} prevents acting";
                 if (blocked.Contains(actionId))
-                    return $"{status.Definition.Name} blocks {actionId}";
+                    return $"{statusName} blocks {actionId}";
                 if (cost?.UsesAction == true && blocked.Contains("action"))
-                    return $"{status.Definition.Name} blocks actions";
+                    return $"{statusName} blocks actions";
                 if (cost?.UsesBonusAction == true && blocked.Contains("bonus_action"))
-                    return $"{status.Definition.Name} blocks bonus actions";
+                    return $"{statusName} blocks bonus actions";
                 if (cost?.UsesReaction == true && blocked.Contains("reaction"))
-                    return $"{status.Definition.Name} blocks reactions";
+                    return $"{statusName} blocks reactions";
                 if (cost?.MovementCost > 0 && blocked.Contains("movement"))
-                    return $"{status.Definition.Name} blocks movement";
+                    return $"{statusName} blocks movement";
             }
 
             return null;
@@ -2551,7 +2552,7 @@ namespace QDND.Combat.Actions
 
             if (eligibleReactors.Count > 0)
             {
-                OnAbilityCastTrigger?.Invoke(this, args);
+                OnAbilityCastTrigger?.Invoke(args);
             }
 
             return args;
@@ -2738,7 +2739,7 @@ namespace QDND.Combat.Actions
             // Fire the event if there are eligible reactors
             if (eligibleReactors.Count > 0)
             {
-                OnAbilityCastTrigger?.Invoke(this, args);
+                OnAbilityCastTrigger?.Invoke(args);
             }
 
             return args;
@@ -2847,7 +2848,7 @@ namespace QDND.Combat.Actions
             // Fire the event if there are eligible reactors
             if (eligibleReactors.Count > 0)
             {
-                OnDamageTrigger?.Invoke(this, args);
+                OnDamageTrigger?.Invoke(args);
             }
 
             return args;
@@ -2949,7 +2950,7 @@ namespace QDND.Combat.Actions
 
             if (eligibleReactors.Count > 0)
             {
-                OnAttackTrigger?.Invoke(this, args);
+                OnAttackTrigger?.Invoke(args);
             }
 
             return args;
@@ -3024,7 +3025,7 @@ namespace QDND.Combat.Actions
 
             if (eligibleReactors.Count > 0)
             {
-                OnHitTrigger?.Invoke(this, args);
+                OnHitTrigger?.Invoke(args);
             }
 
             return args;

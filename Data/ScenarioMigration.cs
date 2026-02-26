@@ -48,7 +48,7 @@ namespace QDND.Data
                 return true;
             }
 
-            if (!string.Equals(scenario.Units, "m", StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(scenario.UnitSystem, "m", StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
@@ -72,7 +72,7 @@ namespace QDND.Data
                 return scenario;
             }
 
-            bool legacyUnits = !string.Equals(scenario.Units, "m", StringComparison.OrdinalIgnoreCase);
+            bool legacyUnits = !string.Equals(scenario.UnitSystem, "m", StringComparison.OrdinalIgnoreCase);
             if (legacyUnits && scenario.Units != null)
             {
                 // Keep positions unless they are obviously legacy feet-scale values.
@@ -110,7 +110,7 @@ namespace QDND.Data
                 report.InitiativeDefaultsApplied++;
             }
 
-            scenario.Units = "m";
+            scenario.UnitSystem = "m";
             scenario.SchemaVersion = CurrentSchemaVersion;
             return scenario;
         }

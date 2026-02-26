@@ -97,6 +97,15 @@ namespace QDND.Tools
         }
 
         /// <summary>
+        /// Enable verbose VFX resolver/playback/spawn diagnostics.
+        /// </summary>
+        public static bool VerboseVfx
+        {
+            get => GetFlag(nameof(VerboseVfx));
+            set => SetFlag(nameof(VerboseVfx), value);
+        }
+
+        /// <summary>
         /// Pause before each AI action for inspection.
         /// </summary>
         public static bool PauseOnAITurn
