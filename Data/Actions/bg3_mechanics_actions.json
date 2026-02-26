@@ -3228,7 +3228,7 @@
       "icon": "res://assets/Images/Icons Spells/Mage_Armour_Unfaded_Icon.png",
       "targetType": "SingleUnit",
       "targetFilter": "Self, Allies",
-      "range": 0,
+      "range": 1.5,
       "cost": {
         "usesAction": true
       },
@@ -3669,7 +3669,7 @@
     {
       "id": "enhance_leap",
       "name": "Enhance Leap",
-      "description": "Your jump distance is tripled for the duration. (Utility ability - no tactical combat effect)",
+      "description": "Your jump distance is tripled for the duration.",
       "icon": "res://assets/Images/Icons Spells/Enhance_Leap_Unfaded_Icon.png",
       "targetType": "self",
       "targetFilter": "Self",
@@ -3677,7 +3677,15 @@
       "cost": {
         "usesAction": true
       },
-      "effects": [],
+      "requiresConcentration": true,
+      "concentrationStatusId": "enhance_leap",
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "enhance_leap",
+          "statusDuration": 10
+        }
+      ],
       "tags": [
         "spell",
         "transmutation",
@@ -3708,7 +3716,7 @@
     {
       "id": "arcane_recovery",
       "name": "Arcane Recovery",
-      "description": "Once per day when you finish a short rest, you can recover expended spell slots. (Utility ability - no tactical combat effect)",
+      "description": "Regain a level 1 spell slot once per long rest.",
       "icon": "res://assets/Images/Icons Actions/Spell_Slot_Restoration_Unfaded_Icon.png",
       "targetType": "self",
       "targetFilter": "Self",
@@ -3718,7 +3726,16 @@
           "arcane_recovery": 1
         }
       },
-      "effects": [],
+      "effects": [
+        {
+          "type": "restore_resource",
+          "value": 1,
+          "parameters": {
+            "resource_name": "spellslot",
+            "level": 1
+          }
+        }
+      ],
       "tags": [
         "class_feature",
         "wizard",
@@ -3789,7 +3806,7 @@
     {
       "id": "war_gods_blessing",
       "name": "War God's Blessing",
-      "description": "Grant a +10 bonus to an ally's attack roll. (Simplified - no complex status mechanics)",
+      "description": "Grant a +10 bonus to an ally's next attack roll.",
       "icon": "res://assets/Images/Icons Passive Features/War_God-s_Blessing_Unfaded_Icon.webp",
       "targetType": "singleUnit",
       "targetFilter": "Self, Allies",
@@ -3800,7 +3817,13 @@
           "ChannelDivinity": 1
         }
       },
-      "effects": [],
+      "effects": [
+        {
+          "type": "apply_status",
+          "statusId": "guided_strike",
+          "statusDuration": 1
+        }
+      ],
       "tags": [
         "class_feature",
         "cleric",
@@ -4455,7 +4478,11 @@
       "targetType": "self",
       "targetFilter": "Self",
       "range": 0,
-      "cost": {},
+      "cost": {
+        "resourceCosts": {
+          "tides_of_chaos": 1
+        }
+      },
       "effects": [
         {
           "type": "apply_status",
@@ -4619,7 +4646,11 @@
       "targetType": "self",
       "targetFilter": "Self",
       "range": 0,
-      "cost": {},
+      "cost": {
+        "resourceCosts": {
+          "dark_ones_own_luck": 1
+        }
+      },
       "effects": [
         {
           "type": "apply_status",

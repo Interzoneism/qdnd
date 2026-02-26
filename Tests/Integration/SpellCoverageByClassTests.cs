@@ -209,6 +209,128 @@ namespace QDND.Tests.Integration
                 string.Join("\n", unhandledEffects.Select(u => $"  - {u}")));
         }
 
+        [Fact]
+        public void AllClasses_GrantedAbilities_HaveEffectsAndCosts()
+        {
+            var repoRoot = ResolveRepoRoot();
+            var actionDefs = LoadAllActionDefinitions(repoRoot);
+            var classes = LoadAllClasses(repoRoot);
+
+            var missingEffects = new List<string>();
+            var missingCosts = new List<string>();
+
+            foreach (var cls in classes)
+            {
+                var granted = CollectGrantedAbilities(cls);
+                foreach (var abilityId in granted)
+                {
+                    if (!actionDefs.TryGetValue(abilityId, out var action))
+                        continue;
+
+                    if (action.Effects == null || action.Effects.Count == 0)
+                        missingEffects.Add($"{cls.Id}:{abilityId}");
+
+                    if (!action.HasNonEmptyCost)
+                        missingCosts.Add($"{cls.Id}:{abilityId}");
+                }
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("=== Granted Ability Mechanics Coverage ===");
+            Console.WriteLine($"Missing effects: {missingEffects.Count}");
+            Console.WriteLine($"Missing costs: {missingCosts.Count}");
+
+            Assert.True(
+                missingEffects.Count == 0,
+                "Granted abilities with no effects:\n" +
+                string.Join("\n", missingEffects.Select(m => $"  - {m}")));
+
+            Assert.True(
+                missingCosts.Count == 0,
+                "Granted abilities with empty cost objects:\n" +
+                string.Join("\n", missingCosts.Select(m => $"  - {m}")));
+        }
+
+        [Fact]
+        public void AllClasses_GrantedAbilities_HaveValidTargetingData()
+        {
+            var repoRoot = ResolveRepoRoot();
+            var actionDefs = LoadAllActionDefinitions(repoRoot);
+            var classes = LoadAllClasses(repoRoot);
+
+            var invalidTargeting = new List<string>();
+
+            foreach (var cls in classes)
+            {
+                var granted = CollectGrantedAbilities(cls);
+                foreach (var abilityId in granted)
+                {
+                    if (!actionDefs.TryGetValue(abilityId, out var action))
+                        continue;
+
+                    string targetType = action.TargetType ?? "SingleUnit";
+
+                    if (targetType.Equals("SingleUnit", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (action.Range <= 0f)
+                            invalidTargeting.Add($"{cls.Id}:{abilityId}:SingleUnit range must be > 0");
+
+                        if (action.TargetFilter.Equals("None", StringComparison.OrdinalIgnoreCase))
+                            invalidTargeting.Add($"{cls.Id}:{abilityId}:SingleUnit targetFilter cannot be None");
+                    }
+                    else if (targetType.Equals("MultiUnit", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (action.Range <= 0f)
+                            invalidTargeting.Add($"{cls.Id}:{abilityId}:MultiUnit range must be > 0");
+
+                        if (action.MaxTargets < 2)
+                            invalidTargeting.Add($"{cls.Id}:{abilityId}:MultiUnit maxTargets must be >= 2");
+
+                        if (action.TargetFilter.Equals("None", StringComparison.OrdinalIgnoreCase))
+                            invalidTargeting.Add($"{cls.Id}:{abilityId}:MultiUnit targetFilter cannot be None");
+                    }
+                    else if (targetType.Equals("Circle", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (action.AreaRadius <= 0f)
+                            invalidTargeting.Add($"{cls.Id}:{abilityId}:Circle areaRadius must be > 0");
+                    }
+                    else if (targetType.Equals("Cone", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (action.Range <= 0f)
+                            invalidTargeting.Add($"{cls.Id}:{abilityId}:Cone range must be > 0");
+
+                        if (action.ConeAngle <= 0f)
+                            invalidTargeting.Add($"{cls.Id}:{abilityId}:Cone coneAngle must be > 0");
+                    }
+                    else if (targetType.Equals("Line", StringComparison.OrdinalIgnoreCase) ||
+                             targetType.Equals("WallSegment", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (action.Range <= 0f)
+                            invalidTargeting.Add($"{cls.Id}:{abilityId}:{targetType} range must be > 0");
+
+                        if (action.LineWidth <= 0f)
+                            invalidTargeting.Add($"{cls.Id}:{abilityId}:{targetType} lineWidth must be > 0");
+                    }
+                }
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("=== Granted Ability Targeting Coverage ===");
+            Console.WriteLine($"Invalid targeting definitions: {invalidTargeting.Count}");
+            if (invalidTargeting.Count > 0)
+            {
+                foreach (var issue in invalidTargeting.Take(30))
+                    Console.WriteLine($"  - {issue}");
+                if (invalidTargeting.Count > 30)
+                    Console.WriteLine($"  ... and {invalidTargeting.Count - 30} more");
+            }
+
+            Assert.True(
+                invalidTargeting.Count == 0,
+                "Granted abilities with invalid targeting configuration:\n" +
+                string.Join("\n", invalidTargeting.Select(i => $"  - {i}")));
+        }
+
         // === Data loading helpers ===
 
         private static HashSet<string> LoadAllActionIds(string repoRoot)
@@ -280,6 +402,62 @@ namespace QDND.Tests.Integration
                                 continue;
 
                             var proxy = new ActionDefProxy { Id = id.Trim() };
+
+                            if (action.TryGetProperty("Cost", out var cost) ||
+                                action.TryGetProperty("cost", out cost))
+                            {
+                                if (cost.ValueKind == JsonValueKind.Object)
+                                    proxy.HasNonEmptyCost = cost.EnumerateObject().Any();
+                            }
+
+                            if (action.TryGetProperty("TargetType", out var targetType) ||
+                                action.TryGetProperty("targetType", out targetType))
+                            {
+                                if (targetType.ValueKind == JsonValueKind.String)
+                                    proxy.TargetType = targetType.GetString()?.Trim();
+                            }
+
+                            if (action.TryGetProperty("TargetFilter", out var targetFilter) ||
+                                action.TryGetProperty("targetFilter", out targetFilter))
+                            {
+                                if (targetFilter.ValueKind == JsonValueKind.String)
+                                    proxy.TargetFilter = targetFilter.GetString()?.Trim();
+                            }
+
+                            if (action.TryGetProperty("Range", out var range) ||
+                                action.TryGetProperty("range", out range))
+                            {
+                                if (range.ValueKind == JsonValueKind.Number && range.TryGetSingle(out float value))
+                                    proxy.Range = value;
+                            }
+
+                            if (action.TryGetProperty("AreaRadius", out var areaRadius) ||
+                                action.TryGetProperty("areaRadius", out areaRadius))
+                            {
+                                if (areaRadius.ValueKind == JsonValueKind.Number && areaRadius.TryGetSingle(out float value))
+                                    proxy.AreaRadius = value;
+                            }
+
+                            if (action.TryGetProperty("ConeAngle", out var coneAngle) ||
+                                action.TryGetProperty("coneAngle", out coneAngle))
+                            {
+                                if (coneAngle.ValueKind == JsonValueKind.Number && coneAngle.TryGetSingle(out float value))
+                                    proxy.ConeAngle = value;
+                            }
+
+                            if (action.TryGetProperty("LineWidth", out var lineWidth) ||
+                                action.TryGetProperty("lineWidth", out lineWidth))
+                            {
+                                if (lineWidth.ValueKind == JsonValueKind.Number && lineWidth.TryGetSingle(out float value))
+                                    proxy.LineWidth = value;
+                            }
+
+                            if (action.TryGetProperty("MaxTargets", out var maxTargets) ||
+                                action.TryGetProperty("maxTargets", out maxTargets))
+                            {
+                                if (maxTargets.ValueKind == JsonValueKind.Number && maxTargets.TryGetInt32(out int value))
+                                    proxy.MaxTargets = value;
+                            }
 
                             if (action.TryGetProperty("Effects", out var effects) ||
                                 action.TryGetProperty("effects", out effects))
@@ -394,6 +572,19 @@ namespace QDND.Tests.Integration
                                             proxy.SubclassAbilities.Add(a);
                                     }
                                 }
+
+                                if (sub.TryGetProperty("AlwaysPreparedSpells", out var alwaysPrepared))
+                                {
+                                    foreach (var level in alwaysPrepared.EnumerateObject())
+                                    {
+                                        foreach (var ability in level.Value.EnumerateArray())
+                                        {
+                                            var val = ability.GetString();
+                                            if (!string.IsNullOrWhiteSpace(val))
+                                                proxy.SubclassAbilities.Add(val.Trim());
+                                        }
+                                    }
+                                }
                             }
                         }
 
@@ -478,6 +669,14 @@ namespace QDND.Tests.Integration
         private class ActionDefProxy
         {
             public string Id { get; set; }
+            public bool HasNonEmptyCost { get; set; }
+            public string TargetType { get; set; } = "SingleUnit";
+            public string TargetFilter { get; set; } = "Enemies";
+            public float Range { get; set; } = 5f;
+            public float AreaRadius { get; set; }
+            public float ConeAngle { get; set; } = 60f;
+            public float LineWidth { get; set; } = 1f;
+            public int MaxTargets { get; set; } = 1;
             public List<EffectProxy> Effects { get; } = new();
         }
 

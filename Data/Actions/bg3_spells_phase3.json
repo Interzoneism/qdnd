@@ -605,8 +605,8 @@
       "description": "Conjure 10 berries infused with healing magic. Each berry heals 1 HP.",
       "icon": "res://assets/Images/Icons Spells/Goodberry_Unfaded_Icon.png",
       "targetType": "singleUnit",
-      "targetFilter": "Allies",
-      "range": 0,
+      "targetFilter": "Self, Allies",
+      "range": 1.5,
       "cost": {
         "usesAction": true,
         "resourceCosts": {
@@ -1174,8 +1174,8 @@
       "name": "Prayer of Healing",
       "description": "Heal all allies for 2d8 + spellcasting modifier.",
       "icon": "res://assets/Images/Icons Spells/Prayer_of_Healing_Unfaded_Icon.png",
-      "targetType": "singleUnit",
-      "targetFilter": "Allies",
+      "targetType": "circle",
+      "targetFilter": "Self, Allies",
       "range": 0,
       "areaRadius": 9,
       "cost": {
@@ -2110,6 +2110,43 @@
             "templateId": "guardian_of_faith"
           },
           "condition": "always"
+        }
+      ],
+      "tags": [
+        "spell",
+        "level_4",
+        "conjuration"
+      ],
+      "spellLevel": 4,
+      "school": "conjuration"
+    },
+    {
+      "id": "grasping_vine",
+      "name": "Grasping Vine",
+      "description": "Conjure grasping vines that pull and restrain a creature.",
+      "icon": "res://assets/Images/Icons Spells/Entangle_Unfaded_Icon.png",
+      "targetType": "singleUnit",
+      "targetFilter": "Enemies",
+      "range": 9,
+      "cost": {
+        "usesAction": true,
+        "resourceCosts": {
+          "spell_slot_4": 1
+        }
+      },
+      "saveType": "strength",
+      "requiresConcentration": true,
+      "effects": [
+        {
+          "type": "pull",
+          "value": 6,
+          "condition": "on_failed_save"
+        },
+        {
+          "type": "apply_status",
+          "statusId": "restrained",
+          "statusDuration": 3,
+          "condition": "on_failed_save"
         }
       ],
       "tags": [

@@ -334,9 +334,15 @@ namespace QDND.Combat.Services
                 if (context.AttackType != AttackType.MeleeWeapon && context.AttackType != AttackType.RangedWeapon)
                     return false;
 
-                // Check if attacker has Colossus Slayer feature
+                // Hunter L3 data may expose either "colossus_slayer" or the parent "hunters_prey" feature.
                 bool hasFeature = context.Attacker.ResolvedCharacter?.Features?.Any(f =>
-                    string.Equals(f.Id, "colossus_slayer", StringComparison.OrdinalIgnoreCase)) == true;
+                    string.Equals(f.Id, "colossus_slayer", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(f.Id, "hunters_prey", StringComparison.OrdinalIgnoreCase)) == true;
+                if (!hasFeature)
+                {
+                    hasFeature = context.Attacker.KnownActions?.Any(a =>
+                        string.Equals(a, "colossus_slayer", StringComparison.OrdinalIgnoreCase)) == true;
+                }
                 if (!hasFeature)
                     return false;
 

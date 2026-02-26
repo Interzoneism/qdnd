@@ -815,6 +815,8 @@ namespace QDND.Combat.Arena
             _dataRegistry = registries.DataRegistry;
             _rulesEngine = registries.RulesEngine;
             _statusManager = registries.StatusManager;
+            _specialMovementService.SetStatusQuery(
+                (combatantId, statusId) => _statusManager?.HasStatus(combatantId, statusId) == true);
             _metamagicService = registries.MetamagicService;
             _concentrationSystem = registries.ConcentrationSystem;
             _effectPipeline = registries.EffectPipeline;

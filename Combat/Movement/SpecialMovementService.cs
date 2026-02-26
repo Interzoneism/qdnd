@@ -30,11 +30,21 @@ namespace QDND.Combat.Movement
     {
         private readonly RuleEventBus _events;
         private readonly Dictionary<MovementType, MovementTypeConfig> _configs = new();
+        private Func<string, string, bool> _hasStatus;
 
-        public SpecialMovementService(RuleEventBus events = null)
+        public SpecialMovementService(RuleEventBus events = null, Func<string, string, bool> hasStatus = null)
         {
             _events = events;
+            _hasStatus = hasStatus;
             RegisterDefaultConfigs();
+        }
+
+        /// <summary>
+        /// Set a status query callback used by movement rules that depend on active statuses.
+        /// </summary>
+        public void SetStatusQuery(Func<string, string, bool> hasStatus)
+        {
+            _hasStatus = hasStatus;
         }
 
         /// <summary>
@@ -121,11 +131,12 @@ namespace QDND.Combat.Movement
         {
             int str = combatant.GetAbilityScore(AbilityType.Strength);
             float baseDistance = str;
+            float jumpMultiplier = HasStatus(combatant, "enhance_leap") ? 3f : 1f;
 
             if (!hasRunningStart)
                 baseDistance /= 2f; // Standing long jump is half
 
-            return baseDistance;
+            return baseDistance * jumpMultiplier;
         }
 
         /// <summary>
@@ -136,11 +147,20 @@ namespace QDND.Combat.Movement
         {
             int strMod = combatant.GetAbilityModifier(AbilityType.Strength);
             float height = 3 + strMod;
+            float jumpMultiplier = HasStatus(combatant, "enhance_leap") ? 3f : 1f;
 
             if (!hasRunningStart)
                 height /= 2f;
 
-            return Math.Max(height, 1);
+            return Math.Max(height * jumpMultiplier, 1);
+        }
+
+        private bool HasStatus(Combatant combatant, string statusId)
+        {
+            if (combatant == null || string.IsNullOrWhiteSpace(statusId))
+                return false;
+
+            return _hasStatus?.Invoke(combatant.Id, statusId) == true;
         }
 
         /// <summary>
