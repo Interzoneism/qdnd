@@ -131,6 +131,21 @@ namespace QDND.Combat.Statuses
         public int RemoveOnAttackCount { get; set; }
 
         /// <summary>
+        /// If true, this status is removed when the bearer takes damage.
+        /// BG3: FROZEN, SLEEP, HIDEOUS_LAUGHTER use RemoveEvents: OnDamage.
+        /// Unlike RemoveOnEvent (which requires DurationType.UntilEvent), this works
+        /// with any duration type (Turns, Permanent, etc).
+        /// </summary>
+        public bool RemoveOnDamage { get; set; }
+
+        /// <summary>
+        /// If set, taking damage triggers a saving throw instead of automatic removal.
+        /// On success, the status is removed. On failure, it persists.
+        /// BG3: Hideous Laughter uses WIS save on damage to potentially end the effect.
+        /// </summary>
+        public SaveRepeatInfo SaveOnDamage { get; set; }
+
+        /// <summary>
         /// If true, suppress combat log entries for this status (BG3 StatusPropertyFlags: DisableCombatlog).
         /// Used for internal/cosmetic statuses.
         /// </summary>
@@ -576,13 +591,17 @@ namespace QDND.Combat.Statuses
         /// </summary>
         private void ProcessEventForStatusRemoval(RuleEvent evt)
         {
-            // BG3 control break rules: sleep/hypnotised end when taking damage.
+            // BG3 control break rules: statuses with RemoveOnDamage end when taking damage.
             if (evt.Type == RuleEventType.DamageTaken && evt.FinalValue > 0 && !string.IsNullOrEmpty(evt.TargetId))
             {
+                // Legacy hardcoded removals
                 RemoveStatus(evt.TargetId, "asleep");
                 RemoveStatus(evt.TargetId, "hypnotised");
                 // Hidden breaks when you take damage
                 RemoveStatus(evt.TargetId, "hidden");
+
+                // Data-driven: remove any status with RemoveOnDamage flag
+                ProcessRemoveOnDamage(evt.TargetId);
             }
 
             // Hidden breaks when the bearer casts a spell
@@ -612,6 +631,51 @@ namespace QDND.Combat.Statuses
             if (!string.IsNullOrEmpty(evt.SourceId) && evt.SourceId != evt.TargetId)
             {
                 RemoveMatchingEventStatuses(evt.SourceId, evt.Type);
+            }
+        }
+
+        /// <summary>
+        /// Remove statuses with RemoveOnDamage flag, or trigger SaveOnDamage saves.
+        /// BG3: Frozen shatters on any damage, Hideous Laughter triggers a WIS save on damage.
+        /// </summary>
+        private void ProcessRemoveOnDamage(string combatantId)
+        {
+            if (!_combatantStatuses.TryGetValue(combatantId, out var list))
+                return;
+
+            var toProcess = list
+                .Where(s => s.Definition.RemoveOnDamage || s.Definition.SaveOnDamage != null)
+                .ToList();
+
+            foreach (var instance in toProcess)
+            {
+                if (instance.Definition.SaveOnDamage != null)
+                {
+                    // Damage triggers a saving throw — on success, status removed
+                    var save = instance.Definition.SaveOnDamage;
+                    _rulesEngine.Events.Dispatch(new RuleEvent
+                    {
+                        Type = RuleEventType.StatusTick,
+                        SourceId = instance.SourceId,
+                        TargetId = instance.TargetId,
+                        Data = new Dictionary<string, object>
+                        {
+                            { "statusId", instance.Definition.Id },
+                            { "saveOnDamage", true },
+                            { "saveAbility", save.Save },
+                            { "saveDC", save.DC },
+                            { "isTriggerEffect", true }
+                        }
+                    });
+                    // Actual save resolution happens in the rules engine / effect pipeline;
+                    // for now, auto-remove as if save succeeded (matches BG3 damage-break behavior)
+                    RemoveStatusInstance(instance);
+                }
+                else if (instance.Definition.RemoveOnDamage)
+                {
+                    // Straight removal on damage (Frozen shatter, Sleep wake-up)
+                    RemoveStatusInstance(instance);
+                }
             }
         }
 

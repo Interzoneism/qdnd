@@ -62,6 +62,9 @@ namespace QDND.Data
         public int? BaseCharisma { get; set; }
         public List<string> FeatIds { get; set; }
         public Dictionary<string, Dictionary<string, string>> FeatChoices { get; set; }
+        public Dictionary<string, int> AbilityScoreImprovements { get; set; }
+        public List<string> MetamagicIds { get; set; }
+        public List<string> InvocationIds { get; set; }
         public string BackgroundId { get; set; }
         public List<string> BackgroundSkills { get; set; }
         
@@ -688,6 +691,9 @@ namespace QDND.Data
                     AbilityBonus1 = unit.AbilityBonus1,
                     FeatIds = unit.FeatIds ?? new List<string>(),
                     FeatChoices = unit.FeatChoices ?? new(),
+                    AbilityScoreImprovements = unit.AbilityScoreImprovements ?? new(),
+                    MetamagicIds = unit.MetamagicIds ?? new List<string>(),
+                    InvocationIds = unit.InvocationIds ?? new List<string>(),
                     BackgroundId = unit.BackgroundId,
                     BackgroundSkills = unit.BackgroundSkills ?? new List<string>()
                 };

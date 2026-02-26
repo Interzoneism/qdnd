@@ -34,6 +34,25 @@ namespace QDND.Data
         private readonly Random _random;
         private readonly List<RaceDefinition> _races;
         private readonly List<ClassDefinition> _classes;
+        private static readonly string[] MetamagicOptionIds =
+        {
+            "careful", "distant", "empowered", "extended",
+            "heightened", "quickened", "subtle", "twinned"
+        };
+        private static readonly string[] ElementalAdeptTypes = { "fire", "cold", "lightning", "thunder", "acid" };
+        private static readonly string[] MagicInitiateCantripPool =
+        {
+            "fire_bolt", "ray_of_frost", "shocking_grasp", "acid_splash",
+            "blade_ward", "dancing_lights", "friends", "light",
+            "mage_hand", "minor_illusion", "poison_spray", "true_strike"
+        };
+        private static readonly string[] MagicInitiateSpellPool =
+        {
+            "magic_missile", "shield", "chromatic_orb", "burning_hands",
+            "charm_person", "expeditious_retreat", "false_life", "fog_cloud",
+            "ice_knife", "mage_armor", "sleep", "thunderwave", "witch_bolt",
+            "cure_wounds", "healing_word", "guiding_bolt", "bless", "bane"
+        };
 
         public int Seed { get; }
 
@@ -56,6 +75,11 @@ namespace QDND.Data
         private static bool IsRandomFixtureDefinition(string id)
         {
             return string.Equals(id, TestFixtureId, StringComparison.OrdinalIgnoreCase);
+        }
+
+        public ScenarioUnit GenerateRandomUnit(CharacterGenerationOptions options)
+        {
+            return CreateRandomUnit(options);
         }
 
         public ScenarioDefinition GenerateRandomScenario(int team1Size, int team2Size, int level = 3)
@@ -373,25 +397,42 @@ namespace QDND.Data
             var race = PickRace(options.ForcedRaceId);
             string subraceId = PickSubraceId(race, options.ForcedSubraceId);
             var classDef = PickClass(options.ForcedClassId);
-            string subclassId = PickSubclassId(classDef, level, options.ForcedSubclassId);
-
-            var baseScores = BuildBaseAbilityScores(classDef);
             AbilityType primary = ParseAbilityOrDefault(classDef.PrimaryAbility, AbilityType.Strength);
             AbilityType secondary = GetClassSecondary(classDef.Id);
             if (secondary == primary)
                 secondary = AbilityType.Constitution;
-
-            int dexterity = baseScores[AbilityType.Dexterity];
-            int dexMod = CharacterSheet.GetModifier(dexterity);
-            int initiative = options.Initiative != 0
-                ? options.Initiative
-                : Math.Clamp(10 + dexMod + _random.Next(-2, 5), 1, 30);
 
             string namePrefix = options.DisplayName;
             if (string.IsNullOrWhiteSpace(namePrefix))
             {
                 namePrefix = options.Faction == Faction.Player ? "Player" : "Enemy";
             }
+            string displayName = $"{namePrefix} - {race.Name} {classDef.Name}";
+
+            var baseScores = BuildBaseAbilityScores(classDef);
+            var (abilityBonus2, abilityBonus1) = PickRacialBonuses(baseScores, primary, secondary);
+
+            var background = BackgroundData.All[_random.Next(BackgroundData.All.Count)];
+            var (sheet, subclassId) = BuildLeveledSheet(
+                displayName,
+                race,
+                subraceId,
+                classDef,
+                level,
+                options.ForcedSubclassId,
+                baseScores,
+                abilityBonus2,
+                abilityBonus1,
+                background);
+
+            var resolvedPreview = new CharacterResolver(_characterDataRegistry).Resolve(sheet);
+            int dexterity = resolvedPreview.AbilityScores.TryGetValue(AbilityType.Dexterity, out int finalDex)
+                ? finalDex
+                : sheet.BaseDexterity;
+            int dexMod = CharacterSheet.GetModifier(dexterity);
+            int initiative = options.Initiative != 0
+                ? options.Initiative
+                : Math.Clamp(10 + dexMod + _random.Next(-2, 5), 1, 30);
 
             var abilityOverrides = options.AbilityOverrides?
                 .Where(a => !string.IsNullOrWhiteSpace(a))
@@ -399,23 +440,13 @@ namespace QDND.Data
                 .Distinct()
                 .ToList();
 
-            // Generate feats for characters level 4+
-            var featIds = new List<string>();
-            if (level >= 4)
-            {
-                featIds = SelectFeats(classDef, level, primary);
-            }
-
             // Generate equipment
             var equipment = GenerateDefaultEquipment(classDef.Id, level);
-
-            // Pick a random background
-            var background = BackgroundData.All[_random.Next(BackgroundData.All.Count)];
 
             return new ScenarioUnit
             {
                 Id = options.UnitId,
-                Name = $"{namePrefix} - {race.Name} {classDef.Name}",
+                Name = displayName,
                 Faction = options.Faction,
                 Initiative = initiative,
                 InitiativeTiebreaker = options.InitiativeTiebreaker != 0 ? options.InitiativeTiebreaker : dexterity,
@@ -439,9 +470,13 @@ namespace QDND.Data
                 BaseIntelligence = baseScores[AbilityType.Intelligence],
                 BaseWisdom = baseScores[AbilityType.Wisdom],
                 BaseCharisma = baseScores[AbilityType.Charisma],
-                AbilityBonus2 = primary.ToString(),
-                AbilityBonus1 = secondary.ToString(),
-                FeatIds = featIds,
+                AbilityBonus2 = abilityBonus2.ToString(),
+                AbilityBonus1 = abilityBonus1.ToString(),
+                FeatIds = new List<string>(sheet.FeatIds),
+                FeatChoices = new Dictionary<string, Dictionary<string, string>>(sheet.FeatChoices, StringComparer.OrdinalIgnoreCase),
+                AbilityScoreImprovements = new Dictionary<string, int>(sheet.AbilityScoreImprovements, StringComparer.OrdinalIgnoreCase),
+                MetamagicIds = new List<string>(sheet.MetamagicIds),
+                InvocationIds = new List<string>(sheet.InvocationIds),
                 BackgroundId = background.Id,
                 BackgroundSkills = new List<string>(background.SkillProficiencies),
                 MainHandWeaponId = equipment.MainHandWeaponId,
@@ -450,8 +485,497 @@ namespace QDND.Data
                 ShieldId = equipment.ShieldId,
                 KnownActions = abilityOverrides,
                 ReplaceResolvedActions = options.ReplaceResolvedActions,
-                Tags = BuildTags(classDef, options.Faction, abilityOverrides != null && abilityOverrides.Count > 0)
+                Tags = BuildTags(classDef, subclassId, options.Faction, abilityOverrides != null && abilityOverrides.Count > 0)
             };
+        }
+
+        private (CharacterSheet Sheet, string SubclassId) BuildLeveledSheet(
+            string name,
+            RaceDefinition race,
+            string subraceId,
+            ClassDefinition classDef,
+            int level,
+            string forcedSubclassId,
+            Dictionary<AbilityType, int> baseScores,
+            AbilityType abilityBonus2,
+            AbilityType abilityBonus1,
+            BackgroundEntry background)
+        {
+            var sheet = new CharacterSheet
+            {
+                Name = name,
+                RaceId = race?.Id,
+                SubraceId = subraceId,
+                BaseStrength = baseScores[AbilityType.Strength],
+                BaseDexterity = baseScores[AbilityType.Dexterity],
+                BaseConstitution = baseScores[AbilityType.Constitution],
+                BaseIntelligence = baseScores[AbilityType.Intelligence],
+                BaseWisdom = baseScores[AbilityType.Wisdom],
+                BaseCharisma = baseScores[AbilityType.Charisma],
+                AbilityBonus2 = abilityBonus2.ToString(),
+                AbilityBonus1 = abilityBonus1.ToString(),
+                BackgroundId = background?.Id,
+                BackgroundSkills = background?.SkillProficiencies != null
+                    ? new List<string>(background.SkillProficiencies)
+                    : new List<string>()
+            };
+
+            string subclassId = null;
+            bool subclassChoiceResolved = false;
+            if (!string.IsNullOrWhiteSpace(forcedSubclassId) && level < classDef.SubclassLevel)
+            {
+                throw new InvalidOperationException(
+                    $"Class '{classDef.Id}' cannot select subclass before level {classDef.SubclassLevel}.");
+            }
+
+            var featLevels = classDef.FeatLevels ?? new List<int> { 4, 8, 12 };
+            for (int currentLevel = 1; currentLevel <= level; currentLevel++)
+            {
+                if (!subclassChoiceResolved && currentLevel >= classDef.SubclassLevel)
+                {
+                    subclassId = PickSubclassId(classDef, currentLevel, forcedSubclassId);
+                    subclassChoiceResolved = true;
+                }
+
+                sheet.ClassLevels.Add(new ClassLevel(classDef.Id, subclassId));
+                LevelProgression progression = null;
+                classDef.LevelTable?.TryGetValue(currentLevel.ToString(), out progression);
+
+                ApplyMetamagicChoicesForLevel(sheet, progression);
+                ApplyInvocationChoicesForLevel(sheet, progression);
+
+                if (featLevels.Contains(currentLevel))
+                {
+                    ApplyFeatOrAsiChoice(sheet, classDef, primary: ParseAbilityOrDefault(classDef.PrimaryAbility, AbilityType.Strength), secondary: GetClassSecondary(classDef.Id));
+                }
+            }
+
+            return (sheet, subclassId);
+        }
+
+        private (AbilityType PlusTwo, AbilityType PlusOne) PickRacialBonuses(
+            Dictionary<AbilityType, int> baseScores,
+            AbilityType primary,
+            AbilityType secondary)
+        {
+            var allAbilities = Enum.GetValues(typeof(AbilityType)).Cast<AbilityType>().ToList();
+
+            AbilityType plusTwo;
+            if (_random.NextDouble() < 0.7)
+            {
+                plusTwo = primary;
+            }
+            else
+            {
+                var plusTwoCandidates = allAbilities
+                    .Where(a => a != primary)
+                    .OrderByDescending(a => baseScores[a])
+                    .ThenBy(_ => _random.Next())
+                    .Take(3)
+                    .ToList();
+                plusTwo = plusTwoCandidates.Count > 0 ? plusTwoCandidates[_random.Next(plusTwoCandidates.Count)] : primary;
+            }
+
+            AbilityType plusOne;
+            var remaining = allAbilities.Where(a => a != plusTwo).ToList();
+            if (_random.NextDouble() < 0.6 && remaining.Contains(secondary))
+            {
+                plusOne = secondary;
+            }
+            else
+            {
+                var plusOneCandidates = remaining
+                    .OrderByDescending(a => baseScores[a])
+                    .ThenBy(_ => _random.Next())
+                    .Take(4)
+                    .ToList();
+                plusOne = plusOneCandidates.Count > 0 ? plusOneCandidates[_random.Next(plusOneCandidates.Count)] : remaining[0];
+            }
+
+            return (plusTwo, plusOne);
+        }
+
+        private void ApplyMetamagicChoicesForLevel(CharacterSheet sheet, LevelProgression progression)
+        {
+            if (sheet == null || progression?.Features == null || progression.Features.Count == 0)
+                return;
+
+            int choices = 0;
+            foreach (var feature in progression.Features)
+            {
+                if (feature?.Id == null)
+                    continue;
+
+                if (string.Equals(feature.Id, "metamagic", StringComparison.OrdinalIgnoreCase))
+                    choices += 2;
+                else if (feature.Id.StartsWith("metamagic_", StringComparison.OrdinalIgnoreCase))
+                    choices += 1;
+            }
+
+            if (choices <= 0)
+                return;
+
+            var available = MetamagicOptionIds
+                .Where(id => !sheet.MetamagicIds.Contains(id, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+
+            while (choices > 0 && available.Count > 0)
+            {
+                int index = _random.Next(available.Count);
+                sheet.MetamagicIds.Add(available[index]);
+                available.RemoveAt(index);
+                choices--;
+            }
+        }
+
+        private void ApplyInvocationChoicesForLevel(CharacterSheet sheet, LevelProgression progression)
+        {
+            if (sheet == null || progression?.InvocationsKnown == null)
+                return;
+
+            int targetCount = Math.Max(0, progression.InvocationsKnown.Value);
+            if (sheet.InvocationIds.Count > targetCount)
+            {
+                sheet.InvocationIds = sheet.InvocationIds.Take(targetCount).ToList();
+                return;
+            }
+
+            var invocationPool = _characterDataRegistry.GetAllFeats()
+                .Where(IsInvocationFeat)
+                .Select(f => f.Id)
+                .Where(id => !sheet.InvocationIds.Contains(id, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+
+            while (sheet.InvocationIds.Count < targetCount && invocationPool.Count > 0)
+            {
+                int index = _random.Next(invocationPool.Count);
+                sheet.InvocationIds.Add(invocationPool[index]);
+                invocationPool.RemoveAt(index);
+            }
+        }
+
+        private static bool IsInvocationFeat(FeatDefinition feat)
+        {
+            if (feat == null)
+                return false;
+
+            if (feat.Features == null)
+                return false;
+
+            return feat.Features.Any(feature =>
+                feature?.Tags?.Any(tag => string.Equals(tag, "invocation", StringComparison.OrdinalIgnoreCase)) == true
+                || (feature?.Source?.IndexOf("invocation", StringComparison.OrdinalIgnoreCase) ?? -1) >= 0);
+        }
+
+        private void ApplyFeatOrAsiChoice(CharacterSheet sheet, ClassDefinition classDef, AbilityType primary, AbilityType secondary)
+        {
+            if (sheet == null)
+                return;
+
+            if (primary == secondary)
+                secondary = AbilityType.Constitution;
+
+            var snapshot = new CharacterResolver(_characterDataRegistry).Resolve(sheet);
+            bool chooseAsi = ShouldChooseAsi(snapshot, primary, secondary);
+
+            if (!chooseAsi)
+            {
+                var selectedFeat = PickFeatForSnapshot(sheet, classDef, snapshot, primary);
+                if (selectedFeat != null)
+                {
+                    sheet.FeatIds.Add(selectedFeat.Id);
+                    var choices = BuildFeatChoices(selectedFeat.Id, snapshot, primary, secondary);
+                    if (choices.Count > 0)
+                    {
+                        sheet.FeatChoices[selectedFeat.Id] = choices;
+                    }
+                    return;
+                }
+            }
+
+            ApplyAbilityImprovement(sheet, snapshot, primary, secondary);
+        }
+
+        private bool ShouldChooseAsi(ResolvedCharacter snapshot, AbilityType primary, AbilityType secondary)
+        {
+            int primaryScore = snapshot.AbilityScores.TryGetValue(primary, out var p) ? p : 10;
+            int secondaryScore = snapshot.AbilityScores.TryGetValue(secondary, out var s) ? s : 10;
+
+            if (primaryScore >= 20 && secondaryScore >= 20)
+                return false;
+
+            double chance = primaryScore switch
+            {
+                <= 17 => 0.65,
+                <= 19 => 0.45,
+                _ => 0.3
+            };
+
+            if (secondaryScore >= 20)
+                chance += 0.1;
+
+            return _random.NextDouble() < chance;
+        }
+
+        private void ApplyAbilityImprovement(CharacterSheet sheet, ResolvedCharacter snapshot, AbilityType primary, AbilityType secondary)
+        {
+            sheet.FeatIds.Add("ability_improvement");
+            var abilityOrder = new List<AbilityType> { primary, secondary, AbilityType.Constitution, AbilityType.Dexterity, AbilityType.Wisdom, AbilityType.Charisma, AbilityType.Intelligence, AbilityType.Strength };
+
+            int firstScore = snapshot.AbilityScores.TryGetValue(primary, out int score) ? score : 10;
+            if (firstScore <= 18)
+            {
+                AddAbilityImprovement(sheet, primary, 2);
+                return;
+            }
+
+            var improvable = abilityOrder
+                .Distinct()
+                .Where(a => snapshot.AbilityScores.TryGetValue(a, out int value) && value < 20)
+                .ToList();
+
+            if (improvable.Count == 0)
+                return;
+
+            if (improvable.Count == 1)
+            {
+                AddAbilityImprovement(sheet, improvable[0], 1);
+                return;
+            }
+
+            int bestScore = snapshot.AbilityScores[improvable[0]];
+            if (bestScore <= 18 || _random.NextDouble() < 0.55)
+            {
+                AddAbilityImprovement(sheet, improvable[0], 2);
+            }
+            else
+            {
+                AddAbilityImprovement(sheet, improvable[0], 1);
+                AddAbilityImprovement(sheet, improvable[1], 1);
+            }
+        }
+
+        private static void AddAbilityImprovement(CharacterSheet sheet, AbilityType ability, int amount)
+        {
+            if (sheet == null || amount <= 0)
+                return;
+
+            string key = ability.ToString();
+            if (!sheet.AbilityScoreImprovements.ContainsKey(key))
+            {
+                sheet.AbilityScoreImprovements[key] = 0;
+            }
+
+            sheet.AbilityScoreImprovements[key] += amount;
+        }
+
+        private FeatDefinition PickFeatForSnapshot(
+            CharacterSheet sheet,
+            ClassDefinition classDef,
+            ResolvedCharacter snapshot,
+            AbilityType primaryAbility)
+        {
+            var selectedIds = new HashSet<string>(sheet.FeatIds ?? Enumerable.Empty<string>(), StringComparer.OrdinalIgnoreCase);
+            var candidates = _characterDataRegistry.GetAllFeats()
+                .Where(f => IsSelectableGeneralFeat(f))
+                .Where(f => !selectedIds.Contains(f.Id))
+                .Where(f => MeetsFeatPrerequisites(f, classDef, snapshot))
+                .ToList();
+
+            if (candidates.Count == 0)
+                return null;
+
+            var preferredIds = GetArchetypeFeatPreferences(classDef, primaryAbility);
+            var preferred = candidates
+                .Where(f => preferredIds.Contains(f.Id, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+
+            if (preferred.Count > 0 && _random.NextDouble() < 0.75)
+                return preferred[_random.Next(preferred.Count)];
+
+            return candidates[_random.Next(candidates.Count)];
+        }
+
+        private static bool IsSelectableGeneralFeat(FeatDefinition feat)
+        {
+            if (feat == null || string.IsNullOrWhiteSpace(feat.Id))
+                return false;
+
+            if (string.Equals(feat.Id, "ability_improvement", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            if (feat.IsASI)
+                return false;
+
+            return !IsInvocationFeat(feat) && !IsRandomFixtureDefinition(feat.Id);
+        }
+
+        private static IReadOnlyList<string> GetArchetypeFeatPreferences(ClassDefinition classDef, AbilityType primaryAbility)
+        {
+            bool isCaster = !string.IsNullOrWhiteSpace(classDef?.SpellcastingAbility);
+            bool isMartial = classDef?.Id != null && (
+                classDef.Id.Equals("fighter", StringComparison.OrdinalIgnoreCase) ||
+                classDef.Id.Equals("barbarian", StringComparison.OrdinalIgnoreCase) ||
+                classDef.Id.Equals("paladin", StringComparison.OrdinalIgnoreCase) ||
+                classDef.Id.Equals("ranger", StringComparison.OrdinalIgnoreCase) ||
+                classDef.Id.Equals("monk", StringComparison.OrdinalIgnoreCase));
+            bool isRanged = primaryAbility == AbilityType.Dexterity &&
+                            (classDef?.Id?.Equals("ranger", StringComparison.OrdinalIgnoreCase) == true ||
+                             classDef?.Id?.Equals("fighter", StringComparison.OrdinalIgnoreCase) == true);
+
+            if (isCaster)
+            {
+                return new[] { "war_caster", "resilient", "alert", "lucky", "elemental_adept", "spell_sniper", "tough" };
+            }
+
+            if (isMartial && !isRanged)
+            {
+                return new[] { "great_weapon_master", "sentinel", "polearm_master", "tough", "alert", "savage_attacker", "shield_master" };
+            }
+
+            if (isRanged)
+            {
+                return new[] { "sharpshooter", "crossbow_expert", "alert", "mobile", "lucky", "piercer" };
+            }
+
+            return new[] { "alert", "tough", "mobile", "lucky", "resilient", "athlete" };
+        }
+
+        private static bool MeetsFeatPrerequisites(FeatDefinition feat, ClassDefinition classDef, ResolvedCharacter snapshot)
+        {
+            var prereq = feat?.Prerequisites;
+            if (prereq == null)
+                return true;
+
+            if (prereq.MinLevel > 0 && snapshot?.Sheet?.TotalLevel < prereq.MinLevel)
+                return false;
+
+            if (prereq.RequiresSpellcasting)
+            {
+                bool hasSpellcastingClass = !string.IsNullOrWhiteSpace(classDef?.SpellcastingAbility);
+                bool hasSpellSlots = snapshot?.Resources?.Any(kvp =>
+                    kvp.Key.StartsWith("spell_slot_", StringComparison.Ordinal) && kvp.Value > 0) == true
+                    || (snapshot?.Resources?.TryGetValue("pact_slots", out int pactSlots) == true && pactSlots > 0);
+
+                if (!hasSpellcastingClass && !hasSpellSlots)
+                    return false;
+            }
+
+            if (prereq.MinAbilityScores != null)
+            {
+                foreach (var (abilityName, minValue) in prereq.MinAbilityScores)
+                {
+                    if (!Enum.TryParse<AbilityType>(abilityName, true, out var ability))
+                        continue;
+
+                    if (snapshot.AbilityScores.TryGetValue(ability, out int value) && value < minValue)
+                        return false;
+                }
+            }
+
+            if (prereq.RequiredArmorProficiencies != null)
+            {
+                foreach (var armor in prereq.RequiredArmorProficiencies)
+                {
+                    if (!Enum.TryParse<ArmorCategory>(armor, true, out var category))
+                        continue;
+                    if (!snapshot.Proficiencies.ArmorCategories.Contains(category))
+                        return false;
+                }
+            }
+
+            if (prereq.RequiredWeaponProficiencies != null)
+            {
+                foreach (var weapon in prereq.RequiredWeaponProficiencies)
+                {
+                    if (!Enum.TryParse<WeaponCategory>(weapon, true, out var category))
+                        continue;
+                    if (!snapshot.Proficiencies.WeaponCategories.Contains(category))
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+        private Dictionary<string, string> BuildFeatChoices(
+            string featId,
+            ResolvedCharacter snapshot,
+            AbilityType primary,
+            AbilityType secondary)
+        {
+            var choices = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            string lower = featId?.ToLowerInvariant() ?? string.Empty;
+
+            switch (lower)
+            {
+                case "resilient":
+                {
+                    var preferred = new[] { AbilityType.Constitution, primary, AbilityType.Wisdom, AbilityType.Dexterity, secondary };
+                    AbilityType selected = preferred
+                        .Distinct()
+                        .FirstOrDefault(ability => !snapshot.Proficiencies.SavingThrows.Contains(ability));
+                    if (!Enum.IsDefined(typeof(AbilityType), selected))
+                    {
+                        selected = AbilityType.Constitution;
+                    }
+                    choices["ability"] = selected.ToString();
+                    break;
+                }
+                case "elemental_adept":
+                    choices["damageType"] = ElementalAdeptTypes[_random.Next(ElementalAdeptTypes.Length)];
+                    break;
+                case "skilled":
+                {
+                    var skillPool = Enum.GetValues(typeof(Skill))
+                        .Cast<Skill>()
+                        .Where(skill => !snapshot.Proficiencies.Skills.Contains(skill))
+                        .OrderBy(_ => _random.Next())
+                        .Take(3)
+                        .ToList();
+                    for (int i = 0; i < skillPool.Count; i++)
+                    {
+                        choices[$"skill{i + 1}"] = skillPool[i].ToString();
+                    }
+                    break;
+                }
+                case "athlete":
+                case "lightly_armoured":
+                case "moderately_armoured":
+                case "tavern_brawler":
+                case "weapon_master":
+                    choices["ability"] = ChooseFeatAbility(primary, secondary);
+                    break;
+            }
+
+            if (lower.StartsWith("magic_initiate", StringComparison.OrdinalIgnoreCase))
+            {
+                var cantrips = MagicInitiateCantripPool
+                    .OrderBy(_ => _random.Next())
+                    .Take(2)
+                    .ToList();
+                for (int i = 0; i < cantrips.Count; i++)
+                {
+                    choices[$"cantrip{i + 1}"] = cantrips[i];
+                }
+                choices["spell1"] = MagicInitiateSpellPool[_random.Next(MagicInitiateSpellPool.Length)];
+            }
+
+            return choices;
+        }
+
+        private string ChooseFeatAbility(AbilityType primary, AbilityType secondary)
+        {
+            var candidates = new List<AbilityType> { primary, secondary, AbilityType.Strength, AbilityType.Dexterity };
+            var distinct = candidates.Distinct().ToList();
+            AbilityType selected = distinct[_random.Next(distinct.Count)];
+
+            if (selected != AbilityType.Strength && selected != AbilityType.Dexterity && _random.NextDouble() < 0.8)
+            {
+                selected = _random.NextDouble() < 0.5 ? AbilityType.Strength : AbilityType.Dexterity;
+            }
+
+            return selected.ToString();
         }
 
         private RaceDefinition PickRace(string forcedRaceId)
@@ -608,14 +1132,18 @@ namespace QDND.Data
             return fallback;
         }
 
-        private static List<string> BuildTags(ClassDefinition classDef, Faction faction, bool hasAbilityOverride)
+        private static List<string> BuildTags(ClassDefinition classDef, string subclassId, Faction faction, bool hasAbilityOverride)
         {
             var tags = new List<string>();
 
             if (faction == Faction.Player) tags.Add("player");
             if (faction == Faction.Hostile) tags.Add("enemy");
 
-            if (!string.IsNullOrWhiteSpace(classDef?.SpellcastingAbility))
+            bool subclassCaster = classDef?.Subclasses?.Any(sub =>
+                string.Equals(sub.Id, subclassId, StringComparison.OrdinalIgnoreCase)
+                && sub.SpellcasterModifier > 0) == true;
+
+            if (!string.IsNullOrWhiteSpace(classDef?.SpellcastingAbility) || subclassCaster)
             {
                 tags.Add("caster");
             }
@@ -753,85 +1281,5 @@ namespace QDND.Data
             return weaponId is "greatsword" or "greataxe" or "maul" or "halberd" or "glaive" or "pike";
         }
 
-        /// <summary>
-        /// Select feats for a character based on class and level.
-        /// </summary>
-        private List<string> SelectFeats(ClassDefinition classDef, int level, AbilityType primaryAbility)
-        {
-            var feats = new List<string>();
-            var featLevels = classDef.FeatLevels ?? new List<int> { 4, 8, 12 };
-            
-            // Count how many feats this character should have
-            int featCount = featLevels.Count(l => l <= level);
-            if (featCount == 0) return feats;
-
-            // Get all available feats (exclude ASI since it needs special handling)
-            var allFeats = _characterDataRegistry.GetAllFeats()
-                .Where(f => !f.IsASI)
-                .ToList();
-            if (allFeats.Count == 0) return feats;
-
-            // Determine character archetype for feat selection heuristics
-            bool isCaster = !string.IsNullOrEmpty(classDef.SpellcastingAbility);
-            bool isMartial = classDef.Id.Equals("fighter", StringComparison.OrdinalIgnoreCase) ||
-                             classDef.Id.Equals("barbarian", StringComparison.OrdinalIgnoreCase) ||
-                             classDef.Id.Equals("paladin", StringComparison.OrdinalIgnoreCase) ||
-                             classDef.Id.Equals("ranger", StringComparison.OrdinalIgnoreCase) ||
-                             classDef.Id.Equals("monk", StringComparison.OrdinalIgnoreCase);
-            bool isRanged = primaryAbility == AbilityType.Dexterity && 
-                           (classDef.Id.Equals("ranger", StringComparison.OrdinalIgnoreCase) || 
-                            classDef.Id.Equals("fighter", StringComparison.OrdinalIgnoreCase));
-            bool isMelee = isMartial && !isRanged;
-
-            for (int i = 0; i < featCount; i++)
-            {
-                // Select appropriate feat based on archetype
-                string selectedFeat = null;
-                var candidates = new List<string>();
-
-                if (isCaster)
-                {
-                    candidates = new List<string> { "war_caster", "resilient", "alert", "tough", "lucky", "observant", "elemental_adept", "spell_sniper", "ritual_caster" };
-                }
-                else if (isMelee)
-                {
-                    candidates = new List<string> { "great_weapon_master", "sentinel", "tough", "alert", "polearm_master", "lucky", "savage_attacker", "mobile", "heavy_armor_master", "shield_master", "crusher", "slasher", "piercer" };
-                }
-                else if (isRanged)
-                {
-                    candidates = new List<string> { "sharpshooter", "crossbow_expert", "alert", "tough", "lucky", "mobile", "piercer" };
-                }
-                else
-                {
-                    candidates = new List<string> { "alert", "tough", "mobile", "lucky", "observant", "resilient", "athlete" };
-                }
-
-                // Filter candidates to those that exist and aren't already selected
-                var validCandidates = candidates
-                    .Where(c => allFeats.Any(f => f.Id.Equals(c, StringComparison.OrdinalIgnoreCase)))
-                    .Where(c => !feats.Contains(c))
-                    .ToList();
-
-                if (validCandidates.Count > 0)
-                {
-                    selectedFeat = validCandidates[_random.Next(validCandidates.Count)];
-                    feats.Add(selectedFeat);
-                }
-                else
-                {
-                    // Fallback to any available feat not already selected
-                    var anyAvailable = allFeats
-                        .Select(f => f.Id)
-                        .Where(id => !feats.Contains(id))
-                        .ToList();
-                    if (anyAvailable.Count > 0)
-                    {
-                        feats.Add(anyAvailable[_random.Next(anyAvailable.Count)]);
-                    }
-                }
-            }
-
-            return feats;
-        }
     }
 }

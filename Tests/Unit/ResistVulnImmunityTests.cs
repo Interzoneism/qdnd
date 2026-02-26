@@ -174,9 +174,8 @@ namespace QDND.Tests.Unit
         public void MultipleResistances_DoNotStack()
         {
             // Arrange: Apply two sources of fire resistance
-            // 5e/BG3 policy: multiple resistances don't stack
-            // Implementation question: Do we prevent stacking or let them multiply?
-            // For now, test that they multiply: 0.5 * 0.5 = 0.25
+            // BG3/5e rule: multiple resistances to the same type DON'T stack.
+            // Only the strongest resistance applies (both are -50%, so just one counts).
             int baseDamage = 20;
             var resist1 = DamageResistance.CreateResistance(DamageTypes.Fire, "Ring");
             var resist2 = DamageResistance.CreateResistance(DamageTypes.Fire, "Spell");
@@ -191,12 +190,8 @@ namespace QDND.Tests.Unit
             // Act
             var result = DamagePipeline.Calculate(baseDamage, applicableModifiers, 0, 100);
 
-            // Assert
-            // Current implementation: multiplicative stacking
-            // 20 * 0.5 * 0.5 = 5
-            // Note: True 5e would only apply resistance once, but our system allows stacking
-            // We document this behavior for now
-            Assert.Equal(5, result.FinalDamage); // Multiple resistances stack multiplicatively (20 * 0.5 * 0.5 = 5)
+            // Assert — BG3/5e correct: only one resistance applies → 20 * 0.5 = 10
+            Assert.Equal(10, result.FinalDamage);
         }
 
         [Theory]

@@ -1,4 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using QDND.Combat.Entities;
+using QDND.Data;
 using Xunit;
 using QDND.Data.CharacterModel;
 
@@ -226,6 +230,183 @@ namespace QDND.Tests.Unit
             var resolved = resolver.Resolve(sheet);
 
             Assert.Contains(resolved.Features, f => f.Id == "agonizing_blast");
+        }
+
+        [Fact]
+        public void GenerateRandomUnit_SorcererLevel10_SelectsMetamagicPerLevelMilestones()
+        {
+            var registry = CreateRegistryWithBaseRace();
+            registry.RegisterClass(new ClassDefinition
+            {
+                Id = "sorcerer",
+                Name = "Sorcerer",
+                HitDie = 6,
+                PrimaryAbility = "Charisma",
+                SpellcastingAbility = "Charisma",
+                FeatLevels = new List<int>(),
+                LevelTable = new Dictionary<string, LevelProgression>
+                {
+                    ["1"] = new LevelProgression(),
+                    ["2"] = new LevelProgression
+                    {
+                        Features = new List<Feature> { new() { Id = "metamagic" } }
+                    },
+                    ["3"] = new LevelProgression
+                    {
+                        Features = new List<Feature> { new() { Id = "metamagic_3" } }
+                    },
+                    ["10"] = new LevelProgression
+                    {
+                        Features = new List<Feature> { new() { Id = "metamagic_10" } }
+                    }
+                }
+            });
+
+            var generator = new ScenarioGenerator(registry, seed: 1337);
+            var unit = generator.GenerateRandomUnit(new CharacterGenerationOptions
+            {
+                UnitId = "unit_1",
+                Faction = Faction.Player,
+                Level = 10,
+                ForcedRaceId = "test_race",
+                ForcedClassId = "sorcerer"
+            });
+
+            Assert.NotNull(unit.MetamagicIds);
+            Assert.Equal(4, unit.MetamagicIds.Count);
+            Assert.Equal(4, unit.MetamagicIds.Distinct(StringComparer.OrdinalIgnoreCase).Count());
+        }
+
+        [Fact]
+        public void GenerateRandomUnit_WarlockLevel5_SelectsInvocationsFromProgressionCount()
+        {
+            var registry = CreateRegistryWithBaseRace();
+            registry.RegisterClass(new ClassDefinition
+            {
+                Id = "warlock",
+                Name = "Warlock",
+                HitDie = 8,
+                PrimaryAbility = "Charisma",
+                SpellcastingAbility = "Charisma",
+                FeatLevels = new List<int>(),
+                LevelTable = new Dictionary<string, LevelProgression>
+                {
+                    ["1"] = new LevelProgression(),
+                    ["2"] = new LevelProgression { InvocationsKnown = 2 },
+                    ["5"] = new LevelProgression { InvocationsKnown = 3 }
+                }
+            });
+
+            RegisterInvocationFeat(registry, "agonizing_blast");
+            RegisterInvocationFeat(registry, "repelling_blast");
+            RegisterInvocationFeat(registry, "devils_sight");
+
+            var generator = new ScenarioGenerator(registry, seed: 2026);
+            var unit = generator.GenerateRandomUnit(new CharacterGenerationOptions
+            {
+                UnitId = "unit_1",
+                Faction = Faction.Player,
+                Level = 5,
+                ForcedRaceId = "test_race",
+                ForcedClassId = "warlock"
+            });
+
+            Assert.NotNull(unit.InvocationIds);
+            Assert.Equal(3, unit.InvocationIds.Count);
+            Assert.Equal(3, unit.InvocationIds.Distinct(StringComparer.OrdinalIgnoreCase).Count());
+            Assert.All(unit.InvocationIds, id => Assert.Contains(id, new[] { "agonizing_blast", "repelling_blast", "devils_sight" }));
+        }
+
+        [Fact]
+        public void GenerateRandomUnit_FeatWithChoice_PopulatesFeatChoices()
+        {
+            var registry = CreateRegistryWithBaseRace(
+                new Feature
+                {
+                    Id = "test_race_ability_boost",
+                    AbilityScoreIncreases = new Dictionary<string, int>
+                    {
+                        ["Strength"] = 20,
+                        ["Constitution"] = 20
+                    }
+                });
+
+            registry.RegisterClass(new ClassDefinition
+            {
+                Id = "fighter",
+                Name = "Fighter",
+                HitDie = 10,
+                PrimaryAbility = "Strength",
+                FeatLevels = new List<int> { 4 },
+                LevelTable = new Dictionary<string, LevelProgression>
+                {
+                    ["1"] = new LevelProgression(),
+                    ["2"] = new LevelProgression(),
+                    ["3"] = new LevelProgression(),
+                    ["4"] = new LevelProgression()
+                }
+            });
+
+            registry.RegisterFeat(new FeatDefinition
+            {
+                Id = "resilient",
+                Name = "Resilient",
+                Features = new List<Feature> { new() { Id = "resilient_feature" } }
+            });
+
+            var generator = new ScenarioGenerator(registry, seed: 77);
+            var unit = generator.GenerateRandomUnit(new CharacterGenerationOptions
+            {
+                UnitId = "unit_1",
+                Faction = Faction.Player,
+                Level = 4,
+                ForcedRaceId = "test_race",
+                ForcedClassId = "fighter"
+            });
+
+            Assert.Contains(unit.FeatIds, id => string.Equals(id, "resilient", StringComparison.OrdinalIgnoreCase));
+            Assert.Contains(unit.FeatChoices, kvp => string.Equals(kvp.Key, "resilient", StringComparison.OrdinalIgnoreCase));
+            var resilientChoices = unit.FeatChoices.First(kvp => string.Equals(kvp.Key, "resilient", StringComparison.OrdinalIgnoreCase)).Value;
+            Assert.Contains("ability", resilientChoices.Keys);
+            var chosenAbility = resilientChoices["ability"];
+            Assert.False(string.IsNullOrWhiteSpace(chosenAbility));
+        }
+
+        private static CharacterDataRegistry CreateRegistryWithBaseRace(params Feature[] extraRaceFeatures)
+        {
+            var registry = new CharacterDataRegistry();
+            var features = new List<Feature>();
+            if (extraRaceFeatures != null)
+            {
+                features.AddRange(extraRaceFeatures.Where(feature => feature != null));
+            }
+
+            registry.RegisterRace(new RaceDefinition
+            {
+                Id = "test_race",
+                Name = "Test Race",
+                Features = features
+            });
+
+            return registry;
+        }
+
+        private static void RegisterInvocationFeat(CharacterDataRegistry registry, string id)
+        {
+            registry.RegisterFeat(new FeatDefinition
+            {
+                Id = id,
+                Name = id,
+                Features = new List<Feature>
+                {
+                    new()
+                    {
+                        Id = id,
+                        Tags = new List<string> { "invocation" },
+                        IsPassive = true
+                    }
+                }
+            });
         }
     }
 }

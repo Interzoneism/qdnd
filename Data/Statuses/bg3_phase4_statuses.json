@@ -1053,7 +1053,7 @@
     {
       "id": "petrified",
       "name": "Petrified",
-      "description": "Turned to stone. Incapacitated, auto-fails STR/DEX saves. Resistance to all damage. Attacks against have advantage.",
+      "description": "Turned to stone. Incapacitated. Auto-fails STR/DEX saves. Resistant to all damage types. Immune to poison. Attacks from adjacent creatures auto-crit. If killed while petrified, the body shatters.",
       "icon": "petrified",
       "durationType": "permanent",
       "defaultDuration": 0,
@@ -1061,24 +1061,25 @@
       "stacking": "refresh",
       "isBuff": false,
       "isDispellable": true,
-      "tags": ["condition", "hard_control", "debuff"],
+      "tags": ["condition", "hard_control", "debuff", "incapacitated", "petrified"],
       "blockedActions": ["action", "bonus_action", "reaction", "movement"],
+      "statusImmunities": ["poisoned", "diseased"],
       "modifiers": [
-        {
-          "target": "armorClass",
-          "type": "flat",
-          "value": -4
-        },
-        {
-          "target": "savingThrow",
-          "type": "disadvantage",
-          "value": 1
-        },
-        {
-          "target": "damageTaken",
-          "type": "percentage",
-          "value": -50
-        }
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:slashing" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:piercing" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:bludgeoning" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:fire" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:cold" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:lightning" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:thunder" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:acid" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:poison" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:necrotic" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:radiant" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:force" },
+        { "target": "damageTaken", "type": "percentage", "value": -50, "condition": "damage_type:psychic" },
+        { "target": "attackRoll", "type": "advantage", "value": 1, "condition": "melee_attacker_targeting_this" },
+        { "target": "movementSpeed", "type": "override", "value": 0 }
       ]
     },
     {
