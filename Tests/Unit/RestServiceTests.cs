@@ -121,13 +121,14 @@ namespace Tests.Unit
             Assert.False(fighter.ActionBudget.HasBonusAction);
             Assert.False(fighter.ActionBudget.HasReaction);
             
-            // Replenish turn resources
-            restService.ReplenishRoundResources(fighter);
+            // Replenish turn resources (action + bonus; reaction resets per round, not per turn)
+            restService.ReplenishTurnResources(fighter);
             
-            // Verify replenishment via ActionBudget
+            // Verify action + bonus replenished
             Assert.True(fighter.ActionBudget.HasAction);
             Assert.True(fighter.ActionBudget.HasBonusAction);
-            Assert.True(fighter.ActionBudget.HasReaction);
+            // Reaction is NOT restored by turn replenishment (D&D 5e: reactions reset per round)
+            Assert.False(fighter.ActionBudget.HasReaction);
         }
         
         [Fact]

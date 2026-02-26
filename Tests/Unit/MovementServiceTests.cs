@@ -456,21 +456,21 @@ namespace QDND.Tests.Unit
             var reactionSystem = CreateReactionSystemWithOpportunityAttack();
             var service = new MovementService(null, null, reactionSystem);
 
-            var player = CreateCombatant("player", new Vector3(3, 0, 0), 30f, Faction.Player);
+            var player = CreateCombatant("player", new Vector3(1, 0, 0), 30f, Faction.Player);
             var enemy = CreateCombatant("enemy", new Vector3(0, 0, 0), 30f, Faction.Hostile);
 
             reactionSystem.GrantReaction("enemy", "opportunity_attack");
 
             service.GetCombatants = () => new[] { player, enemy };
 
-            // Act - Move player from (3,0,0) to (20,0,0), leaving enemy's reach
+            // Act - Move player from (1,0,0) to (20,0,0), leaving enemy's reach
             var result = service.MoveTo(player, new Vector3(20, 0, 0));
 
             // Assert
             Assert.True(result.Success);
             Assert.Single(result.TriggeredOpportunityAttacks);
             Assert.Equal("enemy", result.TriggeredOpportunityAttacks[0].ReactorId);
-            Assert.Equal("opportunity_attack", result.TriggeredOpportunityAttacks[0].Reaction.Id);
+            Assert.Equal("reaction.opportunity_attack", result.TriggeredOpportunityAttacks[0].Reaction.Id);
         }
 
         [Fact]
@@ -548,8 +548,8 @@ namespace QDND.Tests.Unit
             var service = new MovementService(null, null, reactionSystem);
 
             var player = CreateCombatant("player", new Vector3(0, 0, 0), 30f, Faction.Player);
-            var enemy1 = CreateCombatant("enemy1", new Vector3(3, 0, 0), 30f, Faction.Hostile);
-            var enemy2 = CreateCombatant("enemy2", new Vector3(0, 3, 0), 30f, Faction.Hostile);
+            var enemy1 = CreateCombatant("enemy1", new Vector3(1, 0, 0), 30f, Faction.Hostile);
+            var enemy2 = CreateCombatant("enemy2", new Vector3(0, 1, 0), 30f, Faction.Hostile);
 
             reactionSystem.GrantReaction("enemy1", "opportunity_attack");
             reactionSystem.GrantReaction("enemy2", "opportunity_attack");
@@ -610,7 +610,7 @@ namespace QDND.Tests.Unit
             var reactionSystem = CreateReactionSystemWithOpportunityAttack();
             var service = new MovementService(null, null, reactionSystem);
 
-            var player = CreateCombatant("player", new Vector3(3, 0, 0), 30f, Faction.Player);
+            var player = CreateCombatant("player", new Vector3(1, 0, 0), 30f, Faction.Player);
             var enemy = CreateCombatant("enemy", new Vector3(0, 0, 0), 30f, Faction.Hostile);
 
             reactionSystem.GrantReaction("enemy", "opportunity_attack");
@@ -684,7 +684,7 @@ namespace QDND.Tests.Unit
             // Arrange
             var service = new MovementService();
             var player = CreateCombatant("player", Vector3.Zero, 30f, Faction.Player);
-            var nearEnemy = CreateCombatant("near", new Vector3(3, 0, 0), 30f, Faction.Hostile);
+            var nearEnemy = CreateCombatant("near", new Vector3(1, 0, 0), 30f, Faction.Hostile);
             var farEnemy = CreateCombatant("far", new Vector3(20, 0, 0), 30f, Faction.Hostile);
             var ally = CreateCombatant("ally", new Vector3(2, 0, 0), 30f, Faction.Player);
             var deadEnemy = CreateCombatant("dead", new Vector3(1, 0, 0), 30f, Faction.Hostile);
@@ -708,14 +708,14 @@ namespace QDND.Tests.Unit
             var reactionSystem = CreateReactionSystemWithOpportunityAttack();
             var service = new MovementService(null, null, reactionSystem);
 
-            var player = CreateCombatant("player", new Vector3(3, 0, 0), 30f, Faction.Player);
+            var player = CreateCombatant("player", new Vector3(1, 0, 0), 30f, Faction.Player);
             var enemy = CreateCombatant("enemy", new Vector3(0, 0, 0), 30f, Faction.Hostile);
 
             reactionSystem.GrantReaction("enemy", "opportunity_attack");
             service.GetCombatants = () => new[] { player, enemy };
 
             // Act
-            var attacks = service.DetectOpportunityAttacks(player, new Vector3(3, 0, 0), new Vector3(20, 0, 0));
+            var attacks = service.DetectOpportunityAttacks(player, new Vector3(1, 0, 0), new Vector3(20, 0, 0));
 
             // Assert
             Assert.Single(attacks);
@@ -723,7 +723,7 @@ namespace QDND.Tests.Unit
             Assert.Equal(ReactionTriggerType.EnemyLeavesReach, context.TriggerType);
             Assert.Equal("player", context.TriggerSourceId);
             Assert.Equal("enemy", context.AffectedId);
-            Assert.Equal(new Vector3(3, 0, 0), context.Position);
+            Assert.Equal(new Vector3(1, 0, 0), context.Position);
             Assert.Equal(20f, (float)context.Data["destinationX"], 0.01);
         }
 
@@ -735,7 +735,7 @@ namespace QDND.Tests.Unit
             var reactionSystem = CreateReactionSystemWithOpportunityAttack();
             var service = new MovementService(events, null, reactionSystem);
 
-            var player = CreateCombatant("player", new Vector3(3, 0, 0), 30f, Faction.Player);
+            var player = CreateCombatant("player", new Vector3(1, 0, 0), 30f, Faction.Player);
             var enemy = CreateCombatant("enemy", new Vector3(0, 0, 0), 30f, Faction.Hostile);
 
             reactionSystem.GrantReaction("enemy", "opportunity_attack");

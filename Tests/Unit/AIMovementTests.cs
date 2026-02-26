@@ -223,6 +223,7 @@ namespace QDND.Tests.Unit
         {
             var combatant = new Combatant(id, id, faction, 50, 10);
             combatant.Position = position;
+            combatant.ActionBudget.MaxMovement = 30f;
             combatant.ActionBudget.ResetFull();
             return combatant;
         }

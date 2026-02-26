@@ -14,8 +14,8 @@ namespace QDND.Tests.Unit
             Assert.True(budget.HasAction);
             Assert.True(budget.HasBonusAction);
             Assert.True(budget.HasReaction);
-            Assert.Equal(30f, budget.RemainingMovement);
-            Assert.Equal(30f, budget.MaxMovement);
+            Assert.Equal(ActionBudget.DefaultMaxMovement, budget.RemainingMovement);
+            Assert.Equal(ActionBudget.DefaultMaxMovement, budget.MaxMovement);
         }
 
         [Fact]

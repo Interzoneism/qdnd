@@ -565,7 +565,7 @@ namespace QDND.Combat.Actions.Effects
                 }
                 else if (applyHalfDamage)
                 {
-                    finalDamage = finalDamage / 2;  // Normal: successful save = half damage
+                    finalDamage = Math.Max(1, finalDamage / 2);  // Normal: successful save = half damage, minimum 1
                 }
 
                 int currentHpBeforeDamage = target.Resources.CurrentHP;

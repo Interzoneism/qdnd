@@ -53,7 +53,7 @@ namespace QDND.Tests.Integration
             // Assert
             var reactions = reactionSystem.GetReactions(combatant.Id);
             Assert.NotEmpty(reactions);
-            Assert.Contains(reactions, r => r.Id == "opportunity_attack");
+            Assert.Contains(reactions, r => r.Id == "reaction.opportunity_attack");
         }
 
         [Fact]
@@ -130,7 +130,7 @@ namespace QDND.Tests.Integration
 
             // Assert
             Assert.NotEmpty(eligibleReactors);
-            Assert.Contains(eligibleReactors, r => r.CombatantId == enemy.Id && r.Reaction.Id == "opportunity_attack");
+            Assert.Contains(eligibleReactors, r => r.CombatantId == enemy.Id && r.Reaction.Id == "reaction.opportunity_attack");
         }
 
         [Fact]

@@ -152,7 +152,7 @@ namespace QDND.Tests.Unit
         {
             // Arrange
             var actor = CreateTestCombatant("ai", 50, 50, Vector3.Zero, Faction.Hostile);
-            var target = CreateTestCombatant("player", 40, 40, new Vector3(3, 20, 0), Faction.Player); // High up
+            var target = CreateTestCombatant("player", 40, 40, new Vector3(2, 20, 0), Faction.Player); // High up
 
             var height = new HeightService { SafeFallDistance = 10f, DamagePerUnit = 1f };
             var scorer = new AIScorer(null, null, height);
@@ -177,7 +177,7 @@ namespace QDND.Tests.Unit
         {
             // Arrange
             var actor = CreateTestCombatant("ai", 50, 50, Vector3.Zero, Faction.Hostile);
-            var target = CreateTestCombatant("player", 40, 40, new Vector3(3, 25, 0), Faction.Player); // 25 units up
+            var target = CreateTestCombatant("player", 40, 40, new Vector3(2, 25, 0), Faction.Player); // 25 units up
 
             var height = new HeightService { SafeFallDistance = 10f, DamagePerUnit = 1f };
             var scorer = new AIScorer(null, null, height);
@@ -229,7 +229,7 @@ namespace QDND.Tests.Unit
         {
             // Arrange
             var actor = CreateTestCombatant("ai", 50, 50, Vector3.Zero, Faction.Hostile);
-            var target = CreateTestCombatant("player", 40, 40, new Vector3(3, 0, 0), Faction.Player);
+            var target = CreateTestCombatant("player", 40, 40, new Vector3(2, 0, 0), Faction.Player);
 
             var scorer = new AIScorer(null, null, null);
             var profile = new AIProfile();

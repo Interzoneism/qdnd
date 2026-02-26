@@ -19,7 +19,7 @@ namespace QDND.Tests.Unit
             // Consume resources
             combatant.ActionBudget.ConsumeAction();
             combatant.ActionBudget.ConsumeBonusAction();
-            combatant.ActionBudget.ConsumeMovement(30f);
+            combatant.ActionBudget.ConsumeMovement(ActionBudget.DefaultMaxMovement);
 
             Assert.False(combatant.ActionBudget.HasAction);
             Assert.False(combatant.ActionBudget.HasBonusAction);
@@ -30,7 +30,7 @@ namespace QDND.Tests.Unit
 
             Assert.True(combatant.ActionBudget.HasAction);
             Assert.True(combatant.ActionBudget.HasBonusAction);
-            Assert.Equal(30f, combatant.ActionBudget.RemainingMovement);
+            Assert.Equal(ActionBudget.DefaultMaxMovement, combatant.ActionBudget.RemainingMovement);
         }
 
         [Fact]
@@ -121,7 +121,7 @@ namespace QDND.Tests.Unit
             // Player uses all their resources
             player.ActionBudget.ConsumeAction();
             player.ActionBudget.ConsumeBonusAction();
-            player.ActionBudget.ConsumeMovement(30f);
+            player.ActionBudget.ConsumeMovement(ActionBudget.DefaultMaxMovement);
 
             // Advance to enemy's turn
             turnQueue.AdvanceTurn();
@@ -139,7 +139,7 @@ namespace QDND.Tests.Unit
             // Player should have resources back
             Assert.True(player.ActionBudget.HasAction);
             Assert.True(player.ActionBudget.HasBonusAction);
-            Assert.Equal(30f, player.ActionBudget.RemainingMovement);
+            Assert.Equal(ActionBudget.DefaultMaxMovement, player.ActionBudget.RemainingMovement);
 
             // Enemy should still have consumed resources (not their turn)
             Assert.False(enemy.ActionBudget.HasAction);
@@ -183,14 +183,14 @@ namespace QDND.Tests.Unit
                         $"Round {turnQueue.CurrentRound}, {current.Name} should have action");
                     Assert.True(current.ActionBudget.HasBonusAction,
                         $"Round {turnQueue.CurrentRound}, {current.Name} should have bonus action");
-                    Assert.Equal(30f, current.ActionBudget.RemainingMovement);
+                    Assert.Equal(ActionBudget.DefaultMaxMovement, current.ActionBudget.RemainingMovement);
                     Assert.True(current.ActionBudget.HasReaction,
                         $"Round {turnQueue.CurrentRound}, {current.Name} should have reaction");
 
                     // Consume all resources during turn
                     current.ActionBudget.ConsumeAction();
                     current.ActionBudget.ConsumeBonusAction();
-                    current.ActionBudget.ConsumeMovement(30f);
+                    current.ActionBudget.ConsumeMovement(ActionBudget.DefaultMaxMovement);
                     current.ActionBudget.ConsumeReaction();
 
                     // Advance to next turn

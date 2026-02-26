@@ -142,7 +142,7 @@ namespace QDND.Tests.Unit
 
             var method = serviceType!.GetMethod(
                 "ComputeTooltipSaveDC",
-                BindingFlags.NonPublic | BindingFlags.Static);
+                BindingFlags.NonPublic | BindingFlags.Instance);
 
             // Guard: if the method is ever renamed this test fails loudly
             Assert.NotNull(method);
@@ -154,7 +154,10 @@ namespace QDND.Tests.Unit
                 SaveType = "Dexterity"
             };
 
-            int dc = (int)method!.Invoke(null, new object[] { action, 3 /* profBonus */ });
+            // Create an uninitialized instance (no constructor needed); the explicit-DC
+            // path returns before touching any instance fields.
+            var serviceInstance = System.Runtime.CompilerServices.RuntimeHelpers.GetUninitializedObject(serviceType);
+            int dc = (int)method!.Invoke(serviceInstance, new object[] { action, 3 /* profBonus */, null /* combatant */ });
 
             Assert.Equal(17, dc);
         }

@@ -23,11 +23,11 @@ namespace QDND.Tests.Integration
 
             var movementService = new MovementService();
 
-            // Move half distance (default MaxMovement is 30)
-            var result = movementService.MoveTo(combatant, new Vector3(15, 0, 0));
+            // Move partial distance (default MaxMovement is ActionBudget.DefaultMaxMovement)
+            var result = movementService.MoveTo(combatant, new Vector3(4, 0, 0));
 
             Assert.True(result.Success);
-            Assert.Equal(15, combatant.ActionBudget.RemainingMovement);
+            Assert.Equal(ActionBudget.DefaultMaxMovement - 4, combatant.ActionBudget.RemainingMovement);
         }
 
         [Fact]
@@ -147,7 +147,7 @@ namespace QDND.Tests.Integration
             // Should have the reaction
             var availableReactions = reactions.GetReactions(fighter.Id);
             Assert.Single(availableReactions);
-            Assert.Equal("opportunity_attack", availableReactions[0].Id);
+            Assert.Equal("reaction.opportunity_attack", availableReactions[0].Id);
         }
 
         [Fact]
