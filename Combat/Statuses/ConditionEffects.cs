@@ -66,8 +66,14 @@ namespace QDND.Combat.Statuses
         /// <summary>Disadvantage on ability checks.</summary>
         public bool HasDisadvantageOnAbilityChecks { get; init; }
 
+        /// <summary>Disadvantage on all saving throws (Exhaustion L3+).</summary>
+        public bool HasDisadvantageOnSavingThrows { get; init; }
+
         /// <summary>Resistance to all damage types (Petrified).</summary>
         public bool HasResistanceToAllDamage { get; init; }
+
+        /// <summary>Speed is halved (Exhaustion L2+).</summary>
+        public bool SpeedHalved { get; init; }
 
         /// <summary>Can't move.</summary>
         public bool CantMove { get; init; }
@@ -301,8 +307,10 @@ namespace QDND.Combat.Statuses
                 ConditionType.Exhaustion, new ConditionMechanics
                 {
                     Type = ConditionType.Exhaustion,
-                    HasDisadvantageOnAbilityChecks = true,
-                    HasDisadvantageOnAttacks = true,
+                    HasDisadvantageOnAttacks = true,         // L1: disadvantage on attacks
+                    HasDisadvantageOnAbilityChecks = true,   // L1: disadvantage on ability checks
+                    // L2+: SpeedHalved, HasDisadvantageOnSavingThrows, etc.
+                    // require ExhaustionLevel tracking which is not yet implemented.
                 }
             },
             {
@@ -531,12 +539,16 @@ namespace QDND.Combat.Statuses
                     result.HasDisadvantageOnDexSaves = true;
                 if (mechanics.HasDisadvantageOnAbilityChecks)
                     result.HasDisadvantageOnAbilityChecks = true;
+                if (mechanics.HasDisadvantageOnSavingThrows)
+                    result.HasDisadvantageOnSavingThrows = true;
 
                 // Combat state
                 if (mechanics.IsIncapacitated)
                     result.IsIncapacitated = true;
                 if (mechanics.SpeedZero || mechanics.CantMove)
                     result.CantMove = true;
+                if (mechanics.SpeedHalved)
+                    result.SpeedHalved = true;
                 if (mechanics.MeleeAutocrits)
                     result.MeleeAutocrits = true;
                 if (mechanics.HasResistanceToAllDamage)
@@ -596,11 +608,17 @@ namespace QDND.Combat.Statuses
         /// <summary>Disadvantage on ability checks (Frightened, Poisoned).</summary>
         public bool HasDisadvantageOnAbilityChecks { get; set; }
 
+        /// <summary>Disadvantage on all saving throws (Exhaustion L3+).</summary>
+        public bool HasDisadvantageOnSavingThrows { get; set; }
+
         /// <summary>Can't take actions or reactions.</summary>
         public bool IsIncapacitated { get; set; }
 
         /// <summary>Can't move.</summary>
         public bool CantMove { get; set; }
+
+        /// <summary>Speed is halved (Exhaustion L2+).</summary>
+        public bool SpeedHalved { get; set; }
 
         /// <summary>Melee hits are auto-crits (Paralyzed, Unconscious).</summary>
         public bool MeleeAutocrits { get; set; }

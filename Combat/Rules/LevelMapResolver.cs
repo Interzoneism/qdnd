@@ -24,6 +24,7 @@ public static class LevelMapResolver
             "ragedamage" => characterLevel switch { < 9 => "2", < 16 => "3", _ => "4" },
             "sneakattackdamage" => $"{(int)Math.Ceiling(characterLevel / 2.0)}d6",
             // BG3 cantrip damage scaling: 1 die at L1-4, 2 dice at L5-9, 3 dice at L10+
+            // BG3 caps at level 12, so no L17+ tier applies.
             "d10cantrip" => characterLevel switch { < 5 => "1d10", < 10 => "2d10", _ => "3d10" },
             "d8cantrip"  => characterLevel switch { < 5 => "1d8",  < 10 => "2d8",  _ => "3d8" },
             "d6cantrip"  => characterLevel switch { < 5 => "1d6",  < 10 => "2d6",  _ => "3d6" },

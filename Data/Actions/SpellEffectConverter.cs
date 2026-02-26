@@ -1489,6 +1489,7 @@ namespace QDND.Data.Actions
                 "force" => true,
                 "teleport" => true,
                 "summon" => true,
+                "unsummon" => true,
                 "summoncreature" => true,
                 "createsurface" => true,
                 "restoreresource" => true,

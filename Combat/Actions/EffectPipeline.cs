@@ -231,8 +231,9 @@ namespace QDND.Combat.Actions
             RegisterEffect(new PullEffect());
             RegisterEffect(new SpawnSurfaceEffect());
 
-            // Summon effect
+            // Summon / unsummon effects
             RegisterEffect(new SummonCombatantEffect());
+            RegisterEffect(new UnsummonCombatantEffect());
 
             // Spawn object effect
             RegisterEffect(new SpawnObjectEffect());

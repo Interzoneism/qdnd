@@ -102,8 +102,10 @@ namespace QDND.Combat.Passives
                 return false;
             }
 
-            // Apply boosts if passive has them
-            if (passive.HasBoosts)
+            // Apply boosts if passive has them and BoostConditions (if any) are satisfied.
+            // BoostConditions are equipment-state predicates evaluated at grant time.
+            // Unknown or compound conditions default to true (safe: apply boosts).
+            if (passive.HasBoosts && EvaluateBoostConditions(Owner, passive.BoostConditions))
             {
                 try
                 {
@@ -154,6 +156,51 @@ namespace QDND.Combat.Passives
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Evaluates a BG3 BoostConditions string against the combatant's current state.
+        /// Handles simple single-function predicates with optional leading "not ".
+        /// Returns true (apply boosts) for null/empty conditions and for any
+        /// unrecognised or compound condition expressions.
+        /// </summary>
+        private static bool EvaluateBoostConditions(Combatant combatant, string conditions)
+        {
+            if (string.IsNullOrWhiteSpace(conditions))
+                return true;
+
+            string raw = conditions.Trim();
+
+            bool negated = false;
+            if (raw.StartsWith("not ", StringComparison.OrdinalIgnoreCase))
+            {
+                negated = true;
+                raw = raw.Substring(4).Trim();
+            }
+
+            bool result;
+
+            // WearingArmor(context.Source) — true when any armour piece is equipped.
+            // Used by FightingStyle_Defense (+1 AC) and similar passives.
+            if (raw.StartsWith("WearingArmor", StringComparison.OrdinalIgnoreCase))
+            {
+                result = combatant.EquippedArmor != null;
+            }
+            // HasHeavyArmor(context.Source) — true when heavy armour is equipped.
+            // Used by Unarmored-movement and similar conditions.
+            else if (raw.StartsWith("HasHeavyArmor", StringComparison.OrdinalIgnoreCase))
+            {
+                result = combatant.EquippedArmor?.Category.ToString()
+                             .Equals("Heavy", StringComparison.OrdinalIgnoreCase) == true;
+            }
+            else
+            {
+                // Unrecognised or compound condition (e.g., HasStatus checks, HasThrownWeapon,
+                // DualWielder). Default to true so boosts are not silently dropped.
+                return true;
+            }
+
+            return negated ? !result : result;
         }
 
         /// <summary>

@@ -630,10 +630,20 @@ namespace QDND.Data
 
         private void ApplyInvocationChoicesForLevel(CharacterSheet sheet, LevelProgression progression)
         {
-            if (sheet == null || progression?.InvocationsKnown == null)
+            if (sheet == null || progression == null)
                 return;
 
-            int targetCount = Math.Max(0, progression.InvocationsKnown.Value);
+            // InvocationsKnown may be set as a top-level property or stored in the Resources dict
+            // (the Warlock LevelTable currently uses Resources["invocations_known"]).
+            int? invocationsKnown = progression.InvocationsKnown;
+            if (invocationsKnown == null && progression.Resources != null &&
+                progression.Resources.TryGetValue("invocations_known", out int resVal))
+                invocationsKnown = resVal;
+
+            if (invocationsKnown == null)
+                return;
+
+            int targetCount = Math.Max(0, invocationsKnown.Value);
             if (sheet.InvocationIds.Count > targetCount)
             {
                 sheet.InvocationIds = sheet.InvocationIds.Take(targetCount).ToList();

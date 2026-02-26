@@ -222,16 +222,13 @@ namespace QDND.Combat.Services
 
             _isPlayerTurn = combatant.IsPlayerControlled;
 
-            // Check for round change and reset reactions for all combatants
+            // Track round transitions. Reactions reset at start of each combatant's OWN turn
+            // (BG3/5e rule), not at the round boundary for everyone.
             int currentRound = _turnQueue.CurrentRound;
             if (currentRound != _previousRound)
             {
-                foreach (var c in _getCombatants())
-                {
-                    c.ActionBudget.ResetReactionForRound();
-                }
                 _previousRound = currentRound;
-                _log($"Round {currentRound}: Reset reactions for all combatants");
+                _log($"Round {currentRound}: New round");
             }
 
             // Process death saves for downed combatants
@@ -279,6 +276,8 @@ namespace QDND.Combat.Services
             }
 
             combatant.ActionBudget.MaxMovement = Mathf.Max(0f, adjustedMovement);
+            // BG3/5e: Reaction resets at the start of this combatant's own turn.
+            combatant.ActionBudget.ResetReactionForRound();
             combatant.ActionBudget.ResetForTurn();
             combatant.AttackedThisTurn.Clear();
 

@@ -122,7 +122,7 @@ namespace Tests.Unit
             Assert.False(fighter.ActionBudget.HasReaction);
             
             // Replenish turn resources
-            restService.ReplenishTurnResources(fighter);
+            restService.ReplenishRoundResources(fighter);
             
             // Verify replenishment via ActionBudget
             Assert.True(fighter.ActionBudget.HasAction);
@@ -144,7 +144,7 @@ namespace Tests.Unit
             Assert.Equal(3, wizard.ActionResources.GetCurrent("SpellSlot", 1));
             
             // Replenish turn resources
-            restService.ReplenishTurnResources(wizard);
+            restService.ReplenishRoundResources(wizard);
             
             // Verify spell slot NOT restored
             Assert.Equal(3, wizard.ActionResources.GetCurrent("SpellSlot", 1));

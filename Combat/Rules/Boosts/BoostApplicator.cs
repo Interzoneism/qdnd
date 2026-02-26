@@ -47,6 +47,16 @@ namespace QDND.Combat.Rules.Boosts
                     var activeBoost = new ActiveBoost(definition, source, sourceId);
                     combatant.AddBoost(activeBoost);
                     appliedCount++;
+
+                    // TemporaryHP boosts are applied as an immediate effect rather than
+                    // passively queried, because ResourceComponent.AddTemporaryHP uses
+                    // BG3-correct non-stacking semantics (takes the higher value).
+                    if (definition.Type == BoostType.TemporaryHP)
+                    {
+                        int tempAmount = definition.GetIntParameter(0, 0);
+                        if (tempAmount > 0)
+                            combatant.Resources.AddTemporaryHP(tempAmount);
+                    }
                 }
 
                 return appliedCount;
