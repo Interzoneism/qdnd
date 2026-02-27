@@ -29,6 +29,7 @@ using QDND.Data.Interrupts;
 using QDND.Data.AI;
 using QDND.Tools.AutoBattler;
 using QDND.Combat.VFX;
+using QDND.Combat.Arena.CustomFight;
 
 namespace QDND.Combat.Arena
 {
@@ -51,6 +52,13 @@ namespace QDND.Combat.Arena
         [Export] public PackedScene CombatantVisualScene;
         [Export] public float TileSize = 1.0f; // World-space meters (1 Godot unit = 1 meter)
         [Export] public float DefaultMovePoints = QDND.Combat.Rules.CombatRules.DefaultMovementBudgetMeters;
+
+        [ExportGroup("Custom Fight")]
+        [Export] public bool CustomFightEnabled = false;
+        [Export] public int CustomFightSeed = 0;
+        [Export] public Godot.Collections.Array<CustomFightCombatantConfig> CustomFightCombatants = new();
+        [Export(PropertyHint.File, "*.json")] public string CustomFightPresetLoadPath = "";
+        [Export] public string CustomFightPresetSaveName = "";
 
         // Node references (set in _Ready or via editor)
         private Camera3D _camera;
@@ -109,6 +117,7 @@ namespace QDND.Combat.Arena
         private AutoBattleRuntime _autoBattleRuntime;
         private AutoBattleConfig _autoBattleConfig;
         private int? _autoBattleSeedOverride;
+        private CustomFightLogger _customFightLogger;
         private ScenarioBootService _scenarioBootService;
         private SphereShape3D _navigationProbeShape;
         private SphereShape3D _jumpProbeShape;
@@ -322,7 +331,66 @@ namespace QDND.Combat.Arena
 
             // Try loading scenario first, fallback to default if it fails
             bool scenarioLoaded = false;
-            if (_dynamicScenarioMode != DynamicScenarioMode.None)
+            if (CustomFightEnabled && CustomFightCombatants != null && CustomFightCombatants.Count > 0)
+            {
+                try
+                {
+                    // Load preset if path is set
+                    if (!string.IsNullOrEmpty(CustomFightPresetLoadPath))
+                    {
+                        var preset = CustomFightManager.LoadPreset(CustomFightPresetLoadPath);
+                        CustomFightManager.ApplyPreset(preset, CustomFightCombatants, out int presetSeed);
+                        if (CustomFightSeed == 0) CustomFightSeed = presetSeed;
+                    }
+
+                    int resolvedSeed = CustomFightManager.ResolveSeed(CustomFightSeed);
+                    CustomFightSeed = resolvedSeed;
+                    RandomSeed = resolvedSeed;
+
+                    var charRegistry = _combatContext.GetService<CharacterDataRegistry>();
+                    var scenario = CustomFightManager.BuildScenario(CustomFightCombatants, resolvedSeed, charRegistry);
+                    _scenarioBootService.LoadScenarioDefinition(scenario, "custom fight");
+                    SyncFromBootService();
+                    scenarioLoaded = true;
+
+                    // Set AI difficulty to Nightmare (best AI)
+                    RealtimeAIDifficulty = AIDifficulty.Nightmare;
+                    RealtimeAIPlayerArchetype = AIArchetype.Tactical;
+                    RealtimeAIEnemyArchetype = AIArchetype.Tactical;
+
+                    // Determine if all combatants are AI-controlled
+                    bool allAi = true;
+                    foreach (var cfg in CustomFightCombatants)
+                    {
+                        if (cfg != null && !cfg.AiControlled)
+                        {
+                            allAi = false;
+                            break;
+                        }
+                    }
+                    UseRealtimeAIForAllFactions = allAi;
+                    UseBuiltInAI = !allAi;
+
+                    // Setup combat logging
+                    var logger = CustomFightManager.CreateLogger(resolvedSeed);
+                    _customFightLogger = new CustomFightLogger { Name = "CustomFightLogger" };
+                    AddChild(_customFightLogger);
+                    _customFightLogger.Initialize(logger, this, resolvedSeed);
+
+                    // Save preset if name is set
+                    if (!string.IsNullOrEmpty(CustomFightPresetSaveName))
+                    {
+                        CustomFightManager.SavePreset(CustomFightPresetSaveName, resolvedSeed, CustomFightCombatants);
+                    }
+
+                    Log($"Custom Fight loaded: {CustomFightCombatants.Count} combatants, seed={resolvedSeed}");
+                }
+                catch (Exception ex)
+                {
+                    GD.PushError($"[CombatArena] Custom Fight failed: {ex.Message}\n{ex.StackTrace}");
+                }
+            }
+            else if (_dynamicScenarioMode != DynamicScenarioMode.None)
             {
                 try
                 {
