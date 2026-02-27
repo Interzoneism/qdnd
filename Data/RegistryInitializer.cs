@@ -187,6 +187,11 @@ namespace QDND.Data
                 r.EffectPipeline.RegisterAction(abilityDef);
             }
 
+            // Initialize Summon Template Registry
+            string summonTemplatePath = Path.Combine(dataPath, "Scenarios", "summon_templates.json");
+            SummonTemplateRegistry.Initialize(summonTemplatePath);
+            log($"Summon Template Registry: {SummonTemplateRegistry.Count} templates loaded");
+
             // Phase C+: On-Hit Trigger System
             var onHitTriggerService = new OnHitTriggerService();
             OnHitTriggers.RegisterAll(onHitTriggerService, r.StatusManager, r.ConcentrationSystem);

@@ -16,6 +16,9 @@ namespace QDND.Combat.Actions.Effects
     /// </summary>
     public class SummonCombatantEffect : Effect
     {
+        private const float SPAWN_OFFSET_METERS = 2f;
+        private const int INITIATIVE_OFFSET = 1;
+
         public override string Type => "summon";
 
         public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
@@ -59,6 +62,35 @@ namespace QDND.Combat.Actions.Effects
             // TODO: Replace with proper summon-specific portraits
             PortraitAssigner.AssignRandomPortrait(summon);
 
+            // Assign known actions from template registry
+            if (SummonTemplateRegistry.TryGetTemplate(templateId, out var template))
+            {
+                foreach (var actionId in template.KnownActions)
+                {
+                    if (!summon.KnownActions.Contains(actionId))
+                        summon.KnownActions.Add(actionId);
+                }
+                RuntimeSafety.Log($"[SummonCombatantEffect] Assigned {template.KnownActions.Count} actions to {summonId} from template '{templateId}'");
+            }
+            else
+            {
+                RuntimeSafety.Log($"[SummonCombatantEffect] No template found for '{templateId}' — summon has no known actions");
+            }
+
+            // Check for inline summonActions parameter as fallback
+            var inlineActions = GetParameterList(definition, "summonActions");
+            if (inlineActions != null && inlineActions.Count > 0)
+            {
+                foreach (var actionId in inlineActions)
+                {
+                    if (!summon.KnownActions.Contains(actionId))
+                        summon.KnownActions.Add(actionId);
+                }
+            }
+
+            if (summon.KnownActions.Count > 0)
+                summon.NotifyKnownActionsChanged();
+
             // Apply initiative policy
             ApplyInitiativePolicy(summon, context.Source, initiativePolicy, context.TurnQueue);
 
@@ -98,14 +130,33 @@ namespace QDND.Combat.Actions.Effects
             return defaultValue;
         }
 
+        private List<string> GetParameterList(EffectDefinition definition, string key)
+        {
+            if (!definition.Parameters.TryGetValue(key, out var value))
+                return null;
+
+            try
+            {
+                if (value is List<string> list)
+                    return list;
+                if (value is System.Text.Json.JsonElement je && je.ValueKind == System.Text.Json.JsonValueKind.Array)
+                    return System.Text.Json.JsonSerializer.Deserialize<List<string>>(je.GetRawText());
+            }
+            catch
+            {
+                // Fall through
+            }
+            return null;
+        }
+
         private Godot.Vector3 CalculateSpawnPosition(EffectContext context, string spawnMode)
         {
             switch (spawnMode.ToLower())
             {
                 case "near_caster":
                 default:
-                    // Spawn 2 units to the right of caster
-                    return context.Source.Position + new Godot.Vector3(2, 0, 0);
+                    // Spawn offset to the right of caster
+                    return context.Source.Position + new Godot.Vector3(SPAWN_OFFSET_METERS, 0, 0);
 
                 case "at_target":
                     if (context.Targets.Count > 0)
@@ -126,14 +177,14 @@ namespace QDND.Combat.Actions.Effects
             {
                 case "after_owner":
                 default:
-                    // Set initiative to 1 less than owner to appear after them
-                    summon.Initiative = owner.Initiative - 1;
+                    // Set initiative slightly less than owner to appear after them
+                    summon.Initiative = owner.Initiative - INITIATIVE_OFFSET;
                     summon.InitiativeTiebreaker = 0;
                     break;
 
                 case "before_owner":
-                    // Set initiative to 1 more than owner to appear before them
-                    summon.Initiative = owner.Initiative + 1;
+                    // Set initiative slightly more than owner to appear before them
+                    summon.Initiative = owner.Initiative + INITIATIVE_OFFSET;
                     summon.InitiativeTiebreaker = 0;
                     break;
 

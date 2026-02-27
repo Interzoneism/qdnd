@@ -1,0 +1,37 @@
+{
+  "statuses": [
+    {
+      "id": "flaming_sphere_aura",
+      "name": "Flaming Sphere Aura",
+      "description": "The Flaming Sphere radiates searing heat. Enemies ending their turn within 2m take 2d6 fire damage (DEX save for half).",
+      "isBuff": true,
+      "durationType": "permanent",
+      "isConcentration": false,
+      "auraRadius": 2.0,
+      "auraStatusId": "flaming_sphere_burn",
+      "auraAffectsEnemiesOnly": true,
+      "tags": ["fire", "flaming_sphere", "aura"],
+      "disableCombatlog": true,
+      "statusPropertyFlags": ["DisableOverhead", "DisableCombatlog"]
+    },
+    {
+      "id": "flaming_sphere_burn",
+      "name": "Ablaze",
+      "description": "Seared by the Flaming Sphere's heat. Takes 2d6 fire damage at the end of each turn (DEX save for half).",
+      "isBuff": false,
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "stacking": "unique",
+      "tickEffects": [
+        {
+          "effectType": "damage",
+          "diceFormula": "2d6",
+          "damageType": "fire",
+          "saveType": "dexterity",
+          "halfDamageOnSave": true
+        }
+      ],
+      "tags": ["fire", "flaming_sphere", "aura_child"]
+    }
+  ]
+}

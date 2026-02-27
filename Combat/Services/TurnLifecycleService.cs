@@ -58,6 +58,7 @@ namespace QDND.Combat.Services
         private readonly Action<string> _resumeDecisionStateIfExecuting;
         private readonly Func<double, SceneTreeTimer> _createTimer;
         private readonly Action<string> _log;
+        private readonly AuraSystem _auraSystem;
 
         /// <summary>Default movement budget when a combatant has no speed.</summary>
         private readonly float _defaultMovePoints;
@@ -113,8 +114,10 @@ namespace QDND.Combat.Services
             Func<double, SceneTreeTimer> createTimer,
             Func<bool> isAutoBattleMode,
             Func<bool> useBuiltInAI,
-            Action<string> log)
+            Action<string> log,
+            AuraSystem auraSystem = null)
         {
+            _auraSystem = auraSystem;
             _turnQueue = turnQueue;
             _stateMachine = stateMachine;
             _effectPipeline = effectPipeline;
@@ -493,6 +496,9 @@ namespace QDND.Combat.Services
             }
 
             _dispatchRuleWindow(RuleWindow.OnTurnEnd, current, null);
+
+            // Process auras before status ticks
+            _auraSystem?.ProcessTurnEndAuras(current.Id);
 
             // Process status ticks
             _statusManager.ProcessTurnEnd(current.Id);

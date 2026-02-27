@@ -96,6 +96,7 @@ namespace QDND.Combat.Movement
         public const float COMBATANT_COLLISION_RADIUS = 0.9f;
         public const float COMBATANT_VERTICAL_TOLERANCE = 1.5f;
         private const float NAVIGATION_SAMPLE_STEP = 0.5f;
+        private const float FEAR_DIRECTION_TOLERANCE = 0.1f;
 
         private readonly RuleEventBus _events;
         private readonly SurfaceManager _surfaces;
@@ -112,6 +113,11 @@ namespace QDND.Combat.Movement
         /// Optional function to get all combatants for opportunity attack checks.
         /// </summary>
         public Func<IEnumerable<Combatant>> GetCombatants { get; set; }
+
+        /// <summary>
+        /// Optional function to resolve a combatant by ID (used for frightened direction checks).
+        /// </summary>
+        public Func<string, Combatant> ResolveCombatant { get; set; }
 
         /// <summary>
         /// Optional world obstacle probe.
@@ -200,14 +206,29 @@ namespace QDND.Combat.Movement
                 return (false, $"Insufficient movement ({combatant.ActionBudget.RemainingMovement:F1}/{path.TotalCost:F1})");
             }
 
-            // BG3: Frightened completely prevents movement (bg3.wiki/wiki/Frightened)
+            // BG3/5e: Frightened creatures can't willingly move closer to fear source
             if (_statuses != null)
             {
-                var frightenedStatus = _statuses.GetStatuses(combatant.Id)
-                    .FirstOrDefault(s => string.Equals(s.Definition.Id, "frightened", StringComparison.OrdinalIgnoreCase)
-                             || string.Equals(s.Definition.Id, "feared", StringComparison.OrdinalIgnoreCase));
-                if (frightenedStatus != null)
-                    return (false, "Frightened: cannot move");
+                var fleeStatus = _statuses.GetStatuses(combatant.Id)
+                    .FirstOrDefault(s => string.Equals(s.Definition?.AIBehaviorTag, "flee_from_source", StringComparison.OrdinalIgnoreCase));
+                if (fleeStatus != null && !string.IsNullOrEmpty(fleeStatus.SourceId))
+                {
+                    if (ResolveCombatant == null)
+                    {
+                        Data.RuntimeSafety.Log("[MovementService] Warning: ResolveCombatant not wired; cannot enforce frightened direction restriction");
+                    }
+                    var fearSource = ResolveCombatant?.Invoke(fleeStatus.SourceId);
+                    if (fearSource != null && fearSource.IsActive)
+                    {
+                        float currentDistance = combatant.Position.DistanceTo(fearSource.Position);
+                        float newDistance = destination.DistanceTo(fearSource.Position);
+
+                        if (newDistance < currentDistance - FEAR_DIRECTION_TOLERANCE)
+                        {
+                            return (false, $"Frightened: cannot move closer to {fearSource.Name}");
+                        }
+                    }
+                }
             }
 
             return (true, null);

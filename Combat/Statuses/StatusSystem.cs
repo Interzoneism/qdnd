@@ -163,6 +163,25 @@ namespace QDND.Combat.Statuses
         public string AIBehaviorTag { get; set; }
 
         /// <summary>
+        /// If > 0, this status emits an aura that auto-applies AuraStatusId to
+        /// combatants within this radius (in meters). Checked at each combatant's turn end.
+        /// BG3 equivalent: AuraRadius field on BOOST statuses.
+        /// </summary>
+        public float AuraRadius { get; set; }
+
+        /// <summary>
+        /// Status ID to apply to combatants within AuraRadius.
+        /// Only used when AuraRadius > 0.
+        /// </summary>
+        public string AuraStatusId { get; set; }
+
+        /// <summary>
+        /// If true, the aura only affects enemies (not allies or self).
+        /// Default: true (matches most BG3 auras like Flaming Sphere).
+        /// </summary>
+        public bool AuraAffectsEnemiesOnly { get; set; } = true;
+
+        /// <summary>
         /// Check if this status has a specific status property flag.
         /// Matching is case-insensitive.
         /// </summary>

@@ -448,8 +448,21 @@ namespace QDND.Combat.Services
             }
         }
 
-        private void SpawnVisualForCombatant(Combatant combatant)
+        public void SpawnVisualForCombatant(Combatant combatant)
         {
+            if (_combatantsContainer == null || _arena == null)
+            {
+                GD.PushError($"[ScenarioBootService] Cannot spawn visual for {combatant.Name}: not initialized");
+                return;
+            }
+
+            // Check if visual already exists
+            if (_combatantVisuals.ContainsKey(combatant.Id))
+            {
+                RuntimeSafety.Log($"[ScenarioBootService] Visual already exists for {combatant.Id}");
+                return;
+            }
+
             CombatantVisual visual;
 
             if (_arena.CombatantVisualScene != null)
@@ -472,6 +485,20 @@ namespace QDND.Combat.Services
             _combatantVisuals[combatant.Id] = visual;
 
             _log($"Spawned visual for {combatant.Name} at {visual.Position}, Layer: {visual.CollisionLayer}, InTree: {visual.IsInsideTree()}");
+        }
+
+        /// <summary>
+        /// Removes and frees the 3D visual node for the given combatant.
+        /// Called when a summon is unsummoned or dies.
+        /// </summary>
+        public void RemoveVisualForCombatant(string combatantId)
+        {
+            if (_combatantVisuals.TryGetValue(combatantId, out var visual))
+            {
+                _combatantVisuals.Remove(combatantId);
+                visual.QueueFree();
+                _log($"[ScenarioBootService] Removed visual for {combatantId}");
+            }
         }
 
         private Vector3 CombatantPositionToWorld(Vector3 gridPos)

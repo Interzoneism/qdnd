@@ -19,6 +19,11 @@ namespace QDND.Combat.Services
         private readonly List<string> _registeredServices = new List<string>();
         private readonly Dictionary<string, Combatant> _combatants = new Dictionary<string, Combatant>(StringComparer.OrdinalIgnoreCase);
 
+        /// <summary>
+        /// Fired when a new combatant is registered (including mid-combat summons).
+        /// </summary>
+        public event Action<Combatant> OnCombatantRegistered;
+
         public override void _EnterTree()
         {
             if (_instance != null && _instance != this)
@@ -123,6 +128,7 @@ namespace QDND.Combat.Services
         public void RegisterCombatant(Combatant combatant)
         {
             _combatants[combatant.Id] = combatant;
+            OnCombatantRegistered?.Invoke(combatant);
         }
 
         /// <summary>

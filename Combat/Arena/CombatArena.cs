@@ -127,6 +127,8 @@ namespace QDND.Combat.Arena
         private List<Combatant> _combatants = new();
         private readonly HashSet<string> _oneTimeLogKeys = new();
         private Random _rng;
+        private bool _initialLoadComplete;
+        private RuleEventSubscription _combatantDiedSubscription;
 
         // Round tracking — now owned by TurnLifecycleService
         private TurnLifecycleService _turnLifecycleService;
@@ -388,6 +390,7 @@ namespace QDND.Combat.Arena
             }
 
             SpawnCombatantVisuals();
+            _initialLoadComplete = true;
             SetupInitialCamera();
 
             if (UseRealtimeAIForAllFactions)
@@ -1022,6 +1025,7 @@ namespace QDND.Combat.Arena
             // Movement Service (Phase E)
             _movementService = new MovementService(_rulesEngine.Events, _surfaceManager, reactionSystem, _statusManager);
             _movementService.GetCombatants = () => _combatants;
+            _movementService.ResolveCombatant = id => _combatContext?.GetCombatant(id);
             _movementService.ReactionResolver = _reactionResolver;
             _movementService.PathNodeSpacing = 0.75f;
             _movementService.IsWorldPositionBlocked = IsWorldNavigationBlocked;
@@ -1112,6 +1116,13 @@ namespace QDND.Combat.Arena
 
             Log($"UI Models initialized");
 
+            // AuraSystem — processes entity-attached auras at turn end.
+            var auraSystem = new AuraSystem(
+                _statusManager,
+                () => _combatants,
+                id => _combatContext.GetCombatant(id));
+            _combatContext.RegisterService(auraSystem);
+
             // TurnLifecycleService — owns StartCombat, BeginTurn, EndCurrentTurn and all turn state.
             _turnLifecycleService = new TurnLifecycleService(
                 _turnQueue, _stateMachine, _effectPipeline, _statusManager,
@@ -1129,7 +1140,8 @@ namespace QDND.Combat.Arena
                 secs => GetTree().CreateTimer(secs),
                 () => IsAutoBattleMode,
                 () => UseBuiltInAI,
-                Log);
+                Log,
+                auraSystem);
             _turnLifecycleService.AfterBeginTurnHook = OnAfterBeginTurn;
             _turnLifecycleService.AllowVictoryHook = ShouldAllowVictory;
 
@@ -1200,6 +1212,10 @@ namespace QDND.Combat.Arena
                 _oneTimeLogKeys,
                 bootConfig,
                 bootVisuals);
+
+            // Subscribe to mid-combat summon visual spawning and death cleanup
+            _combatContext.OnCombatantRegistered += OnMidCombatCombatantRegistered;
+            _combatantDiedSubscription = _rulesEngine?.Events.Subscribe(RuleEventType.CombatantDied, OnCombatantDiedCleanupVisual);
         }
 
         private void LoadRandomScenario()
@@ -1229,6 +1245,52 @@ namespace QDND.Combat.Arena
         }
 
         private void SpawnCombatantVisuals() => _scenarioBootService.SpawnCombatantVisuals();
+
+        /// <summary>
+        /// Handles mid-combat combatant registration (e.g. summons) by spawning a visual
+        /// and wiring per-combatant event subscriptions.
+        /// </summary>
+        private void OnMidCombatCombatantRegistered(Combatant combatant)
+        {
+            if (!_initialLoadComplete) return; // Initial combatants handled by SpawnCombatantVisuals
+
+            if (_scenarioBootService != null)
+            {
+                _scenarioBootService.SpawnVisualForCombatant(combatant);
+            }
+
+            // Register with spatial services so LOS/forced-movement work for summons
+            var losService = _combatContext?.GetService<LOSService>();
+            losService?.RegisterCombatant(combatant);
+            _forcedMovementService?.RegisterCombatant(combatant);
+
+            // Grant movement budget and baseline reactions like initial combatants get
+            _movementCoordinator?.ApplyDefaultMovementToCombatants(new[] { combatant });
+            _reactionCoordinator?.GrantBaselineReactions(new[] { combatant });
+
+            WireCombatantEvents(combatant);
+        }
+
+        /// <summary>
+        /// Cleans up the 3D visual when a summoned combatant dies or is unsummoned.
+        /// Only removes visuals for summons (OwnerId != self) to preserve normal death visuals.
+        /// </summary>
+        private void OnCombatantDiedCleanupVisual(RuleEvent evt)
+        {
+            if (_scenarioBootService == null || string.IsNullOrEmpty(evt.TargetId))
+                return;
+
+            var combatant = _combatContext?.GetCombatant(evt.TargetId);
+            if (combatant == null)
+                return;
+
+            // Only auto-remove visuals for summoned entities (owned by another combatant).
+            bool isSummon = !string.IsNullOrEmpty(combatant.OwnerId) && combatant.OwnerId != combatant.Id;
+            if (isSummon)
+            {
+                _scenarioBootService.RemoveVisualForCombatant(evt.TargetId);
+            }
+        }
 
         /// <summary>Syncs output state written by ScenarioBootService back to CombatArena fields.</summary>
         private void SyncFromBootService()
@@ -1891,9 +1953,11 @@ namespace QDND.Combat.Arena
             // Update path
             ScenarioPath = scenarioPath;
 
-            // Reload
+            // Reload — suppress mid-combat handler during batch load
+            _initialLoadComplete = false;
             LoadScenario(scenarioPath);
             SpawnCombatantVisuals();
+            _initialLoadComplete = true;
             if (UseRealtimeAIForAllFactions)
             {
                 // Ensure arena-side AI cannot race the realtime AI during scenario reload.
@@ -2157,6 +2221,17 @@ namespace QDND.Combat.Arena
             _chargePathPreview?.Hide();
             _wallSegmentPreview?.Hide();
             ClearTargetHighlights();
+        }
+
+        public override void _ExitTree()
+        {
+            if (_combatContext != null)
+                _combatContext.OnCombatantRegistered -= OnMidCombatCombatantRegistered;
+
+            if (_combatantDiedSubscription != null)
+                _rulesEngine?.Events.Unsubscribe(_combatantDiedSubscription.Id);
+
+            base._ExitTree();
         }
 
         // --- Extensibility hooks for subclasses ---
