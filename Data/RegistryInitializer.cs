@@ -67,7 +67,8 @@ namespace QDND.Data
             Func<string, Combatant> resolveCombatant,
             Func<IEnumerable<string>> getAllCombatantIds,
             Action<string> removeSurfacesByCreator,
-            Action<string> removeSurfaceById)
+            Action<string> removeSurfaceById,
+            Action<string> removeSummonsByOwner = null)
         {
             var r = new BootstrapResult();
 
@@ -101,6 +102,7 @@ namespace QDND.Data
             };
             r.ConcentrationSystem.RemoveSurfacesByCreator = removeSurfacesByCreator;
             r.ConcentrationSystem.RemoveSurfaceById = removeSurfaceById;
+            r.ConcentrationSystem.RemoveSummonsByOwner = removeSummonsByOwner;
 
             r.EffectPipeline = new EffectPipeline
             {

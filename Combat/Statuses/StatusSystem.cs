@@ -157,6 +157,12 @@ namespace QDND.Combat.Statuses
         public List<string> GrantedActions { get; set; } = new();
 
         /// <summary>
+        /// If set, overrides AI movement on the affected combatant's turn.
+        /// Values: "flee_from_source", "approach_source"
+        /// </summary>
+        public string AIBehaviorTag { get; set; }
+
+        /// <summary>
         /// Check if this status has a specific status property flag.
         /// Matching is case-insensitive.
         /// </summary>
@@ -200,6 +206,15 @@ namespace QDND.Combat.Statuses
         public float ValuePerStack { get; set; }
         public string DamageType { get; set; }
         public HashSet<string> Tags { get; set; } = new();
+
+        /// <summary>Dice formula for damage (e.g. "2d6"). Takes priority over Value when non-empty.</summary>
+        public string DiceFormula { get; set; }
+
+        /// <summary>Ability used for saving throw (e.g. "dexterity", "wisdom"). Empty = no save.</summary>
+        public string SaveType { get; set; }
+
+        /// <summary>When true, a successful save reduces damage by half. Evasion overrides this for DEX saves.</summary>
+        public bool HalfDamageOnSave { get; set; }
     }
 
     /// <summary>

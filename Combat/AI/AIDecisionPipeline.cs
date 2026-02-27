@@ -229,6 +229,14 @@ namespace QDND.Combat.AI
                     }
                 }
 
+                // Status-driven movement override (Command: Flee/Approach, etc.)
+                var movementOverride = TryGetStatusMovementOverride(actor);
+                if (movementOverride != null)
+                {
+                    result.ChosenAction = movementOverride;
+                    return result;
+                }
+
                 // Check if we have a valid existing plan for this actor
                 if (_currentPlan != null && _currentPlan.CombatantId == actor.Id && 
                     !_currentPlan.IsComplete && _currentPlan.IsValid(_context))
@@ -922,7 +930,10 @@ namespace QDND.Combat.AI
                 // Also skip abilities tagged as "passive"
                 if (!isTestAbility && action.Tags?.Contains("passive") == true) continue;
                 
-                // Skip summon actions (forbidden in canonical scenarios) UNLESS it's a test ability
+                // Skip internal summon-command actions (IsSummon = true). These are class
+                // features that ARE the summon (e.g., Hound of Ill Omen). Castable concentration
+                // spells that happen to have a summon effect (e.g., flaming_sphere) do NOT carry
+                // IsSummon = true and should be evaluated normally by the AI.
                 if (!isTestAbility && action.IsSummon) continue;
                 
                 // Skip bonus action abilities UNLESS it's a test ability
@@ -1201,7 +1212,8 @@ namespace QDND.Combat.AI
                     continue;
                 if (!isTestAbility && action.Tags?.Contains("passive") == true) continue;
                 
-                // Skip summon actions (forbidden in canonical scenarios) UNLESS it's a test ability
+                // Skip internal summon-command actions (IsSummon = true). Castable spells
+                // with summon effects (e.g., flaming_sphere) do not carry IsSummon = true.
                 if (!isTestAbility && action.IsSummon) continue;
                 // Only bonus action abilities (skip if requires both action and bonus for now)
                 if (action.Cost?.UsesBonusAction != true) continue;
@@ -3094,6 +3106,69 @@ namespace QDND.Combat.AI
         private Combatant GetCombatant(string id)
         {
             return _context?.GetCombatant(id);
+        }
+
+        /// <summary>
+        /// Checks if any active status forces a specific movement behavior.
+        /// Returns a forced Move AIAction if so, null otherwise.
+        /// </summary>
+        private AIAction TryGetStatusMovementOverride(Combatant actor)
+        {
+            if (_statusSystem == null) return null;
+
+            float moveRange = actor.ActionBudget?.RemainingMovement ?? 0f;
+            if (moveRange < 0.5f) return null;
+
+            var statuses = _statusSystem.GetStatuses(actor.Id);
+            foreach (var status in statuses)
+            {
+                var tag = status.Definition?.AIBehaviorTag;
+                if (string.IsNullOrEmpty(tag)) continue;
+
+                // Skip if no caster to orient from
+                if (string.IsNullOrEmpty(status.SourceId)) continue;
+                var caster = GetCombatant(status.SourceId);
+                if (caster == null) continue;
+
+                var actorPos = actor.Position;
+                var casterPos = caster.Position;
+
+                if (tag == "flee_from_source")
+                {
+                    var awayDir = (actorPos - casterPos);
+                    if (awayDir.LengthSquared() < 0.001f)
+                        awayDir = new Vector3(1, 0, 0);
+                    awayDir = awayDir.Normalized();
+                    var targetPos = actorPos + awayDir * moveRange;
+                    return new AIAction
+                    {
+                        ActionType = AIActionType.Move,
+                        TargetPosition = targetPos,
+                        IsValid = true
+                    };
+                }
+
+                if (tag == "approach_source")
+                {
+                    float distToCaster = actorPos.DistanceTo(casterPos);
+                    // Already adjacent — end turn to avoid drifting away
+                    if (distToCaster <= 1.5f)
+                        return new AIAction { ActionType = AIActionType.EndTurn, IsValid = true };
+
+                    var towardDir = (casterPos - actorPos).Normalized();
+                    // Stop 1.5 m short to avoid overlap
+                    float travelDist = Math.Min(moveRange, distToCaster - 1.5f);
+                    var targetPos = actorPos + towardDir * travelDist;
+                    return new AIAction
+                    {
+                        ActionType = AIActionType.Move,
+                        TargetPosition = targetPos,
+                        IsValid = true
+                    };
+                }
+            }
+
+            return null;
         }
 
         /// <summary>

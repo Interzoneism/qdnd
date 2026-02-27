@@ -810,7 +810,31 @@ namespace QDND.Combat.Arena
                 resolveCombatant: id => _combatContext?.GetCombatant(id),
                 getAllCombatantIds: () => _combatants.Select(c => c.Id),
                 removeSurfacesByCreator: creatorId => _surfaceManager?.RemoveSurfacesByCreator(creatorId),
-                removeSurfaceById: instanceId => _surfaceManager?.RemoveSurfaceById(instanceId));
+                removeSurfaceById: instanceId => _surfaceManager?.RemoveSurfaceById(instanceId),
+                removeSummonsByOwner: ownerId =>
+                {
+                    // Remove all combatants owned by this caster (summoned creatures).
+                    // Mirrors UnsummonCombatantEffect: set dead, remove from queue, fire death event.
+                    var summons = _combatContext?.GetAllCombatants()
+                        ?.Where(c => c.OwnerId == ownerId && c.Id != ownerId)
+                        .ToList();
+                    if (summons == null) return;
+                    foreach (var summon in summons)
+                    {
+                        summon.LifeState = CombatantLifeState.Dead;
+                        summon.Resources.CurrentHP = 0;
+                        _turnQueue?.RemoveCombatant(summon.Id);
+                        _rulesEngine?.Events.Dispatch(new QDND.Combat.Rules.RuleEvent
+                        {
+                            Type = QDND.Combat.Rules.RuleEventType.CombatantDied,
+                            SourceId = ownerId,
+                            TargetId = summon.Id,
+                            Data = new System.Collections.Generic.Dictionary<string, object>
+                                { { "cause", "concentration_broken" } }
+                        });
+                        Log($"[ConcentrationSystem] Unsummoned {summon.Name} (concentration broken)");
+                    }
+                });
 
             _dataRegistry = registries.DataRegistry;
             _rulesEngine = registries.RulesEngine;
@@ -932,7 +956,8 @@ namespace QDND.Combat.Arena
             {
                 Log = Log,
                 OnShowDamage = (id, amt, dt) => { if (_combatantVisuals.TryGetValue(id, out var v)) v.ShowDamage(amt, damageType: dt); },
-                OnShowHealing = (id, amt) => { if (_combatantVisuals.TryGetValue(id, out var v)) v.ShowHealing(amt); }
+                OnShowHealing = (id, amt) => { if (_combatantVisuals.TryGetValue(id, out var v)) v.ShowHealing(amt); },
+                ResolveCombatant = id => _combatContext.GetCombatant(id)
             };
 
             _combatContext.RegisterService(_dataRegistry);

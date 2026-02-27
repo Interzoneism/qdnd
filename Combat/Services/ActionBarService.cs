@@ -449,7 +449,10 @@ namespace QDND.Combat.Services
             RuntimeSafety.Log($"[DEBUG-ABILITIES] {combatant.Name} ({combatantId}) known={string.Join(", ", combatant.KnownActions ?? new List<string>())} resolved={string.Join(", ", actionDefs.Select(a => a.Id))}");
             var commonActions = GetCommonActions();
 
-            // Filter out summon actions (forbidden in canonical scenarios)
+            // Filter out internal summon-command actions (IsSummon = true on actions like
+            // Hound of Ill Omen or Accursed Specter that ARE the summon mechanic themselves).
+            // Castable spells that have a summon *effect* (e.g., flaming_sphere) do NOT carry
+            // IsSummon = true and must pass through so they appear on the action bar.
             var nonSummonActions = actionDefs.Where(a => !a.IsSummon).ToList();
             var filteredCommonActions = commonActions.Where(a => !a.IsSummon).ToList();
 

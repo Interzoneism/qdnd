@@ -454,7 +454,8 @@
       "isBuff": false,
       "isDispellable": true,
       "tags": ["debuff", "spell", "enchantment", "command", "frightened"],
-      "blockedActions": ["action", "bonusAction", "reaction"]
+      "blockedActions": ["action", "bonusAction", "reaction"],
+      "aiBehaviorTag": "flee_from_source"
     },
     {
       "id": "command_halt",
@@ -505,6 +506,7 @@
       "name": "Command: Approach",
       "description": "Must spend its turn moving as close to the caster as possible.",
       "blockedActions": ["action", "bonusAction", "reaction"],
+      "aiBehaviorTag": "approach_source",
       "duration": 1,
       "durationType": "turns",
       "defaultDuration": 1,

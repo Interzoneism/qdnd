@@ -136,6 +136,13 @@ namespace QDND.Combat.Entities
         public string OwnerId { get; set; }
 
         /// <summary>
+        /// Spell save DC inherited from the summoning caster.
+        /// Used by Ram and similar summon abilities so damage uses the caster's DC.
+        /// Null for non-summon combatants.
+        /// </summary>
+        public int? OwnerSpellSaveDC { get; set; }
+
+        /// <summary>
         /// Life/vitality state of this combatant.
         /// </summary>
         public CombatantLifeState LifeState { get; set; } = CombatantLifeState.Alive;

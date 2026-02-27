@@ -234,6 +234,7 @@ namespace QDND.Combat.Actions
             // Summon / unsummon effects
             RegisterEffect(new SummonCombatantEffect());
             RegisterEffect(new UnsummonCombatantEffect());
+            RegisterEffect(new TeleportSummonEffect());
 
             // Spawn object effect
             RegisterEffect(new SpawnObjectEffect());
@@ -2395,6 +2396,10 @@ namespace QDND.Combat.Actions
 
         private int ComputeSaveDC(Combatant source, ActionDefinition action, HashSet<string> effectiveTags)
         {
+            // Summoned entities inherit their caster's spell save DC
+            if (source?.OwnerSpellSaveDC.HasValue == true)
+                return source.OwnerSpellSaveDC.Value;
+
             if (source?.ResolvedCharacter == null)
                 return 10;
 

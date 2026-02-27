@@ -1,0 +1,52 @@
+{
+  "actions": [
+    {
+      "id": "flaming_sphere_ram",
+      "name": "Ram",
+      "description": "The Flaming Sphere rams a creature, dealing 2d6 fire damage (DEX save for half).",
+      "targetType": "singleUnit",
+      "targetFilter": "enemies",
+      "range": 1.5,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "saveType": "dexterity",
+      "effects": [
+        {
+          "type": "damage",
+          "diceFormula": "2d6",
+          "damageType": "fire",
+          "saveTakesHalf": true
+        }
+      ],
+      "tags": [
+        "summon_ability",
+        "fire",
+        "flaming_sphere"
+      ]
+    },
+    {
+      "id": "flaming_sphere_move",
+      "name": "Move Flaming Sphere",
+      "description": "Move the Flaming Sphere up to 9m (30ft).",
+      "targetType": "point",
+      "targetFilter": "all",
+      "range": 9.0,
+      "cost": {
+        "usesBonusAction": true
+      },
+      "effects": [
+        {
+          "type": "teleport_summon",
+          "parameters": {
+            "summonTemplateId": "flaming_sphere"
+          }
+        }
+      ],
+      "tags": [
+        "summon_control",
+        "flaming_sphere"
+      ]
+    }
+  ]
+}

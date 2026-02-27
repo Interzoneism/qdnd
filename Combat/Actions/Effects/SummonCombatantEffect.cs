@@ -51,7 +51,8 @@ namespace QDND.Combat.Actions.Effects
             {
                 OwnerId = context.Source.Id,
                 Team = context.Source.Team,
-                Position = CalculateSpawnPosition(context, spawnMode)
+                Position = CalculateSpawnPosition(context, spawnMode),
+                OwnerSpellSaveDC = context.Pipeline?.GetSaveDC(context.Source, context.Ability)
             };
 
             // Assign random placeholder portrait to summon
@@ -110,6 +111,10 @@ namespace QDND.Combat.Actions.Effects
                     if (context.Targets.Count > 0)
                         return context.Targets[0].Position;
                     return context.Source.Position;
+
+                case "at_target_point":
+                    // Point-targeted summons (e.g., Flaming Sphere) spawn at the chosen location
+                    return context.TargetPosition ?? context.Source.Position;
 
                     // More spawn modes can be added here
             }

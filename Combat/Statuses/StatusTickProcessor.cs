@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
 using QDND.Combat.Services;
@@ -28,6 +29,9 @@ namespace QDND.Combat.Statuses
 
         /// <summary>Optional log sink. Pass CombatArena.Log to route through VerboseLogging.</summary>
         public Action<string> Log;
+
+        /// <summary>Resolves a combatant by ID. Used to look up the caster for spell save DC computation.</summary>
+        public Func<string, Combatant> ResolveCombatant;
 
         public StatusTickProcessor(RulesEngine rulesEngine, CombatLog combatLog, StatusManager statusManager)
         {
@@ -64,7 +68,74 @@ namespace QDND.Combat.Statuses
 
         private void ProcessDamageTick(StatusInstance status, Combatant target, StatusTickEffect tick, float value)
         {
-            int baseDamage = (int)value;
+            // Roll base damage: dice formula takes priority over flat value
+            int baseDamage;
+            if (!string.IsNullOrEmpty(tick.DiceFormula) && _rulesEngine != null)
+            {
+                var (count, sides, bonus) = ParseDice(tick.DiceFormula);
+                baseDamage = sides > 0 ? _rulesEngine.Dice.Roll(count, sides, bonus) : bonus;
+            }
+            else
+            {
+                baseDamage = (int)value;
+            }
+
+            // Roll saving throw if configured
+            bool savedSuccessfully = false;
+            bool hasSave = !string.IsNullOrEmpty(tick.SaveType);
+            if (hasSave && _rulesEngine != null)
+            {
+                int saveDC = 10;
+                if (status.SaveDCOverride.HasValue)
+                {
+                    saveDC = status.SaveDCOverride.Value;
+                }
+                else if (!string.IsNullOrEmpty(status.SourceId))
+                {
+                    var caster = ResolveCombatant?.Invoke(status.SourceId);
+                    if (caster != null)
+                        saveDC = 8 + caster.GetProficiencyBonus() + GetSpellcastingAbilityModifier(caster);
+                }
+
+                int saveBonus = 0;
+                if (Enum.TryParse<AbilityType>(tick.SaveType, ignoreCase: true, out var abilityType))
+                    saveBonus = target.GetSavingThrowModifier(abilityType);
+
+                var saveQuery = new QueryInput
+                {
+                    Type = QueryType.SavingThrow,
+                    Target = target,
+                    DC = saveDC,
+                    BaseValue = saveBonus
+                };
+                saveQuery.Tags.Add($"save:{tick.SaveType.ToLowerInvariant()}");
+                if (_statusManager != null)
+                {
+                    saveQuery.Parameters["targetActiveStatuses"] = _statusManager.GetStatuses(target.Id)
+                        .Select(s => s.Definition.Id).ToList();
+                }
+
+                var saveResult = _rulesEngine.RollSave(saveQuery);
+                savedSuccessfully = saveResult.IsSuccess;
+                string sourceName2 = status.Definition?.Name ?? "Status";
+                Log?.Invoke($"{target.Name} rolls {tick.SaveType} save vs DC {saveDC}: {(savedSuccessfully ? "SUCCESS" : "FAIL")} ({sourceName2})");
+            }
+
+            // Apply Evasion (DEX save, Rogue/Monk L7): success = 0 damage, fail = half
+            bool isDexSave = string.Equals(tick.SaveType, "dexterity", StringComparison.OrdinalIgnoreCase);
+            bool hasEvasion = hasSave && isDexSave &&
+                target.ResolvedCharacter?.Features?.Any(f =>
+                    string.Equals(f.Id, "evasion", StringComparison.OrdinalIgnoreCase)) == true;
+
+            if (hasEvasion)
+            {
+                baseDamage = savedSuccessfully ? 0 : baseDamage / 2;
+            }
+            else if (hasSave && tick.HalfDamageOnSave && savedSuccessfully)
+            {
+                baseDamage = baseDamage / 2;
+            }
+
             int finalDamage = baseDamage;
 
             if (_rulesEngine != null)
@@ -182,6 +253,45 @@ namespace QDND.Combat.Statuses
             if (!string.IsNullOrEmpty(tick.DamageType))
                 Enum.TryParse<DamageType>(tick.DamageType, ignoreCase: true, out parsedDamageType);
             OnShowDamage?.Invoke(target.Id, finalDamage, parsedDamageType);
+        }
+
+        private static (int Count, int Sides, int Bonus) ParseDice(string formula)
+        {
+            if (string.IsNullOrEmpty(formula)) return (0, 0, 0);
+            formula = formula.ToLower().Replace(" ", "");
+            int bonus = 0;
+            int plusIdx = formula.IndexOf('+');
+            int minusIdx = formula.IndexOf('-');
+            int bonusIdx = plusIdx > 0 ? plusIdx : (minusIdx > 0 ? minusIdx : -1);
+            if (bonusIdx > 0 && int.TryParse(formula[bonusIdx..], out bonus))
+                formula = formula[..bonusIdx];
+            int dIdx = formula.IndexOf('d');
+            if (dIdx < 0)
+            {
+                if (int.TryParse(formula, out int flat)) return (0, 0, flat + bonus);
+                return (0, 0, bonus);
+            }
+            string countStr = dIdx == 0 ? "1" : formula[..dIdx];
+            string sidesStr = formula[(dIdx + 1)..];
+            int.TryParse(countStr, out int count);
+            int.TryParse(sidesStr, out int sides);
+            return (count, sides, bonus);
+        }
+
+        private static int GetSpellcastingAbilityModifier(Combatant source)
+        {
+            if (source?.ResolvedCharacter?.Sheet?.ClassLevels == null) return 0;
+            foreach (var cl in source.ResolvedCharacter.Sheet.ClassLevels)
+            {
+                string classId = cl.ClassId?.ToLowerInvariant();
+                switch (classId)
+                {
+                    case "wizard": return source.GetAbilityModifier(AbilityType.Intelligence);
+                    case "cleric" or "druid" or "ranger" or "monk": return source.GetAbilityModifier(AbilityType.Wisdom);
+                    case "bard" or "sorcerer" or "warlock" or "paladin": return source.GetAbilityModifier(AbilityType.Charisma);
+                }
+            }
+            return 0;
         }
 
         private void ProcessHealTick(StatusInstance status, Combatant target, StatusTickEffect tick, float value)

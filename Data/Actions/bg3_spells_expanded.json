@@ -921,17 +921,15 @@
       "name": "Flaming Sphere",
       "description": "Summon a rolling sphere of fire that burns enemies.",
       "icon": "res://assets/Images/Icons Spells/Flaming_Sphere_Unfaded_Icon.png",
-      "targetType": "circle",
+      "targetType": "point",
       "targetFilter": "all",
       "range": 18,
-      "areaRadius": 1.5,
       "cost": {
         "usesAction": true,
         "resourceCosts": {
           "spell_slot_2": 1
         }
       },
-      "saveType": "dexterity",
       "requiresConcentration": true,
       "concentrationStatusId": "flaming_sphere_zone",
       "canUpcast": true,
@@ -942,17 +940,13 @@
       },
       "effects": [
         {
-          "type": "damage",
-          "diceFormula": "2d6",
-          "damageType": "fire",
-          "saveTakesHalf": true
-        },
-        {
-          "type": "spawn_surface",
-          "value": 1.5,
-          "statusDuration": 10,
+          "type": "summon",
           "parameters": {
-            "surface_type": "fire"
+            "templateId": "flaming_sphere",
+            "summonName": "Flaming Sphere",
+            "hp": 20,
+            "initiativePolicy": "after_owner",
+            "spawnMode": "at_target_point"
           }
         }
       ],
@@ -960,7 +954,6 @@
         "spell",
         "conjuration",
         "fire",
-        "aoe",
         "concentration",
         "level_2"
       ],

@@ -175,6 +175,14 @@ namespace QDND.Combat.Statuses
         /// </summary>
         public Action<string> RemoveSurfacesByCreator { get; set; }
 
+        /// <summary>
+        /// Optional callback to remove all summoned combatants owned by a specific caster.
+        /// Called when concentration breaks on a summon-creating spell (e.g., Flaming Sphere).
+        /// Set by the arena so ConcentrationSystem can request summon removal without
+        /// taking a TurnQueueService dependency.
+        /// </summary>
+        public Action<string> RemoveSummonsByOwner { get; set; }
+
         public ConcentrationSystem(StatusManager statusManager, RulesEngine rulesEngine)
         {
             _statusManager = statusManager ?? throw new ArgumentNullException(nameof(statusManager));
@@ -392,6 +400,9 @@ namespace QDND.Combat.Statuses
 
             // Remove linked surfaces when concentration breaks
             RemoveLinkedSurfaces(info);
+
+            // Remove summoned creatures when concentration breaks for summon-creating spells
+            RemoveLinkedSummons(info);
 
             OnConcentrationBroken?.Invoke(combatantId, info, reason);
 
@@ -699,16 +710,33 @@ namespace QDND.Combat.Statuses
                 var surfaceActionIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 {
                     "spirit_guardians", "darkness", "cloud_of_daggers", "moonbeam",
-                    "flaming_sphere", "wall_of_fire", "hunger_of_hadar", "sleet_storm",
+                    "wall_of_fire", "hunger_of_hadar", "sleet_storm",
                     "spike_growth", "plant_growth", "stinking_cloud", "web",
                     "grease", "entangle", "fog_cloud", "silence"
                 };
+                // Note: flaming_sphere is NOT listed here — it creates a summon, not a surface.
 
                 if (!string.IsNullOrWhiteSpace(info.ActionId) && surfaceActionIds.Contains(info.ActionId))
                 {
                     RemoveSurfacesByCreator(info.CombatantId);
                 }
             }
+        }
+
+        /// <summary>
+        /// Remove summoned combatants when concentration breaks on a summon-creating spell.
+        /// Only fires if <see cref="RemoveSummonsByOwner"/> is wired and the action is known
+        /// to create a summon (not a surface).
+        /// </summary>
+        private void RemoveLinkedSummons(ConcentrationInfo info)
+        {
+            if (info == null || RemoveSummonsByOwner == null)
+                return;
+
+            // Any concentration break removes owned summons — all concentration summons
+            // (Flaming Sphere, Spiritual Weapon, Conjure Animals, etc.) die when
+            // concentration breaks. This is a no-op if the caster has no summons.
+            RemoveSummonsByOwner(info.CombatantId);
         }
 
         private RuleEventContext BuildConcentrationCheckContext(
