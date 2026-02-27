@@ -512,8 +512,11 @@ namespace QDND.Combat.AI
             // Bonus action candidates
             if (actor.ActionBudget?.HasBonusAction == true || isTestMode)
             {
-                                // Shove candidates - uses bonus action
-                                candidates.AddRange(GenerateShoveCandidates(actor));
+                                // Shove candidates disabled: Shove action is not yet implemented
+                                // in CombatArena/RealtimeAIController. Generating shove candidates
+                                // causes infinite loops because the "not implemented" fallback
+                                // doesn't consume the bonus action. Re-enable when Shove is implemented.
+                                // candidates.AddRange(GenerateShoveCandidates(actor));
                 candidates.AddRange(GenerateBonusActionCandidates(actor));
             }
 

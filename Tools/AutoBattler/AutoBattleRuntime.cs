@@ -57,6 +57,8 @@ namespace QDND.Tools.AutoBattler
         private RuleEventBus _ruleEventBus;
         private RuleEventSubscription _specialMovementSub;
         private RuleEventSubscription _surfaceDamageSub;
+        private RuleEventSubscription _passiveTriggerSub;
+        private RuleEventSubscription _customPassiveSub;
 
         // Avoid false positives during scene bootstrap where combatants may not be registered yet.
         private const double EMPTY_ARENA_GRACE_SECONDS = 0.75;
@@ -135,6 +137,19 @@ namespace QDND.Tools.AutoBattler
                                    "surface".Equals(src?.ToString(), StringComparison.OrdinalIgnoreCase),
                     ownerId: "AutoBattleRuntime"
                 );
+                _passiveTriggerSub = _ruleEventBus.Subscribe(
+                    RuleEventType.ReactionTriggered,
+                    OnPassiveTriggered,
+                    priority: 99,
+                    ownerId: "AutoBattleRuntime_Passives"
+                );
+                _customPassiveSub = _ruleEventBus.Subscribe(
+                    RuleEventType.Custom,
+                    OnPassiveTriggered,
+                    priority: 99,
+                    filter: evt => IsPassiveOrReactionEvent(evt),
+                    ownerId: "AutoBattleRuntime_Passives"
+                );
             }
 
             // Always subscribe to status events for combat log observability
@@ -152,7 +167,6 @@ namespace QDND.Tools.AutoBattler
                 if (_effectPipeline != null)
                 {
                     _effectPipeline.OnEffectUnhandled += OnEffectUnhandled;
-                    _effectPipeline.OnAbilityExecuted += OnAbilityExecutedForDamage;
                 }
 
                 _surfaceManager = context?.GetService<SurfaceManager>();
@@ -160,6 +174,12 @@ namespace QDND.Tools.AutoBattler
                 {
                     _surfaceManager.OnSurfaceCreated += OnSurfaceCreatedForParity;
                 }
+            }
+
+            // Always subscribe for damage logging
+            if (_effectPipeline != null)
+            {
+                _effectPipeline.OnAbilityExecuted += OnAbilityExecutedForDamage;
             }
 
             // Collect granted abilities at battle start
@@ -177,25 +197,7 @@ namespace QDND.Tools.AutoBattler
                 }
             }
 
-            // Build unit snapshots with abilities for BATTLE_START
-            var unitSnapshots = _arena.GetCombatants().Select(c => new UnitSnapshot
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Faction = c.Faction.ToString(),
-                HP = c.Resources.CurrentHP,
-                MaxHP = c.Resources.MaxHP,
-                Position = new[] { c.Position.X, c.Position.Y, c.Position.Z },
-                Alive = c.IsActive && c.Resources.CurrentHP > 0,
-                Abilities = c.KnownActions?.ToList() // Populate abilities from KnownActions
-            }).ToList();
-
-            _logger.Write(new LogEntry
-            {
-                Event = LogEventType.BATTLE_START,
-                Seed = _seed,
-                Units = unitSnapshots
-            });
+            _logger.LogBattleStart(_seed, _arena.GetCombatants().ToList());
             _watchdog.StartMonitoring();
 
             // Deferred: connect to AI controller events after arena finishes setup
@@ -249,6 +251,14 @@ namespace QDND.Tools.AutoBattler
             if (_ruleEventBus != null && _surfaceDamageSub != null)
             {
                 _ruleEventBus.Unsubscribe(_surfaceDamageSub.Id);
+            }
+            if (_ruleEventBus != null && _passiveTriggerSub != null)
+            {
+                _ruleEventBus.Unsubscribe(_passiveTriggerSub.Id);
+            }
+            if (_ruleEventBus != null && _customPassiveSub != null)
+            {
+                _ruleEventBus.Unsubscribe(_customPassiveSub.Id);
             }
         }
 
@@ -376,6 +386,7 @@ namespace QDND.Tools.AutoBattler
             if (uiAware != null)
             {
                 uiAware.OnActionExecuted += OnActionExecuted;
+                uiAware.OnTurnStarted += OnAITurnStarted;
                 uiAware.OnTurnEnded += OnAITurnEnded;
                 uiAware.OnError += OnAIError;
                 GD.Print("[AutoBattleRuntime] Connected to UIAwareAIController events");
@@ -383,6 +394,7 @@ namespace QDND.Tools.AutoBattler
             else if (realtime != null)
             {
                 realtime.OnActionExecuted += OnActionExecuted;
+                realtime.OnTurnStarted += OnAITurnStarted;
                 realtime.OnTurnEnded += OnAITurnEnded;
                 realtime.OnError += OnAIError;
                 GD.Print("[AutoBattleRuntime] Connected to RealtimeAIController events");
@@ -397,6 +409,7 @@ namespace QDND.Tools.AutoBattler
                     if (uiAwareLate != null)
                     {
                         uiAwareLate.OnActionExecuted += OnActionExecuted;
+                        uiAwareLate.OnTurnStarted += OnAITurnStarted;
                         uiAwareLate.OnTurnEnded += OnAITurnEnded;
                         uiAwareLate.OnError += OnAIError;
                         GD.Print("[AutoBattleRuntime] Connected to UIAwareAIController events (deferred)");
@@ -404,6 +417,7 @@ namespace QDND.Tools.AutoBattler
                     else if (realtimeLate != null)
                     {
                         realtimeLate.OnActionExecuted += OnActionExecuted;
+                        realtimeLate.OnTurnStarted += OnAITurnStarted;
                         realtimeLate.OnTurnEnded += OnAITurnEnded;
                         realtimeLate.OnError += OnAIError;
                         GD.Print("[AutoBattleRuntime] Connected to RealtimeAIController events (deferred)");
@@ -442,6 +456,18 @@ namespace QDND.Tools.AutoBattler
             
             // Check for unit deaths after every action
             CheckForDeaths();
+        }
+
+        private void OnAITurnStarted(string actorId)
+        {
+            if (_completed) return;
+
+            var combatant = _arena?.Context?.GetCombatant(actorId);
+            if (combatant == null) return;
+
+            var activeStatuses = _statusManager?.GetStatuses(actorId);
+            var spellSlots = BlackBoxLogger.CollectSpellSlots(combatant);
+            _logger.LogTurnStart(combatant, _turnCount, _roundNumber, activeStatuses, spellSlots);
         }
 
         private void OnStatusApplied(StatusInstance instance)
@@ -562,7 +588,7 @@ namespace QDND.Tools.AutoBattler
 
         private void OnAbilityExecutedForDamage(ActionExecutionResult result)
         {
-            if (_completed || !DebugFlags.ParityReportMode || result == null) return;
+            if (_completed || result == null) return;
 
             // Extract damage from effect results
             var effectResults = result.EffectResults ?? new List<EffectResult>();
@@ -589,7 +615,8 @@ namespace QDND.Tools.AutoBattler
                             damageAmount,
                             damageType,
                             result.ActionId);
-                        _totalDamageDealt += damageAmount;
+                        if (DebugFlags.ParityReportMode)
+                            _totalDamageDealt += damageAmount;
                     }
                 }
             }
@@ -624,6 +651,29 @@ namespace QDND.Tools.AutoBattler
             string surfaceId = evt.Data.TryGetValue("surfaceId", out var sid) ? sid?.ToString() : evt.SourceId;
             string damageType = evt.Data.TryGetValue("damageType", out var dt) ? dt?.ToString() : null;
             _logger?.LogSurfaceDamage(surfaceId, evt.TargetId, (int)evt.Value, damageType);
+        }
+
+        private void OnPassiveTriggered(RuleEvent evt)
+        {
+            if (_completed || evt == null) return;
+            string passive = evt.ActionId ?? evt.CustomType ?? "unknown_passive";
+            string trigger = evt.CustomType ?? evt.Type.ToString();
+            string desc = evt.Data?.TryGetValue("description", out var d) == true ? d?.ToString() : null;
+            _logger?.LogPassiveTriggered(evt.SourceId ?? "unknown", passive, trigger, desc);
+        }
+
+        private static bool IsPassiveOrReactionEvent(RuleEvent evt)
+        {
+            if (string.IsNullOrEmpty(evt?.CustomType)) return false;
+            var ct = evt.CustomType;
+            return ct.Contains("Reaction", StringComparison.OrdinalIgnoreCase) ||
+                   ct.Contains("Passive", StringComparison.OrdinalIgnoreCase) ||
+                   ct.Contains("OpportunityAttack", StringComparison.OrdinalIgnoreCase) ||
+                   ct.Contains("Counterspell", StringComparison.OrdinalIgnoreCase) ||
+                   ct.Contains("HellishRebuke", StringComparison.OrdinalIgnoreCase) ||
+                   ct.Contains("Shield", StringComparison.OrdinalIgnoreCase) ||
+                   ct.Contains("Riposte", StringComparison.OrdinalIgnoreCase) ||
+                   ct.Contains("WarCaster", StringComparison.OrdinalIgnoreCase);
         }
 
         private static bool IsSpecialMovementEvent(RuleEvent evt)

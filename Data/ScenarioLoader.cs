@@ -718,6 +718,7 @@ namespace QDND.Data
                 }
                 
                 var resolver = new CharacterResolver(_charRegistry);
+                resolver.SpellSelectionSeed = _rng?.Next();
                 
                 // Issue 4: Wire ActionRegistry into CharacterResolver for ability validation
                 if (_actionRegistry != null)

@@ -6,6 +6,7 @@ using QDND.Combat.Arena;
 using QDND.Combat.AI;
 using QDND.Combat.Services;
 using QDND.Combat.States;
+using QDND.Combat.Statuses;
 using QDND.Combat.Entities;
 
 namespace QDND.Tools.AutoBattler
@@ -390,7 +391,11 @@ namespace QDND.Tools.AutoBattler
             if (combatant != null)
             {
                 var turnQueue = _arena.Context.GetService<TurnQueueService>();
-                _logger.LogTurnStart(combatant, _turnCount, turnQueue?.CurrentRound ?? 1);
+                var statusManager = _arena.Context.GetService<StatusManager>();
+                var activeStatuses = statusManager?.GetStatuses(actorId);
+                var spellSlots = BlackBoxLogger.CollectSpellSlots(combatant);
+                _logger.LogTurnStart(combatant, _turnCount, turnQueue?.CurrentRound ?? 1,
+                    activeStatuses, spellSlots);
             }
             
             // Check turn limit

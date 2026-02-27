@@ -458,6 +458,18 @@ namespace QDND.Combat.AI
             }
             action.PushDirection = pushDirection;
 
+            // If this is a shove_prone variant, invalidate immediately if target is already prone
+            if (string.Equals(action.VariantId, "shove_prone", StringComparison.OrdinalIgnoreCase))
+            {
+                var statusSystem = _context?.GetService<StatusManager>();
+                if (statusSystem != null && statusSystem.HasStatus(target.Id, "prone"))
+                {
+                    action.IsValid = false;
+                    action.InvalidReason = "Target already prone";
+                    return;
+                }
+            }
+
             // Base shove value (repositioning enemy is moderately useful)
             float baseValue = 1f;
             breakdown["base_shove_value"] = baseValue;

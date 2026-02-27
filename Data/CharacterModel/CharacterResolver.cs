@@ -53,6 +53,13 @@ namespace QDND.Data.CharacterModel
         {
             _actionRegistry = actionRegistry;
         }
+
+        /// <summary>
+        /// Optional seed for spell selection randomization. When set, this overrides
+        /// the default name-based hash for spell shuffling, allowing different scenario
+        /// seeds to produce different spell loadouts for the same character.
+        /// </summary>
+        public int? SpellSelectionSeed { get; set; }
         
         /// <summary>
         /// Resolve a character sheet into a fully computed character.
@@ -295,6 +302,19 @@ namespace QDND.Data.CharacterModel
         /// Subclass spells (AlwaysPreparedSpells) are always included outside the cap.
         /// Non-spell class features are never filtered.
         /// </summary>
+        /// <summary>
+        /// Stable string hash that does not change across process restarts.
+        /// .NET 6+ randomizes string.GetHashCode() by default.
+        /// </summary>
+        private static int StableStringHash(string s)
+        {
+            if (s == null) return 0;
+            int h = 17;
+            foreach (char c in s)
+                h = unchecked(h * 31 + c);
+            return h;
+        }
+
         private List<string> ApplySpellLimits(List<string> rawAbilityIds, CharacterSheet sheet,
             List<string> subclassSpellIds, ResolvedCharacter resolved)
         {
@@ -412,7 +432,12 @@ namespace QDND.Data.CharacterModel
             }
 
             // Seeded random keyed to character name: same build always gets the same subset.
-            var rng = new Random(sheet.Name?.GetHashCode() ?? 42);
+            // If SpellSelectionSeed is provided, XOR it with the name hash so different scenario
+            // seeds produce different spell loadouts while still differentiating characters.
+            int nameHash = StableStringHash(sheet.Name);
+            var rng = SpellSelectionSeed.HasValue
+                ? new Random(SpellSelectionSeed.Value ^ nameHash)
+                : new Random(nameHash != 0 ? nameHash : 42);
 
             // Subclass (domain/oath) spells are always-prepared — exclude them from the cap pool.
             var subclassSpellSet = new HashSet<string>(subclassSpellIds, StringComparer.OrdinalIgnoreCase);

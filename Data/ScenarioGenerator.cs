@@ -425,7 +425,7 @@ namespace QDND.Data
                 abilityBonus1,
                 background);
 
-            var resolvedPreview = new CharacterResolver(_characterDataRegistry).Resolve(sheet);
+            var resolvedPreview = new CharacterResolver(_characterDataRegistry) { SpellSelectionSeed = _random.Next() }.Resolve(sheet);
             int dexterity = resolvedPreview.AbilityScores.TryGetValue(AbilityType.Dexterity, out int finalDex)
                 ? finalDex
                 : sheet.BaseDexterity;
@@ -685,7 +685,7 @@ namespace QDND.Data
             if (primary == secondary)
                 secondary = AbilityType.Constitution;
 
-            var snapshot = new CharacterResolver(_characterDataRegistry).Resolve(sheet);
+            var snapshot = new CharacterResolver(_characterDataRegistry) { SpellSelectionSeed = _random.Next() }.Resolve(sheet);
             bool chooseAsi = ShouldChooseAsi(snapshot, primary, secondary);
 
             if (!chooseAsi)

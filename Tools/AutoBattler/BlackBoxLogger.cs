@@ -7,6 +7,8 @@ using System.Text.Json.Serialization;
 using Godot;
 using QDND.Combat.AI;
 using QDND.Combat.Entities;
+using QDND.Combat.Statuses;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Tools.AutoBattler
 {
@@ -50,7 +52,8 @@ namespace QDND.Tools.AutoBattler
         ACTION_DETAIL,
         ACTION_BATCH_SUMMARY,
         SURFACE_DAMAGE,
-        STATUS_TICK
+        STATUS_TICK,
+        PASSIVE_TRIGGERED
     }
 
     /// <summary>
@@ -233,6 +236,18 @@ namespace QDND.Tools.AutoBattler
         [JsonPropertyName("details")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public Dictionary<string, object> Details { get; set; }
+
+        [JsonPropertyName("active_statuses")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public List<Dictionary<string, object>> ActiveStatuses { get; set; }
+
+        [JsonPropertyName("spell_slots")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Dictionary<string, int> SpellSlots { get; set; }
+
+        [JsonPropertyName("conditions")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public List<string> Conditions { get; set; }
     }
 
     /// <summary>
@@ -264,6 +279,62 @@ namespace QDND.Tools.AutoBattler
         [JsonPropertyName("abilities")]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public List<string> Abilities { get; set; }
+
+        [JsonPropertyName("race")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string Race { get; set; }
+
+        [JsonPropertyName("class")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string Class { get; set; }
+
+        [JsonPropertyName("subclass")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string Subclass { get; set; }
+
+        [JsonPropertyName("level")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? Level { get; set; }
+
+        [JsonPropertyName("ac")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public int? AC { get; set; }
+
+        [JsonPropertyName("main_hand")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string MainHand { get; set; }
+
+        [JsonPropertyName("off_hand")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string OffHand { get; set; }
+
+        [JsonPropertyName("armor")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string Armor { get; set; }
+
+        [JsonPropertyName("shield")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string Shield { get; set; }
+
+        [JsonPropertyName("feats")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public List<string> Feats { get; set; }
+
+        [JsonPropertyName("passives")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public List<string> Passives { get; set; }
+
+        [JsonPropertyName("spell_slots")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Dictionary<string, int> SpellSlots { get; set; }
+
+        [JsonPropertyName("ability_scores")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public Dictionary<string, int> AbilityScores { get; set; }
+
+        [JsonPropertyName("tags")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public List<string> Tags { get; set; }
     }
 
     /// <summary>
@@ -362,9 +433,11 @@ namespace QDND.Tools.AutoBattler
             });
         }
 
-        public void LogTurnStart(Combatant actor, int turnNumber, int round)
+        public void LogTurnStart(Combatant actor, int turnNumber, int round,
+            List<StatusInstance> activeStatuses = null,
+            Dictionary<string, int> spellSlots = null)
         {
-            Write(new LogEntry
+            var entry = new LogEntry
             {
                 Event = LogEventType.TURN_START,
                 UnitId = actor.Id,
@@ -376,7 +449,22 @@ namespace QDND.Tools.AutoBattler
                 MaxHP = actor.Resources.MaxHP,
                 ActionPoints = actor.ActionBudget?.ToString(),
                 Position = new[] { actor.Position.X, actor.Position.Y, actor.Position.Z }
-            });
+            };
+
+            if (activeStatuses?.Count > 0)
+            {
+                entry.ActiveStatuses = activeStatuses.Select(s => new Dictionary<string, object>
+                {
+                    ["id"] = s.Definition.Id,
+                    ["source"] = s.SourceId ?? "unknown",
+                    ["remaining_duration"] = s.RemainingDuration
+                }).ToList();
+            }
+
+            if (spellSlots?.Count > 0)
+                entry.SpellSlots = spellSlots;
+
+            Write(entry);
         }
 
         public void LogDecision(string actorId, AIDecisionResult decision)
@@ -389,7 +477,23 @@ namespace QDND.Tools.AutoBattler
                 ? chosen.ScoreBreakdown.OrderByDescending(kv => kv.Value).First().Key
                 : null;
 
-            Write(new LogEntry
+            List<Dictionary<string, object>> candidateSummary = null;
+            if (decision.AllCandidates?.Count > 0)
+            {
+                candidateSummary = decision.AllCandidates
+                    .OrderByDescending(c => c.Score)
+                    .Take(10)
+                    .Select(c => new Dictionary<string, object>
+                    {
+                        ["action"] = c.ActionType.ToString(),
+                        ["ability_id"] = c.ActionId ?? "",
+                        ["target"] = c.TargetId ?? "",
+                        ["score"] = Math.Round(c.Score, 2),
+                        ["valid"] = c.IsValid
+                    }).ToList();
+            }
+
+            var entry = new LogEntry
             {
                 Event = LogEventType.DECISION,
                 UnitId = actorId,
@@ -404,7 +508,23 @@ namespace QDND.Tools.AutoBattler
                         .Take(5)
                         .ToDictionary(kv => kv.Key, kv => (float)Math.Round(kv.Value, 2)))
                     : null
-            });
+            };
+
+            if (candidateSummary?.Count > 0)
+            {
+                entry.Details = new Dictionary<string, object>
+                {
+                    ["candidates"] = candidateSummary,
+                    ["total_candidates"] = decision.AllCandidates.Count,
+                    ["is_forced"] = decision.IsForcedByTest,
+                    ["is_part_of_plan"] = decision.IsPartOfPlan
+                };
+
+                if (decision.TurnPlan != null)
+                    entry.Details["turn_plan_steps"] = decision.TurnPlan.PlannedActions?.Count ?? 0;
+            }
+
+            Write(entry);
         }
 
         public void LogActionResult(string actorId, ActionRecord action)
@@ -637,9 +757,21 @@ namespace QDND.Tools.AutoBattler
             });
         }
 
+        public void LogPassiveTriggered(string unitId, string passiveId, string trigger, string description = null)
+        {
+            Write(new LogEntry
+            {
+                Event = LogEventType.PASSIVE_TRIGGERED,
+                UnitId = unitId,
+                ActionId = passiveId,
+                Action = trigger,
+                Description = description
+            });
+        }
+
         private UnitSnapshot SnapshotUnit(Combatant c)
         {
-            return new UnitSnapshot
+            var snapshot = new UnitSnapshot
             {
                 Id = c.Id,
                 Name = c.Name,
@@ -648,8 +780,77 @@ namespace QDND.Tools.AutoBattler
                 MaxHP = c.Resources.MaxHP,
                 Position = new[] { c.Position.X, c.Position.Y, c.Position.Z },
                 Alive = c.IsActive && c.Resources.CurrentHP > 0,
-                Abilities = c.KnownActions?.ToList()
+                Abilities = c.KnownActions?.ToList(),
+                AC = c.GetArmorClass(),
+                MainHand = c.MainHandWeapon?.Id,
+                OffHand = c.OffHandWeapon?.Id,
+                Armor = c.EquippedArmor?.Id,
+                Shield = c.EquippedShield?.Id,
+                Passives = c.PassiveIds?.Count > 0 ? c.PassiveIds.ToList() : null,
+                Tags = c.Tags?.Count > 0 ? c.Tags.ToList() : null
             };
+
+            var rc = c.ResolvedCharacter;
+            if (rc?.Sheet != null)
+            {
+                snapshot.Race = rc.Sheet.RaceId;
+                snapshot.Level = rc.Sheet.TotalLevel;
+                snapshot.Feats = rc.Sheet.FeatIds?.Count > 0 ? rc.Sheet.FeatIds.ToList() : null;
+
+                var firstClass = rc.Sheet.ClassLevels?.FirstOrDefault();
+                if (firstClass != null)
+                {
+                    snapshot.Class = firstClass.ClassId;
+                    snapshot.Subclass = firstClass.SubclassId;
+                }
+
+                if (rc.AbilityScores?.Count > 0)
+                {
+                    snapshot.AbilityScores = rc.AbilityScores.ToDictionary(
+                        kv => kv.Key.ToString(), kv => kv.Value);
+                }
+            }
+
+            var slotSnapshot = CollectSpellSlots(c);
+            if (slotSnapshot?.Count > 0)
+                snapshot.SpellSlots = slotSnapshot;
+
+            return snapshot;
+        }
+
+        public static Dictionary<string, int> CollectSpellSlots(Combatant c)
+        {
+            if (c.ActionResources == null) return null;
+            var slots = new Dictionary<string, int>();
+            foreach (var kv in c.ActionResources.Resources)
+            {
+                var resource = kv.Value;
+                if (resource.IsLeveled)
+                {
+                    // Iterate MaxByLevel so exhausted (current = 0) slots are still reported.
+                    foreach (var levelKv in resource.MaxByLevel)
+                    {
+                        int level = levelKv.Key;
+                        int current = resource.CurrentByLevel.TryGetValue(level, out var cur) ? cur : 0;
+                        slots[$"{kv.Key}_L{level}"] = current;
+                    }
+                }
+                else
+                {
+                    var name = kv.Key;
+                    if (!IsTurnEconomyResource(name))
+                        slots[name] = resource.Current;
+                }
+            }
+            return slots.Count > 0 ? slots : null;
+        }
+
+        private static bool IsTurnEconomyResource(string id)
+        {
+            return id != null && (
+                id.Equals("ActionPoint", StringComparison.OrdinalIgnoreCase) ||
+                id.Equals("BonusActionPoint", StringComparison.OrdinalIgnoreCase) ||
+                id.Equals("ReactionActionPoint", StringComparison.OrdinalIgnoreCase));
         }
 
         private bool ShouldEchoToStdout(LogEntry entry)
