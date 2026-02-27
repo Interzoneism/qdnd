@@ -889,5 +889,47 @@ namespace QDND.Tests
             var effects = SpellEffectConverter.ParseEffects("GROUND:CreateSurface(4,3,SpikeGrowth)");
             Assert.NotEmpty(effects);
         }
+
+        [Fact]
+        public void ParseEffects_IfHasStatus_Simple_SetsRequiresStatusCondition()
+        {
+            string formula = "IF(HasStatus('DASH_STACKED')):ApplyStatus(DASH_STACKED_2,100,1)";
+            var effects = SpellEffectConverter.ParseEffects(formula);
+            Assert.Single(effects);
+            Assert.Equal("apply_status", effects[0].Type);
+            Assert.Equal("requires_status:dash_stacked", effects[0].Condition);
+        }
+
+        [Fact]
+        public void ParseEffects_IfNotHasStatus_Simple_SetsRequiresNoStatusCondition()
+        {
+            string formula = "IF(not HasStatus('SNEAKING')):ApplyStatus(SNEAKING,100,-1)";
+            var effects = SpellEffectConverter.ParseEffects(formula);
+            Assert.Single(effects);
+            Assert.Equal("apply_status", effects[0].Type);
+            Assert.Equal("requires_no_status:sneaking", effects[0].Condition);
+        }
+
+        [Fact]
+        public void ParseEffects_CompoundHasStatusCondition_FallsThroughToNull()
+        {
+            // Compound conditions with "and" are not yet supported — should return null condition
+            string formula = "IF(not HasStatus('DASH_STACKED_2') and HasStatus('DASH')):ApplyStatus(DASH_STACKED,100,1)";
+            var effects = SpellEffectConverter.ParseEffects(formula);
+            Assert.Single(effects);
+            Assert.Null(effects[0].Condition);
+        }
+
+        [Fact]
+        public void ParseEffects_UnconditionalSiblingKeepsNullCondition()
+        {
+            // Second functor after IF-guarded first is unconditional
+            string formula = "IF(HasStatus('SOME_STATUS')):SpawnExtraProjectiles(Proj);ApplyStatus(MARK,100,1)";
+            var effects = SpellEffectConverter.ParseEffects(formula);
+            // SpawnExtraProjectiles takes the IF condition; ApplyStatus is unconditional
+            Assert.Equal(2, effects.Count);
+            Assert.Equal("requires_status:some_status", effects[0].Condition);
+            Assert.Null(effects[1].Condition); // unconditional
+        }
     }
 }

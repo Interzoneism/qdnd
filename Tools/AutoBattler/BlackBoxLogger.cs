@@ -53,7 +53,9 @@ namespace QDND.Tools.AutoBattler
         ACTION_BATCH_SUMMARY,
         SURFACE_DAMAGE,
         STATUS_TICK,
-        PASSIVE_TRIGGERED
+        PASSIVE_TRIGGERED,
+        REACTION_TRIGGERED,  // TODO: wire from ReactionCoordinator when a reaction fires
+        REACTION_USED        // TODO: wire from ReactionCoordinator when a reaction is consumed
     }
 
     /// <summary>

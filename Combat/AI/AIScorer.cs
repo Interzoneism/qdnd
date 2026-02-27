@@ -359,7 +359,9 @@ namespace QDND.Combat.AI
                     statusValue = _weights.Get("debuff_status");
                 else if (lower.Contains("advantage") || lower.Contains("protect") || lower.Contains("resist") ||
                          lower.Contains("bless") || lower.Contains("shield") || lower.Contains("armor") ||
-                         lower.Contains("haste") || lower.Contains("barkskin"))
+                         lower.Contains("haste") || lower.Contains("barkskin") ||
+                         lower.Contains("dodg") || lower.Contains("dash") || lower.Contains("disengage") ||
+                         lower.Contains("ward") || lower.Contains("regenerat") || lower.Contains("raging"))
                     statusValue = _weights.Get("buff_status");
                 else
                     statusValue = 2f;
@@ -895,6 +897,81 @@ namespace QDND.Combat.AI
                     return true;
             }
             return false;
+        }
+
+        public void ScoreSurfaceEffect(
+            AIAction action,
+            Combatant actor,
+            string surfaceTypeId,
+            float radius,
+            int duration,
+            Vector3 center,
+            AIProfile profile)
+        {
+            float score = 0;
+            var breakdown = action.ScoreBreakdown;
+
+            // Classify surface
+            bool isDamaging = surfaceTypeId.Contains("fire") || surfaceTypeId.Contains("acid") ||
+                surfaceTypeId.Contains("lightning") || surfaceTypeId.Contains("poison") ||
+                surfaceTypeId.Contains("daggers") || surfaceTypeId.Contains("moonbeam") ||
+                surfaceTypeId.Contains("hadar");
+            bool isControl = surfaceTypeId.Contains("grease") || surfaceTypeId.Contains("ice") ||
+                surfaceTypeId.Contains("web") || surfaceTypeId.Contains("entangle") ||
+                surfaceTypeId.Contains("spike");
+
+            // Count combatants in zone
+            var enemies = GetEnemies(actor);
+            var allies = GetAllies(actor);
+            int enemiesInZone = enemies.Count(e => center.DistanceTo(e.Position) <= radius);
+            int alliesInZone = allies.Count(a => center.DistanceTo(a.Position) <= radius);
+
+            // Base zone value
+            float baseWeight;
+            if (isDamaging)
+            {
+                baseWeight = _weights.Get("surface_damage_zone");
+                breakdown["surface_zone_type"] = baseWeight;
+            }
+            else if (isControl)
+            {
+                baseWeight = _weights.Get("surface_control_zone");
+                breakdown["surface_zone_type"] = baseWeight;
+            }
+            else
+            {
+                baseWeight = _weights.Get("surface_utility_zone");
+                breakdown["surface_zone_type"] = baseWeight;
+            }
+
+            // Enemy threat scoring
+            float enemyFactor = Math.Max(enemiesInZone, 0.3f);
+            float zoneScore = baseWeight * enemyFactor;
+            breakdown["surface_enemies"] = zoneScore;
+            score += zoneScore;
+
+            // Duration bonus
+            if (duration > 1)
+            {
+                float durBonus = Math.Min(duration - 1, 5) * _weights.Get("surface_duration_bonus");
+                breakdown["surface_duration"] = durBonus;
+                score += durBonus;
+            }
+
+            // Area bonus
+            float areaBonus = Math.Max(0f, radius - 1.5f) * _weights.Get("surface_area_bonus");
+            breakdown["surface_area"] = areaBonus;
+            score += areaBonus;
+
+            // Friendly fire penalty — matches ScoreAoE weight so persistent surfaces are equally penalised
+            if (alliesInZone > 0)
+            {
+                float ffPenalty = alliesInZone * _weights.Get("friendly_fire_penalty");
+                breakdown["surface_friendly_fire"] = -ffPenalty;
+                score -= ffPenalty;
+            }
+
+            action.Score += Math.Max(0f, score);
         }
 
         private List<Combatant> GetEnemies(Combatant actor)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using QDND.Combat.Actions;
 using QDND.Combat.Rules;
 using QDND.Combat.Rules.Functors;
@@ -88,6 +89,8 @@ namespace QDND.Data
             r.RulesEngine = new RulesEngine(42);
 
             r.StatusManager = new StatusManager(r.RulesEngine);
+            r.RulesEngine.BlockDexFromACCheck = id =>
+                r.StatusManager.GetStatuses(id).Any(s => s.Definition.BlockDexFromAC);
 
             r.MetamagicService = new MetamagicService(r.RulesEngine);
             combatContext.RegisterService(r.MetamagicService);

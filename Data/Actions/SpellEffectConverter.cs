@@ -1164,6 +1164,23 @@ namespace QDND.Data.Actions
                 return "on_save_success";
             }
 
+            // HasStatus('statusId') — simple single-arg form
+            var notHasStatusMatch = Regex.Match(normalized,
+                @"^nothasstatus\('([^']+)'\)$", RegexOptions.IgnoreCase);
+            if (notHasStatusMatch.Success)
+                return $"requires_no_status:{notHasStatusMatch.Groups[1].Value}";
+
+            var hasStatusMatch = Regex.Match(normalized,
+                @"^hasstatus\('([^']+)'\)$", RegexOptions.IgnoreCase);
+            if (hasStatusMatch.Success)
+                return $"requires_status:{hasStatusMatch.Groups[1].Value}";
+
+            // Detect HasStatus forms we didn't match — log so they're auditable
+            if (Regex.IsMatch(normalized, @"(not)?hasstatus\("))
+            {
+                RuntimeSafety.LogError($"[SpellEffectConverter] Unhandled HasStatus form: {conditionExpression}");
+            }
+
             return null;
         }
 

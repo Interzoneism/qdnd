@@ -146,6 +146,18 @@ namespace QDND.Combat.Statuses
         public SaveRepeatInfo SaveOnDamage { get; set; }
 
         /// <summary>
+        /// If true, this status is removed when the bearer receives healing.
+        /// BG3: BLEEDING uses RemoveEvents: OnHeal.
+        /// </summary>
+        public bool RemoveOnHeal { get; set; }
+
+        /// <summary>
+        /// If true, the Dexterity modifier is excluded from AC calculation while this status is active.
+        /// BG3: DAZED uses BlockAbilityModifierFromAC(Dexterity).
+        /// </summary>
+        public bool BlockDexFromAC { get; set; }
+
+        /// <summary>
         /// If true, suppress combat log entries for this status (BG3 StatusPropertyFlags: DisableCombatlog).
         /// Used for internal/cosmetic statuses.
         /// </summary>
@@ -638,6 +650,12 @@ namespace QDND.Combat.Statuses
                 ProcessRemoveOnDamage(evt.TargetId);
             }
 
+            // BG3: statuses with RemoveOnHeal (e.g. BLEEDING) are removed when the bearer receives healing.
+            if (evt.Type == RuleEventType.HealingReceived && evt.FinalValue > 0 && !string.IsNullOrEmpty(evt.TargetId))
+            {
+                ProcessRemoveOnHeal(evt.TargetId);
+            }
+
             // Hidden breaks when the bearer casts a spell
             if (evt.Type == RuleEventType.AbilityDeclared && !string.IsNullOrEmpty(evt.SourceId))
             {
@@ -711,6 +729,18 @@ namespace QDND.Combat.Statuses
                     RemoveStatusInstance(instance);
                 }
             }
+        }
+
+        /// <summary>
+        /// Remove statuses with RemoveOnHeal flag.
+        /// BG3: BLEEDING is cleansed when the bearer receives any healing.
+        /// </summary>
+        private void ProcessRemoveOnHeal(string combatantId)
+        {
+            if (!_combatantStatuses.TryGetValue(combatantId, out var list))
+                return;
+            foreach (var instance in list.Where(s => s.Definition.RemoveOnHeal).ToList())
+                RemoveStatusInstance(instance);
         }
 
         /// <summary>

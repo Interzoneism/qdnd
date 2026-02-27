@@ -191,6 +191,12 @@ namespace QDND.Tools.AutoBattler
                     {
                         foreach (var abilityId in combatant.KnownActions)
                         {
+                            // Exclude basic attacks (handled by AttackCandidates pipeline)
+                            if (BasicAttackIds.All.Contains(abilityId)) continue;
+                            var actionDef = _effectPipeline?.GetAction(abilityId);
+                            if (actionDef == null) continue;
+                            if (actionDef.Tags?.Contains("passive") == true) continue;
+                            if (actionDef.Cost?.UsesReaction == true) continue;
                             _grantedAbilities.Add(abilityId);
                         }
                     }
