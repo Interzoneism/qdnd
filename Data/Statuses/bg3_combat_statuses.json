@@ -485,11 +485,34 @@
       "isBuff": false,
       "isDispellable": true,
       "tags": ["debuff", "spell", "enchantment", "command", "prone"],
-      "blockedActions": ["action", "bonusAction", "reaction"],
+      "blockedActions": ["action", "bonusAction", "reaction", "movement"],
       "modifiers": [
         { "target": "attackRoll", "type": "advantage", "value": 1, "condition": "melee_attacker_targeting_this" },
         { "target": "attackRoll", "type": "disadvantage", "value": 1, "condition": "ranged_attacker_targeting_this" }
+      ],
+      "triggerEffects": [
+        {
+          "triggerOn": "OnApply",
+          "effectType": "apply_status",
+          "statusId": "prone",
+          "triggerChance": 100,
+          "parameters": { "statusDuration": 1 }
+        }
       ]
+    },
+    {
+      "id": "command_approach",
+      "name": "Command: Approach",
+      "description": "Must spend its turn moving as close to the caster as possible.",
+      "blockedActions": ["action", "bonusAction", "reaction"],
+      "duration": 1,
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "maxStacks": 1,
+      "stacking": "refresh",
+      "isBuff": false,
+      "isDispellable": true,
+      "tags": ["debuff", "spell", "enchantment", "command"]
     },
     {
       "id": "oiled",

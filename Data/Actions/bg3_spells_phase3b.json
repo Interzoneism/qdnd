@@ -5,9 +5,10 @@
       "name": "Create or Destroy Water",
       "description": "Either create or destroy up to 10 gallons of water in an open container, or create rain or destroy fog in a 30-foot cube.",
       "icon": "res://assets/Images/Icons Spells/Create_Water_Unfaded_Icon.png",
-      "targetType": "singleUnit",
-      "targetFilter": "Enemies",
-      "range": 30,
+      "targetType": "circle",
+      "targetFilter": "all",
+      "range": 9,
+      "areaRadius": 4.5,
       "cost": {
         "usesAction": true,
         "resourceCosts": {
@@ -20,9 +21,9 @@
       "effects": [
         {
           "type": "spawn_surface",
-          "surface": "water",
-          "radius": 6,
-          "duration": 1
+          "value": 4.5,
+          "statusDuration": 3,
+          "parameters": { "surface_type": "water" }
         }
       ],
       "tags": [

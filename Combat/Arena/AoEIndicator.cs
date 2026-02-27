@@ -193,7 +193,7 @@ namespace QDND.Combat.Arena
 
             // Calculate rotation to face direction
             float yaw = Mathf.Atan2(lookDir.X, lookDir.Z);
-            _coneMesh.Rotation = new Vector3(Mathf.Pi / 2, yaw, 0); // Tip forward, rotated to face direction
+            _coneMesh.Rotation = new Vector3(-Mathf.Pi / 2, yaw, 0); // Tip forward, rotated to face direction
             _coneMesh.Position = lookDir * length / 2 + new Vector3(0, 0.05f, 0); // Center at half length
 
             _coneMesh.Visible = true;

@@ -1145,7 +1145,7 @@ namespace QDND.Combat.Environment
 
             void Add(SurfaceDefinition d) => RegisterSurface(d);
 
-            var fire = Def("fire", "Fire", SurfaceType.Fire, SurfaceLayer.Ground, 3, "#FF6A00", 0.62f);
+            var fire = Def("fire", "Fire", SurfaceType.Fire, SurfaceLayer.Ground, 3, "#FF6A00", 0.62f, liquid: false);
             fire.DamagePerTrigger = 5; fire.DamageType = "fire";
             fire.Tags = new HashSet<string> { "fire", "elemental" };
             fire.Interactions = new Dictionary<string, string> { ["water"] = "steam", ["oil"] = "fire", ["grease"] = "fire", ["web"] = "fire", ["poison"] = "fire", ["ice"] = "water" };

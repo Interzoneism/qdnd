@@ -1273,20 +1273,13 @@
       "description": "A spectral weapon fights alongside you.",
       "icon": "spiritual_weapon",
       "durationType": "turns",
-      "defaultDuration": 3,
+      "defaultDuration": 100,
       "maxStacks": 1,
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": true,
       "tags": ["buff", "spell", "force"],
-      "grantedActions": ["spiritual_weapon_attack"],
-      "modifiers": [
-        {
-          "target": "damageDealt",
-          "type": "flat",
-          "value": 3
-        }
-      ]
+      "grantedActions": ["spiritual_weapon_attack"]
     },
     {
       "id": "slowed_frost",

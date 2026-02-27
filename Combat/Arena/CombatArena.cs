@@ -885,15 +885,15 @@ namespace QDND.Combat.Arena
             // Inject resolver back into coordinator (breaks the construction cycle).
             _reactionCoordinator.SetReactionResolver(_reactionResolver);
 
-            // Subscribe to reaction events
-            reactionSystem.OnPromptCreated += _reactionCoordinator.OnReactionPrompt;
-            reactionSystem.OnReactionUsed += _reactionCoordinator.OnReactionUsed;
-
-            // Wire BG3 interrupt-driven reactions (Shield AC+5, Counterspell cancel, Uncanny Dodge half damage)
+            // Wire BG3 interrupt-driven reactions FIRST so its OnReactionUsed handler runs before the coordinator's
             var bg3ReactionIntegration = new BG3ReactionIntegration(reactionSystem, _interruptRegistry);
             bg3ReactionIntegration.RegisterCoreInterrupts();
             _combatContext.RegisterService(bg3ReactionIntegration);
             Log("BG3 Reaction Integration wired (OpportunityAttack, Shield, Counterspell, UncannyDodge)");
+
+            // Subscribe coordinator AFTER BG3 integration so BG3 effects (Shield AC, Counterspell) are applied first
+            reactionSystem.OnPromptCreated += _reactionCoordinator.OnReactionPrompt;
+            reactionSystem.OnReactionUsed += _reactionCoordinator.OnReactionUsed;
 
             // Wire reaction system into effect pipeline
             _effectPipeline.Reactions = reactionSystem;

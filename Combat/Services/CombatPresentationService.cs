@@ -313,6 +313,7 @@ namespace QDND.Combat.Services
                             if (movedDistance > 0.05f)
                             {
                                 var destinationWorld = CombatantPositionToWorld(t.Position);
+                                bool isTeleportMovement = IsTeleportAction(action);
                                 bool isJumpMovement = IsJumpAction(action) && t.Id == actor.Id;
                                 List<Vector3> jumpPath = null;
                                 if (isJumpMovement && _pendingJumpWorldPaths.TryGetValue(actor.Id, out var pendingPath))
@@ -335,7 +336,12 @@ namespace QDND.Combat.Services
                                 }
                                 else
                                 {
-                                    if (isJumpMovement)
+                                    if (isTeleportMovement)
+                                    {
+                                        visual.Position = destinationWorld;
+                                        visual.PlayIdleAnimation();
+                                    }
+                                    else if (isJumpMovement)
                                     {
                                         if (jumpPath == null || jumpPath.Count < 2)
                                         {
@@ -924,9 +930,15 @@ namespace QDND.Combat.Services
                 action.TargetType != TargetType.Line)
                 return;
 
+            // Self-centered AoE (e.g. Thunderwave): range == 0 means the caster is always the origin
+            bool selfCentered = action.Range <= 0f &&
+                (action.TargetType == TargetType.Circle || action.TargetType == TargetType.Cone);
+            if (selfCentered)
+                cursorPosition = actor.Position;
+
             // Check if cast point is within range
             float distanceToCastPoint = actor.Position.DistanceTo(cursorPosition);
-            bool isCastPointValid = distanceToCastPoint <= action.Range;
+            bool isCastPointValid = selfCentered || distanceToCastPoint <= action.Range;
 
             // Get affected targets using TargetValidator (only if cast point is valid)
             List<Combatant> affectedTargets = new();
@@ -1169,5 +1181,9 @@ namespace QDND.Combat.Services
                    string.Equals(action.Id, "jump", StringComparison.OrdinalIgnoreCase) ||
                    string.Equals(action.Id, "jump_action", StringComparison.OrdinalIgnoreCase);
         }
+
+        private static bool IsTeleportAction(ActionDefinition action)
+            => action?.Effects?.Any(e =>
+                   string.Equals(e?.Type, "teleport", StringComparison.OrdinalIgnoreCase)) == true;
     }
 }

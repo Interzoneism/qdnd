@@ -75,9 +75,11 @@ namespace QDND.Data
             ["Target_MistyStep"] = "misty_step",
             ["Target_OffHandAttack"] = "offhand_attack",
             ["Target_SacredFlame"] = "sacred_flame",
+            ["Target_Shove"] = "shove",
             ["Target_SpiritGuardians"] = "spirit_guardians",
             ["Zone_HungerOfHadar"] = "hunger_of_hadar",
-            ["Zone_Thunderwave"] = "thunderwave"
+            ["Zone_Thunderwave"] = "thunderwave",
+            ["Throw_Throw"] = "throw"
         };
 
         // Reverse lookup: internal ID → BG3 IDs that map to it

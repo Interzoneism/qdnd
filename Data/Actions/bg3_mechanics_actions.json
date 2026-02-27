@@ -2134,17 +2134,28 @@
       "name": "Spiritual Weapon",
       "description": "Summon a spectral weapon that fights for you.",
       "icon": "res://assets/Images/Icons Spells/Spiritual_Weapon_Greatsword_Unfaded_Icon.png",
-      "targetType": "self",
-      "targetFilter": "Self",
-      "range": 0,
+      "targetType": "point",
+      "targetFilter": "all",
+      "range": 18,
       "cost": {
-        "usesBonusAction": true
+        "usesBonusAction": true,
+        "resourceCosts": { "spell_slot_2": 1 }
       },
       "effects": [
         {
+          "type": "summon",
+          "parameters": {
+            "templateId": "spiritual_weapon",
+            "summonName": "Spiritual Weapon",
+            "hp": 20,
+            "initiativePolicy": "after_owner",
+            "spawnMode": "at_target"
+          }
+        },
+        {
           "type": "apply_status",
           "statusId": "spiritual_weapon_active",
-          "statusDuration": 3
+          "statusDuration": 100
         }
       ],
       "tags": [

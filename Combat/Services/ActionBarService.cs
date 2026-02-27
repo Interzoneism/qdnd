@@ -6,6 +6,7 @@ using QDND.Combat.Actions;
 using QDND.Combat.Entities;
 using QDND.Combat.UI;
 using QDND.Data;
+using QDND.Data.Actions;
 using QDND.Data.Passives;
 using QDND.Combat.Statuses;
 
@@ -524,7 +525,7 @@ namespace QDND.Combat.Services
                     SaveDC = ComputeTooltipSaveDC(def, combatant?.ProficiencyBonus ?? 0, combatant),
                     SpellSchool = def.School != SpellSchool.None ? def.School.ToString() : null,
                     RequiresConcentration = def.RequiresConcentration,
-                    DamageSummary = BuildDamageSummary(def),
+                    DamageSummary = BuildDamageSummary(def, combatant),
                 };
                 entries.Add(entry);
             }
@@ -930,16 +931,23 @@ namespace QDND.Combat.Services
             return 0;
         }
 
-        private static string BuildDamageSummary(ActionDefinition action)
+        private static string BuildDamageSummary(ActionDefinition action, Combatant combatant = null)
         {
             var dmgEffect = action?.Effects?.FirstOrDefault(e =>
                 string.Equals(e.Type, "damage", StringComparison.OrdinalIgnoreCase));
             if (dmgEffect == null)
                 return null;
-            if (!string.IsNullOrEmpty(dmgEffect.DiceFormula) && !string.IsNullOrEmpty(dmgEffect.DamageType))
-                return $"{dmgEffect.DiceFormula} {dmgEffect.DamageType}";
-            if (!string.IsNullOrEmpty(dmgEffect.DiceFormula))
-                return dmgEffect.DiceFormula;
+            string formula = dmgEffect.DiceFormula ?? "";
+            string type = dmgEffect.DamageType ?? "";
+            if (combatant != null)
+            {
+                formula = SpellEffectConverter.ResolveDynamicFormula(formula, combatant);
+                type = SpellEffectConverter.ResolveDynamicFormula(type, combatant);
+            }
+            if (!string.IsNullOrEmpty(formula) && !string.IsNullOrEmpty(type))
+                return $"{formula} {type}";
+            if (!string.IsNullOrEmpty(formula))
+                return formula;
             return null;
         }
     }
