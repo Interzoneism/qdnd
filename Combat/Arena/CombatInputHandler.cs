@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using QDND.Combat.Entities;
 using QDND.Combat.Actions;
+using QDND.Combat.Targeting;
 using QDND.Combat.UI;
 
 namespace QDND.Combat.Arena
@@ -88,43 +89,20 @@ namespace QDND.Combat.Arena
             ProcessCameraInput((float)delta);
             SyncMultiTargetSelectionState();
 
-            // Update AoE preview if ability selected
-            if (!string.IsNullOrEmpty(Arena.SelectedAbilityId) && Camera != null && Arena != null)
+            // Update targeting system if active
+            if (Arena?.Targeting != null && Arena.Targeting.CurrentPhase != TargetingPhase.Inactive)
             {
-                var action = Arena.GetActionById(Arena.SelectedAbilityId);
-                if (action != null && TryGetWorldPointFromMouse(out var targetPos, collisionMask: 1))
+                if (Camera != null && Arena.HoverPipeline != null)
                 {
-                    if (action.TargetType == TargetType.Point && IsJumpAction(action))
-                    {
-                        Arena.UpdateJumpPreview(targetPos);
-                    }
-                    else
-                    {
-                        // Ground-project to logical tile space for all preview types.
-                        var logicalPos = new Vector3(
-                            targetPos.X / Arena.TileSize,
-                            0,
-                            targetPos.Z / Arena.TileSize
-                        );
+                    var mousePos = GetViewport().GetMousePosition();
+                    var hover = Arena.HoverPipeline.Update(Camera, mousePos);
+                    Arena.Targeting.UpdateFrame(hover);
 
-                        switch (action.TargetType)
-                        {
-                            case TargetType.Circle:
-                            case TargetType.Cone:
-                            case TargetType.Line:
-                                Arena.UpdateAoEPreview(logicalPos);
-                                break;
-                            case TargetType.Point:
-                                Arena.UpdatePointPreview(logicalPos);
-                                break;
-                            case TargetType.Charge:
-                                Arena.UpdateChargePreview(logicalPos);
-                                break;
-                            case TargetType.WallSegment:
-                                Arena.UpdateWallSegmentPreview(logicalPos);
-                                break;
-                        }
-                    }
+                    // Render targeting visuals
+                    Arena.TargetingVisuals?.Render(
+                        Arena.Targeting.CurrentPreview,
+                        Camera,
+                        id => Arena.GetCombatantVisual(id));
                 }
             }
 
@@ -243,7 +221,6 @@ namespace QDND.Combat.Arena
                 Arena?.NotifyHoverChanged(null);
             }
 
-            Arena?.UpdateHoveredTargetPreview(null);
         }
 
         /// <summary>
@@ -301,11 +278,15 @@ namespace QDND.Combat.Arena
             }
             else if (Input.IsActionJustPressed("combat_cancel"))
             {
-                _multiPickedTargets.Clear();
-                _multiPickAbilityId = null;
-                _multiPickActorId = null;
-                _hudController?.HideMultiTargetPrompt();
-                Arena.ClearSelection();
+                if (Arena?.Targeting != null && Arena.Targeting.CurrentPhase != TargetingPhase.Inactive)
+                {
+                    Arena.Targeting.HandleEscapeCancel();
+                }
+                else
+                {
+                    ResetMultiTargetSelection();
+                    Arena.ClearSelection();
+                }
                 GetViewport().SetInputAsHandled();
             }
             else if (Input.IsActionJustPressed("combat_move"))
@@ -540,9 +521,6 @@ namespace QDND.Combat.Arena
 
                 Arena.NotifyHoverChanged(_hoveredVisual?.CombatantId);
             }
-
-            // Keep hovered targeting preview in sync with current cursor target.
-            Arena.UpdateHoveredTargetPreview(_hoveredVisual?.CombatantId);
         }
 
         private void DebugRaycastOnClick(Vector2 mousePos)
@@ -605,6 +583,19 @@ namespace QDND.Combat.Arena
                 }
             }
 
+            // If new targeting system is active, delegate click handling to it
+            if (Arena?.Targeting != null && Arena.Targeting.CurrentPhase != TargetingPhase.Inactive)
+            {
+                if (Camera != null && Arena.HoverPipeline != null)
+                {
+                    var mousePos = GetViewport().GetMousePosition();
+                    var hover = Arena.HoverPipeline.Update(Camera, mousePos);
+                    Arena.Targeting.HandleConfirm(hover);
+                }
+                GetViewport().SetInputAsHandled();
+                return;
+            }
+
             // Handle movement mode
             if (_currentMode == TargetingMode.Move && !string.IsNullOrEmpty(_movingActorId))
             {
@@ -636,8 +627,7 @@ namespace QDND.Combat.Arena
                                             action.TargetType == TargetType.Cone ||
                                             action.TargetType == TargetType.Line ||
                                             action.TargetType == TargetType.Point ||
-                                            action.TargetType == TargetType.Charge ||
-                                            action.TargetType == TargetType.WallSegment;
+                                            action.TargetType == TargetType.Charge;
 
                     if (isGroundTargeted)
                     {
@@ -655,71 +645,6 @@ namespace QDND.Combat.Arena
                             // Non-jump abilities keep static range validation here.
                             if (!isJumpPointAction)
                             {
-                                // WallSegment two-click: first click sets start, second click executes.
-                                if (action.TargetType == TargetType.WallSegment)
-                                {
-                                    var worldPos = new Vector3(
-                                        logicalPos.X * Arena.TileSize,
-                                        0,
-                                        logicalPos.Z * Arena.TileSize
-                                    );
-
-                                    if (!Arena.IsWallSegmentStartSet())
-                                    {
-                                        // First click — set start point.
-                                        float distToStart = actor.Position.DistanceTo(logicalPos);
-                                        if (distToStart > action.Range)
-                                        {
-                                            if (DebugInput)
-                                                GD.Print($"[InputHandler] Wall start point out of range: {distToStart:F2} > {action.Range:F2}");
-                                            GetViewport().SetInputAsHandled();
-                                            return;
-                                        }
-
-                                        Arena.SetWallSegmentStart(worldPos);
-                                        if (DebugInput)
-                                            GD.Print($"[InputHandler] Wall segment start set at {worldPos}");
-                                        GetViewport().SetInputAsHandled();
-                                        return;
-                                    }
-                                    // else: has start — handle second click below.
-                                }
-
-                                // For WallSegment second click, inject start point into execution options.
-                                if (action.TargetType == TargetType.WallSegment && Arena.IsWallSegmentStartSet())
-                                {
-                                    var startWorld = Arena.GetWallSegmentStartPoint();
-                                    if (startWorld.HasValue)
-                                    {
-                                        var startLogical = new Vector3(
-                                            startWorld.Value.X / Arena.TileSize, 0f, startWorld.Value.Z / Arena.TileSize);
-
-                                        // Validate wall length before executing.
-                                        if (action.MaxWallLength > 0f)
-                                        {
-                                            float wallLen = startLogical.DistanceTo(logicalPos);
-                                            if (wallLen > action.MaxWallLength)
-                                            {
-                                                if (DebugInput)
-                                                    GD.Print($"[InputHandler] Wall too long: {wallLen:F2} > {action.MaxWallLength:F2}");
-                                                GetViewport().SetInputAsHandled();
-                                                return;
-                                            }
-                                        }
-
-                                        var opts = Arena.GetSelectedAbilityOptions() ?? new ActionExecutionOptions();
-                                        opts.SecondaryTargetPosition = startLogical;
-
-                                        Arena.ExecuteAbilityAtPosition(
-                                            Arena.SelectedCombatantId,
-                                            Arena.SelectedAbilityId,
-                                            logicalPos,
-                                            opts);
-                                        GetViewport().SetInputAsHandled();
-                                        return;
-                                    }
-                                }
-
                                 float distanceToCastPoint = actor.Position.DistanceTo(logicalPos);
                                 if (distanceToCastPoint > action.Range)
                                 {
@@ -949,7 +874,15 @@ namespace QDND.Combat.Arena
         private void HandleRightClick()
         {
             if (DebugInput)
-                GD.Print("[InputHandler] HandleRightClick - clearing selection");
+                GD.Print("[InputHandler] HandleRightClick");
+
+            // If targeting system is active, delegate cancel to it
+            if (Arena?.Targeting != null && Arena.Targeting.CurrentPhase != TargetingPhase.Inactive)
+            {
+                Arena.Targeting.HandleCancel();
+                GetViewport().SetInputAsHandled();
+                return;
+            }
 
             // Cancel multi-target picking if in progress
             if (_multiPickedTargets?.Count > 0)

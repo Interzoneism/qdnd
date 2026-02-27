@@ -12,6 +12,8 @@ using QDND.Combat.Actions;
 using QDND.Combat.Actions.Effects;
 using QDND.Combat.Statuses;
 using QDND.Combat.Targeting;
+using QDND.Combat.Targeting.Visuals;
+using QDND.Combat.Targeting.Modes;
 using QDND.Combat.AI;
 using QDND.Combat.Animation;
 using QDND.Combat.UI;
@@ -56,16 +58,15 @@ namespace QDND.Combat.Arena
         private Node3D _surfacesContainer;
         private CanvasLayer _hudLayer;
         private MovementPreview _movementPreview;
-        private JumpTrajectoryPreview _jumpTrajectoryPreview;
-        private AttackTargetingLine _attackTargetingLine;
         private CombatInputHandler _inputHandler;
         private RangeIndicator _rangeIndicator;
-        private AoEIndicator _aoeIndicator;
         private ReactionPromptUI _reactionPromptUI;
         private CombatVFXManager _vfxManager;
-        private PointReticle _pointReticle;
-        private ChargePathPreview _chargePathPreview;
-        private WallSegmentPreview _wallSegmentPreview;
+
+        // New targeting system
+        private TargetingSystem _targetingSystem;
+        private TargetingHoverPipeline _hoverPipeline;
+        private QDND.Combat.Targeting.Visuals.TargetingVisualSystem _targetingVisualSystem;
 
         // Combat backend
         private CombatContext _combatContext;
@@ -288,23 +289,9 @@ namespace QDND.Combat.Arena
             _rangeIndicator = new RangeIndicator { Name = "RangeIndicator" };
             AddChild(_rangeIndicator);
 
-            _aoeIndicator = new AoEIndicator { Name = "AoEIndicator" };
-            AddChild(_aoeIndicator);
-
-            _jumpTrajectoryPreview = new JumpTrajectoryPreview { Name = "JumpTrajectoryPreview" };
-            AddChild(_jumpTrajectoryPreview);
-
-            _attackTargetingLine = new AttackTargetingLine { Name = "AttackTargetingLine" };
-            AddChild(_attackTargetingLine);
-
-            _pointReticle = new PointReticle { Name = "PointReticle" };
-            AddChild(_pointReticle);
-
-            _chargePathPreview = new ChargePathPreview { Name = "ChargePathPreview" };
-            AddChild(_chargePathPreview);
-
-            _wallSegmentPreview = new WallSegmentPreview { Name = "WallSegmentPreview" };
-            AddChild(_wallSegmentPreview);
+            // Create new targeting visual system
+            _targetingVisualSystem = new QDND.Combat.Targeting.Visuals.TargetingVisualSystem { Name = "TargetingVisualSystem" };
+            AddChild(_targetingVisualSystem);
 
             // Create and add reaction prompt UI to HUD layer
             _reactionPromptUI = new ReactionPromptUI { Name = "ReactionPromptUI" };
@@ -1110,9 +1097,10 @@ namespace QDND.Combat.Arena
             _combatContext.RegisterService<IVfxPlaybackService>(_vfxPlaybackService);
 
             _presentationService.SetPreviewDependencies(
-                _combatContext, _effectPipeline, _rulesEngine, _targetValidator,
-                _attackTargetingLine, _aoeIndicator, _jumpTrajectoryPreview,
-                _pointReticle, _chargePathPreview, _wallSegmentPreview);
+                _combatContext, _effectPipeline, _rulesEngine, _targetValidator);
+
+            // Initialize new targeting system after all services are ready
+            InitializeTargetingSystem();
 
             Log($"UI Models initialized");
 
@@ -1636,13 +1624,6 @@ namespace QDND.Combat.Arena
 
             if (actor != null && action != null)
             {
-                // Show range indicator centered on actor (except Jump which uses trajectory preview).
-                if (action.Range > 0 && !IsJumpAction(action))
-                {
-                    var actorWorldPos = CombatantPositionToWorld(actor.Position);
-                    _rangeIndicator.Show(actorWorldPos, action.Range);
-                }
-
                 // Self/all/none abilities are primed and execute on next click anywhere.
                 if (action.TargetType == TargetType.Self ||
                     action.TargetType == TargetType.All ||
@@ -1652,29 +1633,32 @@ namespace QDND.Combat.Arena
                     return;
                 }
 
-                // Ground-targeted abilities (AoE, Point, Charge, WallSegment) are preview-driven on mouse move.
-                // For single-target abilities, highlight valid targets.
-                if (action.TargetType == TargetType.Circle ||
-                    action.TargetType == TargetType.Cone ||
-                    action.TargetType == TargetType.Line ||
-                    action.TargetType == TargetType.Point ||
-                    action.TargetType == TargetType.Charge ||
-                    action.TargetType == TargetType.WallSegment)
+                // All other target types enter the new targeting system
+                if (_targetingSystem != null)
                 {
-                    Log($"Ground-targeted action selected: {action.TargetType}");
+                    var sourceWorldPos = CombatantPositionToWorld(actor.Position);
+                    if (_targetingSystem.BeginTargeting(actionId, action, actor, sourceWorldPos))
+                    {
+                        Log($"Targeting started for {actionId} ({action.TargetType})");
+                    }
+                    else
+                    {
+                        Log($"Warning: No targeting mode registered for {action.TargetType}");
+                    }
                 }
                 else
                 {
-                    // Single-target action preview is hover-driven (see UpdateHoveredTargetPreview).
-                    Log($"Targeted action selected: {action.TargetType} (hover a valid target to preview)");
+                    // Fallback: legacy path if targeting system not initialized
+                    if (action.Range > 0 && !IsJumpAction(action))
+                    {
+                        var actorWorldPos = CombatantPositionToWorld(actor.Position);
+                        _rangeIndicator.Show(actorWorldPos, action.Range);
+                    }
+                    Log($"Targeted action selected: {action.TargetType} (legacy path)");
                 }
             }
         }
 
-        public void UpdateHoveredTargetPreview(string hoveredCombatantId)
-        {
-            _presentationService.UpdateHoveredTargetPreview(_selectionService?.SelectedCombatantId, _selectionService?.SelectedAbilityId, hoveredCombatantId);
-        }
         public void ClearSelection()
         {
             Log("ClearSelection called");
@@ -1682,54 +1666,6 @@ namespace QDND.Combat.Arena
             ClearTargetingVisuals();
         }
 
-        /// <summary>
-        /// Update AoE preview at the cursor position.
-        /// Shows the AoE shape and highlights affected combatants.
-        /// </summary>
-        public void UpdateAoEPreview(Vector3 cursorPosition)
-        {
-            _presentationService.UpdateAoEPreview(_selectionService?.SelectedCombatantId, _selectionService?.SelectedAbilityId, cursorPosition, _combatants);
-        }
-
-        public void UpdatePointPreview(Vector3 cursorPosition)
-        {
-            _presentationService.UpdatePointPreview(_selectionService?.SelectedCombatantId, _selectionService?.SelectedAbilityId, cursorPosition);
-        }
-
-        public void UpdateChargePreview(Vector3 cursorPosition)
-        {
-            _presentationService.UpdateChargePreview(_selectionService?.SelectedCombatantId, _selectionService?.SelectedAbilityId, cursorPosition);
-        }
-
-        public void UpdateWallSegmentPreview(Vector3 cursorPosition)
-        {
-            _presentationService.UpdateWallSegmentPreview(_selectionService?.SelectedCombatantId, _selectionService?.SelectedAbilityId, cursorPosition);
-        }
-
-        public bool IsWallSegmentStartSet()
-        {
-            return _presentationService.IsWallSegmentStartSet;
-        }
-
-        public void SetWallSegmentStart(Vector3 worldPosition)
-        {
-            _presentationService.SetWallSegmentStart(worldPosition);
-        }
-
-        public Vector3? GetWallSegmentStartPoint()
-        {
-            return _presentationService.GetWallSegmentStartPoint();
-        }
-
-        public void ResetWallSegmentStart()
-        {
-            _wallSegmentPreview?.Hide();
-        }
-
-        public void UpdateJumpPreview(Vector3 cursorWorldPosition)
-        {
-            _presentationService.UpdateJumpPreview(_selectionService?.SelectedCombatantId, _selectionService?.SelectedAbilityId, cursorWorldPosition, BuildJumpPath, GetJumpDistanceLimit);
-        }
         /// <summary>
         /// Use an item from inventory in combat.
         /// Looks up the item's UseActionId, executes via EffectPipeline, and consumes the item on success.
@@ -2204,7 +2140,6 @@ namespace QDND.Combat.Arena
 
         private void ClearTargetHighlights()
         {
-            _attackTargetingLine?.Hide();
             foreach (var visual in _combatantVisuals.Values)
             {
                 visual.SetValidTarget(false);
@@ -2214,17 +2149,105 @@ namespace QDND.Combat.Arena
 
         private void ClearTargetingVisuals()
         {
+            _targetingSystem?.ForceEnd();
+            _targetingVisualSystem?.ClearAll();
             _rangeIndicator?.Hide();
-            _aoeIndicator?.Hide();
-            _jumpTrajectoryPreview?.Clear();
-            _pointReticle?.Hide();
-            _chargePathPreview?.Hide();
-            _wallSegmentPreview?.Hide();
             ClearTargetHighlights();
+        }
+
+        // ── New Targeting System ──────────────────────────────────────────
+
+        /// <summary>The new unified targeting system.</summary>
+        public TargetingSystem Targeting => _targetingSystem;
+        /// <summary>The targeting hover pipeline for cursor raycasting.</summary>
+        public TargetingHoverPipeline HoverPipeline => _hoverPipeline;
+        /// <summary>The targeting visual system.</summary>
+        public QDND.Combat.Targeting.Visuals.TargetingVisualSystem TargetingVisuals => _targetingVisualSystem;
+
+        /// <summary>Looks up a CombatantVisual by entity ID.</summary>
+        public CombatantVisual GetCombatantVisual(string entityId)
+        {
+            if (string.IsNullOrEmpty(entityId)) return null;
+            return _combatantVisuals.TryGetValue(entityId, out var visual) ? visual : null;
+        }
+
+        private void InitializeTargetingSystem()
+        {
+            // Dependencies
+            var losService = _combatContext?.GetService<LOSService>();
+            Func<string, Combatant> getCombatant = id => _combatContext.GetCombatant(id);
+            Func<List<Combatant>> getAllCombatants = () => _combatants;
+            Func<Combatant, Vector3> getPosition = c => CombatantPositionToWorld(c.Position);
+            Func<PhysicsDirectSpaceState3D> getSpaceState = () => GetWorld3D().DirectSpaceState;
+
+            // Create hover pipeline
+            _hoverPipeline = new TargetingHoverPipeline(getCombatant);
+
+            // Create targeting system
+            _targetingSystem = new TargetingSystem(_stateMachine);
+
+            // Register all 12 targeting modes
+            _targetingSystem.RegisterMode(new SingleTargetMode(_targetValidator, _rulesEngine, losService, getCombatant, getAllCombatants));
+            _targetingSystem.RegisterMode(new FreeAimGroundMode(_targetValidator, losService));
+            _targetingSystem.RegisterMode(new StraightLineMode(_targetValidator, losService, getSpaceState, getCombatant, getAllCombatants));
+            _targetingSystem.RegisterMode(new BallisticArcMode(_targetValidator, losService, getSpaceState, getCombatant));
+            _targetingSystem.RegisterMode(new BezierCurveMode(_targetValidator, losService, getSpaceState, getCombatant));
+            _targetingSystem.RegisterMode(new PathfindProjectileMode(_targetValidator, losService, getCombatant));
+            _targetingSystem.RegisterMode(new AoECircleMode(_targetValidator, losService, getCombatant, getAllCombatants, getPosition));
+            _targetingSystem.RegisterMode(new AoEConeMode(_targetValidator, losService, getCombatant, getAllCombatants, getPosition));
+            _targetingSystem.RegisterMode(new AoELineMode(_targetValidator, losService, getCombatant, getAllCombatants, getPosition));
+            _targetingSystem.RegisterMode(new AoEWallMode(_targetValidator, losService, getCombatant, getAllCombatants));
+            _targetingSystem.RegisterMode(new MultiTargetMode(_targetValidator, _rulesEngine, losService, getCombatant, getAllCombatants));
+            _targetingSystem.RegisterMode(new ChainMode(_targetValidator, getCombatant, getAllCombatants));
+
+            // Subscribe to events
+            _targetingSystem.OnTargetingConfirmed += OnTargetingConfirmed;
+            _targetingSystem.OnTargetingCancelled += () => ClearSelection();
+
+            Log("New targeting system initialized with 12 modes");
+        }
+
+        private void OnTargetingConfirmed(ConfirmResult result)
+        {
+            var actorId = _selectionService?.SelectedCombatantId;
+            var actionId = _targetingSystem?.ActiveActionId ?? _selectionService?.SelectedAbilityId;
+            var options = GetSelectedAbilityOptions();
+
+            if (string.IsNullOrEmpty(actorId) || string.IsNullOrEmpty(actionId)) return;
+
+            switch (result.Outcome)
+            {
+                case ConfirmOutcome.ExecuteSingleTarget:
+                    ExecuteAction(actorId, actionId, result.TargetEntityId, options);
+                    break;
+                case ConfirmOutcome.ExecuteAtPosition:
+                    if (result.TargetPosition.HasValue)
+                    {
+                        // TODO: When wall execution support is added, pass WallStart/WallEnd
+                        // to the execution pipeline so it can reconstruct full wall geometry.
+                        ExecuteAbilityAtPosition(actorId, actionId, result.TargetPosition.Value, options);
+                    }
+                    break;
+                case ConfirmOutcome.Complete:
+                    if (result.AllTargetIds != null && result.AllTargetIds.Count > 0)
+                        _actionExecutionService.ExecuteAction(actorId, actionId, result.AllTargetIds, options);
+                    else if (result.TargetPosition.HasValue)
+                        ExecuteAbilityAtPosition(actorId, actionId, result.TargetPosition.Value, options);
+                    break;
+            }
+
+            // Clear all targeting visuals after dispatching execution
+            _targetingVisualSystem?.ClearAll();
         }
 
         public override void _ExitTree()
         {
+            if (_targetingSystem != null)
+            {
+                _targetingSystem.OnTargetingConfirmed -= OnTargetingConfirmed;
+                // OnTargetingCancelled uses a lambda, so we just null the system
+            }
+
             if (_combatContext != null)
                 _combatContext.OnCombatantRegistered -= OnMidCombatCombatantRegistered;
 
