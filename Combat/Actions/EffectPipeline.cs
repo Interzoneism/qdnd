@@ -2608,7 +2608,8 @@ namespace QDND.Combat.Actions
                 Data = new Dictionary<string, object>
                 {
                     { "actionName", action.Name },
-                    { "targetCount", targets.Count }
+                    { "targetCount", targets.Count },
+                    { "priorityTarget", (object)true }
                 }
             };
 
@@ -2812,7 +2813,8 @@ namespace QDND.Combat.Actions
                 Data = new Dictionary<string, object>
                 {
                     { "actionName", action.Name },
-                    { "targetCount", targets.Count }
+                    { "targetCount", targets.Count },
+                    { "priorityTarget", (object)true }
                 }
             };
 

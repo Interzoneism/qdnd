@@ -79,6 +79,7 @@
       "stacking": "refresh",
       "isBuff": false,
       "isDispellable": true,
+      "blockDexFromAC": true,
       "tags": ["control", "debuff"],
       "blockedActions": ["reaction"],
       "modifiers": [
@@ -276,6 +277,7 @@
       "stacking": "stack",
       "isBuff": false,
       "isDispellable": true,
+      "removeOnHeal": true,
       "tags": ["debuff", "physical"],
       "modifiers": [
         {
@@ -289,7 +291,7 @@
           "effectType": "damage",
           "value": 2,
           "valuePerStack": 1,
-          "damageType": "physical",
+          "damageType": "slashing",
           "tags": ["dot"]
         }
       ]

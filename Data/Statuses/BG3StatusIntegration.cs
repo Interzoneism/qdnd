@@ -202,11 +202,18 @@ namespace QDND.Data.Statuses
                 "ondamage" => RuleEventType.DamageTaken,
                 "onattack" => RuleEventType.AttackDeclared,
                 "oncast" => RuleEventType.AbilityDeclared,
+                "onheal" => RuleEventType.HealingReceived,
                 _ => (RuleEventType?)null
             };
 
             if (mappedEvent.HasValue)
             {
+                if (mappedEvent.Value == RuleEventType.HealingReceived)
+                {
+                    // OnHeal: use dedicated RemoveOnHeal flag — keep DurationType.Turns so tick effects still fire
+                    statusDef.RemoveOnHeal = true;
+                    return;
+                }
                 statusDef.DurationType = DurationType.UntilEvent;
                 statusDef.RemoveOnEvent = mappedEvent.Value;
             }
@@ -286,6 +293,14 @@ namespace QDND.Data.Statuses
 
                 // For unsupported boost types, just log and continue
                 // Don't use Godot.GD.Print to avoid testhost crash
+                // BlockAbilityModifierFromAC(Dexterity) - mark status to exclude DEX from AC
+                var blockAcMatch = Regex.Match(trimmed, @"BlockAbilityModifierFromAC\s*\(\s*Dexterity\s*\)", RegexOptions.IgnoreCase);
+                if (blockAcMatch.Success)
+                {
+                    statusDef.BlockDexFromAC = true;
+                    continue;
+                }
+
                 Console.WriteLine($"[BG3StatusIntegration] Unsupported boost: {trimmed}");
             }
         }

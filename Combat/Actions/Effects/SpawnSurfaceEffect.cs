@@ -31,6 +31,12 @@ namespace QDND.Combat.Actions.Effects
                     "on_crit" => context.IsCritical,
                     "on_save_fail" or "on_failed_save" => context.Targets.Count > 0 && context.Targets.Any(t => context.DidTargetFailSave(t.Id)),
                     "on_save_success" => context.Targets.Count > 0 && context.Targets.Any(t => !context.DidTargetFailSave(t.Id)),
+                    string s when s.StartsWith("requires_status:") =>
+                        context.Statuses != null && context.Targets.Count > 0 &&
+                        context.Targets.Any(t => context.Statuses.HasStatus(t.Id, s["requires_status:".Length..])),
+                    string s when s.StartsWith("requires_no_status:") =>
+                        context.Statuses == null || context.Targets.Count == 0 ||
+                        context.Targets.All(t => !context.Statuses.HasStatus(t.Id, s["requires_no_status:".Length..])),  
                     _ => true
                 };
                 if (!conditionMet)

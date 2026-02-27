@@ -512,11 +512,7 @@ namespace QDND.Combat.AI
             // Bonus action candidates
             if (actor.ActionBudget?.HasBonusAction == true || isTestMode)
             {
-                                // Shove candidates disabled: Shove action is not yet implemented
-                                // in CombatArena/RealtimeAIController. Generating shove candidates
-                                // causes infinite loops because the "not implemented" fallback
-                                // doesn't consume the bonus action. Re-enable when Shove is implemented.
-                                // candidates.AddRange(GenerateShoveCandidates(actor));
+                candidates.AddRange(GenerateShoveCandidates(actor));
                 candidates.AddRange(GenerateBonusActionCandidates(actor));
             }
 
@@ -2605,6 +2601,7 @@ namespace QDND.Combat.AI
             bool isDamage = actionDef.Effects.Any(e => e.Type == "damage");
             bool isHealing = actionDef.Effects.Any(e => e.Type == "heal");
             bool isStatus = actionDef.Effects.Any(e => e.Type == "apply_status");
+            bool isSurface = actionDef.Effects.Any(e => e.Type == "spawn_surface");
             bool isAoE = actionDef.AreaRadius > 0 || actionDef.TargetType == TargetType.Circle || 
                          actionDef.TargetType == TargetType.Cone || actionDef.TargetType == TargetType.Line ||
                          actionDef.TargetType == TargetType.Point || actionDef.TargetType == TargetType.WallSegment;
@@ -2651,12 +2648,25 @@ namespace QDND.Combat.AI
                         .ToList();
                 }
 
-                // Score AoE - only score enemies_hit if ability actually does damage
+                // Score AoE - additive: damage and surface effects are scored independently
                 if (isDamage)
                 {
                     _scorer.ScoreAoE(action, actor, action.TargetPosition.Value, effectiveRadius, profile);
                 }
-                else
+
+                if (isSurface)
+                {
+                    var surfaceEff = actionDef.Effects.First(e => e.Type == "spawn_surface");
+                    string surfaceId = surfaceEff.Parameters.TryGetValue("surface_type", out var rawSurfaceId)
+                        ? rawSurfaceId?.ToString() ?? string.Empty
+                        : string.Empty;
+                    float surfaceRadius = surfaceEff.Value > 0 ? surfaceEff.Value : effectiveRadius;
+                    int surfaceDuration = surfaceEff.StatusDuration;
+                    _scorer.ScoreSurfaceEffect(action, actor, surfaceId, surfaceRadius, surfaceDuration,
+                        action.TargetPosition.Value, profile);
+                }
+
+                if (!isDamage && !isSurface)
                 {
                     // Non-damaging AoE (utility spells like mage_hand) - very low score
                     action.AddScore("utility_aoe", 0.1f);
@@ -2723,7 +2733,7 @@ namespace QDND.Combat.AI
                     else
                     {
                         // Self-buff
-                        float buffValue = 2f * GetEffectiveWeight(profile, "status_value");
+                        float buffValue = 4f * GetEffectiveWeight(profile, "status_value");
                         action.AddScore("self_buff", buffValue);
 
                         // Spell level bonus for leveled self-buff spells
@@ -2733,11 +2743,11 @@ namespace QDND.Combat.AI
                             action.AddScore("spell_level_value", spellLevelBonus);
                         }
 
-                        // Early-combat buff bonus — casting protective spells in first 2 rounds is tactically smart
+                        // Early-combat buff bonus — casting protective spells in first 3 rounds is tactically smart
                         int currentRound = _context?.GetService<QDND.Combat.Services.TurnQueueService>()?.CurrentRound ?? 1;
-                        if (currentRound <= 2)
+                        if (currentRound <= 3)
                         {
-                            float earlyBuffBonus = 4f * GetEffectiveWeight(profile, "status_value");
+                            float earlyBuffBonus = 2f * GetEffectiveWeight(profile, "status_value");
                             action.AddScore("early_combat_buff", earlyBuffBonus);
                         }
                     }
@@ -2795,6 +2805,10 @@ namespace QDND.Combat.AI
                     if (currentConc != null && string.Equals(currentConc.ActionId, actionDef.Id, StringComparison.OrdinalIgnoreCase))
                     {
                         action.AddScore("redundant_concentration_recast", -20f);
+                    }
+                    else if (currentConc != null)
+                    {
+                        action.AddScore("concentration_break_cost", -AIWeights.BuffStatusValue);
                     }
                 }
             }

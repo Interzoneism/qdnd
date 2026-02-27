@@ -56,6 +56,13 @@ namespace QDND.Combat.AI
         // Hit chance adjustments
         public const float LowHitChanceThreshold = 0.3f;
         public const float LowHitChancePenalty = 0.5f;  // Multiplier
+
+        // Surface zone scoring
+        public const float SurfaceDamageZoneValue  = 6f;
+        public const float SurfaceControlZoneValue = 5f;
+        public const float SurfaceUtilityZoneValue = 2f;
+        public const float SurfaceDurationBonus    = 0.5f;
+        public const float SurfaceAreaBonus        = 0.3f;
     }
 
     /// <summary>
@@ -92,6 +99,12 @@ namespace QDND.Combat.AI
             Weights["shove_near_ledge"] = AIWeights.ShoveNearLedgeBonus;
             Weights["shove_into_hazard"] = AIWeights.ShoveIntoHazardBonus;
             Weights["shove_base_cost"] = AIWeights.ShoveBaseCost;
+
+            Weights["surface_damage_zone"]  = AIWeights.SurfaceDamageZoneValue;
+            Weights["surface_control_zone"] = AIWeights.SurfaceControlZoneValue;
+            Weights["surface_utility_zone"] = AIWeights.SurfaceUtilityZoneValue;
+            Weights["surface_duration_bonus"] = AIWeights.SurfaceDurationBonus;
+            Weights["surface_area_bonus"]   = AIWeights.SurfaceAreaBonus;
         }
 
         public float Get(string key)

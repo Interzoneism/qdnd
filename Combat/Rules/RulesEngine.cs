@@ -356,6 +356,12 @@ namespace QDND.Combat.Rules
         /// <summary>Public dice roller access for subsystems that need simple rolls.</summary>
         public DiceRoller Dice => _dice;
 
+        /// <summary>
+        /// When set, returns true for a combatant ID if their Dexterity modifier should not contribute to AC.
+        /// Wired by RegistryInitializer to check for DAZED and similar statuses.
+        /// </summary>
+        public Func<string, bool> BlockDexFromACCheck { get; set; }
+
         public RulesEngine(int? seed = null)
         {
             _dice = seed.HasValue ? new DiceRoller(seed.Value) : new DiceRoller();
@@ -1421,6 +1427,16 @@ namespace QDND.Combat.Rules
             // Add boost-based AC bonus
             int boostACBonus = BoostEvaluator.GetACBonus(combatant);
             finalAC += boostACBonus;
+
+            // BG3 DAZED: BlockAbilityModifierFromAC(Dexterity) — remove the DEX contribution.
+            // For armored combatants the contribution is clamped to [0, MaxDexBonus];
+            // for unarmored it is also clamped to min 0 so only a positive modifier is removed.
+            if (BlockDexFromACCheck?.Invoke(combatant.Id) == true)
+            {
+                int equippedMaxDex = combatant.EquippedArmor?.MaxDexBonus ?? int.MaxValue;
+                int dexMod = combatant.GetAbilityModifier(AbilityType.Dexterity);
+                finalAC -= Math.Clamp(dexMod, 0, equippedMaxDex);
+            }
 
             return finalAC;
         }

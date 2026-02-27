@@ -306,6 +306,8 @@ namespace QDND.Combat.Services
                     return false;
                 case ReactionAIPolicy.Random:
                     return _getRng()?.Next(0, 2) == 1;
+                case ReactionAIPolicy.PriorityTargets:
+                    return true;
                 default:
                     return false;
             }
@@ -384,7 +386,8 @@ namespace QDND.Combat.Services
 
                     // Hellish Rebuke: Tieflings get it racially, or any class that knows the spell
                     bool hasHellishRebuke = combatant.KnownActions?.Any(a =>
-                        a.IndexOf("hellish_rebuke", StringComparison.OrdinalIgnoreCase) >= 0) == true;
+                        a.IndexOf("hellish_rebuke", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                        a.IndexOf("HellishRebuke", StringComparison.OrdinalIgnoreCase) >= 0) == true;
 
                     // Cutting Words: Bard feature (College of Lore subclass)
                     bool hasCuttingWords = combatant.ResolvedCharacter?.Features?.Any(f =>

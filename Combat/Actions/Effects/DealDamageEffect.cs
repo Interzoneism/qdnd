@@ -37,6 +37,12 @@ namespace QDND.Combat.Actions.Effects
                         "on_crit" => context.IsCritical,
                         "on_save_fail" or "on_failed_save" => context.DidTargetFailSave(target.Id),
                         "on_save_success" => !context.DidTargetFailSave(target.Id),
+                        string s when s.StartsWith("requires_status:") =>
+                            context.Statuses != null &&
+                            context.Statuses.HasStatus(target.Id, s["requires_status:".Length..]),
+                        string s when s.StartsWith("requires_no_status:") =>
+                            context.Statuses == null ||
+                            !context.Statuses.HasStatus(target.Id, s["requires_no_status:".Length..]),
                         _ => true
                     };
                     if (!conditionMet)
@@ -746,20 +752,5 @@ namespace QDND.Combat.Actions.Effects
             return GetDiceRange(definition, canCrit: true);
         }
 
-        private bool CheckCondition(EffectDefinition definition, EffectContext context)
-        {
-            if (string.IsNullOrEmpty(definition.Condition))
-                return true;
-
-            return definition.Condition switch
-            {
-                "on_hit" => context.DidHit,
-                "on_miss" => !context.DidHit,
-                "on_crit" => context.IsCritical,
-                "on_save_fail" or "on_failed_save" => context.SaveFailed,
-                "on_save_success" => !context.SaveFailed,
-                _ => true
-            };
-        }
     }
 }

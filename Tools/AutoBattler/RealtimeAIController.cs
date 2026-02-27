@@ -383,6 +383,21 @@ namespace QDND.Tools.AutoBattler
                         }
                         break;
 
+                    case AIActionType.Shove:
+                        {
+                            string shoveId = !string.IsNullOrEmpty(action.ActionId) ? action.ActionId : "shove";
+                            bool shoveSuccess = false;
+                            if (!string.IsNullOrEmpty(action.TargetId))
+                            {
+                                var shoveOpts = new ActionExecutionOptions { VariantId = action.VariantId };
+                                _arena.ExecuteAction(actor.Id, shoveId, action.TargetId, shoveOpts);
+                                shoveSuccess = true;
+                            }
+                            OnActionExecuted?.Invoke(actor.Id,
+                                $"Shove({action.VariantId ?? "auto"})\u2192{action.TargetId}", shoveSuccess);
+                        }
+                        break;
+
                     case AIActionType.EndTurn:
                         OnTurnEnded?.Invoke(actor.Id);
                         CallEndTurn();

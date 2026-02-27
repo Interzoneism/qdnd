@@ -308,13 +308,13 @@ namespace QDND.Combat.Reactions
                 Id = ShieldId,
                 Name = bg3Data?.DisplayName ?? "Shield",
                 Description = bg3Data?.Description ?? "When you are about to be hit, increase your AC by 5. Lasts until your next turn.",
-                Triggers = new List<ReactionTriggerType> { ReactionTriggerType.YouAreAttacked, ReactionTriggerType.YouTakeDamage },
+                Triggers = new List<ReactionTriggerType> { ReactionTriggerType.YouAreAttacked },
                 Priority = 20,
                 Range = 0f,
                 CanCancel = false,
                 CanModify = true,
                 Tags = new HashSet<string> { "shield", "spell", "ac_boost", "requires_hit", "bg3" },
-                AIPolicy = ReactionAIPolicy.DamageThreshold,
+                AIPolicy = ReactionAIPolicy.Always,
                 ActionId = "shield"
             };
 
