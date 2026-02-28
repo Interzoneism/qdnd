@@ -1,6 +1,6 @@
-[gd_scene format=4 uid="uid://bb0mpyebg24sm"]
+[gd_scene format=4 uid="uid://d2gc8y0v5dpwv"]
 
-[ext_resource type="Script" path="res://Combat/Arena/CombatantVisual.cs" id="1_combatant_visual_script"]
+[ext_resource type="Script" uid="uid://cslsy4j8vmme5" path="res://Combat/Arena/CombatantVisual.cs" id="1_combatant_visual_script"]
 [ext_resource type="AnimationLibrary" uid="uid://g6he6nsrv1v0" path="res://Animations.res" id="3_uuxsw"]
 [ext_resource type="AnimationLibrary" uid="uid://dn626n3stbwgc" path="res://Animation2.res" id="4_alj8v"]
 
@@ -269,8 +269,8 @@ bind/64/bone = -1
 bind/64/pose = Transform3D(-1.0000001, -6.9388815e-18, -1.05879106e-22, 4.879777e-15, -1.490116e-07, 0.9999998, -5.8207675e-11, 1.0000001, -3.5527135e-15, -0.08900002, -0.19209997, -0.015200032)
 
 [sub_resource type="TorusMesh" id="TorusMesh_1"]
-inner_radius = 0.568
-outer_radius = 0.612
+inner_radius = 0.846
+outer_radius = 0.911
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ring"]
 transparency = 1
@@ -282,12 +282,11 @@ emission_energy_multiplier = 2.0
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_tdo1a"]
 
 [node name="CombatantVisual" type="Area3D" unique_id=840700769]
-script = ExtResource("1_combatant_visual_script")
 collision_layer = 2
 collision_mask = 0
+script = ExtResource("1_combatant_visual_script")
 
 [node name="ModelRoot" type="Node3D" parent="." unique_id=250999663]
-transform = Transform3D(1.1, 0, 0, 0, 1.1, 0, 0, 0, 1.1, 0, 0, 0)
 
 [node name="Armature" type="Node3D" parent="ModelRoot" unique_id=1237200962]
 
@@ -753,18 +752,20 @@ bones/64/scale = Vector3(1, 1, 0.9999995)
 [node name="Mannequin" type="MeshInstance3D" parent="ModelRoot/Armature/GeneralSkeleton" unique_id=876174968]
 mesh = SubResource("ArrayMesh_xhgao")
 skin = SubResource("Skin_t46p5")
+skeleton = NodePath("..")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="ModelRoot" unique_id=18110620]
 libraries/ = ExtResource("3_uuxsw")
 libraries/Animation2 = ExtResource("4_alj8v")
 
 [node name="SelectionRing" type="MeshInstance3D" parent="." unique_id=1030920624]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.033, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
 mesh = SubResource("TorusMesh_1")
 surface_material_override/0 = SubResource("StandardMaterial3D_ring")
 
 [node name="NameLabel" type="Label3D" parent="." unique_id=620126777]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.3000002, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.8745368, 0)
+visible = false
 pixel_size = 0.001
 billboard = 1
 no_depth_test = true

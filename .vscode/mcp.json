@@ -22,7 +22,15 @@
 				"@upstash/context7-mcp@latest"
 			],
 			"type": "stdio"
-		}
+		},
+				"godot": {
+      "command": "node",
+      "args": ["C:/Users/Martin/source/repos/godot-mcp/build/index.js"],
+      "env": {
+        "DEBUG": "true",
+		"GODOT_PATH": "C:\\HQ\\Godot\\Godot_v4.6-stable_mono_win64\\Godot_v4.6-stable_mono_win64.exe"                // Enable detailed logging
+      }
+    	}
 	},
 	"inputs": []
 }

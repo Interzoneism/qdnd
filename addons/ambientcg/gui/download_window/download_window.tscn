@@ -1,26 +1,26 @@
-[gd_scene load_steps=3 format=3 uid="uid://bxxcwt6y0ixyg"]
+[gd_scene format=3 uid="uid://cqs4i5tw5ubh"]
 
 [ext_resource type="Script" uid="uid://ew5aw7503d0c" path="res://addons/ambientcg/gui/download_window/download_window.gd" id="1_p7iqu"]
 [ext_resource type="Script" uid="uid://dns7le84qmy3s" path="res://addons/ambientcg/gui/TMakerBG.gd" id="2_8pnig"]
 
-[node name="DownloadWindow" type="Window"]
+[node name="DownloadWindow" type="Window" unique_id=374960901]
 oversampling_override = 1.0
 initial_position = 2
 size = Vector2i(720, 480)
 exclusive = true
 script = ExtResource("1_p7iqu")
 
-[node name="TMakerBG" type="ColorRect" parent="."]
+[node name="TMakerBG" type="ColorRect" parent="." unique_id=1490838077]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.1254902, 0.1254902, 0.1254902, 1)
+color = Color(0.161, 0.161, 0.161, 1)
 script = ExtResource("2_8pnig")
 metadata/_custom_type_script = "uid://dns7le84qmy3s"
 
-[node name="MaterialIcon" type="TextureRect" parent="."]
+[node name="MaterialIcon" type="TextureRect" parent="." unique_id=988482776]
 unique_name_in_owner = true
 anchors_preset = -1
 anchor_left = 0.0111111
@@ -30,7 +30,7 @@ anchor_bottom = 0.291667
 offset_right = 1.52588e-05
 metadata/_edit_use_anchors_ = true
 
-[node name="DownloadPanel" type="Panel" parent="."]
+[node name="DownloadPanel" type="Panel" parent="." unique_id=2058666956]
 unique_name_in_owner = true
 visible = false
 anchors_preset = -1
@@ -40,7 +40,7 @@ anchor_right = 0.988889
 anchor_bottom = 0.958333
 metadata/_edit_use_anchors_ = true
 
-[node name="Title" type="Label" parent="DownloadPanel"]
+[node name="Title" type="Label" parent="DownloadPanel" unique_id=710185614]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = -0.208332
@@ -50,7 +50,7 @@ text = "Download"
 vertical_alignment = 1
 metadata/_edit_use_anchors_ = true
 
-[node name="DownloadContainer" type="HBoxContainer" parent="DownloadPanel"]
+[node name="DownloadContainer" type="HBoxContainer" parent="DownloadPanel" unique_id=1782209022]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -60,7 +60,7 @@ grow_horizontal = 2
 grow_vertical = 2
 metadata/_edit_use_anchors_ = true
 
-[node name="DownloadProgress" type="ProgressBar" parent="DownloadPanel"]
+[node name="DownloadProgress" type="ProgressBar" parent="DownloadPanel" unique_id=1512042754]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = -1
@@ -70,7 +70,7 @@ anchor_bottom = -0.0208333
 show_percentage = false
 metadata/_edit_use_anchors_ = true
 
-[node name="ExtractPanel" type="Panel" parent="."]
+[node name="ExtractPanel" type="Panel" parent="." unique_id=553654066]
 unique_name_in_owner = true
 anchors_preset = -1
 anchor_left = 0.0111111
@@ -79,7 +79,7 @@ anchor_right = 0.988889
 anchor_bottom = 0.958333
 metadata/_edit_use_anchors_ = true
 
-[node name="Title" type="Label" parent="ExtractPanel"]
+[node name="Title" type="Label" parent="ExtractPanel" unique_id=741937730]
 layout_mode = 1
 anchors_preset = -1
 anchor_top = -0.208332
@@ -89,7 +89,7 @@ text = "Select & Extract Files"
 vertical_alignment = 1
 metadata/_edit_use_anchors_ = true
 
-[node name="Title2" type="Label" parent="ExtractPanel"]
+[node name="Title2" type="Label" parent="ExtractPanel" unique_id=1318501802]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.636364
@@ -100,7 +100,7 @@ text = "Advanced Import Settings"
 vertical_alignment = 1
 metadata/_edit_use_anchors_ = true
 
-[node name="ExtractScroll" type="ScrollContainer" parent="ExtractPanel"]
+[node name="ExtractScroll" type="ScrollContainer" parent="ExtractPanel" unique_id=116578437]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = -1
@@ -111,14 +111,14 @@ grow_vertical = 2
 horizontal_scroll_mode = 0
 metadata/_edit_use_anchors_ = true
 
-[node name="ExtractFileOptions" type="VBoxContainer" parent="ExtractPanel/ExtractScroll"]
+[node name="ExtractFileOptions" type="VBoxContainer" parent="ExtractPanel/ExtractScroll" unique_id=1032039364]
 unique_name_in_owner = true
 clip_contents = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="extract_button" type="Button" parent="ExtractPanel"]
+[node name="extract_button" type="Button" parent="ExtractPanel" unique_id=1448709098]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = -1
@@ -129,7 +129,7 @@ anchor_bottom = 1.0
 text = "EXTRACT AND SAVE"
 metadata/_edit_use_anchors_ = true
 
-[node name="PopulationOptionsContainer" type="GridContainer" parent="ExtractPanel"]
+[node name="PopulationOptionsContainer" type="GridContainer" parent="ExtractPanel" unique_id=1559248303]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = -1
@@ -141,7 +141,7 @@ theme_override_constants/v_separation = 0
 columns = 2
 metadata/_edit_use_anchors_ = true
 
-[node name="img_size_width" type="SpinBox" parent="ExtractPanel/PopulationOptionsContainer"]
+[node name="img_size_width" type="SpinBox" parent="ExtractPanel/PopulationOptionsContainer" unique_id=436722537]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
@@ -151,7 +151,7 @@ value = 1024.0
 update_on_text_changed = true
 prefix = "Width"
 
-[node name="img_size_height" type="SpinBox" parent="ExtractPanel/PopulationOptionsContainer"]
+[node name="img_size_height" type="SpinBox" parent="ExtractPanel/PopulationOptionsContainer" unique_id=889192135]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
@@ -160,19 +160,19 @@ max_value = 8192.0
 value = 1024.0
 prefix = "Height"
 
-[node name="enable_triplanar" type="CheckButton" parent="ExtractPanel/PopulationOptionsContainer"]
+[node name="enable_triplanar" type="CheckButton" parent="ExtractPanel/PopulationOptionsContainer" unique_id=846231522]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(128, 32)
 layout_mode = 2
 text = "Triplanar"
 
-[node name="enable_resize" type="CheckButton" parent="ExtractPanel/PopulationOptionsContainer"]
+[node name="enable_resize" type="CheckButton" parent="ExtractPanel/PopulationOptionsContainer" unique_id=962229163]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(128, 32)
 layout_mode = 2
 text = "Resize"
 
-[node name="enable_packing" type="CheckButton" parent="ExtractPanel/PopulationOptionsContainer"]
+[node name="enable_packing" type="CheckButton" parent="ExtractPanel/PopulationOptionsContainer" unique_id=1536435026]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(128, 32)

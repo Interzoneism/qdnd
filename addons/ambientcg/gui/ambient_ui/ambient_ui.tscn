@@ -1,9 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://s0qvbretbfj4"]
+[gd_scene format=3 uid="uid://d3br3n44aqi1"]
 
 [ext_resource type="Script" uid="uid://qty5c6pwmgy6" path="res://addons/ambientcg/gui/ambient_ui/ambient_ui.gd" id="1_tpory"]
 [ext_resource type="Texture2D" uid="uid://bh5suxm427fn0" path="res://addons/ambientcg/plugin_assets/icon/Search.svg" id="2_1lun0"]
 
-[node name="AmbientUI" type="Control"]
+[node name="AmbientUI" type="Control" unique_id=1665851295]
 clip_children = 1
 clip_contents = true
 custom_minimum_size = Vector2(100, 100)
@@ -17,7 +17,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("1_tpory")
 
-[node name="SearchResultCount" type="Label" parent="."]
+[node name="SearchResultCount" type="Label" parent="." unique_id=1946724909]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 1
@@ -30,7 +30,7 @@ grow_horizontal = 0
 grow_vertical = 0
 metadata/_edit_use_anchors_ = true
 
-[node name="SearchingIndicator" type="Label" parent="."]
+[node name="SearchingIndicator" type="Label" parent="." unique_id=833812364]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(0, 24)
@@ -45,7 +45,7 @@ grow_vertical = 0
 text = "Searching..."
 metadata/_edit_use_anchors_ = true
 
-[node name="APIVersionInfo" type="Label" parent="."]
+[node name="APIVersionInfo" type="Label" parent="." unique_id=487425011]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = -1
@@ -56,7 +56,7 @@ theme_override_font_sizes/font_size = 12
 text = "Fetching API Information"
 metadata/_edit_use_anchors_ = true
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1979167349]
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.00347222
@@ -67,7 +67,7 @@ grow_horizontal = 2
 theme_override_constants/separation = 4
 metadata/_edit_use_anchors_ = true
 
-[node name="SearchBar" type="LineEdit" parent="VBoxContainer"]
+[node name="SearchBar" type="LineEdit" parent="VBoxContainer" unique_id=215551907]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
@@ -76,24 +76,24 @@ placeholder_text = "Search"
 right_icon = ExtResource("2_1lun0")
 metadata/_edit_use_anchors_ = true
 
-[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer" unique_id=1548569656]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 metadata/_edit_use_anchors_ = true
 
-[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer" unique_id=836916414]
 custom_minimum_size = Vector2(98, 32)
 layout_mode = 2
 text = "Sort By Type"
 vertical_alignment = 1
 
-[node name="TypeOptions" type="OptionButton" parent="VBoxContainer/HBoxContainer"]
+[node name="TypeOptions" type="OptionButton" parent="VBoxContainer/HBoxContainer" unique_id=1562567324]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(96, 32)
 layout_mode = 2
 tooltip_text = "Resource Type"
 
-[node name="MaterialBrowser" type="Panel" parent="."]
+[node name="MaterialBrowser" type="Panel" parent="." unique_id=1050697757]
 unique_name_in_owner = true
 layout_mode = 0
 anchor_left = 0.00347222
@@ -104,7 +104,7 @@ grow_horizontal = 2
 grow_vertical = 2
 metadata/_edit_use_anchors_ = true
 
-[node name="SearchScroll" type="ScrollContainer" parent="MaterialBrowser"]
+[node name="SearchScroll" type="ScrollContainer" parent="MaterialBrowser" unique_id=1423146291]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
@@ -114,7 +114,7 @@ grow_horizontal = 2
 grow_vertical = 2
 horizontal_scroll_mode = 0
 
-[node name="SearchGrid" type="GridContainer" parent="MaterialBrowser/SearchScroll"]
+[node name="SearchGrid" type="GridContainer" parent="MaterialBrowser/SearchScroll" unique_id=1864295462]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
