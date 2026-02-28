@@ -1926,6 +1926,61 @@ namespace QDND.Combat.Arena
         public IEnumerable<Combatant> GetCombatants() => _combatants;
 
         /// <summary>
+        /// Resolve the highest-priority surface at a world position.
+        /// Clouds are prioritized over ground surfaces when both overlap.
+        /// </summary>
+        public SurfaceInstance GetTopSurfaceAtWorldPosition(Vector3 worldPosition)
+        {
+            if (_surfaceManager == null)
+            {
+                return null;
+            }
+
+            var surfaces = _surfaceManager.GetSurfacesAt(worldPosition);
+            if (surfaces == null || surfaces.Count == 0)
+            {
+                return null;
+            }
+
+            SurfaceInstance best = null;
+            int bestLayer = int.MinValue;
+            float bestHazardScore = float.MinValue;
+            long bestCreatedAt = long.MinValue;
+
+            foreach (var surface in surfaces)
+            {
+                if (surface?.Definition == null)
+                {
+                    continue;
+                }
+
+                int layer = (int)surface.Definition.Layer;
+                float hazardScore = 0f;
+                if (surface.Definition.DamagePerTrigger > 0f)
+                {
+                    hazardScore += 2f;
+                }
+                if (!string.IsNullOrWhiteSpace(surface.Definition.AppliesStatusId))
+                {
+                    hazardScore += 1f;
+                }
+
+                if (best == null ||
+                    layer > bestLayer ||
+                    (layer == bestLayer && hazardScore > bestHazardScore) ||
+                    (layer == bestLayer && Mathf.IsEqualApprox(hazardScore, bestHazardScore) && surface.CreatedAt > bestCreatedAt))
+                {
+                    best = surface;
+                    bestLayer = layer;
+                    bestHazardScore = hazardScore;
+                    bestCreatedAt = surface.CreatedAt;
+                }
+            }
+
+            return best;
+        }
+
+        /// <summary>
         /// Reload combat with a new scenario.
         /// </summary>
         public void ReloadWithScenario(string scenarioPath)

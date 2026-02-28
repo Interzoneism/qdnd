@@ -7,6 +7,7 @@ using QDND.Combat.Entities;
 using QDND.Combat.Services;
 using QDND.Combat.States;
 using QDND.Combat.Actions;
+using QDND.Combat.Environment;
 using QDND.Combat.UI.Base;
 using QDND.Combat.UI.Controls;
 using QDND.Combat.UI.Panels;
@@ -2016,6 +2017,24 @@ namespace QDND.Combat.UI
             return _windowManager?.AnyModalOpen == true;
         }
 
+        public void ShowSurfaceTooltip(SurfaceInstance surface)
+        {
+            if (_unifiedTooltip == null || surface?.Definition == null)
+            {
+                return;
+            }
+
+            string layerLabel = surface.Definition.Layer == SurfaceLayer.Cloud ? "Cloud" : "Surface";
+            string title = $"{surface.Definition.Name} ({layerLabel})";
+            string body = BuildSurfaceTooltipBody(surface);
+            _unifiedTooltip.ShowText(title, body, HudTheme.Gold);
+        }
+
+        public void HideSurfaceTooltip()
+        {
+            _unifiedTooltip?.Hide();
+        }
+
         private Combatant GetActivePlayerCombatant()
         {
             if (Arena == null) return null;
@@ -2117,6 +2136,64 @@ namespace QDND.Combat.UI
                 "rogue" => "DEX",
                 _ => "",
             };
+        }
+
+        private static string BuildSurfaceTooltipBody(SurfaceInstance surface)
+        {
+            var definition = surface.Definition;
+            var lines = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(definition.Description))
+            {
+                lines.Add(definition.Description.Trim());
+            }
+
+            lines.Add(surface.IsPermanent
+                ? "Duration: Permanent"
+                : $"Duration: {surface.RemainingDuration} round(s)");
+            lines.Add($"Radius: {surface.Radius:0.0}m");
+
+            if (definition.DamagePerTrigger > 0f)
+            {
+                string damageType = string.IsNullOrWhiteSpace(definition.DamageType)
+                    ? "damage"
+                    : ResolveDisplayIdentifier(definition.DamageType).ToLowerInvariant();
+                lines.Add($"Damage: {definition.DamagePerTrigger:0.#} {damageType} on enter/turn start");
+            }
+
+            if (!string.IsNullOrWhiteSpace(definition.DamageDicePerDistanceUnit))
+            {
+                lines.Add($"Traversal: {definition.DamageDicePerDistanceUnit} per {definition.DamageDistanceUnit:0.#}m moved");
+            }
+
+            if (!string.IsNullOrWhiteSpace(definition.AppliesStatusId))
+            {
+                string statusName = ResolveDisplayIdentifier(definition.AppliesStatusId);
+                if (definition.SaveAbility.HasValue && definition.SaveDC.HasValue)
+                {
+                    string saveAbility = ResolveDisplayIdentifier(definition.SaveAbility.Value.ToString());
+                    lines.Add($"Status: {statusName} (Save: {saveAbility} DC {definition.SaveDC.Value})");
+                }
+                else
+                {
+                    lines.Add($"Status: {statusName}");
+                }
+            }
+
+            if (definition.MovementCostMultiplier > 1.01f)
+            {
+                lines.Add($"Movement Cost: x{definition.MovementCostMultiplier:0.##}");
+            }
+
+            if (definition.Tags != null && definition.Tags.Count > 0)
+            {
+                var tags = definition.Tags
+                    .OrderBy(tag => tag)
+                    .Select(ResolveDisplayIdentifier);
+                lines.Add($"Tags: {string.Join(", ", tags)}");
+            }
+
+            return string.Join("\n", lines);
         }
 
         // ════════════════════════════════════════════════════════════
