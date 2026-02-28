@@ -16,7 +16,7 @@ namespace QDND.Combat.UI.Panels
         private Button _editorButton;
         private bool _isPlayerTurn;
 
-        private const int ButtonDiameter = 72;
+        private const int ButtonDiameter = 125;
 
         public TurnControlsPanel()
         {
@@ -47,7 +47,7 @@ namespace QDND.Combat.UI.Panels
             _endTurnButton.CustomMinimumSize = new Vector2(ButtonDiameter, ButtonDiameter);
             _endTurnButton.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
 
-            int radius = ButtonDiameter / 2;
+            int radius = (ButtonDiameter + 1) / 2;
 
             var normalStyle = HudTheme.CreateButtonStyle(
                 HudTheme.SecondaryDark, HudTheme.Gold,
@@ -67,7 +67,7 @@ namespace QDND.Combat.UI.Panels
             _endTurnButton.AddThemeStyleboxOverride("pressed", pressedStyle);
             _endTurnButton.AddThemeStyleboxOverride("disabled", disabledStyle);
 
-            HudTheme.StyleButton(_endTurnButton, HudTheme.FontMedium, HudTheme.Gold);
+            HudTheme.StyleButton(_endTurnButton, HudTheme.FontLarge, HudTheme.Gold);
             _endTurnButton.AddThemeColorOverride("font_color", HudTheme.Gold);
             _endTurnButton.AddThemeColorOverride("font_hover_color", HudTheme.WarmWhite);
             _endTurnButton.AddThemeColorOverride("font_pressed_color", HudTheme.WarmWhite);

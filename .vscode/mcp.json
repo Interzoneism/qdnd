@@ -22,7 +22,15 @@
 				"@upstash/context7-mcp@latest"
 			],
 			"type": "stdio"
-		}
+		},
+		"godot": {
+      "command": "node",
+      "args": ["/home/martin/repos/godot-mcp/build/index.js"],
+      "env": {
+        "DEBUG": "true"                  // Enable detailed logging
+      }
+    	}
 	},
+	
 	"inputs": []
 }

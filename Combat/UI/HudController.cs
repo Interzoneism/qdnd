@@ -39,10 +39,13 @@ namespace QDND.Combat.UI
         private CombatLogPanel _combatLogPanel;
 
         // ── Portrait (BG3-style, left of hotbar) ──────────────────
-        private PanelContainer _portraitContainer;
+        private Control _portraitContainer;
         private ColorRect _portraitColorRect;
         private TextureRect _portraitTextureRect;
         private Label _portraitHpLabel;
+
+        // ── Reaction Icons (right side of hotbar) ─────────────────
+        private HBoxContainer _reactionIconContainer;
 
         // ── Overlays ───────────────────────────────────────────────
         private ReactionPromptOverlay _reactionPrompt;
@@ -180,21 +183,16 @@ namespace QDND.Combat.UI
             var screenSize = GetViewport()?.GetVisibleRect().Size ?? new Vector2(1920, 1080);
 
             // ── Hotbar geometry ─────────────────────────────────────
-            // 12 cols × 48px + 11 gaps × 3px = 576 + 33 = 609
-            const int slotSize = 48;
+            // 12 cols × 44px + 11 gaps × 3px = 528 + 33 = 561
+            const int slotSize = 44;
             const int slotGap = 3;
             const int gridCols = 12;
-            float actionGridWidth = gridCols * slotSize + (gridCols - 1) * slotGap; // ~609
-            float actionBarWidth = actionGridWidth + 24; // padding
-            float actionBarHeight = 148; // will be dynamic once panel loads
-            const float portraitSize = 72;
-            const float turnBtnSize = 80;
-            const float hotbarGap = 8;
+            float actionGridWidth = gridCols * slotSize + (gridCols - 1) * slotGap;
+            float actionBarWidth = actionGridWidth + 24 + 44; // 24 padding + 44 resize buttons
+            const float portraitCircleSize = 125;
+            const float hotbarGap = 4;
 
-            // Center the whole cluster: [portrait] [actionbar] [endturn]
-            float clusterWidth = portraitSize + hotbarGap + actionBarWidth + hotbarGap + turnBtnSize;
-            float clusterLeft = (screenSize.X - clusterWidth) / 2;
-            float hotbarBottom = screenSize.Y - 8;
+            float hotbarBottom = screenSize.Y - 54;
 
             // Initiative Ribbon — top center (auto-sizes to portrait count)
             _initiativeRibbon = new InitiativeRibbon();
@@ -206,62 +204,57 @@ namespace QDND.Combat.UI
             _partyPanel = new PartyPanel();
             AddChild(_partyPanel);
             _partyPanel.Size = new Vector2(90, 460);
-            _partyPanel.SetScreenPosition(new Vector2(4, 80));
+            float partyPanelHeight = _partyPanel.Size.Y;
+            _partyPanel.SetScreenPosition(new Vector2(15, (screenSize.Y - partyPanelHeight) / 2));
             _partyPanel.OnMemberClicked += OnPartyMemberClicked;
 
-            // ── Active Character Portrait — left of hotbar ─────────
-            _portraitContainer = new PanelContainer();
-            _portraitContainer.CustomMinimumSize = new Vector2(portraitSize, portraitSize);
-            _portraitContainer.Size = new Vector2(portraitSize, portraitSize + 18);
-            _portraitContainer.AddThemeStyleboxOverride("panel",
-                HudTheme.CreatePanelStyle(HudTheme.SecondaryDark, HudTheme.Gold, (int)(portraitSize / 2), 2, 4));
-            _portraitContainer.ClipChildren = ClipChildrenMode.AndDraw;
+            // ── Active Character Portrait — left of hotbar (125×125 circle) ─────────
+            // Plain Control so children keep their manual position/size (PanelContainer force-fits children).
+            _portraitContainer = new Control();
+            _portraitContainer.CustomMinimumSize = new Vector2(portraitCircleSize, portraitCircleSize);
+            _portraitContainer.Size = new Vector2(portraitCircleSize, portraitCircleSize);
             AddChild(_portraitContainer);
 
-            var portraitVBox = new VBoxContainer();
-            portraitVBox.Alignment = BoxContainer.AlignmentMode.Center;
-            portraitVBox.AddThemeConstantOverride("separation", 2);
-            _portraitContainer.AddChild(portraitVBox);
-
-            // Portrait image area: ColorRect fallback + TextureRect overlay in a container
-            var portraitImageContainer = new Control();
-            portraitImageContainer.CustomMinimumSize = new Vector2(portraitSize - 8, portraitSize - 8);
-            portraitImageContainer.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
-            portraitVBox.AddChild(portraitImageContainer);
-
-            // Faction-colored portrait background (fallback)
+            // Fallback color background — visible only when no portrait texture is loaded
             _portraitColorRect = new ColorRect();
             _portraitColorRect.SetAnchorsPreset(LayoutPreset.FullRect);
             _portraitColorRect.Color = HudTheme.PlayerBlue;
             _portraitColorRect.MouseFilter = MouseFilterEnum.Ignore;
-            portraitImageContainer.AddChild(_portraitColorRect);
+            _portraitContainer.AddChild(_portraitColorRect);
 
-            // Portrait texture overlay (loaded from combatant PortraitPath)
+            // Portrait texture — KeepAspectCovered zooms to fill 125×125; circular shader clips to circle
+            var circleShader = new Shader();
+            circleShader.Code =
+@"shader_type canvas_item;
+void fragment() {
+    vec2 uv = UV - vec2(0.5);
+    if (length(uv) > 0.5) discard;
+    COLOR = texture(TEXTURE, UV);
+}";
+            var circleShaderMat = new ShaderMaterial();
+            circleShaderMat.Shader = circleShader;
             _portraitTextureRect = new TextureRect();
             _portraitTextureRect.SetAnchorsPreset(LayoutPreset.FullRect);
             _portraitTextureRect.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
             _portraitTextureRect.StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered;
+            _portraitTextureRect.Material = circleShaderMat;
             _portraitTextureRect.MouseFilter = MouseFilterEnum.Ignore;
-            portraitImageContainer.AddChild(_portraitTextureRect);
+            _portraitContainer.AddChild(_portraitTextureRect);
 
-            _portraitHpLabel = new Label();
-            _portraitHpLabel.Text = "";
-            _portraitHpLabel.HorizontalAlignment = HorizontalAlignment.Center;
-            HudTheme.StyleLabel(_portraitHpLabel, HudTheme.FontTiny, HudTheme.HealthGreen);
-            _portraitHpLabel.AddThemeColorOverride("font_shadow_color", new Color(0, 0, 0, 0.7f));
-            _portraitHpLabel.AddThemeConstantOverride("shadow_offset_x", 1);
-            _portraitHpLabel.AddThemeConstantOverride("shadow_offset_y", 1);
-            portraitVBox.AddChild(_portraitHpLabel);
+            // Gold circular border ring — non-interactive overlay drawn on top of portrait
+            var portraitBorderRing = new PanelContainer();
+            portraitBorderRing.SetAnchorsPreset(LayoutPreset.FullRect);
+            portraitBorderRing.MouseFilter = MouseFilterEnum.Ignore;
+            portraitBorderRing.AddThemeStyleboxOverride("panel",
+                HudTheme.CreatePanelStyle(Colors.Transparent, HudTheme.Gold, cornerRadius: 63, borderWidth: 2, contentMargin: 0));
+            _portraitContainer.AddChild(portraitBorderRing);
 
-            float portraitX = clusterLeft;
-            float portraitY = hotbarBottom - (portraitSize + 18);
-            _portraitContainer.GlobalPosition = new Vector2(portraitX, portraitY);
-
-            // ── Action Bar — bottom center (2×12 grid + tabs) ──────
+            // ── Action Bar — bottom center ──────────────────────────
             _actionBarPanel = new ActionBarPanel();
             AddChild(_actionBarPanel);
+            float actionBarHeight = _actionBarPanel.CalculateHeight();
             _actionBarPanel.Size = new Vector2(actionBarWidth, actionBarHeight);
-            float actionBarX = clusterLeft + portraitSize + hotbarGap;
+            float actionBarX = (screenSize.X - actionBarWidth) / 2;
             float actionBarY = hotbarBottom - actionBarHeight;
             _actionBarPanel.SetScreenPosition(new Vector2(actionBarX, actionBarY));
             _actionBarPanel.OnActionPressed += OnActionPressed;
@@ -270,22 +263,38 @@ namespace QDND.Combat.UI
             _actionBarPanel.OnActionReordered += OnActionReordered;
             _actionBarPanel.OnGridResized += OnHotbarGridResized;
 
-            // ── Resource Bar — above the action grid, same width ───
+            // Portrait — left of hotbar, 30px from screen bottom
+            float portraitX = actionBarX - hotbarGap - portraitCircleSize;
+            float portraitY = screenSize.Y - 30 - portraitCircleSize;
+            _portraitContainer.GlobalPosition = new Vector2(portraitX, portraitY);
+
+            // ── Resource Bar — centered above hotbar, 4px margin ───
             _resourceBarPanel = new ResourceBarPanel();
             AddChild(_resourceBarPanel);
-            _resourceBarPanel.Size = new Vector2(Mathf.Max(actionBarWidth, 500), 80);
+            float resWidth = Mathf.Max(actionBarWidth, 500);
+            _resourceBarPanel.Size = new Vector2(resWidth, 80);
             _resourceBarPanel.SetScreenPosition(new Vector2(
-                (screenSize.X - Mathf.Max(actionBarWidth, 500)) / 2, actionBarY - 84));
+                (screenSize.X - resWidth) / 2, actionBarY - 4 - 80));
 
             // ── Turn Controls (circular End Turn) — right of hotbar ─
             _turnControlsPanel = new TurnControlsPanel();
             AddChild(_turnControlsPanel);
-            _turnControlsPanel.Size = new Vector2(turnBtnSize, turnBtnSize + 24);
+            _turnControlsPanel.Size = new Vector2(125, 125 + 10);
             float turnX = actionBarX + actionBarWidth + hotbarGap;
-            float turnY = hotbarBottom - (turnBtnSize + 24);
+            float turnY = screenSize.Y - 30 - (125 + 10);
             _turnControlsPanel.SetScreenPosition(new Vector2(turnX, turnY));
             _turnControlsPanel.OnEndTurnPressed += OnEndTurnPressed;
             _turnControlsPanel.OnActionEditorPressed += OnActionEditorPressed;
+
+            // ── Active Reaction Icons — right of hotbar, 10px above hotbar top ─
+            _reactionIconContainer = new HBoxContainer();
+            _reactionIconContainer.AddThemeConstantOverride("separation", 2);
+            _reactionIconContainer.LayoutDirection = LayoutDirectionEnum.Rtl;
+            _reactionIconContainer.MouseFilter = MouseFilterEnum.Ignore;
+            AddChild(_reactionIconContainer);
+            float reactionX = actionBarX + actionBarWidth + 4;
+            float reactionY = actionBarY - 10 - 30; // 10px above hotbar top, icons are 30px tall
+            _reactionIconContainer.GlobalPosition = new Vector2(reactionX, reactionY);
 
             // ── Combat Log — right side ─────────────────────────────
             _combatLogPanel = new CombatLogPanel();
@@ -858,11 +867,10 @@ namespace QDND.Combat.UI
 
         private void UpdatePortraitHp()
         {
-            if (_portraitHpLabel == null || Arena == null) return;
+            if (Arena == null) return;
             var combatant = GetActivePlayerCombatant();
             if (combatant != null)
             {
-                _portraitHpLabel.Text = $"{combatant.Resources.CurrentHP}/{combatant.Resources.MaxHP}";
                 if (_portraitColorRect != null)
                 {
                     _portraitColorRect.Color = combatant.Faction == Faction.Player
@@ -878,7 +886,6 @@ namespace QDND.Combat.UI
             }
             else
             {
-                _portraitHpLabel.Text = "--/--";
                 if (_portraitColorRect != null)
                     _portraitColorRect.Color = HudTheme.PlayerBlue;
                 if (_portraitTextureRect != null)
@@ -1345,32 +1352,41 @@ namespace QDND.Combat.UI
             var screenSize = GetViewport()?.GetVisibleRect().Size ?? new Vector2(1920, 1080);
 
             float newWidth = _actionBarPanel.CalculateWidth();
-            const float portraitSize = 72;
-            const float turnBtnSize = 80;
-            const float hotbarGap = 8;
+            const float portraitCircleSize = 125;
+            const float hotbarGap = 4;
             float actionBarHeight = _actionBarPanel.CalculateHeight();
 
-            float clusterWidth = portraitSize + hotbarGap + newWidth + hotbarGap + turnBtnSize;
-            float clusterLeft = (screenSize.X - clusterWidth) / 2;
-            float hotbarBottom = screenSize.Y - 8;
+            float hotbarBottom = screenSize.Y - 54;
+            float actionBarX = (screenSize.X - newWidth) / 2;
+            float actionBarY = hotbarBottom - actionBarHeight;
 
             _actionBarPanel.Size = new Vector2(newWidth, actionBarHeight);
-            _actionBarPanel.SetScreenPosition(new Vector2(clusterLeft + portraitSize + hotbarGap, hotbarBottom - actionBarHeight));
+            _actionBarPanel.SetScreenPosition(new Vector2(actionBarX, actionBarY));
 
-            _portraitContainer.GlobalPosition = new Vector2(clusterLeft, hotbarBottom - (portraitSize + 18));
+            _portraitContainer.GlobalPosition = new Vector2(
+                actionBarX - hotbarGap - portraitCircleSize,
+                screenSize.Y - 30 - portraitCircleSize);
 
             if (_resourceBarPanel != null)
             {
                 float resWidth = Mathf.Max(newWidth, 500);
                 _resourceBarPanel.Size = new Vector2(resWidth, 80);
                 _resourceBarPanel.SetScreenPosition(new Vector2(
-                    (screenSize.X - resWidth) / 2, hotbarBottom - actionBarHeight - 84));
+                    (screenSize.X - resWidth) / 2, actionBarY - 4 - 80));
             }
 
             if (_turnControlsPanel != null)
             {
-                float turnX = clusterLeft + portraitSize + hotbarGap + newWidth + hotbarGap;
-                _turnControlsPanel.SetScreenPosition(new Vector2(turnX, hotbarBottom - (turnBtnSize + 24)));
+                float turnX = actionBarX + newWidth + hotbarGap;
+                float turnY = screenSize.Y - 30 - (125 + 10);
+                _turnControlsPanel.SetScreenPosition(new Vector2(turnX, turnY));
+            }
+
+            if (_reactionIconContainer != null)
+            {
+                float reactionX = actionBarX + newWidth + 4;
+                float reactionY = actionBarY - 10 - 30;
+                _reactionIconContainer.GlobalPosition = new Vector2(reactionX, reactionY);
             }
         }
 
@@ -1418,6 +1434,25 @@ namespace QDND.Combat.UI
             _windowManager?.CloseModal(_reactionPrompt);
             _reactionCallback?.Invoke(false);
             _reactionCallback = null;
+        }
+
+        // ── Active Reaction Icons ──────────────────────────────────
+
+        public void SetActiveReactions(System.Collections.Generic.IReadOnlyList<(string name, string iconPath)> reactions)
+        {
+            HudTheme.ClearChildren(_reactionIconContainer);
+            if (reactions == null) return;
+            foreach (var (name, iconPath) in reactions)
+            {
+                var icon = new TextureRect();
+                icon.CustomMinimumSize = new Vector2(30, 30);
+                icon.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+                icon.StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered;
+                icon.MouseFilter = MouseFilterEnum.Ignore;
+                if (!string.IsNullOrEmpty(iconPath) && ResourceLoader.Exists(iconPath))
+                    icon.Texture = GD.Load<Texture2D>(iconPath);
+                _reactionIconContainer.AddChild(icon);
+            }
         }
 
         // ── Character Sheet ────────────────────────────────────────
