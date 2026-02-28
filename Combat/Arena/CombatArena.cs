@@ -199,6 +199,8 @@ namespace QDND.Combat.Arena
                 TargetPosition = opts.TargetPosition,
                 SkipCostValidation = opts.SkipCostValidation,
                 SkipRangeValidation = opts.SkipRangeValidation,
+                IgnoreReactionBudgetCheck = opts.IgnoreReactionBudgetCheck,
+                SkipReactionBudgetConsumption = opts.SkipReactionBudgetConsumption,
                 TriggerContext = opts.TriggerContext
             };
         }
@@ -331,7 +333,10 @@ namespace QDND.Combat.Arena
 
             // Try loading scenario first, fallback to default if it fails
             bool scenarioLoaded = false;
-            if (CustomFightEnabled && CustomFightCombatants != null && CustomFightCombatants.Count > 0)
+            // In CLI auto-battle mode, command-line scenario/runtime settings must win.
+            // Custom fight editor presets are intended for manual/local sandboxing.
+            bool allowCustomFightBootstrap = _autoBattleConfig == null;
+            if (allowCustomFightBootstrap && CustomFightEnabled && CustomFightCombatants != null && CustomFightCombatants.Count > 0)
             {
                 try
                 {
@@ -939,6 +944,21 @@ namespace QDND.Combat.Arena
             var reactionSystem = new ReactionSystem(_rulesEngine.Events, reactionAliasResolver)
             {
                 StrictGrantValidation = true
+            };
+            reactionSystem.AdditionalEligibilityCheck = (reactor, reaction, context) =>
+            {
+                if (_effectPipeline == null || reactor == null)
+                    return true;
+                if (string.IsNullOrWhiteSpace(reaction?.ActionId))
+                    return true;
+
+                // Opportunity attack currently resolves through main_hand_attack, which is not
+                // action-economy equivalent to explicit action use in this reaction window.
+                if (reaction.Tags != null && reaction.Tags.Contains("opportunity_attack"))
+                    return true;
+
+                var (canUse, _) = _effectPipeline.CanUseAbility(reaction.ActionId, reactor);
+                return canUse;
             };
             _reactionSystem = reactionSystem; // Store reference
             _resolutionStack = new ResolutionStack();
@@ -1656,6 +1676,8 @@ namespace QDND.Combat.Arena
                     TargetPosition = options.TargetPosition,
                     SkipCostValidation = options.SkipCostValidation,
                     SkipRangeValidation = options.SkipRangeValidation,
+                    IgnoreReactionBudgetCheck = options.IgnoreReactionBudgetCheck,
+                    SkipReactionBudgetConsumption = options.SkipReactionBudgetConsumption,
                     TriggerContext = options.TriggerContext
                 }
                 : null;

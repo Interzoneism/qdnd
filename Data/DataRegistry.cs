@@ -147,6 +147,8 @@ namespace QDND.Data
             if (string.IsNullOrEmpty(status.Id))
                 throw new ArgumentException("Status must have an Id");
 
+            status.BlockedActions = StatusActionBlockNormalizer.Normalize(status.BlockedActions);
+
             _statuses[status.Id] = status;
         }
 
@@ -388,6 +390,12 @@ namespace QDND.Data
                             result.AddWarning("Status", status.Id, "Modifier has no target");
                         }
                     }
+                }
+
+                var unknownBlockedTokens = StatusActionBlockNormalizer.FindUnknownTokens(status.BlockedActions);
+                foreach (var token in unknownBlockedTokens)
+                {
+                    result.AddError("Status", status.Id, $"Unknown blockedActions token: {token}");
                 }
             }
         }

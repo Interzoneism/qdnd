@@ -124,6 +124,44 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
+        public void RegisterStatus_BlockedActionsAlias_NormalizesBonusActionToken()
+        {
+            var registry = new DataRegistry();
+            var status = new StatusDefinition
+            {
+                Id = "blocked_alias",
+                Name = "Blocked Alias",
+                MaxStacks = 1,
+                BlockedActions = new HashSet<string> { "bonusAction" }
+            };
+
+            registry.RegisterStatus(status);
+
+            var stored = registry.GetStatus("blocked_alias");
+            Assert.NotNull(stored);
+            Assert.Contains("bonus_action", stored.BlockedActions);
+            Assert.DoesNotContain("bonusAction", stored.BlockedActions);
+        }
+
+        [Fact]
+        public void ValidateStatuses_UnknownBlockedActionToken_ReportsError()
+        {
+            var registry = new DataRegistry();
+            registry.RegisterStatus(new StatusDefinition
+            {
+                Id = "bad_block",
+                Name = "Bad Block",
+                MaxStacks = 1,
+                BlockedActions = new HashSet<string> { "not_a_real_token" }
+            });
+
+            var result = registry.Validate();
+
+            Assert.True(result.HasErrors);
+            Assert.Contains(result.Issues, i => i.Message.Contains("Unknown blockedActions token"));
+        }
+
+        [Fact]
         public void RegisterStatus_NegativeMaxStacks_ReportsError()
         {
             var registry = new DataRegistry();

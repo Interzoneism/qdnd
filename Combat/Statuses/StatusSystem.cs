@@ -948,6 +948,7 @@ namespace QDND.Combat.Statuses
         /// </summary>
         public void RegisterStatus(StatusDefinition definition)
         {
+            definition.BlockedActions = StatusActionBlockNormalizer.Normalize(definition.BlockedActions);
             _definitions[definition.Id] = definition;
         }
 

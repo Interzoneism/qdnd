@@ -266,22 +266,6 @@ namespace QDND.Combat.Statuses
             if (statusDefinition == null)
                 return;
 
-            if (IsProneStatus(statusDefinition))
-            {
-                var result = CheckConcentrationAgainstDc(
-                    evt.TargetId,
-                    MinimumConcentrationDc,
-                    ConcentrationCheckTrigger.Prone,
-                    statusId: statusDefinition.Id);
-
-                if (!result.Maintained)
-                {
-                    BreakConcentration(evt.TargetId, "failed concentration save (prone)");
-                }
-
-                return;
-            }
-
             if (IsIncapacitatingStatus(statusDefinition))
             {
                 DispatchConcentrationCheckWindow(

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Xunit;
 using QDND.Combat.Actions;
 using QDND.Combat.Entities;
+using QDND.Combat.Reactions;
 using QDND.Combat.Rules;
 using QDND.Data.CharacterModel;
 
@@ -253,6 +254,61 @@ namespace QDND.Tests.Unit
             
             // Assert — With 200 trials, we should find at least one mixed result
             Assert.True(foundMixed, "Expected to find at least one case with mixed hit/miss results across 200 trials");
+        }
+
+        [Fact]
+        public void EffectPipeline_MagicMissile_AutoHitProjectiles_TriggerAttackReactionsPerProjectile()
+        {
+            var pipeline = CreatePipeline();
+            var reactions = new ReactionSystem();
+            pipeline.Reactions = reactions;
+
+            var caster = CreateCaster();
+            var target = CreateTarget();
+            pipeline.GetCombatants = () => new List<Combatant> { caster, target };
+
+            reactions.RegisterReaction(new ReactionDefinition
+            {
+                Id = "test_shield_window",
+                Name = "Test Shield Window",
+                Triggers = new List<ReactionTriggerType> { ReactionTriggerType.YouAreAttacked },
+                Tags = new HashSet<string> { "requires_hit" },
+                Range = 0f
+            });
+            reactions.GrantReaction(target.Id, "test_shield_window");
+
+            var magicMissile = new ActionDefinition
+            {
+                Id = "Projectile_MagicMissile",
+                Name = "Magic Missile",
+                TargetType = TargetType.SingleUnit,
+                ProjectileCount = 3,
+                AttackType = null,
+                Tags = new HashSet<string> { "spell", "auto_hit" },
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition
+                    {
+                        Type = "damage",
+                        DiceFormula = "1d4+1",
+                        DamageType = "force"
+                    }
+                }
+            };
+
+            pipeline.RegisterAction(magicMissile);
+
+            int attackReactionWindows = 0;
+            pipeline.OnAttackTrigger += args =>
+            {
+                attackReactionWindows++;
+                Assert.True((bool)args.Context.Data["attackWouldHit"]);
+            };
+
+            var result = pipeline.ExecuteAction("Projectile_MagicMissile", caster, new List<Combatant> { target });
+
+            Assert.True(result.Success);
+            Assert.Equal(3, attackReactionWindows);
         }
         
         // Helper methods

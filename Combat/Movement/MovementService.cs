@@ -374,6 +374,8 @@ namespace QDND.Combat.Movement
                 return result;
 
             bool moverDisengaged = _statuses != null && _statuses.HasStatus(mover.Id, "disengaged");
+            bool moverIgnoresLeaveAttackRange = _statuses != null &&
+                _statuses.GetStatuses(mover.Id).Any(s => s?.Definition?.Tags?.Contains("ignore_leave_attack_range") == true);
             bool moverHasMobile = mover.ResolvedCharacter?.Sheet?.FeatIds?.Contains("mobile") == true;
 
             var allCombatants = GetCombatants().ToList();
@@ -388,7 +390,7 @@ namespace QDND.Combat.Movement
             foreach (var enemy in enemiesInReach)
             {
                 // Disengaged mover is safe from all OAs. In BG3, Sentinel does NOT ignore Disengage.
-                if (moverDisengaged)
+                if (moverDisengaged || moverIgnoresLeaveAttackRange)
                     continue;
 
                 // Mobile feat: no OA from targets the mover attacked this turn

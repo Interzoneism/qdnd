@@ -233,6 +233,16 @@ namespace QDND.Combat.Actions
         public bool SkipRangeValidation { get; set; }
 
         /// <summary>
+        /// If true, ignore reaction budget checks during legality validation while still enforcing other costs.
+        /// </summary>
+        public bool IgnoreReactionBudgetCheck { get; set; }
+
+        /// <summary>
+        /// If true, skip reaction-budget consumption in ActionBudget while preserving resource consumption.
+        /// </summary>
+        public bool SkipReactionBudgetConsumption { get; set; }
+
+        /// <summary>
         /// Optional trigger context when this execution is itself reaction-driven.
         /// </summary>
         public QDND.Combat.Reactions.ReactionTriggerContext TriggerContext { get; set; }
@@ -252,6 +262,8 @@ namespace QDND.Combat.Actions
             TargetPosition = null,
             SkipCostValidation = false,
             SkipRangeValidation = false,
+            IgnoreReactionBudgetCheck = false,
+            SkipReactionBudgetConsumption = false,
             TriggerContext = null
         };
     }

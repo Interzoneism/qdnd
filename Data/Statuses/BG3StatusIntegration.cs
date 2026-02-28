@@ -301,6 +301,50 @@ namespace QDND.Data.Statuses
                     continue;
                 }
 
+                var actionResourceBlockMatch = Regex.Match(trimmed, @"ActionResourceBlock\s*\(\s*(ActionPoint|BonusActionPoint|ReactionActionPoint|Movement)\s*\)", RegexOptions.IgnoreCase);
+                if (actionResourceBlockMatch.Success)
+                {
+                    string resource = actionResourceBlockMatch.Groups[1].Value;
+                    string blockedToken = resource.ToLowerInvariant() switch
+                    {
+                        "actionpoint" => "action",
+                        "bonusactionpoint" => "bonus_action",
+                        "reactionactionpoint" => "reaction",
+                        "movement" => "movement",
+                        _ => null
+                    };
+
+                    if (!string.IsNullOrEmpty(blockedToken))
+                    {
+                        statusDef.BlockedActions.Add(blockedToken);
+                    }
+
+                    continue;
+                }
+
+                var ignoreLeaveAttackRangeMatch = Regex.Match(trimmed, @"IgnoreLeaveAttackRange\s*\(?.*\)?", RegexOptions.IgnoreCase);
+                if (ignoreLeaveAttackRangeMatch.Success)
+                {
+                    statusDef.Tags.Add("ignore_leave_attack_range");
+                    continue;
+                }
+
+                var failedSavingThrowMatch = Regex.Match(trimmed, @"AbilityFailedSavingThrow\s*\(\s*(Strength|Dexterity)\s*\)", RegexOptions.IgnoreCase);
+                if (failedSavingThrowMatch.Success)
+                {
+                    string ability = failedSavingThrowMatch.Groups[1].Value;
+                    if (ability.Equals("Strength", StringComparison.OrdinalIgnoreCase))
+                    {
+                        statusDef.Tags.Add("auto_fail_save_strength");
+                    }
+                    else if (ability.Equals("Dexterity", StringComparison.OrdinalIgnoreCase))
+                    {
+                        statusDef.Tags.Add("auto_fail_save_dexterity");
+                    }
+
+                    continue;
+                }
+
                 Console.WriteLine($"[BG3StatusIntegration] Unsupported boost: {trimmed}");
             }
         }

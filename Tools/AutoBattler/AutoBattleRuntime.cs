@@ -283,13 +283,20 @@ namespace QDND.Tools.AutoBattler
                 return;
             }
             
-            // Cache AI diagnostic data for background thread access
+            // Cache AI diagnostic data for background thread access.
+            // In full-fidelity mode we can report fine-grained UI wait reasons;
+            // in fast mode fall back to a stable realtime-controller marker.
             try
             {
                 var uiAware = _arena?.GetNodeOrNull<UIAwareAIController>("UIAwareAIController");
                 if (uiAware != null)
                 {
                     _cachedAIWaitReason = uiAware.CurrentWaitReason ?? "none";
+                }
+                else
+                {
+                    var realtime = _arena?.GetNodeOrNull<RealtimeAIController>("RealtimeAIController");
+                    _cachedAIWaitReason = realtime != null ? "realtime_controller" : "not_connected";
                 }
             }
             catch { /* ignore during shutdown */ }

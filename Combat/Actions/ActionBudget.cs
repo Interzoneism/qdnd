@@ -308,6 +308,15 @@ namespace QDND.Combat.Actions
         }
 
         /// <summary>
+        /// Sync attack pool to currently available action charges.
+        /// </summary>
+        public void RefreshAttacksFromAvailableActions()
+        {
+            AttacksRemaining = _actionCharges > 0 ? MaxAttacks : 0;
+            OnBudgetChanged?.Invoke();
+        }
+
+        /// <summary>
         /// Check if a spell/action cost can be paid, integrating with ResourceManager.
         /// This validates both action economy and resource costs (spell slots, ki, etc.).
         /// </summary>

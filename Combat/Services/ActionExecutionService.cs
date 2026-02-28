@@ -944,6 +944,8 @@ namespace QDND.Combat.Services
                     UpcastLevel = options?.UpcastLevel ?? 0,
                     SkipCostValidation = (attackIndex > 0) || (options?.SkipCostValidation ?? false),
                     SkipRangeValidation = options?.SkipRangeValidation ?? false,
+                    IgnoreReactionBudgetCheck = options?.IgnoreReactionBudgetCheck ?? false,
+                    SkipReactionBudgetConsumption = options?.SkipReactionBudgetConsumption ?? false,
                     TriggerContext = options?.TriggerContext
                 };
 

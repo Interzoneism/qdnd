@@ -541,6 +541,36 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
+        public void MoveTo_IgnoreLeaveAttackRangeTag_NoOpportunityAttacks()
+        {
+            // Arrange
+            var reactionSystem = CreateReactionSystemWithOpportunityAttack();
+            var statuses = new StatusManager(new RulesEngine());
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "ignore_oa_test",
+                Name = "Ignore OA",
+                Tags = new HashSet<string> { "ignore_leave_attack_range" }
+            });
+
+            var service = new MovementService(null, null, reactionSystem, statuses);
+
+            var player = CreateCombatant("player", new Vector3(3, 0, 0), 30f, Faction.Player);
+            var enemy = CreateCombatant("enemy", new Vector3(0, 0, 0), 30f, Faction.Hostile);
+            reactionSystem.GrantReaction("enemy", "opportunity_attack");
+            statuses.ApplyStatus("ignore_oa_test", "player", "player");
+
+            service.GetCombatants = () => new[] { player, enemy };
+
+            // Act
+            var result = service.MoveTo(player, new Vector3(20, 0, 0));
+
+            // Assert
+            Assert.True(result.Success);
+            Assert.Empty(result.TriggeredOpportunityAttacks);
+        }
+
+        [Fact]
         public void MoveTo_MultipleEnemiesInReach_ChecksEach()
         {
             // Arrange

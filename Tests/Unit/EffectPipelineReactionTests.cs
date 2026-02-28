@@ -111,6 +111,78 @@ namespace QDND.Tests.Unit
         #region SpellCastNearby Trigger Tests
 
         [Fact]
+        public void ExecuteAction_ReactionSpell_NoReactionBudget_FailsWithoutOverride()
+        {
+            var (pipeline, _, _, _) = CreatePipelineWithReactions();
+            var caster = CreateCombatant("caster", Faction.Player, 100);
+            caster.ActionBudget.ConsumeReaction();
+            caster.ActionResources.RegisterSimple("spell_slot_1", 1);
+
+            pipeline.RegisterAction(new ActionDefinition
+            {
+                Id = "shield_test",
+                Name = "Shield Test",
+                TargetType = TargetType.Self,
+                SpellLevel = 1,
+                Cost = new ActionCost
+                {
+                    UsesReaction = true,
+                    ResourceCosts = new Dictionary<string, int> { { "spell_slot_1", 1 } }
+                },
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "heal", Value = 1 }
+                }
+            });
+
+            var result = pipeline.ExecuteAction("shield_test", caster, new List<Combatant> { caster });
+
+            Assert.False(result.Success);
+            Assert.Contains("reaction", result.ErrorMessage ?? string.Empty, StringComparison.OrdinalIgnoreCase);
+            Assert.Equal(1, caster.ActionResources.GetCurrent("spell_slot_1"));
+        }
+
+        [Fact]
+        public void ExecuteAction_ReactionSpell_IgnoreBudgetCheck_ConsumesSpellSlotOnly()
+        {
+            var (pipeline, _, _, _) = CreatePipelineWithReactions();
+            var caster = CreateCombatant("caster", Faction.Player, 100);
+            caster.ActionBudget.ConsumeReaction();
+            caster.ActionResources.RegisterSimple("spell_slot_1", 1);
+
+            pipeline.RegisterAction(new ActionDefinition
+            {
+                Id = "shield_test",
+                Name = "Shield Test",
+                TargetType = TargetType.Self,
+                SpellLevel = 1,
+                Cost = new ActionCost
+                {
+                    UsesReaction = true,
+                    ResourceCosts = new Dictionary<string, int> { { "spell_slot_1", 1 } }
+                },
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "heal", Value = 1 }
+                }
+            });
+
+            var result = pipeline.ExecuteAction(
+                "shield_test",
+                caster,
+                new List<Combatant> { caster },
+                new ActionExecutionOptions
+                {
+                    IgnoreReactionBudgetCheck = true,
+                    SkipReactionBudgetConsumption = true
+                });
+
+            Assert.True(result.Success);
+            Assert.False(caster.ActionBudget.HasReaction);
+            Assert.Equal(0, caster.ActionResources.GetCurrent("spell_slot_1"));
+        }
+
+        [Fact]
         public void CastingSpell_TriggersSpellCastNearby_WhenEnemyHasCounterspell()
         {
             // Arrange

@@ -177,6 +177,27 @@ namespace QDND.Tests.Integration
             Assert.False(fighter.ActionBudget.HasAction);
             Assert.Equal(0, fighter.ActionBudget.AttacksRemaining);
         }
+
+        [Fact]
+        public void ExtraAction_ThenSpell_StillAllowsWeaponAttacksFromRemainingAction()
+        {
+            var fighter = CreateFighter(level: 5);
+            fighter.KnownActions.Add("Projectile_FireBolt");
+            var enemy = CreateEnemy();
+            var pipeline = CreatePipeline();
+            fighter.ActionBudget.ResetForTurn();
+
+            fighter.ActionBudget.GrantAdditionalAction();
+
+            var spellResult = pipeline.ExecuteAction("Projectile_FireBolt", fighter, new List<Combatant> { enemy });
+
+            Assert.True(spellResult.Success);
+            Assert.True(fighter.ActionBudget.HasAction);
+            Assert.True(fighter.ActionBudget.AttacksRemaining > 0);
+
+            var (canUseAttack, reason) = pipeline.CanUseAbility("Target_MainHandAttack", fighter);
+            Assert.True(canUseAttack, reason);
+        }
         
        [Fact]
         public void TwoWeaponFighting_BonusActionAttack()

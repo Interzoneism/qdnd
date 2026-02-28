@@ -416,7 +416,7 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
-        public void ApplyingProneToConcentratingCaster_TriggersCheck_AndBreaksOnFailure()
+        public void ApplyingProneToConcentratingCaster_DoesNotTriggerConcentrationCheck()
         {
             // Arrange
             var (_, rules, statuses) = CreatePipeline();
@@ -439,8 +439,6 @@ namespace QDND.Tests.Unit
                 DefaultDuration = 1
             });
 
-            rules.RuleWindows.Register(new ForceConcentrationFailProvider(caster.Id));
-
             statuses.ApplyStatus("bless", caster.Id, caster.Id);
             concentration.StartConcentration(caster.Id, "bless", "bless", caster.Id);
 
@@ -451,11 +449,42 @@ namespace QDND.Tests.Unit
             statuses.ApplyStatus("prone", "enemy", caster.Id);
 
             // Assert
-            Assert.NotNull(checkResult);
-            Assert.Equal(ConcentrationCheckTrigger.Prone, checkResult.Trigger);
-            Assert.False(checkResult.Maintained);
-            Assert.False(concentration.IsConcentrating(caster.Id));
-            Assert.False(statuses.HasStatus(caster.Id, "bless"));
+            Assert.Null(checkResult);
+            Assert.True(concentration.IsConcentrating(caster.Id));
+            Assert.True(statuses.HasStatus(caster.Id, "bless"));
+        }
+
+        [Fact]
+        public void CanUseAbility_StatusWithBonusActionAlias_BlocksBonusActionAbility()
+        {
+            var (pipeline, _, statuses) = CreatePipeline();
+            var caster = CreateCombatant("caster", 100);
+
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "no_bonus",
+                Name = "No Bonus",
+                BlockedActions = new HashSet<string> { "bonusAction" }
+            });
+
+            pipeline.RegisterAction(new ActionDefinition
+            {
+                Id = "bonus_ability",
+                Name = "Bonus Ability",
+                TargetType = TargetType.Self,
+                Cost = new ActionCost { UsesBonusAction = true },
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "heal", Value = 1 }
+                }
+            });
+
+            statuses.ApplyStatus("no_bonus", caster.Id, caster.Id);
+
+            var (canUse, reason) = pipeline.CanUseAbility("bonus_ability", caster);
+
+            Assert.False(canUse);
+            Assert.Contains("bonus", reason ?? string.Empty, StringComparison.OrdinalIgnoreCase);
         }
 
         [Fact]

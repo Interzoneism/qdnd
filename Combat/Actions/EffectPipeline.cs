@@ -619,9 +619,11 @@ namespace QDND.Combat.Actions
             // resource checks but enforces cooldown and budget.
             if (!options.SkipCostValidation)
             {
-                var (canUse, reason) = CanUseAbilityWithCost(actionId, source, effectiveCost);
+                var (canUse, reason) = CanUseAbilityWithCost(actionId, source, effectiveCost, options.IgnoreReactionBudgetCheck);
                 if (!canUse)
                     return ActionExecutionResult.Failure(actionId, source.Id, reason);
+
+                var budgetCost = BuildBudgetCostOverride(effectiveCost, options.SkipReactionBudgetConsumption);
 
                 // Extra Attack handling: weapon attacks consume from attack pool
                 bool isWeaponAttack = action.AttackType == AttackType.MeleeWeapon ||
@@ -642,22 +644,22 @@ namespace QDND.Combat.Actions
                     }
                     
                     // Consume bonus action, reaction, movement normally
-                    if (effectiveCost.UsesBonusAction && source.ActionBudget != null)
+                    if (budgetCost.UsesBonusAction && source.ActionBudget != null)
                         source.ActionBudget.ConsumeBonusAction();
-                    if (effectiveCost.UsesReaction && source.ActionBudget != null)
+                    if (budgetCost.UsesReaction && source.ActionBudget != null)
                         source.ActionBudget.ConsumeReaction();
-                    if (effectiveCost.MovementCost > 0 && source.ActionBudget != null)
-                        source.ActionBudget.ConsumeMovement(effectiveCost.MovementCost);
+                    if (budgetCost.MovementCost > 0 && source.ActionBudget != null)
+                        source.ActionBudget.ConsumeMovement(budgetCost.MovementCost);
                 }
                 else
                 {
-                    // Non-weapon actions (spells, etc.) consume action economy normally
-                    // and reset the attack pool
-                    if (source.ActionBudget != null && effectiveCost.UsesAction)
+                    // Non-weapon actions consume budget and then derive attack pool state
+                    // from remaining action charges.
+                    source.ActionBudget?.ConsumeCost(budgetCost);
+                    if (source.ActionBudget != null && budgetCost.UsesAction)
                     {
-                        source.ActionBudget.ResetAttacks();
+                        source.ActionBudget.RefreshAttacksFromAvailableActions();
                     }
-                    source.ActionBudget?.ConsumeCost(effectiveCost);
                 }
 
                 // Consume BG3 ActionResources first
@@ -1874,6 +1876,12 @@ namespace QDND.Combat.Actions
                         }
                     }
                 }
+                else if (effectiveTags.Any(tag => string.Equals(tag, "auto_hit", StringComparison.OrdinalIgnoreCase)))
+                {
+                    // Auto-hit projectiles do not re-check hit chance, but still need the
+                    // YouAreAttacked reaction window so Shield can apply before damage.
+                    TryTriggerAttackReactions(source, targetForProjectile, action, "auto_hit", attackHit: true);
+                }
                 // Note: Multi-projectile spells with saves (rare) would roll saves here
                 // For now, we assume multi-projectile = attack-based or auto-hit (Magic Missile)
 
@@ -1909,7 +1917,11 @@ namespace QDND.Combat.Actions
         /// <summary>
         /// Check if an ability can be used with a specific cost.
         /// </summary>
-        private (bool CanUse, string Reason) CanUseAbilityWithCost(string actionId, Combatant source, ActionCost cost)
+        private (bool CanUse, string Reason) CanUseAbilityWithCost(
+            string actionId,
+            Combatant source,
+            ActionCost cost,
+            bool ignoreReactionBudgetCheck = false)
         {
             if (!_actions.TryGetValue(actionId, out var action))
             {
@@ -1954,7 +1966,8 @@ namespace QDND.Combat.Actions
             // Check action economy budget with effective cost (enforced for all combatants)
             if (source.ActionBudget != null)
             {
-                var (canPay, budgetReason) = source.ActionBudget.CanPayCost(cost);
+                var budgetCost = BuildBudgetCostOverride(cost, ignoreReactionBudgetCheck);
+                var (canPay, budgetReason) = source.ActionBudget.CanPayCost(budgetCost);
                 if (!canPay)
                     return (false, budgetReason);
             }
@@ -1969,6 +1982,23 @@ namespace QDND.Combat.Actions
             }
 
             return (true, null);
+        }
+
+        private static ActionCost BuildBudgetCostOverride(ActionCost original, bool ignoreReaction)
+        {
+            if (!ignoreReaction || original == null || !original.UsesReaction)
+                return original;
+
+            return new ActionCost
+            {
+                UsesAction = original.UsesAction,
+                UsesBonusAction = original.UsesBonusAction,
+                UsesReaction = false,
+                MovementCost = original.MovementCost,
+                ResourceCosts = original.ResourceCosts != null
+                    ? new Dictionary<string, int>(original.ResourceCosts)
+                    : new Dictionary<string, int>()
+            };
         }
 
         /// <summary>
@@ -2546,7 +2576,14 @@ namespace QDND.Combat.Actions
             string normalized = saveType.Trim().ToLowerInvariant();
             if (normalized != "strength" && normalized != "dexterity")
                 return false;
-            var tgtIds = Statuses.GetStatuses(target.Id).Select(s => s.Definition.Id);
+
+            var activeStatuses = Statuses.GetStatuses(target.Id);
+            if (normalized == "strength" && activeStatuses.Any(s => s?.Definition?.Tags?.Contains("auto_fail_save_strength") == true))
+                return true;
+            if (normalized == "dexterity" && activeStatuses.Any(s => s?.Definition?.Tags?.Contains("auto_fail_save_dexterity") == true))
+                return true;
+
+            var tgtIds = activeStatuses.Select(s => s.Definition.Id);
             var tgtEffects = ConditionEffects.GetAggregateEffects(tgtIds);
             return tgtEffects.AutoFailStrDexSaves;
         }
@@ -2555,6 +2592,12 @@ namespace QDND.Combat.Actions
         {
             if (Statuses == null || source == null)
                 return null;
+
+            ActionDefinition action = null;
+            if (!string.IsNullOrWhiteSpace(actionId))
+            {
+                action = GetAction(actionId);
+            }
 
             var activeStatuses = Statuses.GetStatuses(source.Id);
             foreach (var status in activeStatuses)
@@ -2566,8 +2609,6 @@ namespace QDND.Combat.Actions
 
                 if (blocked.Contains("*"))
                     return $"{statusName} prevents acting";
-                if (blocked.Contains(actionId))
-                    return $"{statusName} blocks {actionId}";
                 if (cost?.UsesAction == true && blocked.Contains("action"))
                     return $"{statusName} blocks actions";
                 if (cost?.UsesBonusAction == true && blocked.Contains("bonus_action"))
@@ -2576,6 +2617,12 @@ namespace QDND.Combat.Actions
                     return $"{statusName} blocks reactions";
                 if (cost?.MovementCost > 0 && blocked.Contains("movement"))
                     return $"{statusName} blocks movement";
+                if (blocked.Contains("verbal_spell") &&
+                    action != null &&
+                    action.Components.HasFlag(SpellComponents.Verbal))
+                {
+                    return $"{statusName} blocks verbal spells";
+                }
             }
 
             return null;

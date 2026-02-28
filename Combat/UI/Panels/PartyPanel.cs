@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Godot;
 using QDND.Combat.UI.Base;
 
@@ -31,8 +32,12 @@ namespace QDND.Combat.UI.Panels
     {
         public event Action<string> OnMemberClicked;
 
-        private const int ConditionIconSize = 30;
+        private const int MaxVisibleConditionIcons = 4;
+        private const int ConditionIconSize = 22;
         private const int ConditionDotSpacing = 2;
+        private const int ConditionIconOffset = 6;
+        private static readonly Dictionary<string, string> ConditionIconIndex = new(StringComparer.OrdinalIgnoreCase);
+        private static bool _conditionIconIndexBuilt;
 
         private VBoxContainer _memberContainer;
         private readonly Dictionary<string, PortraitCard> _cards = new();
@@ -44,7 +49,8 @@ namespace QDND.Combat.UI.Panels
             ShowDragHandle = false;
             Draggable = false;
             CustomMinimumSize = new Vector2(
-                HudTheme.PortraitWidth + HudTheme.PortraitBorderSelected * 2 + 4, 0);
+                HudTheme.PortraitWidth + HudTheme.PortraitBorderSelected * 2 + GetConditionAreaWidth() + 4f,
+                0f);
         }
 
         protected override void BuildContent(Control parent)
@@ -133,11 +139,12 @@ namespace QDND.Combat.UI.Panels
             int ph = HudTheme.PortraitHeight;
             int hpBarH = HudTheme.PortraitHpBarHeight;
             int bSel = HudTheme.PortraitBorderSelected;
+            float conditionAreaWidth = GetConditionAreaWidth();
 
             // Root button — the entire card is clickable
             var button = new Button();
             button.CustomMinimumSize = new Vector2(
-                pw + bSel * 2,
+                pw + bSel * 2 + conditionAreaWidth,
                 ph + hpBarH + bSel * 2);
             button.ClipText = true;
             button.Pressed += () => OnMemberClicked?.Invoke(member.Id);
@@ -213,7 +220,10 @@ namespace QDND.Combat.UI.Panels
             var conditionContainer = new HBoxContainer();
             conditionContainer.AddThemeConstantOverride("separation", ConditionDotSpacing);
             conditionContainer.MouseFilter = MouseFilterEnum.Ignore;
-            conditionContainer.Position = new Vector2(bSel + pw + 2, bSel);
+            conditionContainer.Position = new Vector2(
+                bSel + pw + ConditionIconOffset,
+                bSel + (ph - ConditionIconSize) * 0.5f);
+            conditionContainer.CustomMinimumSize = new Vector2(conditionAreaWidth, ConditionIconSize);
             layers.AddChild(conditionContainer);
 
             var card = new PortraitCard
@@ -267,8 +277,7 @@ namespace QDND.Combat.UI.Panels
 
             if (conditions == null || conditions.Count == 0) return;
 
-            // Show up to 8 condition icons
-            int count = System.Math.Min(conditions.Count, 8);
+            int count = System.Math.Min(conditions.Count, MaxVisibleConditionIcons);
             for (int i = 0; i < count; i++)
             {
                 string iconPath = ResolveConditionIconPath(conditions[i]);
@@ -305,12 +314,96 @@ namespace QDND.Combat.UI.Panels
         /// </summary>
         private static string ResolveConditionIconPath(string condition)
         {
-            if (string.IsNullOrEmpty(condition)) return null;
+            if (string.IsNullOrWhiteSpace(condition))
+                return null;
+
+            if (condition.StartsWith("res://", StringComparison.OrdinalIgnoreCase) &&
+                ResourceLoader.Exists(condition))
+            {
+                return condition;
+            }
+
+            EnsureConditionIconIndex();
+            foreach (var key in EnumerateConditionLookupKeys(condition))
+            {
+                if (ConditionIconIndex.TryGetValue(key, out var path) && ResourceLoader.Exists(path))
+                    return path;
+            }
+
+            return null;
+        }
+
+        private static void EnsureConditionIconIndex()
+        {
+            if (_conditionIconIndexBuilt)
+                return;
+
+            _conditionIconIndexBuilt = true;
+            var dir = DirAccess.Open("res://assets/Images/Icons Conditions");
+            if (dir == null)
+                return;
+
+            foreach (var fileName in dir.GetFiles())
+            {
+                if (!fileName.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                string stem = fileName[..^4];
+                stem = StripConditionIconSuffix(stem);
+                string key = NormalizeConditionLookupKey(stem);
+                if (string.IsNullOrEmpty(key))
+                    continue;
+
+                string path = $"res://assets/Images/Icons Conditions/{fileName}";
+                if (!ConditionIconIndex.ContainsKey(key))
+                    ConditionIconIndex[key] = path;
+            }
+        }
+
+        private static IEnumerable<string> EnumerateConditionLookupKeys(string condition)
+        {
+            string normalized = NormalizeConditionLookupKey(condition);
+            if (!string.IsNullOrEmpty(normalized))
+                yield return normalized;
+
             var words = condition.Split(new[] { ' ', '_' }, StringSplitOptions.RemoveEmptyEntries);
-            string fileName = string.Join("_", words.Select(w =>
-                char.ToUpperInvariant(w[0]) + (w.Length > 1 ? w[1..].ToLowerInvariant() : "")));
-            string path = $"res://assets/Images/Icons Conditions/{fileName}_Condition_Icon.png";
-            return ResourceLoader.Exists(path) ? path : null;
+            if (words.Length > 0)
+            {
+                string titleCase = string.Join("_", words.Select(w =>
+                    char.ToUpperInvariant(w[0]) + (w.Length > 1 ? w[1..].ToLowerInvariant() : "")));
+                string titleCaseKey = NormalizeConditionLookupKey(titleCase);
+                if (!string.IsNullOrEmpty(titleCaseKey))
+                    yield return titleCaseKey;
+            }
+        }
+
+        private static string StripConditionIconSuffix(string value)
+        {
+            const string suffix = "_condition_icon";
+            if (value.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+                return value[..(value.Length - suffix.Length)];
+            return value;
+        }
+
+        private static string NormalizeConditionLookupKey(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return string.Empty;
+
+            var sb = new StringBuilder(value.Length);
+            foreach (char c in value)
+            {
+                if (char.IsLetterOrDigit(c))
+                    sb.Append(char.ToLowerInvariant(c));
+            }
+            return sb.ToString();
+        }
+
+        private static float GetConditionAreaWidth()
+        {
+            return MaxVisibleConditionIcons * ConditionIconSize
+                + (MaxVisibleConditionIcons - 1) * ConditionDotSpacing
+                + ConditionIconOffset;
         }
 
         /// <summary>
