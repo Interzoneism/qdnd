@@ -834,7 +834,7 @@ namespace QDND.Tools.AutoBattler
             if (!string.IsNullOrEmpty(action.ActionId))
             {
                 int usedCount = _abilityUsageThisTurn.TryGetValue(action.ActionId, out var count) ? count : 0;
-                bool isBasicAttack = action.ActionId == "basic_attack";
+                bool isBasicAttack = action.ActionId is "main_hand_attack" or "offhand_attack" or "unarmed_strike";
 
                 // Check if this unit is an ability test actor
                 bool isAbilityTestActor = actor.Tags?.Any(t => t.StartsWith("ability_test_actor:", StringComparison.OrdinalIgnoreCase)) ?? false;

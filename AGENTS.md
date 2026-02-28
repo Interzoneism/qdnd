@@ -17,6 +17,11 @@
   - scripts/ci-godot-log-check.sh — lightweight Godot startup smoke test; runs the engine headless for ~60 frames and fails if any `ERROR:`, `SCRIPT ERROR:`, or `Unhandled Exception:` lines appear in the log. Much faster than a full autobattle or headless test suite. Catches script parse errors, autoload failures, and `_Ready()` exceptions introduced by a change. Set `GODOT_BIN` if godot is not on PATH.
 - If you introduce new systems, update documentation in /docs.
 
+## Up to date code
+- Always use Context7 MCP when you need library/API documentation, code generation, setup or configuration steps without having to explicitly ask.
+- use library /supabase/supabase for API and docs.
+
+
 ## Godot-specific commands
 ### Automation helpers
 - `./scripts/run_headless_tests.sh` runs the headless verification suite that uses `Tools/HeadlessTestRunner.cs` to validate services, registries, and scenarios without rendering.
@@ -51,7 +56,5 @@
 
 ## Common Gotchas
 - Ring mesh orientation: `TorusMesh` is already ground-aligned in Godot. Do **not** rotate range/selection/target torus indicators by 90 degrees unless you have verified the mesh orientation in-scene. A forced X-axis 90 rotation will put rings on the wrong axis.
-- HUD/action UX: Targetless abilities (`Self`, `All`, `None`) should be primed first, then executed on the next battlefield click. Do not auto-fire them on hotbar click.
 - Test-host interop: In `dotnet test` (`testhost`/`vstest`) processes, direct Godot interop calls like `Godot.GD.Print/PrintErr` (and sometimes `Godot.FileAccess`/`DirAccess`) can crash the host. For parser/data paths exercised by unit tests, guard for testhost and fall back to `Console` + `System.IO`.
-- Full-fidelity + WSL = llvmpipe danger: Under WSL2 without a GPU, Godot uses **llvmpipe** (software Vulkan) which burns ~50% CPU per core and can freeze the OS. Always use `run_autobattle.sh` (safety wrappers enabled by default); WSL full-fidelity now defaults to native Windows Godot rendering (override with `GODOT_WIN_BIN` if needed) while keeping logs in WSL. Never launch full-fidelity Godot directly. See [AGENTS-FULL-FIDELITY-TESTING.md § WSL / Software Rendering Safety](AGENTS-FULL-FIDELITY-TESTING.md).
 - Keep this section updated: when you discover a recurring engine/UI pitfall that can waste debugging time, add it here as a concise rule for future agents.

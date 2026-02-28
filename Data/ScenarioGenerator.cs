@@ -225,7 +225,7 @@ namespace QDND.Data
                 X = targetX,
                 Y = 0f,
                 Z = 0f,
-                AbilityOverrides = new List<string> { "basic_attack" },
+                AbilityOverrides = new List<string> { "main_hand_attack" },
                 ReplaceResolvedActions = true
             });
 
@@ -261,10 +261,10 @@ namespace QDND.Data
 
             level = Math.Clamp(level, 1, 12);
 
-            // Pad to 6 slots with basic_attack
+            // Pad to 6 slots with main_hand_attack
             var slots = new List<string>(actionIds);
             while (slots.Count < 6)
-                slots.Add("basic_attack");
+                slots.Add("main_hand_attack");
 
             var positions = new (float X, float Y, float Z)[]
             {

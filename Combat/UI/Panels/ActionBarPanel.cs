@@ -35,7 +35,7 @@ namespace QDND.Combat.UI.Panels
         private const int DefaultGridColumns = 12;
         private const int MinGridRows = 1;
         private const int MaxGridRows = 6;
-        private const int SlotSize = 48;
+        private const int SlotSize = 44;
         private const int SlotGap = 3;
         private const ulong DragHoldMs = 50; // Match the reduced drag delay
         private int _gridColumns = DefaultGridColumns;
@@ -80,7 +80,7 @@ namespace QDND.Combat.UI.Panels
             // Contract button (left)
             var contractBtn = new Button();
             contractBtn.Text = "\u25C0";
-            contractBtn.CustomMinimumSize = new Vector2(20, 48);
+            contractBtn.CustomMinimumSize = new Vector2(20, 44);
             contractBtn.Pressed += () => ResizeGrid(_gridColumns - 1);
             StyleResizeButton(contractBtn);
             gridRow.AddChild(contractBtn);
@@ -91,7 +91,7 @@ namespace QDND.Combat.UI.Panels
             // Expand button (right)
             var expandBtn = new Button();
             expandBtn.Text = "\u25B6";
-            expandBtn.CustomMinimumSize = new Vector2(20, 48);
+            expandBtn.CustomMinimumSize = new Vector2(20, 44);
             expandBtn.Pressed += () => ResizeGrid(_gridColumns + 1);
             StyleResizeButton(expandBtn);
             gridRow.AddChild(expandBtn);
@@ -272,7 +272,7 @@ namespace QDND.Combat.UI.Panels
             _actionGrid = new GridContainer();
             _actionGrid.Columns = _gridColumns;
             _actionGrid.AddThemeConstantOverride("h_separation", SlotGap);
-            _actionGrid.AddThemeConstantOverride("v_separation", SlotGap);
+            _actionGrid.AddThemeConstantOverride("v_separation", 2);
             // Don't add to parent here — caller will place it
         }
 
@@ -339,7 +339,7 @@ namespace QDND.Combat.UI.Panels
 
         public float CalculateHeight()
         {
-            float gridHeight = _gridRows * SlotSize + (_gridRows - 1) * SlotGap;
+            float gridHeight = _gridRows * SlotSize + (_gridRows - 1) * 2; // 2px vertical gap between rows
             return gridHeight + 16 + 16 + 22 + 24; // row btns + tabs + spacing
         }
 

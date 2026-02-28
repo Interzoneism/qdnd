@@ -985,8 +985,20 @@ namespace QDND.Combat.Arena
             _effectPipeline.TurnQueue = _turnQueue;
             _effectPipeline.DataRegistry = _dataRegistry;
 
+            // Surface Manager
+            _surfaceManager = new SurfaceManager(_rulesEngine.Events, _statusManager);
+            _surfaceManager.Rules = _rulesEngine;  // Wire up for resistance calculations
+            _surfaceManager.OnSurfaceCreated += OnSurfaceCreated;
+            _surfaceManager.OnSurfaceRemoved += OnSurfaceRemoved;
+            _surfaceManager.OnSurfaceTransformed += OnSurfaceTransformed;
+            _surfaceManager.OnSurfaceTriggered += OnSurfaceTriggered;
+            _surfaceManager.OnSurfaceGeometryChanged += OnSurfaceGeometryChanged;
+            _surfaceManager.ResolveCombatants = () => _combatants;
+            _combatContext.RegisterService(_surfaceManager);
+
             // Phase D: Create LOS and Height services
             var losService = new LOSService();
+            losService.SetSurfaceManager(_surfaceManager);
             var heightService = new HeightService(_rulesEngine.Events);
 
             // Phase E: Create ForcedMovementService with dependencies
@@ -1065,17 +1077,6 @@ namespace QDND.Combat.Arena
             // AI Pipeline
             _aiPipeline = new AIDecisionPipeline(_combatContext);
             _combatContext.RegisterService(_aiPipeline);
-
-            // Surface Manager
-            _surfaceManager = new SurfaceManager(_rulesEngine.Events, _statusManager);
-            _surfaceManager.Rules = _rulesEngine;  // Wire up for resistance calculations
-            _surfaceManager.OnSurfaceCreated += OnSurfaceCreated;
-            _surfaceManager.OnSurfaceRemoved += OnSurfaceRemoved;
-            _surfaceManager.OnSurfaceTransformed += OnSurfaceTransformed;
-            _surfaceManager.OnSurfaceTriggered += OnSurfaceTriggered;
-            _surfaceManager.OnSurfaceGeometryChanged += OnSurfaceGeometryChanged;
-            _surfaceManager.ResolveCombatants = () => _combatants;
-            _combatContext.RegisterService(_surfaceManager);
 
             // Movement Service (Phase E)
             _movementService = new MovementService(_rulesEngine.Events, _surfaceManager, reactionSystem, _statusManager);

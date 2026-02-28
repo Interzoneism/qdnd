@@ -307,12 +307,13 @@ namespace QDND.Combat.UI.Base
         // ── Portrait / Slot / Hotbar Constants ─────────────────────
 
         // Portrait sizes
-        public const int PortraitWidth = 80;
-        public const int PortraitHeight = 100;
+        public const int PortraitWidth = 75;   // was 80
+        public const int PortraitHeight = 107;  // was 100
         public const int PortraitHpBarHeight = 5;
         public const int PortraitSpacing = 6;
         public const int PortraitBorderSelected = 3;
         public const int PortraitBorderNormal = 1;
+        public const int ConditionIconSize = 30;
 
         // New colors
         public static readonly Color PortraitBgDark = new(0.06f, 0.05f, 0.08f, 0.85f);

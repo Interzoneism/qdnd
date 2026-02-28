@@ -36,7 +36,17 @@ namespace QDND.Combat.Actions.Effects
                         context.Targets.Any(t => context.Statuses.HasStatus(t.Id, s["requires_status:".Length..])),
                     string s when s.StartsWith("requires_no_status:") =>
                         context.Statuses == null || context.Targets.Count == 0 ||
-                        context.Targets.All(t => !context.Statuses.HasStatus(t.Id, s["requires_no_status:".Length..])),  
+                        context.Targets.All(t => !context.Statuses.HasStatus(t.Id, s["requires_no_status:".Length..])),
+                    string s when s.StartsWith("requires_source_status:") =>
+                        context.Source != null && context.Statuses != null &&
+                        context.Statuses.HasStatus(context.Source.Id, s["requires_source_status:".Length..]),
+                    string s when s.StartsWith("requires_source_no_status:") =>
+                        context.Source == null || context.Statuses == null ||
+                        !context.Statuses.HasStatus(context.Source.Id, s["requires_source_no_status:".Length..]),
+                    string s when s.StartsWith("compound_status:") =>
+                        context.Targets.Count > 0 &&
+                        context.Targets.Any(t =>
+                            EvaluateCompoundStatus(s["compound_status:".Length..], context.Statuses, t)),
                     _ => true
                 };
                 if (!conditionMet)
@@ -52,6 +62,9 @@ namespace QDND.Combat.Actions.Effects
             string surfaceType = "generic";
             if (definition.Parameters.TryGetValue("surface_type", out var typeObj))
                 surfaceType = typeObj?.ToString() ?? "generic";
+            surfaceType = surfaceType.Trim();
+            bool skipSpawn = string.IsNullOrWhiteSpace(surfaceType) ||
+                             string.Equals(surfaceType, "none", StringComparison.OrdinalIgnoreCase);
 
             float radius = definition.Value;
             int duration = definition.StatusDuration;
@@ -75,7 +88,8 @@ namespace QDND.Combat.Actions.Effects
             }
 
             // Create actual surface if manager is available.
-            context.Surfaces?.CreateSurface(surfaceType, spawnPosition, radius, context.Source?.Id, duration);
+            if (!skipSpawn)
+                context.Surfaces?.CreateSurface(surfaceType, spawnPosition, radius, context.Source?.Id, duration);
 
             // Emit event for surface system
             context.Rules.Events.Dispatch(new QDND.Combat.Rules.RuleEvent
@@ -93,7 +107,9 @@ namespace QDND.Combat.Actions.Effects
                 }
             });
 
-            string msg = $"Created {surfaceType} surface (radius: {radius}, duration: {duration})";
+            string msg = skipSpawn
+                ? $"Skipped surface spawn (surface type: '{surfaceType}')"
+                : $"Created {surfaceType} surface (radius: {radius}, duration: {duration})";
             var result = EffectResult.Succeeded(Type, context.Source.Id, null, radius, msg);
             result.Data["surfaceType"] = surfaceType;
             result.Data["radius"] = radius;

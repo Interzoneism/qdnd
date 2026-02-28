@@ -172,9 +172,16 @@ namespace QDND.Combat.Movement
             if (_surfaces != null)
             {
                 var surfacesAtEnd = _surfaces.GetSurfacesAt(targetPosition);
+                var crossedIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 foreach (var surface in surfacesAtEnd)
                 {
-                    result.SurfacesCrossed.Add(surface.Definition.Id);
+                    if (!string.IsNullOrWhiteSpace(surface?.Definition?.Id))
+                        crossedIds.Add(surface.Definition.Id);
+                }
+
+                if (crossedIds.Count > 0)
+                {
+                    result.SurfacesCrossed.AddRange(crossedIds);
                     result.TriggeredSurface = true;
                     _surfaces.ProcessEnter(target, targetPosition);
                 }
@@ -257,9 +264,16 @@ namespace QDND.Combat.Movement
             if (_surfaces != null)
             {
                 var surfacesAtEnd = _surfaces.GetSurfacesAt(targetPosition);
+                var crossedIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 foreach (var surface in surfacesAtEnd)
                 {
-                    result.SurfacesCrossed.Add(surface.Definition.Id);
+                    if (!string.IsNullOrWhiteSpace(surface?.Definition?.Id))
+                        crossedIds.Add(surface.Definition.Id);
+                }
+
+                if (crossedIds.Count > 0)
+                {
+                    result.SurfacesCrossed.AddRange(crossedIds);
                     result.TriggeredSurface = true;
                     _surfaces.ProcessEnter(target, targetPosition);
                 }

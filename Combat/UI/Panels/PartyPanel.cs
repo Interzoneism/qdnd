@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using QDND.Combat.UI.Base;
 
@@ -30,7 +31,7 @@ namespace QDND.Combat.UI.Panels
     {
         public event Action<string> OnMemberClicked;
 
-        private const int ConditionDotSize = 7;
+        private const int ConditionIconSize = 30;
         private const int ConditionDotSpacing = 2;
 
         private VBoxContainer _memberContainer;
@@ -189,11 +190,11 @@ namespace QDND.Combat.UI.Panels
             // HP text overlay — bottom of the portrait area, centered
             var hpLabel = new Label();
             hpLabel.Text = $"{member.HpCurrent}/{member.HpMax}";
-            HudTheme.StyleLabel(hpLabel, HudTheme.FontSmall, HudTheme.WarmWhite);
+            HudTheme.StyleLabel(hpLabel, HudTheme.FontTiny, HudTheme.WarmWhite);
             hpLabel.HorizontalAlignment = HorizontalAlignment.Center;
             hpLabel.VerticalAlignment = VerticalAlignment.Bottom;
             hpLabel.Position = new Vector2(bSel, bSel);
-            hpLabel.Size = new Vector2(pw, ph);
+            hpLabel.Size = new Vector2(pw, ph - 10);
             hpLabel.MouseFilter = MouseFilterEnum.Ignore;
             // Black shadow for readability over the portrait
             hpLabel.AddThemeColorOverride("font_shadow_color", new Color(0, 0, 0, 0.9f));
@@ -201,12 +202,18 @@ namespace QDND.Combat.UI.Panels
             hpLabel.AddThemeConstantOverride("shadow_offset_y", 1);
             layers.AddChild(hpLabel);
 
-            // Condition dots container (top-right corner of portrait)
+            // Frame overlay — border rendered on top of portrait layers
+            var frameOverlay = new PanelContainer();
+            frameOverlay.Position = new Vector2(0, 0);
+            frameOverlay.Size = new Vector2(pw + bSel * 2, ph + hpBarH + bSel * 2);
+            frameOverlay.MouseFilter = MouseFilterEnum.Ignore;
+            layers.AddChild(frameOverlay);
+
+            // Condition icons container — to the RIGHT of the portrait
             var conditionContainer = new HBoxContainer();
             conditionContainer.AddThemeConstantOverride("separation", ConditionDotSpacing);
             conditionContainer.MouseFilter = MouseFilterEnum.Ignore;
-            conditionContainer.Position = new Vector2(bSel + pw - 2, bSel + 2);
-            conditionContainer.LayoutDirection = LayoutDirectionEnum.Rtl;
+            conditionContainer.Position = new Vector2(bSel + pw + 2, bSel);
             layers.AddChild(conditionContainer);
 
             var card = new PortraitCard
@@ -216,10 +223,20 @@ namespace QDND.Combat.UI.Panels
                 Portrait = portrait,
                 HpBar = hpBar,
                 HpLabel = hpLabel,
+                FrameOverlay = frameOverlay,
                 ConditionContainer = conditionContainer,
                 IsSelected = member.IsSelected,
                 MemberId = member.Id
             };
+
+            // Make button fully transparent — frame overlay handles the visual border
+            var transparentStyle = new StyleBoxFlat();
+            transparentStyle.BgColor = Colors.Transparent;
+            transparentStyle.SetBorderWidthAll(0);
+            button.AddThemeStyleboxOverride("normal", transparentStyle);
+            button.AddThemeStyleboxOverride("hover", transparentStyle);
+            button.AddThemeStyleboxOverride("pressed", transparentStyle);
+            button.AddThemeStyleboxOverride("focus", transparentStyle);
 
             RebuildConditionDots(card, member.Conditions);
             ApplyBorder(card, member.IsSelected);
@@ -231,30 +248,15 @@ namespace QDND.Combat.UI.Panels
 
         private static void ApplyBorder(PortraitCard card, bool selected)
         {
+            // Frame overlay shows the border; button itself stays transparent
             var frameStyle = HudTheme.CreatePortraitFrameStyle(selected);
-
-            // Build hover / pressed variants
-            var hoverStyle = HudTheme.CreatePortraitFrameStyle(selected);
-            hoverStyle.BgColor = new Color(
-                frameStyle.BgColor.R * 1.25f,
-                frameStyle.BgColor.G * 1.25f,
-                frameStyle.BgColor.B * 1.25f,
-                frameStyle.BgColor.A);
-
-            var pressedStyle = HudTheme.CreatePortraitFrameStyle(selected);
-            pressedStyle.BgColor = new Color(
-                frameStyle.BgColor.R * 0.8f,
-                frameStyle.BgColor.G * 0.8f,
-                frameStyle.BgColor.B * 0.8f,
-                frameStyle.BgColor.A);
-
-            card.Root.AddThemeStyleboxOverride("normal", frameStyle);
-            card.Root.AddThemeStyleboxOverride("hover", hoverStyle);
-            card.Root.AddThemeStyleboxOverride("pressed", pressedStyle);
+            frameStyle.BgColor = Colors.Transparent; // border-only overlay
+            card.FrameOverlay.AddThemeStyleboxOverride("panel", frameStyle);
         }
 
         /// <summary>
-        /// Map conditions to small colored dots at the top-right of the portrait.
+        /// Map conditions to 30×30 texture icons to the right of the portrait.
+        /// Falls back to a centered 7×7 colored dot if no icon asset is found.
         /// </summary>
         private static void RebuildConditionDots(PortraitCard card, List<string> conditions)
         {
@@ -265,16 +267,50 @@ namespace QDND.Combat.UI.Panels
 
             if (conditions == null || conditions.Count == 0) return;
 
-            // Show up to 4 dot indicators
-            int count = System.Math.Min(conditions.Count, 4);
+            // Show up to 8 condition icons
+            int count = System.Math.Min(conditions.Count, 8);
             for (int i = 0; i < count; i++)
             {
-                var dot = new ColorRect();
-                dot.CustomMinimumSize = new Vector2(ConditionDotSize, ConditionDotSize);
-                dot.Color = GetConditionDotColor(conditions[i]);
-                dot.MouseFilter = MouseFilterEnum.Ignore;
-                card.ConditionContainer.AddChild(dot);
+                string iconPath = ResolveConditionIconPath(conditions[i]);
+                if (iconPath != null)
+                {
+                    var icon = new TextureRect();
+                    icon.CustomMinimumSize = new Vector2(ConditionIconSize, ConditionIconSize);
+                    icon.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+                    icon.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
+                    icon.Texture = GD.Load<Texture2D>(iconPath);
+                    icon.MouseFilter = MouseFilterEnum.Ignore;
+                    card.ConditionContainer.AddChild(icon);
+                }
+                else
+                {
+                    // Fallback: 7×7 dot centered inside a 30×30 container
+                    var container = new Control();
+                    container.CustomMinimumSize = new Vector2(ConditionIconSize, ConditionIconSize);
+                    container.MouseFilter = MouseFilterEnum.Ignore;
+                    var dot = new ColorRect();
+                    dot.Position = new Vector2((ConditionIconSize - 7) / 2f, (ConditionIconSize - 7) / 2f);
+                    dot.Size = new Vector2(7, 7);
+                    dot.Color = GetConditionDotColor(conditions[i]);
+                    dot.MouseFilter = MouseFilterEnum.Ignore;
+                    container.AddChild(dot);
+                    card.ConditionContainer.AddChild(container);
+                }
             }
+        }
+
+        /// <summary>
+        /// Convert a condition name to its icon resource path.
+        /// Returns null if no matching icon file exists.
+        /// </summary>
+        private static string ResolveConditionIconPath(string condition)
+        {
+            if (string.IsNullOrEmpty(condition)) return null;
+            var words = condition.Split(new[] { ' ', '_' }, StringSplitOptions.RemoveEmptyEntries);
+            string fileName = string.Join("_", words.Select(w =>
+                char.ToUpperInvariant(w[0]) + (w.Length > 1 ? w[1..].ToLowerInvariant() : "")));
+            string path = $"res://assets/Images/Icons Conditions/{fileName}_Condition_Icon.png";
+            return ResourceLoader.Exists(path) ? path : null;
         }
 
         /// <summary>
@@ -312,6 +348,7 @@ namespace QDND.Combat.UI.Panels
             public TextureRect Portrait { get; set; }
             public ProgressBar HpBar { get; set; }
             public Label HpLabel { get; set; }
+            public PanelContainer FrameOverlay { get; set; }
             public HBoxContainer ConditionContainer { get; set; }
             public bool IsSelected { get; set; }
             public string MemberId { get; set; }

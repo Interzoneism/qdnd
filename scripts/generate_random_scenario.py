@@ -15,11 +15,15 @@ import sys
 # Ability pools
 ADDITIONAL_ABILITIES = [
     "ranged_attack",
-    "power_strike",
-    "fireball",
-    "heal_wounds",
-    "poison_strike",
-    "battle_cry"
+    "offhand_attack",
+    "shove",
+    "dash",
+    "dodge_action",
+    "hide",
+    "second_wind",
+    "bardic_inspiration",
+    "cure_wounds",
+    "Target_PoisonSpray"
 ]
 
 # Name pools
@@ -54,17 +58,15 @@ def assign_tags(abilities):
     """Auto-assign tags based on abilities."""
     tags = []
     
-    if "fireball" in abilities:
-        tags.extend(["caster", "ranged"])
-    if "heal_wounds" in abilities:
+    if "Target_PoisonSpray" in abilities:
+        tags.extend(["melee", "debuffer"])
+    if "cure_wounds" in abilities:
         tags.extend(["healer", "support"])
     if "ranged_attack" in abilities and "ranged" not in tags:
         tags.append("ranged")
-    if "power_strike" in abilities:
+    if "offhand_attack" in abilities and "melee" not in tags:
         tags.append("melee")
-    if "poison_strike" in abilities:
-        tags.extend(["melee", "debuffer"])
-    if "battle_cry" in abilities and "support" not in tags:
+    if "bardic_inspiration" in abilities and "support" not in tags:
         tags.append("support")
     
     # Remove duplicates while preserving order
@@ -80,8 +82,8 @@ def assign_tags(abilities):
 
 def generate_character(char_id, name, faction, x_range, z_range, rng):
     """Generate a single character with randomized stats and abilities."""
-    # Always include basic_attack
-    abilities = ["basic_attack"]
+    # Always include main_hand_attack
+    abilities = ["main_hand_attack"]
     
     # Add 1-3 additional abilities
     num_additional = rng.randint(1, 3)

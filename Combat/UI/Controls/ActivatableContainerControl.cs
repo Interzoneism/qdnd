@@ -22,8 +22,8 @@ namespace QDND.Combat.UI.Controls
         public bool AllowDragAndDrop { get; set; }
         public ulong DragHoldMs { get; set; } = 50;
 
-        private const int DefaultSlotSize = 52;
-        private const int IconPadding = 0;
+        private const int DefaultSlotSize = 44;
+        private const int IconPadding = 1;
         private const float SpinnerSpeedRadPerSecond = 2.8f;
 
         private TextureRect _iconTexture;
