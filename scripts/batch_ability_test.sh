@@ -19,10 +19,10 @@ NC='\033[0m'
 PHASE="${1:-all}"
 
 # Core Actions
-PHASE1=(basic_attack ranged_attack dash_action disengage_action dodge_action hide_action help_action shove jump_action throw_action dip_action)
+PHASE1=(main_hand_attack ranged_attack dash disengage dodge_action hide help shove jump throw dip)
 
 # Weapon Actions
-PHASE2_WPN=(cleave lacerate smash topple pommel_strike offhand_attack power_strike)
+PHASE2_WPN=(cleave lacerate smash topple pommel_strike offhand_attack)
 
 # Cantrips
 PHASE3_CANT=(fire_bolt ray_of_frost sacred_flame eldritch_blast toll_the_dead chill_touch shocking_grasp thorn_whip vicious_mockery poison_spray blade_ward produce_flame)
@@ -46,7 +46,7 @@ PHASE8_FEAT=(great_weapon_master_toggle sharpshooter_toggle polearm_butt_attack 
 PHASE9_RACIAL=(acid_breath_line fire_breath_line fire_breath_cone cold_breath_cone lightning_breath_line poison_breath_cone)
 
 # Misc
-PHASE10_MISC=(poison_strike battle_cry heal_wounds globe_of_invulnerability)
+PHASE10_MISC=(globe_of_invulnerability)
 
 PASS_COUNT=0
 FAIL_COUNT=0

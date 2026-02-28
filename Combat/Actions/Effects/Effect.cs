@@ -270,5 +270,39 @@ namespace QDND.Combat.Actions.Effects
             }
             return (definition.Value, definition.Value, definition.Value);
         }
+
+        /// <summary>
+        /// Evaluate a compound_status expression against a specific target.
+        /// Format: parts joined by '&amp;' (AND all) or '|' (OR any), with '!' prefix for negated checks.
+        /// Example: "!DASH_STACKED_2&amp;DASH" — target must NOT have DASH_STACKED_2 AND must have DASH.
+        /// </summary>
+        protected static bool EvaluateCompoundStatus(string expr, StatusManager statuses, Combatant target)
+        {
+            if (statuses == null || target == null)
+                return false;
+
+            if (expr.Contains('&'))
+            {
+                return expr.Split('&').All(part =>
+                {
+                    if (part.StartsWith('!'))
+                        return !statuses.HasStatus(target.Id, part.Substring(1));
+                    return statuses.HasStatus(target.Id, part);
+                });
+            }
+            if (expr.Contains('|'))
+            {
+                return expr.Split('|').Any(part =>
+                {
+                    if (part.StartsWith('!'))
+                        return !statuses.HasStatus(target.Id, part.Substring(1));
+                    return statuses.HasStatus(target.Id, part);
+                });
+            }
+            // Single term
+            if (expr.StartsWith('!'))
+                return !statuses.HasStatus(target.Id, expr.Substring(1));
+            return statuses.HasStatus(target.Id, expr);
+        }
     }
 }

@@ -20,13 +20,28 @@ This project now includes a BG3-style surface runtime centered on `SurfaceManage
 
 - `CreateSurface`:
   - Creates blob geometry
+  - Normalizes common BG3 raw surface tokens/aliases (for example `WaterFrozen`, `FogCloud`, `DarknessCloud`, `SpikeGrowth`, `Vines`)
   - Merges same-type/layer overlaps
   - Resolves overlap/contact reactions with existing surfaces
 - `ApplySurfaceEvent(eventId, position, radius, sourceId)`:
   - Applies event reactions (for example: `ignite`, `freeze`, `electrify`, `douse`, `melt`)
+  - Supports additional BG3 event aliases such as `DestroyWater`/`destroy_water`
+  - Supports global daylight cleanup of darkness-style surfaces
   - Supports fallback transforms for common BG3-style interactions
 - `AddSurfaceArea` and `SubtractSurfaceArea` allow dynamic growth/carving at runtime.
 - `ResolveCombatants` hook enables reaction explosions/status application to nearby units.
+
+## Extended surface IDs
+
+Alongside the original core set, runtime definitions now include:
+
+- `poison_cloud`
+- `spores`
+- `insect_plague`
+- `wind`
+- `entangle`
+- `daylight`
+- `stone_wall`
 
 ## Character interactions
 

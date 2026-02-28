@@ -43,6 +43,33 @@ namespace QDND.Combat.Environment
                     ["ice"] = "water"
                 }
             };
+        private static readonly Dictionary<string, string> SurfaceAliases =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                ["waterfrozen"] = "ice",
+                ["waterelectrified"] = "electrified_water",
+                ["bloodfrozen"] = "ice",
+                ["bloodelectrified"] = "electrified_water",
+                ["fogcloud"] = "fog",
+                ["darknesscloud"] = "darkness",
+                ["stinkingcloud"] = "stinking_cloud",
+                ["poisoncloud"] = "poison_cloud",
+                ["cloudkillcloud"] = "cloudkill",
+                ["spikegrowth"] = "spike_growth",
+                ["vines"] = "entangle",
+                ["overgrowth"] = "plant_growth",
+                ["sporeblackcloud"] = "spores",
+                ["sporegreencloud"] = "spores",
+                ["sporewhitecloud"] = "spores",
+                ["sporepinkcloud"] = "spores",
+                ["watercloudelectrified"] = "electrified_steam",
+                ["causticbrine"] = "acid",
+                ["alcohol"] = "oil",
+                ["mud"] = "entangle",
+                ["lava"] = "fire",
+                ["cloud"] = "fog",
+                ["none"] = string.Empty
+            };
 
         private readonly Dictionary<string, SurfaceDefinition> _definitions = new(StringComparer.OrdinalIgnoreCase);
         private readonly List<SurfaceInstance> _activeSurfaces = new();
@@ -81,7 +108,11 @@ namespace QDND.Combat.Environment
         /// </summary>
         public SurfaceDefinition GetDefinition(string id)
         {
-            return _definitions.TryGetValue(id, out var def) ? def : null;
+            string resolvedId = ResolveSurfaceId(id);
+            if (string.IsNullOrWhiteSpace(resolvedId))
+                return null;
+
+            return _definitions.TryGetValue(resolvedId, out var def) ? def : null;
         }
 
         /// <summary>
@@ -89,7 +120,11 @@ namespace QDND.Combat.Environment
         /// </summary>
         public SurfaceInstance CreateSurface(string surfaceId, Vector3 position, float radius, string creatorId = null, int? duration = null)
         {
-            if (!_definitions.TryGetValue(surfaceId, out var def))
+            string resolvedSurfaceId = ResolveSurfaceId(surfaceId);
+            if (string.IsNullOrWhiteSpace(resolvedSurfaceId))
+                return null;
+
+            if (!_definitions.TryGetValue(resolvedSurfaceId, out var def))
             {
                 Godot.GD.PushWarning($"Unknown surface type: {surfaceId}");
                 return null;
@@ -252,17 +287,9 @@ namespace QDND.Combat.Environment
 
                 if (reaction == null)
                 {
-                    if (string.Equals(normalized, "douse", StringComparison.OrdinalIgnoreCase) &&
-                        surface.Definition.Tags.Contains("fire"))
+                    if (TryApplyGlobalEvent(normalized, surface, position, radius))
                     {
-                        if (surface.SubtractArea(position, radius))
-                        {
-                            affected++;
-                            if (surface.IsDepleted)
-                                RemoveSurface(surface);
-                            else
-                                OnSurfaceGeometryChanged?.Invoke(surface);
-                        }
+                        affected++;
                     }
                     continue;
                 }
@@ -302,8 +329,71 @@ namespace QDND.Combat.Environment
                 "electric" => "electrify",
                 "thaw" => "melt",
                 "extinguish" => "douse",
+                "destroywater" => "destroy_water",
+                "remove_water" => "destroy_water",
                 _ => eventId.Trim().ToLowerInvariant()
             };
+        }
+
+        private bool TryApplyGlobalEvent(string eventId, SurfaceInstance surface, Vector3 position, float radius)
+        {
+            if (surface?.Definition == null)
+                return false;
+
+            switch (eventId)
+            {
+                case "douse":
+                    if (surface.Definition.Tags.Contains("fire"))
+                        return ReduceOrRemoveSurface(surface, position, radius);
+                    return false;
+
+                case "daylight":
+                    if (surface.Definition.Tags.Contains("darkness") ||
+                        string.Equals(surface.Definition.Id, "hunger_of_hadar", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return ReduceOrRemoveSurface(surface, position, radius);
+                    }
+                    return false;
+
+                case "destroy_water":
+                    if (string.Equals(surface.Definition.Id, "water", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(surface.Definition.Id, "electrified_water", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(surface.Definition.Id, "ice", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(surface.Definition.Id, "blood", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(surface.Definition.Id, "steam", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(surface.Definition.Id, "electrified_steam", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return ReduceOrRemoveSurface(surface, position, radius);
+                    }
+                    return false;
+
+                default:
+                    return false;
+            }
+        }
+
+        private bool ReduceOrRemoveSurface(SurfaceInstance surface, Vector3 position, float radius)
+        {
+            if (surface.Definition.CanBeSubtracted)
+            {
+                if (!surface.SubtractArea(position, radius))
+                    return false;
+
+                if (surface.IsDepleted)
+                {
+                    RemoveSurface(surface);
+                }
+                else
+                {
+                    OnSurfaceGeometryChanged?.Invoke(surface);
+                    DispatchSurfaceGeometryChanged(surface);
+                }
+
+                return true;
+            }
+
+            RemoveSurface(surface);
+            return true;
         }
 
         /// <summary>
@@ -1050,7 +1140,11 @@ namespace QDND.Combat.Environment
 
         private void ImportSnapshot(Persistence.SurfaceSnapshot snapshot)
         {
-            if (!_definitions.TryGetValue(snapshot.SurfaceType, out var def))
+            string resolvedSurfaceId = ResolveSurfaceId(snapshot.SurfaceType);
+            if (string.IsNullOrWhiteSpace(resolvedSurfaceId))
+                return;
+
+            if (!_definitions.TryGetValue(resolvedSurfaceId, out var def))
             {
                 Godot.GD.PushWarning($"Unknown surface type during import: {snapshot.SurfaceType}");
                 return;
@@ -1087,6 +1181,33 @@ namespace QDND.Combat.Environment
             }
 
             _activeSurfaces.Add(instance);
+        }
+
+        private string ResolveSurfaceId(string surfaceId)
+        {
+            if (string.IsNullOrWhiteSpace(surfaceId))
+                return string.Empty;
+
+            string normalized = surfaceId.Trim().Trim('\'', '"').ToLowerInvariant();
+            if (string.IsNullOrWhiteSpace(normalized))
+                return string.Empty;
+
+            if (_definitions.ContainsKey(normalized))
+                return normalized;
+
+            if (SurfaceAliases.TryGetValue(normalized, out var aliased))
+                return aliased;
+
+            if (normalized.StartsWith("surface", StringComparison.OrdinalIgnoreCase))
+            {
+                string withoutPrefix = normalized["surface".Length..];
+                if (_definitions.ContainsKey(withoutPrefix))
+                    return withoutPrefix;
+                if (SurfaceAliases.TryGetValue(withoutPrefix, out var prefixedAlias))
+                    return prefixedAlias;
+            }
+
+            return normalized;
         }
 
         private void DispatchSurfaceCreated(SurfaceInstance instance, string creatorId)
@@ -1318,6 +1439,42 @@ namespace QDND.Combat.Environment
             cloudkill.DamagePerTrigger = 5; cloudkill.DamageType = "poison"; cloudkill.AppliesStatusId = "poisoned";
             cloudkill.Tags = new HashSet<string> { "poison", "obscure", "cloud", "magic" };
             Add(cloudkill);
+
+            var poisonCloud = Def("poison_cloud", "Poison Cloud", SurfaceType.Poison, SurfaceLayer.Cloud, 10, "#5FAE42", 0.46f, liquid: false);
+            poisonCloud.DamagePerTrigger = 4; poisonCloud.DamageType = "poison"; poisonCloud.AppliesStatusId = "poisoned";
+            poisonCloud.Tags = new HashSet<string> { "poison", "obscure", "cloud", "magic" };
+            Add(poisonCloud);
+
+            var spores = Def("spores", "Spores", SurfaceType.Custom, SurfaceLayer.Cloud, 4, "#8FAF5B", 0.42f, liquid: false);
+            spores.DamagePerTrigger = 2; spores.DamageType = "poison"; spores.AppliesStatusId = "poisoned";
+            spores.Tags = new HashSet<string> { "poison", "obscure", "cloud", "nature" };
+            Add(spores);
+
+            var insectPlague = Def("insect_plague", "Insect Plague", SurfaceType.Custom, SurfaceLayer.Cloud, 10, "#7F8457", 0.48f, liquid: false);
+            insectPlague.DamagePerTrigger = 4; insectPlague.DamageType = "piercing";
+            insectPlague.Tags = new HashSet<string> { "hazard", "obscure", "cloud", "nature", "magic" };
+            Add(insectPlague);
+
+            var wind = Def("wind", "Wind", SurfaceType.Custom, SurfaceLayer.Cloud, 2, "#BDD6E4", 0.3f, liquid: false);
+            wind.Tags = new HashSet<string> { "wind", "cloud", "magic" };
+            Add(wind);
+
+            var entangle = Def("entangle", "Entangle", SurfaceType.Custom, SurfaceLayer.Ground, 10, "#4E7A36", 0.48f, liquid: false);
+            entangle.MovementCostMultiplier = 2f;
+            entangle.AppliesStatusId = "entangled";
+            entangle.SaveAbility = AbilityType.Strength;
+            entangle.SaveDC = 12;
+            entangle.Tags = new HashSet<string> { "nature", "difficult_terrain" };
+            Add(entangle);
+
+            var daylight = Def("daylight", "Daylight", SurfaceType.Custom, SurfaceLayer.Cloud, 10, "#FFF0B2", 0.28f, liquid: false);
+            daylight.Tags = new HashSet<string> { "light", "cloud", "magic" };
+            Add(daylight);
+
+            var stoneWall = Def("stone_wall", "Wall of Stone", SurfaceType.Custom, SurfaceLayer.Ground, 10, "#8A8A82", 0.62f, liquid: false);
+            stoneWall.MovementCostMultiplier = 8f;
+            stoneWall.Tags = new HashSet<string> { "wall", "obstacle", "magic" };
+            Add(stoneWall);
 
             var esteam = Def("electrified_steam", "Electrified Steam", SurfaceType.Custom, SurfaceLayer.Cloud, 2, "#C3D9FF", 0.44f, liquid: false);
             esteam.DamagePerTrigger = 4; esteam.DamageType = "lightning";

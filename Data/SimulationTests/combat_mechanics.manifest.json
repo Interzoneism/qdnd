@@ -4,8 +4,8 @@
   "defaultScenarioPath": "res://Data/Scenarios/minimal_combat.json",
   "tests": [
     {
-      "name": "power_strike_extra_damage",
-      "description": "Fighter uses power_strike for bonus damage - damage should be higher than basic attack avg",
+      "name": "main_hand_attack_extra_damage",
+      "description": "Fighter uses Target_MainHandAttack - verifies damage dealt and action consumption",
       "commands": [
         { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_MainHandAttack", "targetId": "enemy_1" }
       ],
@@ -126,8 +126,8 @@
       ]
     },
     {
-      "name": "basic_attack_damage_dealt",
-      "description": "Basic attack reduces enemy HP",
+      "name": "main_hand_attack_damage_dealt",
+      "description": "Main hand attack reduces enemy HP",
       "commands": [
         { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_MainHandAttack", "targetId": "enemy_1" }
       ],

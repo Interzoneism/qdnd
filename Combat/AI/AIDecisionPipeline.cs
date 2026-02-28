@@ -326,7 +326,7 @@ namespace QDND.Combat.AI
                 if (!string.IsNullOrEmpty(testAbilityId))
                 {
                     // Match the specific ability ID from the tag
-                    // Check both UseAbility (for most abilities) and Attack (for basic_attack)
+                    // Check both UseAbility (for most abilities) and Attack action types
                     var forcedAbilityAction = candidates.FirstOrDefault(c =>
                         (c.ActionType == AIActionType.UseAbility || c.ActionType == AIActionType.Attack) &&
                         string.Equals(c.ActionId, testAbilityId, StringComparison.OrdinalIgnoreCase));

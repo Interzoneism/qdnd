@@ -144,10 +144,10 @@ namespace QDND.Tools.Simulation
             var meleeTest = new SimulationTestCase
             {
                 Name = "golden_path_melee_attack",
-                Description = "Fighter (ally_1) attacks Goblin (enemy_1) with basic_attack",
+                Description = "Fighter (ally_1) attacks Goblin (enemy_1) with main_hand_attack",
                 Commands = new List<SimulationCommand>
                 {
-                    SimulationCommand.UseAbility("ally_1", "basic_attack", "enemy_1")
+                    SimulationCommand.UseAbility("ally_1", "main_hand_attack", "enemy_1")
                 },
                 Assertions = new List<SimulationAssertion>
                 {
@@ -158,14 +158,14 @@ namespace QDND.Tools.Simulation
             AddTestCase(meleeTest);
             
             // Scenario B: Buff Application
-            // Ally uses battle_cry (bonus action buff) -> Status applied -> Attack bonus changes
+            // Ally uses bardic_inspiration (bonus action buff) -> Status applied -> Attack bonus changes
             var buffTest = new SimulationTestCase
             {
                 Name = "golden_path_buff_status",
-                Description = "Fighter (ally_1) uses battle_cry -> ally_1 gets 'inspired' status",
+                Description = "Bard (ally_1) uses bardic_inspiration -> ally_1 gets 'inspired' status",
                 Commands = new List<SimulationCommand>
                 {
-                    SimulationCommand.UseAbility("ally_1", "battle_cry", "ally_1")
+                    SimulationCommand.UseAbility("ally_1", "bardic_inspiration", "ally_1")
                 },
                 Assertions = new List<SimulationAssertion>
                 {

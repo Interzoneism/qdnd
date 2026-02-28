@@ -15,6 +15,34 @@ namespace QDND.Data.Actions
     /// </summary>
     public static class SpellEffectConverter
     {
+        private static readonly Dictionary<string, string> SurfaceTypeAliases =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                ["waterfrozen"] = "ice",
+                ["waterelectrified"] = "electrified_water",
+                ["bloodfrozen"] = "ice",
+                ["bloodelectrified"] = "electrified_water",
+                ["fogcloud"] = "fog",
+                ["darknesscloud"] = "darkness",
+                ["stinkingcloud"] = "stinking_cloud",
+                ["poisoncloud"] = "poison_cloud",
+                ["cloudkillcloud"] = "cloudkill",
+                ["spikegrowth"] = "spike_growth",
+                ["vines"] = "entangle",
+                ["overgrowth"] = "plant_growth",
+                ["sporeblackcloud"] = "spores",
+                ["sporegreencloud"] = "spores",
+                ["sporewhitecloud"] = "spores",
+                ["sporepinkcloud"] = "spores",
+                ["watercloudelectrified"] = "electrified_steam",
+                ["causticbrine"] = "acid",
+                ["alcohol"] = "oil",
+                ["mud"] = "entangle",
+                ["lava"] = "fire",
+                ["cloud"] = "fog",
+                ["none"] = string.Empty
+            };
+
         /// <summary>
         /// Parse a BG3 SpellSuccess or SpellFail formula string into a list of EffectDefinitions.
         /// </summary>
@@ -572,8 +600,9 @@ namespace QDND.Data.Actions
                 }
 
                 string surfaceType = createZoneCloudMatch.Groups[3].Success
-                    ? createZoneCloudMatch.Groups[3].Value.Trim().ToLowerInvariant()
+                    ? NormalizeSurfaceTypeToken(createZoneCloudMatch.Groups[3].Value)
                     : "cloud";
+                surfaceType = NormalizeSurfaceTypeToken(surfaceType);
 
                 return new EffectDefinition
                 {
@@ -653,7 +682,7 @@ namespace QDND.Data.Actions
                     Type = "spawn_surface",
                     Parameters = new Dictionary<string, object>
                     {
-                        { "surface_type", surfaceMatch.Groups[3].Value.Trim().ToLowerInvariant() }
+                        { "surface_type", NormalizeSurfaceTypeToken(surfaceMatch.Groups[3].Value) }
                     }
                 };
 
@@ -798,7 +827,7 @@ namespace QDND.Data.Actions
             if (TryGetFunctorArguments(functor, "SurfaceChange", out var surfaceChangeArgs) &&
                 surfaceChangeArgs.Count >= 1)
             {
-                string surfaceType = NormalizeFunctorToken(surfaceChangeArgs[0]).ToLowerInvariant();
+                string surfaceType = NormalizeSurfaceEventToken(surfaceChangeArgs[0]);
                 float radius = 0f;
                 int lifetime = 0;
                 bool foundRadius = false;
@@ -1175,10 +1204,92 @@ namespace QDND.Data.Actions
             if (hasStatusMatch.Success)
                 return $"requires_status:{hasStatusMatch.Groups[1].Value}";
 
-            // Detect HasStatus forms we didn't match — log so they're auditable
-            if (Regex.IsMatch(normalized, @"(not)?hasstatus\("))
+            // Category A: single HasStatus with extra args — extract status name + qualifier
+            // Matches: (not)?HasStatus('NAME', optionalArgs...)
+            var singleHasStatusMultiArg = Regex.Match(normalized,
+                @"^(not)?hasstatus\('([^']+)'(,[^)]+)?\)$", RegexOptions.IgnoreCase);
+            if (singleHasStatusMultiArg.Success)
             {
-                RuntimeSafety.LogError($"[SpellEffectConverter] Unhandled HasStatus form: {conditionExpression}");
+                bool negated = singleHasStatusMultiArg.Groups[1].Success;
+                string statusId = singleHasStatusMultiArg.Groups[2].Value;
+                string args = singleHasStatusMultiArg.Groups[3].Value; // e.g. ",context.source" — already lowercased
+
+                if (args.Contains("getactiveweapon()") || args.Contains("context.hitdescription"))
+                {
+                    // Item-specific — not yet supported
+                    RuntimeSafety.Log($"[SpellEffectConverter] Skipping weapon/item-qualified HasStatus (unsupported): {conditionExpression}");
+                    return null;
+                }
+                if (args.Contains("context.source"))
+                {
+                    return negated ? $"requires_source_no_status:{statusId}" : $"requires_source_status:{statusId}";
+                }
+                // Default: treat as target check (context.target or no qualifier)
+                return negated ? $"requires_no_status:{statusId}" : $"requires_status:{statusId}";
+            }
+
+            // Category B & C: compound expressions that contain hasstatus(
+            if (normalized.Contains("hasstatus("))
+            {
+                // Phase 1: Remove HasStatus tokens (including multi-arg forms) and parentheses.
+                // Whitespace was already stripped, so 'nothasstatus(...)' is one contiguous token.
+                string strippedPhase1 = Regex.Replace(normalized,
+                    @"(not)?hasstatus\('[^']*'(?:,[^)']*)?\)|[()]",
+                    string.Empty, RegexOptions.IgnoreCase);
+
+                // Phase 2: Remove boolean keywords WITHOUT word boundaries (they're already fused
+                // to adjacent tokens after whitespace removal, so \b never fires).
+                string stripped = Regex.Replace(strippedPhase1, @"and|or|not", string.Empty, RegexOptions.IgnoreCase);
+
+                bool isPureHasStatus = stripped.Length == 0;
+                if (isPureHasStatus)
+                {
+                    // Category C: pure HasStatus compound — parse at convert-time into a structured token.
+                    bool hasAnd = strippedPhase1.Contains("and");
+                    bool hasOr  = strippedPhase1.Contains("or");
+                    if (hasAnd && hasOr)
+                    {
+                        // Mixed AND/OR with potential precedence ambiguity — fall through to Category B.
+                        RuntimeSafety.Log($"[SpellEffectConverter] Skipping mixed AND/OR compound condition: {conditionExpression}");
+                        return null;
+                    }
+
+                    // Extract each (not)?hasstatus clause; normalized is already lowercase.
+                    var clauseMatches = Regex.Matches(normalized,
+                        @"(not)?hasstatus\('([^']+)'(?:,[^)']*)?\)",
+                        RegexOptions.IgnoreCase);
+                    if (clauseMatches.Count == 0)
+                        return null;
+
+                    // Safety net: if any HasStatus clause has a source qualifier, we can't
+                    // safely evaluate it against targets — bail to Category B.
+                    var clauseMatchesFull = Regex.Matches(normalized,
+                        @"(not)?hasstatus\('([^']+)'(?:,([^)]*))?\)",
+                        RegexOptions.IgnoreCase);
+                    foreach (Match m in clauseMatchesFull)
+                    {
+                        if (m.Groups[3].Success && m.Groups[3].Value.Contains("context.source"))
+                        {
+                            RuntimeSafety.Log($"[SpellEffectConverter] Skipping source-qualified HasStatus in compound condition: {conditionExpression}");
+                            return null;
+                        }
+                    }
+
+                    char separator = hasOr ? '|' : '&';
+                    var parts = new List<string>();
+                    foreach (Match m in clauseMatches)
+                    {
+                        bool negated  = m.Groups[1].Success;
+                        string statusId = m.Groups[2].Value.ToUpperInvariant();
+                        parts.Add(negated ? $"!{statusId}" : statusId);
+                    }
+
+                    return $"compound_status:{string.Join(separator, parts)}";
+                }
+
+                // Category B: mixed compound — we can't evaluate it, fire unconditionally
+                RuntimeSafety.Log($"[SpellEffectConverter] Skipping unsupported compound condition: {conditionExpression}");
+                return null;
             }
 
             return null;
@@ -1376,6 +1487,32 @@ namespace QDND.Data.Actions
                 return string.Empty;
 
             return token.Trim().Trim('\'', '"');
+        }
+
+        private static string NormalizeSurfaceTypeToken(string token)
+        {
+            string normalized = NormalizeFunctorToken(token).ToLowerInvariant();
+            if (string.IsNullOrWhiteSpace(normalized))
+                return string.Empty;
+
+            if (normalized.StartsWith("surface", StringComparison.OrdinalIgnoreCase))
+                normalized = normalized["surface".Length..];
+
+            return SurfaceTypeAliases.TryGetValue(normalized, out var alias) ? alias : normalized;
+        }
+
+        private static string NormalizeSurfaceEventToken(string token)
+        {
+            string normalized = NormalizeFunctorToken(token).ToLowerInvariant();
+            if (string.IsNullOrWhiteSpace(normalized))
+                return string.Empty;
+
+            return normalized switch
+            {
+                "destroywater" => "destroy_water",
+                "remove_water" => "destroy_water",
+                _ => normalized
+            };
         }
 
         private static bool TryParseIntArgument(string token, out int value)

@@ -43,6 +43,14 @@ namespace QDND.Combat.Actions.Effects
                         string s when s.StartsWith("requires_no_status:") =>
                             context.Statuses == null ||
                             !context.Statuses.HasStatus(target.Id, s["requires_no_status:".Length..]),
+                        string s when s.StartsWith("requires_source_status:") =>
+                            context.Source != null && context.Statuses != null &&
+                            context.Statuses.HasStatus(context.Source.Id, s["requires_source_status:".Length..]),
+                        string s when s.StartsWith("requires_source_no_status:") =>
+                            context.Source == null || context.Statuses == null ||
+                            !context.Statuses.HasStatus(context.Source.Id, s["requires_source_no_status:".Length..]),
+                        string s when s.StartsWith("compound_status:") =>
+                            EvaluateCompoundStatus(s["compound_status:".Length..], context.Statuses, target),
                         _ => true
                     };
                     if (!conditionMet)

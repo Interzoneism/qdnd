@@ -138,6 +138,16 @@ namespace QDND.Combat.UI.Panels
                 return;
             }
 
+            // Health is displayed in dedicated HP UI, not in the resource icon row.
+            if (id == "health")
+            {
+                if (_resourceValues.Remove(id))
+                {
+                    _rebuildPending = true;
+                }
+                return;
+            }
+
             _resourceValues[id] = (current, max);
 
             if (_resourceIcons.TryGetValue(id, out var widget))
@@ -216,7 +226,7 @@ namespace QDND.Combat.UI.Panels
                 var (current, max) = _spellSlotValues[level];
                 if (max <= 0) continue;
                 var iconPath = ResolveSpellSlotIconPath(current, level);
-                var widget = CreateIconWidget(iconPath, current, max, ToRoman(level));
+                var widget = CreateIconWidget(iconPath, current, max, null);
                 // Hide redundant count label when per-level pip icon is loaded
                 bool isGeneric = iconPath.EndsWith("Spell_Slot_Bar_Icon.png");
                 if (!isGeneric)
@@ -234,7 +244,7 @@ namespace QDND.Combat.UI.Panels
                 _warlockSlotIcon = CreateIconWidget(
                     warlockIconPath,
                     _warlockSlotValue.current, _warlockSlotValue.max,
-                    ToRoman(_warlockSlotValue.level));
+                    null);
                 // Hide redundant count label when per-level pip icon is loaded
                 bool isGenericWarlock = warlockIconPath.EndsWith("Spell_Slot_Bar_Icon.png");
                 if (!isGenericWarlock)
@@ -247,7 +257,7 @@ namespace QDND.Combat.UI.Panels
             // Class resources (anything not in core or movement)
             foreach (var (id, (current, max)) in _resourceValues)
             {
-                if (coreResources.Contains(id) || id == "movement") continue;
+                if (coreResources.Contains(id) || id == "movement" || id == "health") continue;
                 var iconPath = ResourceIconPaths.GetValueOrDefault(id, "");
                 if (string.IsNullOrEmpty(iconPath))
                 {
@@ -267,14 +277,6 @@ namespace QDND.Combat.UI.Panels
             var container = new VBoxContainer();
             container.AddThemeConstantOverride("separation", 1);
             container.Alignment = BoxContainer.AlignmentMode.Center;
-
-            // Level label (roman numeral, only for spell slots)
-            var lvlLabel = new Label();
-            lvlLabel.Text = levelLabel ?? "";
-            lvlLabel.Visible = !string.IsNullOrEmpty(levelLabel);
-            lvlLabel.HorizontalAlignment = HorizontalAlignment.Center;
-            HudTheme.StyleLabel(lvlLabel, HudTheme.FontTiny, HudTheme.Gold);
-            container.AddChild(lvlLabel);
 
             // Icon container (holds icon + count overlay)
             var iconContainer = new Control();
@@ -320,7 +322,6 @@ namespace QDND.Combat.UI.Panels
                 Container = container,
                 IconRect = iconRect,
                 CountLabel = countLabel,
-                LevelLabel = lvlLabel,
                 Current = current,
                 Max = max,
             };
@@ -407,18 +408,11 @@ namespace QDND.Combat.UI.Panels
                 : "res://assets/Images/Icons Resources Hotbar/Spell_Slot_Bar_Icon.png";
         }
 
-        private static string ToRoman(int number) => number switch
-        {
-            1 => "I", 2 => "II", 3 => "III", 4 => "IV", 5 => "V",
-            6 => "VI", 7 => "VII", 8 => "VIII", 9 => "IX", _ => number.ToString()
-        };
-
         private class ResourceIconWidget
         {
             public VBoxContainer Container { get; set; }
             public TextureRect IconRect { get; set; }
             public Label CountLabel { get; set; }
-            public Label LevelLabel { get; set; }
             public int Current { get; set; }
             public int Max { get; set; }
         }

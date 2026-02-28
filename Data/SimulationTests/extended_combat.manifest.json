@@ -5,7 +5,7 @@
   "tests": [
     {
       "name": "bg3_round1_opening",
-      "description": "BG3 Round 1: Fighter buffs with battle_cry, then attacks Goblin",
+      "description": "BG3 Round 1: Fighter uses Shout_ActionSurge (buff), then attacks Goblin",
       "commands": [
         { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Shout_ActionSurge", "targetId": "ally_1" },
         { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_MainHandAttack", "targetId": "enemy_1" },
@@ -33,7 +33,7 @@
     },
     {
       "name": "bg3_power_strike_burst",
-      "description": "BG3 Burst: Use power_strike for maximum single-target damage",
+      "description": "BG3 Burst: Use Target_MainHandAttack for maximum single-target damage",
       "commands": [
         { "type": "UseAbility", "actorId": "ally_1", "abilityId": "Target_MainHandAttack", "targetId": "enemy_1" }
       ],

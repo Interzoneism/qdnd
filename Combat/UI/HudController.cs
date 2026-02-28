@@ -1151,6 +1151,7 @@ namespace QDND.Combat.UI
         private void OnResourceChanged(string resourceId)
         {
             if (_disposed || !IsInstanceValid(this) || !IsInsideTree()) return;
+            if (resourceId == "health") return;
             var resource = Arena?.ResourceBarModel?.GetResource(resourceId);
             if (resource != null)
                 _resourceBarPanel?.SetResource(resourceId, resource.Current, resource.Maximum);
