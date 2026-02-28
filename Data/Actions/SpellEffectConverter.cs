@@ -1605,6 +1605,18 @@ namespace QDND.Data.Actions
                     System.Text.RegularExpressions.RegexOptions.IgnoreCase);
             }
 
+            // Replace MainRangedWeaponDamageType with actual weapon damage type
+            // NOTE: must be checked BEFORE MainRangedWeapon to avoid partial prefix match
+            if (resolved.Contains("MainRangedWeaponDamageType", StringComparison.OrdinalIgnoreCase))
+            {
+                string weaponDmgType = GetWeaponDamageType(caster, isMelee: false);
+                resolved = System.Text.RegularExpressions.Regex.Replace(
+                    resolved,
+                    @"MainRangedWeaponDamageType",
+                    weaponDmgType,
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            }
+
             // Replace MainRangedWeapon with actual weapon dice
             if (resolved.Contains("MainRangedWeapon", StringComparison.OrdinalIgnoreCase))
             {
@@ -1616,6 +1628,18 @@ namespace QDND.Data.Actions
                     System.Text.RegularExpressions.RegexOptions.IgnoreCase);
             }
 
+            // Replace OffhandMeleeWeaponDamageType with actual weapon damage type
+            // NOTE: must be checked BEFORE OffhandMeleeWeapon to avoid partial prefix match
+            if (resolved.Contains("OffhandMeleeWeaponDamageType", StringComparison.OrdinalIgnoreCase))
+            {
+                string offhandDmgType = GetOffhandWeaponDamageType(caster);
+                resolved = System.Text.RegularExpressions.Regex.Replace(
+                    resolved,
+                    @"OffhandMeleeWeaponDamageType",
+                    offhandDmgType,
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            }
+
             // Replace OffhandMeleeWeapon with offhand weapon dice
             if (resolved.Contains("OffhandMeleeWeapon", StringComparison.OrdinalIgnoreCase))
             {
@@ -1624,6 +1648,29 @@ namespace QDND.Data.Actions
                     resolved,
                     @"OffhandMeleeWeapon",
                     offhandDice,
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            }
+
+            // Replace OffhandRangedWeaponDamageType with actual weapon damage type
+            // NOTE: must be checked BEFORE OffhandRangedWeapon to avoid partial prefix match
+            if (resolved.Contains("OffhandRangedWeaponDamageType", StringComparison.OrdinalIgnoreCase))
+            {
+                string offhandRangedDmgType = GetOffhandWeaponDamageType(caster);
+                resolved = System.Text.RegularExpressions.Regex.Replace(
+                    resolved,
+                    @"OffhandRangedWeaponDamageType",
+                    offhandRangedDmgType,
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            }
+
+            // Replace OffhandRangedWeapon with offhand weapon dice
+            if (resolved.Contains("OffhandRangedWeapon", StringComparison.OrdinalIgnoreCase))
+            {
+                string offhandRangedDice = GetOffhandWeaponDamageDice(caster);
+                resolved = System.Text.RegularExpressions.Regex.Replace(
+                    resolved,
+                    @"OffhandRangedWeapon",
+                    offhandRangedDice,
                     System.Text.RegularExpressions.RegexOptions.IgnoreCase);
             }
 
@@ -1733,7 +1780,7 @@ namespace QDND.Data.Actions
         {
             var weapon = caster.MainHandWeapon;
             if (weapon == null)
-                return "slashing"; // Unarmed strike default
+                return "bludgeoning"; // Unarmed strike default
 
             if (isMelee && weapon.IsRanged && caster.OffHandWeapon?.IsRanged == false)
                 weapon = caster.OffHandWeapon;
@@ -1741,6 +1788,19 @@ namespace QDND.Data.Actions
                 weapon = caster.OffHandWeapon;
 
             return weapon.DamageType.ToString().ToLowerInvariant();
+        }
+
+        /// <summary>
+        /// Get the damage type of the caster's offhand weapon.
+        /// Falls back to bludgeoning (BG3 unarmed default) if no offhand weapon is equipped.
+        /// </summary>
+        private static string GetOffhandWeaponDamageType(QDND.Combat.Entities.Combatant caster)
+        {
+            var offhand = caster.OffHandWeapon;
+            if (offhand == null)
+                return "bludgeoning"; // Unarmed strike default
+
+            return offhand.DamageType.ToString().ToLowerInvariant();
         }
 
         /// <summary>

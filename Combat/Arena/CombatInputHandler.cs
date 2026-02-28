@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using QDND.Combat.Entities;
 using QDND.Combat.Actions;
+using QDND.Combat.Environment;
 using QDND.Combat.Targeting;
 using QDND.Combat.UI;
 
@@ -45,6 +46,7 @@ namespace QDND.Combat.Arena
         [Export] public float MaxPitch = 80f; // Maximum pitch angle (more top-down)
 
         private CombatantVisual _hoveredVisual;
+        private string _hoveredSurfaceId;
         private PhysicsDirectSpaceState3D _spaceState;
         private int _debugFrameCounter = 0;
         private int _rayDebugThrottleCounter = 0;
@@ -221,6 +223,11 @@ namespace QDND.Combat.Arena
                 Arena?.NotifyHoverChanged(null);
             }
 
+            if (!string.IsNullOrEmpty(_hoveredSurfaceId))
+            {
+                _hoveredSurfaceId = null;
+                _hudController?.HideSurfaceTooltip();
+            }
         }
 
         /// <summary>
@@ -520,6 +527,26 @@ namespace QDND.Combat.Arena
                 }
 
                 Arena.NotifyHoverChanged(_hoveredVisual?.CombatantId);
+            }
+
+            SurfaceInstance hoveredSurface = null;
+            if (_hoveredVisual == null && TryGetWorldPointFromMouse(out var worldPoint, collisionMask: 1))
+            {
+                hoveredSurface = Arena.GetTopSurfaceAtWorldPosition(worldPoint);
+            }
+
+            string newSurfaceId = hoveredSurface?.InstanceId;
+            if (!string.Equals(newSurfaceId, _hoveredSurfaceId, StringComparison.Ordinal))
+            {
+                _hoveredSurfaceId = newSurfaceId;
+                if (hoveredSurface != null)
+                {
+                    _hudController?.ShowSurfaceTooltip(hoveredSurface);
+                }
+                else
+                {
+                    _hudController?.HideSurfaceTooltip();
+                }
             }
         }
 
