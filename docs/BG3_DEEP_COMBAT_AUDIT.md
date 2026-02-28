@@ -338,3 +338,263 @@ BG3 removes the 5e rule that casting a bonus action spell restricts your action 
 | m2 | Spells | Prone triggers concentration check | MINOR | ConcentrationSystem.cs#L255 | No |
 | m3 | Spells | Magic Missile darts trigger separate concentration checks | MINOR | EffectPipeline.cs (multi-proj) | No |
 | m4 | Economy | Non-weapon action resets attack pool irreversibly | MINOR | EffectPipeline.cs#L653 | No |
+
+---
+
+## Area 8: Creature Mechanics — How Creatures Differ from Player Characters
+
+> **Research source:** bg3.wiki (Creatures, Wild Shape, Companions, Find Familiar, Beast Master, Ranger's Companion, Actions, List of Creature Types, Summon disambiguation, Conjuration spells)
+
+### 8.1 Unified Creature Model
+
+In BG3, **every living entity is a "creature"** — PCs, NPCs, companions, summons, familiars, wild shape forms, and enemies all share the same stat block framework:
+
+| Property | Shared by all creatures |
+|----------|------------------------|
+| Creature type | Yes (Humanoid, Beast, Fiend, etc.) |
+| Race | Yes |
+| Hit Points (HP) | Yes |
+| Armour Class (AC) | Yes |
+| Level | Yes |
+| Size | Yes (Tiny → Huge) |
+| Weight | Yes |
+| Movement speed | Yes (base from race, modified by form) |
+| 6 Ability scores | Yes (STR, DEX, CON, INT, WIS, CHA) |
+| Proficiency bonus | Yes (determined by level) |
+| Conditions | Yes (same condition system) |
+| Resistances/vulnerabilities | Yes (often by creature type) |
+
+**Key implication for implementation:** There is NOT a separate "Creature" class vs "PlayerCharacter" class in the game rules. The differences are in *what features, actions, and resources* a creature has access to — not in its stat block structure.
+
+---
+
+### 8.2 Creature Types (14 categories)
+
+BG3 has 14 creature types. These matter mechanically because:
+- Spells target by type (e.g., Hold Person → Humanoid only, Hold Monster → any)
+- Resistances/vulnerabilities are often type-inherited
+- Some passives key off creature type
+
+| Type | Description | Combat relevance |
+|------|-------------|-----------------|
+| **Aberration** | Alien beings (Mind Flayers, Intellect Devourers) | Often psionic abilities |
+| **Beast** | Natural animals (bears, rats, wolves) | Wild Shape forms, familiars, ranger companions |
+| **Celestial** | Upper Planes natives (Deva, Hollyphant) | Radiant damage, healing |
+| **Construct** | Artificial creatures (Steel Watcher, Bernard) | Often immune to many conditions |
+| **Dragon** | Ancient reptilians | Breath weapons, frightful presence |
+| **Elemental** | Elemental Plane natives | Elemental damage/immunity |
+| **Fey** | Nature-magical creatures (Dryads, Redcaps) | Familiars are Fey type |
+| **Fiend** | Lower Planes natives (Cambions, Imps) | Fire resistance typical |
+| **Giant** | Enormous humanoid-like (Ogres, Trolls) | High STR, large size |
+| **Humanoid** | Bipedal races (all playable races, goblins, etc.) | Hold Person target |
+| **Monstrosity** | Magical monsters (Ettercaps, Owlbears) | Varied special abilities |
+| **Ooze** | Gelatinous creatures | Often split on damage, acid |
+| **Plant** | Vegetative/fungal creatures | Nature magic interaction |
+| **Undead** | Reanimated (Zombies, Vampires, Liches) | Necrotic resistant, radiant vulnerable |
+
+---
+
+### 8.3 Action Economy — Identical Framework, Different Actions
+
+**All creatures share the same 3-resource action economy:**
+
+| Resource | Per-turn refresh | Notes |
+|----------|-----------------|-------|
+| **Action** | 1/turn (reset at turn start) | Can gain extra via Action Surge, Haste |
+| **Bonus Action** | 1/turn (reset at turn start) | |
+| **Reaction** | 1/round (reset at round start) | Used for Opportunity Attacks, Shield, Counterspell, etc. |
+
+**What differs between creatures and PCs is the action *list*:**
+
+- **Common actions** (available to ALL creatures): Dash, Disengage, Main Hand Attack, Ranged Attack, Throw, Unarmed Strike, Shove (BA), Jump (BA), Dip (BA), Off-Hand Attack (BA)
+- **Class actions** (PCs + classed NPCs): Action Surge, Extra Attack, Sneak Attack, Divine Smite, Wild Shape, etc.
+- **Racial actions** (from race): Dragonborn breath weapons, Githyanki Psionics, etc.
+- **Creature-specific actions** (NPC/monster only): Beast form attacks (Claws, Bite, Tusk Attack), breath weapons, special abilities
+- **Weapon actions** (from equipped weapons): Pommel Strike, Lacerate, etc.
+
+**Extra Attack mechanics:**
+- PCs: Extra Attack at class level 5 (1→2 attacks), Fighter Improved Extra Attack at 11 (1→3)
+- Beast Master companions: Bestial Fury at Ranger 11 grants extra attack to all companions
+- NPCs/monsters: May have Multiattack as a custom action (multiple attacks in one action)
+
+**Legendary Actions (Honour Mode bosses):**
+- Triggered like reactions but use a separate resource pool (not the Reaction resource)
+- Unaffected by conditions that prevent reactions (Dazed, Shocked, Slowed, Surprised)
+- Only available to specific boss NPCs in Honour Mode difficulty
+
+---
+
+### 8.4 Summon/Companion Categories and Control Model
+
+BG3 has several distinct summoning mechanics, each with different rules:
+
+#### A. Ranger's Companion (Beast Master)
+
+| Property | Detail |
+|----------|--------|
+| **Source** | Beast Master subclass, Level 3 |
+| **Cost** | Action + Recharges on Short Rest |
+| **Duration** | Permanent until killed or resummoned |
+| **Concentration** | **NO** — not a concentration spell |
+| **Control** | Fully player-controlled (own turn in initiative) |
+| **Stacking** | Independent of Find Familiar; can have both simultaneously |
+| **Scaling** | HP/AC/abilities upgrade at Ranger levels 3, 5, 8, 11 |
+
+**Companion stat progression:**
+
+| Companion | HP 3→5→8→11 | AC 3→5→8→11 | Key abilities |
+|-----------|-------------|-------------|---------------|
+| Bear | 19→39→69→99 | 11→15→16→18 | Goading Roar, Claws, Honeyed Paws, Ursine Reinforcements |
+| Boar | 11→27→51→85 | 11→14→15→18 | Tusk, Charge, Rage, Frenzied Strike, Kick Up Muck |
+| Dire Raven | 13→21→32→44 | 16→19→19→22 | Beak, Rend Vision, Fly, Bad Omen, On Black Wings |
+| Wolf | 11→31→61→91 | 13→16→16→21 | Bite, Lunging Bite, Pack Tactics, Infectious Bite |
+| Wolf Spider | 10→24→42→60 | 14→18→18→21 | Venomous Bite, Web, Cocoon, Bursting Brood |
+
+**Level 7 — Exceptional Training:** Companions can Dash, Disengage, and Hide as bonus actions.
+**Level 11 — Bestial Fury:** Companions get an extra attack.
+**All companions learn:** Prey's Scent, Companion's Bond, Exceptional Training, Bestial Fury (progressively).
+
+#### B. Find Familiar
+
+| Property | Detail |
+|----------|--------|
+| **Source** | Level 1 Conjuration spell |
+| **Cost** | Action + Level 1 Spell Slot (can be cast as Ritual) |
+| **Duration** | Until killed, dismissed, or caster leaves active party |
+| **Concentration** | **NO** — not a concentration spell |
+| **Control** | Fully player-controlled (own turn in initiative) |
+| **Limit** | Only one familiar at a time (all Find Familiar variants mutually exclusive) |
+| **Restrictions** | Cannot interact with environment (no buttons/levers), CAN drink elixirs/potions, attacks always use DEX |
+
+**Familiar variants:**
+- Standard: Cat, Crab, Frog, Rat, Raven, Spider
+- Pact of the Chain (Warlock): Imp, Quasit (stronger combat familiars)
+- Special: Boo (Minsc only), Cheeky Quasit (quest), Scratch (conditional)
+- Available to: Wizard L1, Ranger (Beast Tamer), Eldritch Knight L3, Arcane Trickster L3, Warlock (Pact of Chain)
+
+#### C. Conjuration Summons (Concentration-based)
+
+Many summoning spells **do** require concentration:
+
+| Spell | Level | Concentration? | Summon type |
+|-------|-------|----------------|-------------|
+| Find Familiar | 1 | No | Fey spirit (beast form) |
+| Animate Dead | 3 | No | Undead (zombie/skeleton) |
+| Conjure Minor Elemental | 4 | No* | Azer / Mephits |
+| Conjure Woodland Being | 4 | No* | Fey creature |
+| Conjure Elemental | 5 | No* | Elemental |
+| Create Undead | 6 | No | Greater undead |
+| Planar Ally | 6 | No | Celestial/Fiend |
+| Flaming Sphere | 2 | **Yes** | Fire sphere |
+| Guardian of Faith | 4 | No | Guardian spirit |
+| Spiritual Weapon | 2 | No | Floating weapon |
+
+*\*BG3 removes concentration from several summon spells that require it in 5e RAW — this is a major BG3-specific deviation.*
+
+**Focused Conjuration (Wizard Conjuration School):** Concentration can't be broken by taking damage while concentrating on a Conjuration spell. Key subclass feature for summoner builds.
+
+#### D. Attached Followers (Narrative)
+
+These are NPC-controlled allies that join temporarily during quests. They fight alongside the party but are NOT directly controlled:
+- Us (Intellect Devourer), Scratch (Dog), Boo, Glut (Myconid), Armoured Owlbear, Strange Ox
+- Powerful NPCs: Aylin (Paladin), Mizora (Cambion), The Emperor (Mind Flayer), Orpheus (Monk)
+
+---
+
+### 8.5 Wild Shape — Stat Replacement Rules
+
+Wild Shape is the most complex creature-transformation mechanic:
+
+| Property | Rule |
+|----------|------|
+| **Physical stats** | STR, DEX, CON → replaced by beast form's scores |
+| **Mental stats** | INT, WIS, CHA → retained from original character |
+| **HP** | Replaced by beast form HP (separate pool) |
+| **AC** | Replaced by beast form AC |
+| **Movement** | Racial base speed + form-specific bonus |
+| **Spellcasting** | **Cannot cast spells** while Wild Shaped |
+| **Concentration** | Spells cast BEFORE Wild Shape **persist** (keep concentrating) |
+| **Equipment** | Merges into form, no effect until revert |
+| **Proficiencies** | Retain skill and saving throw proficiencies (use new physical scores) |
+| **On 0 HP** | Revert to original form; overflow damage applies to original HP |
+| **Instant death** | If overflow damage kills original form → instant death |
+| **Actions** | Limited to beast form actions only |
+
+**Beast form HP scaling:**
+- Base HP increases every 2 Druid levels
+- Form-specific multipliers: Wolf 1.4x, Bear/Badger/Spider 1.3x, Myrmidons/Rothe/Owlbear 1.2x, Sabre-Tooth/Panther 1.15x
+
+**Attack damage scaling:**
+- Level 4: +1d4 or +1d6 bonus (form-dependent)
+- Scales up at levels 8 and 12
+- Special attack DC = 8 + proficiency + WIS modifier
+
+**Form unlock levels:**
+- Level 2: Badger, Cat, Spider, Wolf, Bear* 
+- Level 4: Dire Raven*, Deep Rothé
+- Level 6: Panther, Owlbear
+- Level 8: Sabre-Toothed Tiger*
+- Level 10: Dilophosaurus, Myrmidons*
+- (* = Circle of the Moon only)
+
+---
+
+### 8.6 AI Control vs Player Control
+
+| Entity type | Controlled by | Turn in initiative? |
+|-------------|--------------|---------------------|
+| Player characters | Player | Yes |
+| Companions | Player | Yes (when in party) |
+| Ranger's Companion | Player | Yes (own turn) |
+| Familiars | Player | Yes (own turn) |
+| Conjured summons | Player | Yes (own turn) |
+| Wild Shape form | Player (replaces PC turn) | Same initiative as PC |
+| Attached followers | AI (NPC) | Yes (own turn) |
+| Enemy creatures | AI (NPC) | Yes |
+| Neutral creatures | AI (NPC) | Yes (if in combat) |
+
+**Key distinction:** Player-controlled summons/companions get their OWN turn in initiative order. They are separate entities from the summoner. The summoner and the summon act independently on different initiative counts.
+
+---
+
+### 8.7 Creature-Only Mechanics (Not Available to Standard PCs)
+
+| Mechanic | Description | Who has it |
+|----------|-------------|-----------|
+| **Multiattack** | Custom action: multiple attacks in one action (not Extra Attack) | Boss NPCs, some monsters |
+| **Legendary Actions** | Reaction-like actions using separate resource (Honour Mode) | Boss NPCs only |
+| **Frightful Presence** | AoE fear on encounter start | Dragons, some bosses |
+| **Breath Weapons (innate)** | Recharging AoE damage (not from Dragonborn race) | Dragons, elementals |
+| **NPC-only spells** | Spells unavailable to players (NPC Conjuration list) | Specific boss NPCs |
+| **Pack Tactics** | Advantage on attack if ally within 1.5m of target | Wolves, some beasts |
+| **Web Walker** | Immune to web movement penalty | Spiders |
+| **Fly** | Permanent flight movement | Ravens, some forms |
+| **Instant death at 0 HP** | No death saves for non-party creatures | All hostile/neutral NPCs |
+| **Condition immunities** | Blanket immune to multiple conditions | Constructs, Undead, Oozes |
+
+**NPC-only conjuration spells (sampled):**
+- Summon Gilded Hellsboar (L1), Astral Rift (L3), Invigorating Flame (L4), Ethel's Insect Plague (L5), Invocation of Eternal Debt (L6), The Closed Fist of Bane (L6), Vampiric Swarm (L6)
+
+---
+
+### 8.8 Implementation Implications for QDND
+
+Based on this research, the key architectural decisions for creature mechanics are:
+
+1. **Single `Combatant` class** — Do NOT create separate PC/Creature hierarchies. Use composition: every combatant has the same stat block; features/actions are data-driven.
+
+2. **Creature type as enum/tag** — Used for spell targeting validation (Hold Person checks Humanoid), resistance defaults, and some passive feature gates.
+
+3. **Summon lifecycle management:**
+   - Track summon→summoner relationship (for auto-dismiss when caster leaves party)
+   - Some summons are concentration-linked (breaks concentration → dismiss summon)
+   - Some summons are permanent (Ranger's Companion, Animate Dead)
+   - Enforce mutual exclusion where needed (only one Find Familiar variant active)
+
+4. **Wild Shape as stat overlay** — Store original stats, overlay beast form stats. On revert, restore original stats and apply overflow damage.
+
+5. **Action list is data-driven** — Creatures don't need a different action system; they just have different action IDs in their action list. Common actions are universal.
+
+6. **NPC instant death** — Non-party creatures skip death saves entirely at 0 HP.
+
+7. **Legendary Actions are a separate resource** — Not reactions. Not blocked by reaction-preventing conditions. Only available to designated boss entities.

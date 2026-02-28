@@ -1,17 +1,28 @@
 {
-  "servers": {
-    "vision-bridge": {
-      "type": "stdio",
-      "command": "python3",
-      "args": ["${workspaceFolder}/.mcp/vision-bridge/launcher.py"],
-      "env": {
-        "PATH": "${workspaceFolder}/.mcp/vision-bridge/shims;${env:PATH}",
-        "WORKSPACE_ROOT": "${workspaceFolder}",
-        "OLLAMA_HOST": "http://localhost:11434",
-        "OLLAMA_MODEL": "qwen2.5vl:7b",
-        "VISION_MAX_EDGE": "1600",
-        "VISION_TIMEOUT_S": "120"
-      }
-    }
-  }
+	"servers": {
+		"vision-bridge": {
+			"type": "stdio",
+			"command": "python3",
+			"args": [
+				"${workspaceFolder}/.mcp/vision-bridge/launcher.py"
+			],
+			"env": {
+				"PATH": "${workspaceFolder}/.mcp/vision-bridge/shims;${env:PATH}",
+				"WORKSPACE_ROOT": "${workspaceFolder}",
+				"OLLAMA_HOST": "http://localhost:11434",
+				"OLLAMA_MODEL": "qwen2.5vl:7b",
+				"VISION_MAX_EDGE": "1600",
+				"VISION_TIMEOUT_S": "120"
+			}
+		},
+		"context7": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@upstash/context7-mcp@latest"
+			],
+			"type": "stdio"
+		}
+	},
+	"inputs": []
 }
