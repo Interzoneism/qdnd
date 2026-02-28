@@ -18,8 +18,10 @@ public partial class GroundShapeRenderer : Node3D
     private TargetingNodePool<MeshInstance3D> _boxPool;
 
     private readonly Dictionary<(float, float), ArrayMesh> _coneMeshCache = new();
+    private readonly Dictionary<(float, float), ArrayMesh> _coneOutlineCache = new();
 
     private const int CONE_SEGMENTS = 24;
+    private const int CONE_OUTLINE_SEGMENTS = 24;
     private const float DISC_HEIGHT = 0.01f;
 
     // ------------------------------------------------------------------ //
@@ -97,6 +99,7 @@ public partial class GroundShapeRenderer : Node3D
         _conePool?.Dispose();
         _boxPool?.Dispose();
         _coneMeshCache.Clear();
+        _coneOutlineCache.Clear();
     }
 
     // ------------------------------------------------------------------ //
@@ -137,13 +140,12 @@ public partial class GroundShapeRenderer : Node3D
         cone.Rotation = new Vector3(0, YawForDirection(s.Direction), 0);
         cone.MaterialOverride = TargetingMaterialCache.GetGroundFillMaterial(fillColor);
 
-        // Outline ring at the cone's max arc (optional emphasis)
-        var ring = _ringPool.Acquire();
-        float arcRadius = s.Length;
-        ConfigureRing(ring, arcRadius, TargetingStyleTokens.Strokes.THIN);
-        ring.Position = GroundPos(s.Center);
-        ring.Rotation = Vector3.Zero;
-        ring.MaterialOverride = TargetingMaterialCache.GetGroundOutlineMaterial(outlineColor);
+        // Flat 2D outline: two straight edges + outer arc (no 3D torus ring)
+        var outline = _conePool.Acquire();
+        outline.Mesh = GetOrBuildConeOutlineMesh(s.Angle / 2f, s.Length);
+        outline.Position = GroundPos(s.Center);
+        outline.Rotation = new Vector3(0, YawForDirection(s.Direction), 0);
+        outline.MaterialOverride = TargetingMaterialCache.GetGroundOutlineMaterial(outlineColor);
     }
 
     private void RenderLine(GroundShapeData s)
@@ -334,6 +336,84 @@ public partial class GroundShapeRenderer : Node3D
             st.AddVertex(v1);
             st.SetNormal(Vector3.Up);
             st.AddVertex(v2);
+        }
+
+        return st.Commit();
+    }
+
+    /// <summary>
+    /// Returns a cached cone outline mesh, building one if missing.
+    /// </summary>
+    private ArrayMesh GetOrBuildConeOutlineMesh(float halfAngleDeg, float length)
+    {
+        var key = (MathF.Round(halfAngleDeg, 2), MathF.Round(length, 2));
+        if (_coneOutlineCache.TryGetValue(key, out var cached))
+            return cached;
+
+        var mesh = BuildConeOutlineMesh(halfAngleDeg, length, CONE_OUTLINE_SEGMENTS);
+        _coneOutlineCache[key] = mesh;
+        return mesh;
+    }
+
+    /// <summary>
+    /// Builds a flat outline mesh for a cone: two straight edge strips from the
+    /// apex to the arc endpoints, plus an arc strip along the outer boundary.
+    /// All geometry lies on the XZ plane (Y=0) facing local +Z.
+    /// </summary>
+    private static ArrayMesh BuildConeOutlineMesh(float halfAngleDeg, float length, int arcSegments)
+    {
+        var st = new SurfaceTool();
+        st.Begin(Mesh.PrimitiveType.Triangles);
+
+        float halfRad = Mathf.DegToRad(halfAngleDeg);
+        float stroke = TargetingStyleTokens.Strokes.OUTLINE_RING_STROKE;
+
+        // --- Two straight edge lines from apex to arc endpoints ---
+        for (int side = -1; side <= 1; side += 2)
+        {
+            float edgeAngle = halfRad * side;
+            var dir = new Vector3(Mathf.Sin(edgeAngle), 0f, Mathf.Cos(edgeAngle));
+            // Perpendicular in XZ plane (rotated 90°)
+            var perp = new Vector3(dir.Z, 0f, -dir.X);
+            float halfStroke = stroke / 2f;
+
+            var a = Vector3.Zero + perp * halfStroke;
+            var b = Vector3.Zero - perp * halfStroke;
+            var c = dir * length + perp * halfStroke;
+            var d = dir * length - perp * halfStroke;
+
+            // Triangle 1: a, c, b
+            st.SetNormal(Vector3.Up); st.AddVertex(a);
+            st.SetNormal(Vector3.Up); st.AddVertex(c);
+            st.SetNormal(Vector3.Up); st.AddVertex(b);
+            // Triangle 2: b, c, d
+            st.SetNormal(Vector3.Up); st.AddVertex(b);
+            st.SetNormal(Vector3.Up); st.AddVertex(c);
+            st.SetNormal(Vector3.Up); st.AddVertex(d);
+        }
+
+        // --- Outer arc strip ---
+        float innerR = length - stroke / 2f;
+        float outerR = length + stroke / 2f;
+
+        for (int i = 0; i < arcSegments; i++)
+        {
+            float a0 = -halfRad + (2f * halfRad * i / arcSegments);
+            float a1 = -halfRad + (2f * halfRad * (i + 1) / arcSegments);
+
+            var inner0 = new Vector3(Mathf.Sin(a0) * innerR, 0f, Mathf.Cos(a0) * innerR);
+            var outer0 = new Vector3(Mathf.Sin(a0) * outerR, 0f, Mathf.Cos(a0) * outerR);
+            var inner1 = new Vector3(Mathf.Sin(a1) * innerR, 0f, Mathf.Cos(a1) * innerR);
+            var outer1 = new Vector3(Mathf.Sin(a1) * outerR, 0f, Mathf.Cos(a1) * outerR);
+
+            // Triangle 1
+            st.SetNormal(Vector3.Up); st.AddVertex(inner0);
+            st.SetNormal(Vector3.Up); st.AddVertex(outer0);
+            st.SetNormal(Vector3.Up); st.AddVertex(inner1);
+            // Triangle 2
+            st.SetNormal(Vector3.Up); st.AddVertex(inner1);
+            st.SetNormal(Vector3.Up); st.AddVertex(outer0);
+            st.SetNormal(Vector3.Up); st.AddVertex(outer1);
         }
 
         return st.Commit();
