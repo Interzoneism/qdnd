@@ -122,7 +122,7 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
-        public void GetDamageModifier_HigherRanged_Bonus()
+        public void GetDamageModifier_HigherRanged_NoDamageBonus()
         {
             var service = CreateService();
             var attacker = CreateCombatant("attacker", 10);
@@ -130,7 +130,19 @@ namespace QDND.Tests.Unit
 
             float modifier = service.GetDamageModifier(attacker, target, isRanged: true);
 
-            Assert.True(modifier > 1f);
+            Assert.Equal(1f, modifier);
+        }
+
+        [Fact]
+        public void GetDamageModifier_LowerRanged_NoDamagePenalty()
+        {
+            var service = CreateService();
+            var attacker = CreateCombatant("attacker", 0);
+            var target = CreateCombatant("target", 10);
+
+            float modifier = service.GetDamageModifier(attacker, target, isRanged: true);
+
+            Assert.Equal(1f, modifier);
         }
 
         [Fact]

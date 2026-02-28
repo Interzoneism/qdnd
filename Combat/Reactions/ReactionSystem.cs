@@ -28,6 +28,11 @@ namespace QDND.Combat.Reactions
         public bool StrictGrantValidation { get; set; }
 
         /// <summary>
+        /// Optional hook for additional runtime legality checks before creating prompts.
+        /// </summary>
+        public Func<Combatant, ReactionDefinition, ReactionTriggerContext, bool> AdditionalEligibilityCheck { get; set; }
+
+        /// <summary>
         /// Fired when a reaction prompt is created (for UI).
         /// </summary>
         public event Action<ReactionPrompt> OnPromptCreated;
@@ -181,8 +186,11 @@ namespace QDND.Combat.Reactions
                 hitObj is bool hitVal && !hitVal)
                 return false;
 
-            if (!HasRequiredResources(reactor, reaction))
+            if (AdditionalEligibilityCheck != null &&
+                !AdditionalEligibilityCheck(reactor, reaction, context))
+            {
                 return false;
+            }
 
             return true;
         }

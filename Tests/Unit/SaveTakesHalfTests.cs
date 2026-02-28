@@ -186,6 +186,50 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
+        public void SaveTakesHalf_AutoFailDexterityTag_ForcesFullDamage()
+        {
+            var (pipeline, _, statuses) = CreatePipeline(seed: 123);
+            var caster = CreateCombatant("caster", 100);
+            var target = CreateCombatant("target", 100, dexScore: 30);
+
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "auto_fail_dex",
+                Name = "Auto Fail Dex",
+                Tags = new HashSet<string> { "auto_fail_save_dexterity" }
+            });
+            statuses.ApplyStatus("auto_fail_dex", caster.Id, target.Id);
+
+            var action = new ActionDefinition
+            {
+                Id = "dex_save_test",
+                Name = "Dex Save Test",
+                TargetType = TargetType.SingleUnit,
+                SaveType = "dexterity",
+                SaveDC = 1,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition
+                    {
+                        Type = "damage",
+                        Value = 40,
+                        DamageType = "fire",
+                        Condition = "on_save_fail",
+                        SaveTakesHalf = true
+                    }
+                }
+            };
+            pipeline.RegisterAction(action);
+
+            int healthBefore = target.Resources.CurrentHP;
+
+            var result = pipeline.ExecuteAction("dex_save_test", caster, new List<Combatant> { target });
+
+            Assert.True(result.Success);
+            Assert.Equal(40, healthBefore - target.Resources.CurrentHP);
+        }
+
+        [Fact]
         public void SaveTakesHalf_MultiTarget_MixedSaves_CorrectDamageDistribution()
         {
             // Arrange

@@ -296,6 +296,61 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
+        public void ConvertToStatusDefinition_ActionResourceBlock_MapsToBlockedActions()
+        {
+            var bg3Status = new BG3StatusData
+            {
+                StatusId = "RESOURCE_BLOCK",
+                StatusType = BG3StatusType.BOOST,
+                DisplayName = "Resource Block",
+                Boosts = "ActionResourceBlock(ActionPoint);ActionResourceBlock(BonusActionPoint);ActionResourceBlock(ReactionActionPoint);ActionResourceBlock(Movement)"
+            };
+
+            var statusDef = DataBG3StatusIntegration.ConvertToStatusDefinition(bg3Status);
+
+            Assert.NotNull(statusDef);
+            Assert.Contains("action", statusDef.BlockedActions);
+            Assert.Contains("bonus_action", statusDef.BlockedActions);
+            Assert.Contains("reaction", statusDef.BlockedActions);
+            Assert.Contains("movement", statusDef.BlockedActions);
+        }
+
+        [Fact]
+        public void ConvertToStatusDefinition_IgnoreLeaveAttackRange_AddsTag()
+        {
+            var bg3Status = new BG3StatusData
+            {
+                StatusId = "NO_OA",
+                StatusType = BG3StatusType.BOOST,
+                DisplayName = "No OA",
+                Boosts = "IgnoreLeaveAttackRange()"
+            };
+
+            var statusDef = DataBG3StatusIntegration.ConvertToStatusDefinition(bg3Status);
+
+            Assert.NotNull(statusDef);
+            Assert.Contains("ignore_leave_attack_range", statusDef.Tags);
+        }
+
+        [Fact]
+        public void ConvertToStatusDefinition_AbilityFailedSavingThrow_AddsAutoFailTags()
+        {
+            var bg3Status = new BG3StatusData
+            {
+                StatusId = "AUTO_FAIL_SAVES",
+                StatusType = BG3StatusType.BOOST,
+                DisplayName = "Auto Fail Saves",
+                Boosts = "AbilityFailedSavingThrow(Strength);AbilityFailedSavingThrow(Dexterity)"
+            };
+
+            var statusDef = DataBG3StatusIntegration.ConvertToStatusDefinition(bg3Status);
+
+            Assert.NotNull(statusDef);
+            Assert.Contains("auto_fail_save_strength", statusDef.Tags);
+            Assert.Contains("auto_fail_save_dexterity", statusDef.Tags);
+        }
+
+        [Fact]
         public void StatusManager_OnApplyOnTickOnRemove_FunctorsExecuteAcrossLifecycle()
         {
             // Arrange

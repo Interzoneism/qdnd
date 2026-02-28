@@ -103,6 +103,8 @@ namespace QDND.Combat.UI
         private CombatStateMachine _stateMachine;
         private TurnQueueService _turnQueue;
         private CombatLog _combatLog;
+        private StatusManager _statusManager;
+        private bool _statusManagerSubscribed;
         private bool _turnTrackerSubscribed;
         private bool _resourceModelSubscribed;
         private bool _actionModelSubscribed;
@@ -203,7 +205,8 @@ namespace QDND.Combat.UI
             // Party Panel — left side (BG3-style compact portraits)
             _partyPanel = new PartyPanel();
             AddChild(_partyPanel);
-            _partyPanel.Size = new Vector2(90, 460);
+            float partyPanelWidth = Mathf.Max(170f, _partyPanel.CustomMinimumSize.X + 12f);
+            _partyPanel.Size = new Vector2(partyPanelWidth, 460);
             float partyPanelHeight = _partyPanel.Size.Y;
             _partyPanel.SetScreenPosition(new Vector2(15, (screenSize.Y - partyPanelHeight) / 2));
             _partyPanel.OnMemberClicked += OnPartyMemberClicked;
@@ -632,6 +635,23 @@ void fragment() {
                 }
             }
 
+            if (_statusManager == null)
+            {
+                _statusManager = Arena.Context.GetService<StatusManager>();
+                if (_statusManager != null)
+                {
+                    boundNew = true;
+                }
+            }
+
+            if (_statusManager != null && !_statusManagerSubscribed)
+            {
+                _statusManager.OnStatusApplied += OnStatusApplied;
+                _statusManager.OnStatusRemoved += OnStatusRemoved;
+                _statusManagerSubscribed = true;
+                boundNew = true;
+            }
+
             if (_combatLog != null && !_combatLogBackfilled)
             {
                 foreach (var entry in _combatLog.GetRecentEntries(100))
@@ -697,6 +717,11 @@ void fragment() {
             if (_stateMachine != null) _stateMachine.OnStateChanged -= OnStateChanged;
             if (_turnQueue != null) _turnQueue.OnTurnChanged -= OnTurnChanged;
             if (_combatLog != null) _combatLog.OnEntryAdded -= OnLogEntryAdded;
+            if (_statusManager != null && _statusManagerSubscribed)
+            {
+                _statusManager.OnStatusApplied -= OnStatusApplied;
+                _statusManager.OnStatusRemoved -= OnStatusRemoved;
+            }
 
             if (Arena != null)
             {
@@ -725,6 +750,7 @@ void fragment() {
             _turnTrackerSubscribed = false;
             _resourceModelSubscribed = false;
             _actionModelSubscribed = false;
+            _statusManagerSubscribed = false;
             _combatLogBackfilled = false;
             _syncedCombatLogEntries = 0;
 
@@ -856,13 +882,72 @@ void fragment() {
                     Name = c.Name,
                     HpCurrent = c.Resources.CurrentHP,
                     HpMax = c.Resources.MaxHP,
-                    Conditions = new List<string>(),
+                    Conditions = GetPortraitConditionIndicators(c),
                     IsSelected = c.Id == Arena.SelectedCombatantId,
                     PortraitPath = c.PortraitPath,
                 })
                 .ToList();
 
             _partyPanel.SetPartyMembers(partyMembers);
+        }
+
+        private List<string> GetPortraitConditionIndicators(Combatant combatant)
+        {
+            if (combatant == null || Arena?.Context == null)
+                return new List<string>();
+
+            var manager = _statusManager ?? Arena.Context.GetService<StatusManager>();
+            if (manager == null)
+                return new List<string>();
+
+            return manager.GetStatuses(combatant.Id)
+                .Where(s => s?.Definition != null && StatusPresentationPolicy.ShowInPortraitIndicators(s.Definition))
+                .Select(s => !string.IsNullOrWhiteSpace(s.Definition.Icon)
+                    ? s.Definition.Icon
+                    : StatusPresentationPolicy.GetDisplayName(s.Definition))
+                .Where(token => !string.IsNullOrWhiteSpace(token))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
+        private void OnStatusApplied(StatusInstance instance)
+        {
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree())
+                return;
+
+            QueuePartyMemberConditionRefresh(instance?.TargetId);
+        }
+
+        private void OnStatusRemoved(StatusInstance instance)
+        {
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree())
+                return;
+
+            QueuePartyMemberConditionRefresh(instance?.TargetId);
+        }
+
+        private void QueuePartyMemberConditionRefresh(string combatantId)
+        {
+            if (string.IsNullOrWhiteSpace(combatantId))
+                return;
+
+            CallDeferred(nameof(RefreshPartyMemberConditionIndicators), combatantId);
+        }
+
+        private void RefreshPartyMemberConditionIndicators(string combatantId)
+        {
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree())
+                return;
+
+            var combatant = Arena?.Context?.GetCombatant(combatantId);
+            if (combatant == null || combatant.Faction != Faction.Player)
+                return;
+
+            _partyPanel?.UpdateMember(
+                combatantId,
+                combatant.Resources.CurrentHP,
+                combatant.Resources.MaxHP,
+                GetPortraitConditionIndicators(combatant));
         }
 
         private void UpdatePortraitHp()
@@ -1145,7 +1230,7 @@ void fragment() {
                 _partyPanel?.UpdateMember(combatantId,
                     combatant.Resources.CurrentHP,
                     combatant.Resources.MaxHP,
-                    new List<string>());
+                    GetPortraitConditionIndicators(combatant));
             }
         }
 

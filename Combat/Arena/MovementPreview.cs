@@ -6,7 +6,7 @@ namespace QDND.Combat.Arena
     /// <summary>
     /// Visual representation of movement path preview.
     /// Shows path from current position to target, with cost and warnings.
-    /// Uses dashed lines, waypoint dots, and visual indicators for better clarity.
+    /// Uses a solid glowing line and visual indicators for better clarity.
     /// </summary>
     public partial class MovementPreview : Node3D
     {
@@ -48,7 +48,8 @@ namespace QDND.Combat.Arena
                 ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
                 VertexColorUseAsAlbedo = true,
                 Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
-                NoDepthTest = true
+                NoDepthTest = true,
+                CullMode = BaseMaterial3D.CullModeEnum.Disabled
             };
             _lineInstance.MaterialOverride = lineMaterial;
 
@@ -168,19 +169,19 @@ namespace QDND.Combat.Arena
             {
                 lineMat.EmissionEnabled = true;
                 lineMat.Emission = new Color(lineColor.R, lineColor.G, lineColor.B, 1.0f);
-                lineMat.EmissionEnergyMultiplier = isValid ? 0.8f : 0.5f;
+                lineMat.EmissionEnergyMultiplier = isValid ? 1.1f : 0.8f;
             }
 
-            // Draw thicker dashed polyline through all waypoints
+            var camera = GetViewport().GetCamera3D();
+
+            // Draw a solid camera-facing glowing polyline through all waypoints.
             _lineMesh.ClearSurfaces();
-            _lineMesh.SurfaceBegin(Mesh.PrimitiveType.Lines);
-            DrawDashedPolyline(waypoints, lineColor);
-            DrawWaypointDots(waypoints, lineColor);
+            _lineMesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);
+            DrawSolidGlowingPolyline(waypoints, lineColor, camera);
             _lineMesh.SurfaceEnd();
 
             // Position cost label to the right of the cursor in world space
             Vector3 targetPos = waypoints[waypoints.Count - 1];
-            var camera = GetViewport().GetCamera3D();
             Vector3 labelOffset = camera != null
                 ? camera.GlobalTransform.Basis.X * 1.0f + Vector3.Up * 0.3f
                 : new Vector3(1.0f, 0.3f, 0f);
@@ -271,59 +272,64 @@ namespace QDND.Combat.Arena
             _warningTween = null;
         }
 
-        private void DrawDashedPolyline(System.Collections.Generic.List<Vector3> waypoints, Color color)
+        private void DrawSolidGlowingPolyline(System.Collections.Generic.List<Vector3> waypoints, Color color, Camera3D camera)
         {
-            // Draw dashed line segments between waypoints
+            const float yOffset = 0.14f;
+            const float glowWidth = 0.33f;
+            const float coreWidth = 0.14f;
+
             for (int i = 0; i < waypoints.Count - 1; i++)
             {
-                Vector3 from = waypoints[i];
-                Vector3 to = waypoints[i + 1];
+                Vector3 from = waypoints[i] + new Vector3(0f, yOffset, 0f);
+                Vector3 to = waypoints[i + 1] + new Vector3(0f, yOffset, 0f);
 
-                // Add vertical offset to prevent z-fighting (0.15f from 0.1f)
-                from.Y += 0.15f;
-                to.Y += 0.15f;
-
-                // Create dashed effect by drawing segments with gaps
-                Vector3 dir = (to - from).Normalized();
-                float distance = from.DistanceTo(to);
-                float dashLength = 0.3f;
-                float gapLength = 0.15f;
-                float traveled = 0f;
-                
-                while (traveled < distance)
-                {
-                    Vector3 segmentStart = from + dir * traveled;
-                    float remainingDist = distance - traveled;
-                    float segmentLength = Mathf.Min(dashLength, remainingDist);
-                    Vector3 segmentEnd = segmentStart + dir * segmentLength;
-
-                    AddPathStrokeSegment(segmentStart, segmentEnd, dir, color);
-                    
-                    traveled += dashLength + gapLength;
-                }
+                DrawRibbonSegment(
+                    from,
+                    to,
+                    glowWidth,
+                    new Color(color.R, color.G, color.B, color.A * 0.35f),
+                    camera);
+                DrawRibbonSegment(from, to, coreWidth, color, camera);
             }
         }
-        
-        private void DrawWaypointDots(System.Collections.Generic.List<Vector3> waypoints, Color color)
+
+        private void DrawRibbonSegment(Vector3 from, Vector3 to, float width, Color color, Camera3D camera)
         {
-            // Draw small sphere instances at each waypoint
-            foreach (var waypoint in waypoints)
-            {
-                // Create a small dot - we'll use line primitives to draw a cross
-                Vector3 pos = waypoint + new Vector3(0, 0.15f, 0);
-                float dotSize = WaypointDotSize;
-                
-                // Draw a small cross at this waypoint
-                _lineMesh.SurfaceSetColor(color);
-                _lineMesh.SurfaceAddVertex(pos + new Vector3(-dotSize, 0, 0));
-                _lineMesh.SurfaceSetColor(color);
-                _lineMesh.SurfaceAddVertex(pos + new Vector3(dotSize, 0, 0));
-                
-                _lineMesh.SurfaceSetColor(color);
-                _lineMesh.SurfaceAddVertex(pos + new Vector3(0, 0, -dotSize));
-                _lineMesh.SurfaceSetColor(color);
-                _lineMesh.SurfaceAddVertex(pos + new Vector3(0, 0, dotSize));
-            }
+            Vector3 segment = to - from;
+            if (segment.LengthSquared() < 0.0001f)
+                return;
+
+            Vector3 direction = segment.Normalized();
+            Vector3 midpoint = (from + to) * 0.5f;
+            Vector3 toCamera = camera != null
+                ? (camera.GlobalPosition - midpoint).Normalized()
+                : Vector3.Up;
+
+            Vector3 side = direction.Cross(toCamera);
+            if (side.LengthSquared() < 0.0001f)
+                side = direction.Cross(Vector3.Up);
+            if (side.LengthSquared() < 0.0001f)
+                side = Vector3.Right;
+
+            side = side.Normalized() * (width * 0.5f);
+
+            Vector3 a = from - side;
+            Vector3 b = from + side;
+            Vector3 c = to + side;
+            Vector3 d = to - side;
+
+            AddTriangle(a, b, c, color);
+            AddTriangle(a, c, d, color);
+        }
+
+        private void AddTriangle(Vector3 a, Vector3 b, Vector3 c, Color color)
+        {
+            _lineMesh.SurfaceSetColor(color);
+            _lineMesh.SurfaceAddVertex(a);
+            _lineMesh.SurfaceSetColor(color);
+            _lineMesh.SurfaceAddVertex(b);
+            _lineMesh.SurfaceSetColor(color);
+            _lineMesh.SurfaceAddVertex(c);
         }
 
         private void AddPathStrokeSegment(Vector3 start, Vector3 end, Vector3 direction, Color color)

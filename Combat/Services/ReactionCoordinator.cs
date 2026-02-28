@@ -209,7 +209,9 @@ namespace QDND.Combat.Services
             var reactionOptions = new ActionExecutionOptions
             {
                 SkipRangeValidation = true,
-                SkipCostValidation = true,
+                SkipCostValidation = false,
+                IgnoreReactionBudgetCheck = true,
+                SkipReactionBudgetConsumption = true,
                 TriggerContext = triggerContext
             };
 

@@ -396,5 +396,33 @@ namespace QDND.Tests.Unit
             Assert.False(budget.HasBonusAction);
             Assert.Equal(0, budget.BonusActionCharges);
         }
+
+        [Fact]
+        public void RefreshAttacksFromAvailableActions_WithActionCharges_RestoresMaxAttacks()
+        {
+            var budget = new ActionBudget();
+            budget.MaxAttacks = 2;
+            budget.ResetForTurn();
+
+            budget.ResetAttacks();
+            Assert.Equal(0, budget.AttacksRemaining);
+
+            budget.RefreshAttacksFromAvailableActions();
+
+            Assert.Equal(2, budget.AttacksRemaining);
+        }
+
+        [Fact]
+        public void RefreshAttacksFromAvailableActions_NoActionCharges_LeavesZeroAttacks()
+        {
+            var budget = new ActionBudget();
+            budget.MaxAttacks = 2;
+            budget.ResetForTurn();
+            budget.ConsumeAction();
+
+            budget.RefreshAttacksFromAvailableActions();
+
+            Assert.Equal(0, budget.AttacksRemaining);
+        }
     }
 }

@@ -355,12 +355,17 @@ else
     EXIT_CODE="$LAST_RUN_EXIT"
 fi
 
-if [[ -n "${LAST_RUN_LOG:-}" ]]; then
+if [[ -n "${LAST_RUN_LOG:-}" && -f "${LAST_RUN_LOG}" ]]; then
     if grep -Fq "Cannot instantiate C# script because the associated class could not be found" "$LAST_RUN_LOG"; then
         log_error "Detected C# script class load failure. Build C# solutions and verify GODOT_BIN points to a .NET-enabled Godot binary."
         EXIT_CODE=1
     fi
-    rm -f "$LAST_RUN_LOG"
+
+    # Treat watchdog fatal markers as hard failure even if Godot exits 0.
+    if grep -Eq "FATAL_ERROR:|WATCHDOG FATAL|\[AutoBattleWatchdog\] FATAL:" "$LAST_RUN_LOG"; then
+        log_error "Detected watchdog fatal output in auto-battle run"
+        EXIT_CODE=1
+    fi
 fi
 
 echo -e "${CYAN}═══════════════════════════════════════════════════${NC}"
@@ -451,6 +456,10 @@ if [[ $EXIT_CODE -eq 0 ]]; then
     fi
 else
     log_error "Auto-battle FAILED (exit code: $EXIT_CODE)"
+fi
+
+if [[ -n "${LAST_RUN_LOG:-}" && -f "${LAST_RUN_LOG}" ]]; then
+    rm -f "$LAST_RUN_LOG"
 fi
 
 exit $EXIT_CODE

@@ -103,16 +103,7 @@ namespace QDND.Combat.Environment
         /// </summary>
         public float GetDamageModifier(Combatant attacker, Combatant target, bool isRanged)
         {
-            if (!isRanged)
-                return 1f;
-
-            var advantage = GetHeightAdvantage(attacker, target);
-            return advantage switch
-            {
-                HeightAdvantage.Higher => 1.15f,  // +15% damage from high ground
-                HeightAdvantage.Lower => 0.9f,    // -10% damage from low ground
-                _ => 1f
-            };
+            return 1f;
         }
 
         /// <summary>

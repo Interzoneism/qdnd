@@ -376,7 +376,7 @@ namespace QDND.Combat.Services
             if (combatant.LifeState != CombatantLifeState.Downed)
                 return;
 
-            int roll = (_getRng()?.Next(1, 21)) ?? 10;
+            int roll = RollDeathSaveTotal(combatant);
 
             _log($"{combatant.Name} makes a death saving throw: {roll}");
 
@@ -452,6 +452,130 @@ namespace QDND.Combat.Services
                     });
                 }
             }
+        }
+
+        private int RollDeathSaveTotal(Combatant combatant)
+        {
+            if (combatant == null)
+                return 10;
+
+            bool hasDeathAdvantage = BoostEvaluator.HasAdvantage(combatant, RollType.DeathSave);
+            bool hasDeathDisadvantage = BoostEvaluator.HasDisadvantage(combatant, RollType.DeathSave);
+            bool hasSaveAdvantage = BoostEvaluator.HasAdvantage(combatant, RollType.SavingThrow);
+            bool hasSaveDisadvantage = BoostEvaluator.HasDisadvantage(combatant, RollType.SavingThrow);
+
+            bool hasAdvantage = hasDeathAdvantage || hasSaveAdvantage;
+            bool hasDisadvantage = hasDeathDisadvantage || hasSaveDisadvantage;
+
+            int naturalRoll = RollDeathSaveNatural(hasAdvantage, hasDisadvantage);
+
+            // Preserve natural 1/20 semantics before any modifiers.
+            if (naturalRoll == 1 || naturalRoll == 20)
+                return naturalRoll;
+
+            int minimumRoll = Math.Max(
+                BoostEvaluator.GetMinimumRollResult(combatant, RollType.DeathSave),
+                BoostEvaluator.GetMinimumRollResult(combatant, RollType.SavingThrow));
+
+            int total = Math.Max(naturalRoll, minimumRoll);
+
+            var bonusDice = BoostEvaluator.GetRollBonusDice(combatant, RollType.DeathSave);
+            bonusDice.AddRange(BoostEvaluator.GetRollBonusDice(combatant, RollType.SavingThrow));
+            foreach (var formula in bonusDice)
+            {
+                total += RollDiceFormula(formula);
+            }
+
+            return total;
+        }
+
+        private int RollDeathSaveNatural(bool hasAdvantage, bool hasDisadvantage)
+        {
+            if (_rulesEngine?.Dice != null)
+            {
+                if (hasAdvantage && !hasDisadvantage)
+                    return _rulesEngine.Dice.RollWithAdvantage().Result;
+                if (hasDisadvantage && !hasAdvantage)
+                    return _rulesEngine.Dice.RollWithDisadvantage().Result;
+                return _rulesEngine.Dice.RollD20();
+            }
+
+            var rng = _getRng();
+            if (rng == null)
+                return 10;
+
+            int r1 = rng.Next(1, 21);
+            if (hasAdvantage && !hasDisadvantage)
+            {
+                int r2 = rng.Next(1, 21);
+                return Math.Max(r1, r2);
+            }
+
+            if (hasDisadvantage && !hasAdvantage)
+            {
+                int r2 = rng.Next(1, 21);
+                return Math.Min(r1, r2);
+            }
+
+            return r1;
+        }
+
+        private int RollDiceFormula(string formula)
+        {
+            var (count, sides, bonus) = ParseDice(formula);
+            if (count <= 0 || sides <= 0)
+                return bonus;
+
+            int total = bonus;
+            if (_rulesEngine?.Dice != null)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    total += _rulesEngine.Dice.Roll(1, sides);
+                }
+                return total;
+            }
+
+            var rng = _getRng();
+            if (rng == null)
+                return bonus;
+
+            for (int i = 0; i < count; i++)
+            {
+                total += rng.Next(1, sides + 1);
+            }
+
+            return total;
+        }
+
+        private static (int Count, int Sides, int Bonus) ParseDice(string formula)
+        {
+            if (string.IsNullOrWhiteSpace(formula))
+                return (0, 0, 0);
+
+            string normalized = formula.ToLowerInvariant().Replace(" ", string.Empty);
+            int bonus = 0;
+            int plusIdx = normalized.IndexOf('+');
+            int minusIdx = normalized.IndexOf('-');
+            int bonusIdx = plusIdx > 0 ? plusIdx : (minusIdx > 0 ? minusIdx : -1);
+            if (bonusIdx > 0 && int.TryParse(normalized[bonusIdx..], out bonus))
+            {
+                normalized = normalized[..bonusIdx];
+            }
+
+            int dIdx = normalized.IndexOf('d');
+            if (dIdx < 0)
+            {
+                return int.TryParse(normalized, out int flat)
+                    ? (0, 0, flat + bonus)
+                    : (0, 0, bonus);
+            }
+
+            string countStr = dIdx == 0 ? "1" : normalized[..dIdx];
+            string sidesStr = normalized[(dIdx + 1)..];
+            int.TryParse(countStr, out int count);
+            int.TryParse(sidesStr, out int sides);
+            return (count, sides, bonus);
         }
 
         public void EndCurrentTurn()
