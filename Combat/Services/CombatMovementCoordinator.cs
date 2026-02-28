@@ -427,10 +427,16 @@ namespace QDND.Combat.Services
                 }
                 else
                 {
+                    // Show confirmed destination circle and keep path visible during animation
+                    _movementPreview?.ShowConfirmedDestination(targetWorldPos);
+                    _movementPreview?.FreezeAsConfirmed();
+                    _rangeIndicator?.Hide();
+
                     // Animated mode: follow computed path waypoints
                     visual.AnimateMoveAlongPath(worldPath, null, () =>
                     {
                         _log($"Movement animation completed for {actor.Name}");
+                        ClearMovementPreview();
                         _resumeDecisionStateIfExecuting("Movement animation completed", thisActionId);
                     });
 
@@ -452,8 +458,6 @@ namespace QDND.Combat.Services
                     }
                     _refreshActionBarUsability(actor.Id);
 
-                    ClearMovementPreview();
-
                     // Safety fallback timer for movement (longer for animation)
                     int moveActionId = (int)thisActionId;
                     _createTimer(10.0).Timeout += () =>
@@ -461,6 +465,7 @@ namespace QDND.Combat.Services
                         if (_stateMachine.CurrentState == CombatState.ActionExecution)
                         {
                             _log($"WARNING: Movement animation timeout for {actor.Name}");
+                            ClearMovementPreview();
                             _resumeDecisionStateIfExecuting("Movement animation timeout", moveActionId);
                         }
                     };

@@ -16,6 +16,7 @@ namespace QDND.Combat.Arena
         private MeshInstance3D _warningMesh;
         private Label3D _warningText;
         private MeshInstance3D _targetMarker;
+        private Tween _warningTween;
 
         public new bool IsVisible { get; private set; }
         public float CurrentCost { get; private set; }
@@ -43,7 +44,8 @@ namespace QDND.Combat.Arena
             {
                 ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
                 VertexColorUseAsAlbedo = true,
-                Transparency = BaseMaterial3D.TransparencyEnum.Alpha
+                Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
+                NoDepthTest = true
             };
             _lineInstance.MaterialOverride = lineMaterial;
 
@@ -102,11 +104,11 @@ namespace QDND.Combat.Arena
             };
             AddChild(_warningText);
             
-            // Target destination marker
+            // Target destination marker (shown only on confirmed move, not during hover)
             var targetRingMesh = new TorusMesh
             {
-                InnerRadius = 0.35f,
-                OuterRadius = 0.45f
+                InnerRadius = 0.75f,
+                OuterRadius = 0.85f
             };
             _targetMarker = new MeshInstance3D
             {
@@ -117,12 +119,13 @@ namespace QDND.Combat.Arena
             };
             var targetMaterial = new StandardMaterial3D
             {
-                AlbedoColor = new Color(0.318f, 0.812f, 0.4f, 0.8f), // Green #51CF66
+                AlbedoColor = new Color(0.867f, 0.82f, 0.851f, 0.8f), // Light grey #ddd1d9
                 ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
                 Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
                 EmissionEnabled = true,
-                Emission = new Color(0.318f, 0.812f, 0.4f),
-                EmissionEnergyMultiplier = 1.5f
+                Emission = new Color(0.867f, 0.82f, 0.851f),
+                EmissionEnergyMultiplier = 1.5f,
+                NoDepthTest = true
             };
             _targetMarker.MaterialOverride = targetMaterial;
             AddChild(_targetMarker);
@@ -153,8 +156,17 @@ namespace QDND.Combat.Arena
             // Determine if path is valid (cost <= budget)
             bool isValid = cost <= budget;
             Color lineColor = isValid 
-                ? new Color(0.318f, 0.812f, 0.4f, 0.7f)  // #51CF66 green at 70% opacity
-                : new Color(1.0f, 0.267f, 0.267f, 0.7f); // #FF4444 red at 70% opacity
+                ? new Color(0.867f, 0.82f, 0.851f, 0.85f)  // Light grey #ddd1d9
+                : new Color(1.0f, 0.5f, 0.5f, 0.85f); // Light red
+
+            // Update line material emission for glow effect
+            var lineMat = _lineInstance.MaterialOverride as StandardMaterial3D;
+            if (lineMat != null)
+            {
+                lineMat.EmissionEnabled = true;
+                lineMat.Emission = new Color(lineColor.R, lineColor.G, lineColor.B, 1.0f);
+                lineMat.EmissionEnergyMultiplier = isValid ? 0.8f : 0.5f;
+            }
 
             // Draw thicker dashed polyline through all waypoints
             _lineMesh.ClearSurfaces();
@@ -163,25 +175,19 @@ namespace QDND.Combat.Arena
             DrawWaypointDots(waypoints, lineColor);
             _lineMesh.SurfaceEnd();
 
-            // Position and update cost label at endpoint
+            // Position cost label to the right of the cursor in world space
             Vector3 targetPos = waypoints[waypoints.Count - 1];
-            _costLabel.Position = targetPos + new Vector3(0, 2.0f, 0); // Higher above target
-            _costLabel.Text = $"{cost:F0}ft";
-            _costLabel.Modulate = isValid ? Colors.LightGreen : Colors.Red;
+            var camera = GetViewport().GetCamera3D();
+            Vector3 labelOffset = camera != null
+                ? camera.GlobalTransform.Basis.X * 1.0f + Vector3.Up * 0.3f
+                : new Vector3(1.0f, 0.3f, 0f);
+            _costLabel.Position = targetPos + labelOffset;
+            _costLabel.Text = $"{cost:F1}m";
+            _costLabel.Modulate = isValid ? Colors.White : new Color(1.0f, 0.5f, 0.5f);
             _costLabel.Visible = true;
-            
-            // Update target destination marker
-            _targetMarker.Position = targetPos + new Vector3(0, 0.02f, 0);
-            var targetMat = _targetMarker.MaterialOverride as StandardMaterial3D;
-            if (targetMat != null)
-            {
-                Color targetColor = isValid 
-                    ? new Color(0.318f, 0.812f, 0.4f, 0.8f)  // Green
-                    : new Color(1.0f, 0.267f, 0.267f, 0.8f); // Red
-                targetMat.AlbedoColor = targetColor;
-                targetMat.Emission = targetColor;
-            }
-            _targetMarker.Visible = true;
+
+            // Target marker stays hidden during hover preview
+            _targetMarker.Visible = false;
 
             // Show/hide warning indicator with pulsing animation
             if (hasOpportunityThreat)
@@ -228,10 +234,38 @@ namespace QDND.Combat.Arena
                 _warningText.Visible = false;
             }
             
+            _warningTween?.Kill();
+            _warningTween = null;
+            
             if (_targetMarker != null)
             {
                 _targetMarker.Visible = false;
             }
+        }
+
+        /// <summary>
+        /// Show a confirmed destination marker at the given world position.
+        /// Called by the coordinator when movement is confirmed.
+        /// </summary>
+        public void ShowConfirmedDestination(Vector3 worldPos)
+        {
+            _targetMarker.Position = worldPos + new Vector3(0, 0.03f, 0);
+            _targetMarker.Visible = true;
+        }
+
+        /// <summary>
+        /// Freeze path as confirmed: hides cost label, destination circle shown separately.
+        /// </summary>
+        public void FreezeAsConfirmed()
+        {
+            if (_costLabel != null)
+                _costLabel.Visible = false;
+            if (_warningMesh != null)
+                _warningMesh.Visible = false;
+            if (_warningText != null)
+                _warningText.Visible = false;
+            _warningTween?.Kill();
+            _warningTween = null;
         }
 
         private void DrawDashedPolyline(System.Collections.Generic.List<Vector3> waypoints, Color color)
@@ -299,10 +333,11 @@ namespace QDND.Combat.Arena
             var material = _warningMesh.MaterialOverride as StandardMaterial3D;
             if (material == null) return;
             
-            var tween = CreateTween();
-            tween.SetLoops();
-            tween.TweenProperty(material, "emission_energy_multiplier", 3.5f, 0.5f);
-            tween.TweenProperty(material, "emission_energy_multiplier", 1.0f, 0.5f);
+            _warningTween?.Kill();
+            _warningTween = CreateTween();
+            _warningTween.SetLoops();
+            _warningTween.TweenProperty(material, "emission_energy_multiplier", 3.5f, 0.5f);
+            _warningTween.TweenProperty(material, "emission_energy_multiplier", 1.0f, 0.5f);
         }
     }
 }

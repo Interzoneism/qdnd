@@ -634,9 +634,16 @@ namespace QDND.Combat.Arena
                     if (DebugInput)
                         GD.Print($"[InputHandler] Executing move to {targetPos}");
                     Arena.ExecuteMovement(_movingActorId, targetPos);
+                    // Only reset input mode state; preview cleanup is handled by coordinator after animation
+                }
+                else
+                {
+                    // Mouse not over terrain — bail cleanly
+                    Arena.ClearMovementPreview();
                 }
 
-                ExitMovementMode();
+                _currentMode = TargetingMode.None;
+                _movingActorId = null;
                 GetViewport().SetInputAsHandled();
                 return;
             }
