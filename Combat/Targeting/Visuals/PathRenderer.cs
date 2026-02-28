@@ -137,7 +137,7 @@ public partial class PathRenderer : Node3D
     private void RenderSolidPath(Vector3[] points, Color color)
     {
         var material = TargetingMaterialCache.GetLineMaterial(color);
-        float width = TargetingStyleTokens.Strokes.MEDIUM;
+        float width = TargetingStyleTokens.Strokes.THICK;
 
         for (int i = 0; i < points.Length - 1; i++)
         {
@@ -210,7 +210,7 @@ public partial class PathRenderer : Node3D
     {
         var box = new BoxMesh();
         box.Size = new Vector3(
-            TargetingStyleTokens.Strokes.MEDIUM,
+            TargetingStyleTokens.Strokes.THICK,
             TargetingStyleTokens.Sizes.RING_HEIGHT,
             1f);
 

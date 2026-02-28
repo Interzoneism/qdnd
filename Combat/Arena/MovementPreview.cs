@@ -10,6 +10,9 @@ namespace QDND.Combat.Arena
     /// </summary>
     public partial class MovementPreview : Node3D
     {
+        private const float PathStrokeHalfWidth = 0.06f;
+        private const float WaypointDotSize = 0.12f;
+
         private ImmediateMesh _lineMesh;
         private MeshInstance3D _lineInstance;
         private Label3D _costLabel;
@@ -54,7 +57,7 @@ namespace QDND.Combat.Arena
             {
                 Name = "CostLabel",
                 Text = "0ft",
-                FontSize = 36,
+                FontSize = 48,
                 Billboard = BaseMaterial3D.BillboardModeEnum.Enabled,
                 NoDepthTest = true,
                 RenderPriority = 10,
@@ -293,11 +296,8 @@ namespace QDND.Combat.Arena
                     float remainingDist = distance - traveled;
                     float segmentLength = Mathf.Min(dashLength, remainingDist);
                     Vector3 segmentEnd = segmentStart + dir * segmentLength;
-                    
-                    _lineMesh.SurfaceSetColor(color);
-                    _lineMesh.SurfaceAddVertex(segmentStart);
-                    _lineMesh.SurfaceSetColor(color);
-                    _lineMesh.SurfaceAddVertex(segmentEnd);
+
+                    AddPathStrokeSegment(segmentStart, segmentEnd, dir, color);
                     
                     traveled += dashLength + gapLength;
                 }
@@ -311,7 +311,7 @@ namespace QDND.Combat.Arena
             {
                 // Create a small dot - we'll use line primitives to draw a cross
                 Vector3 pos = waypoint + new Vector3(0, 0.15f, 0);
-                float dotSize = 0.1f;
+                float dotSize = WaypointDotSize;
                 
                 // Draw a small cross at this waypoint
                 _lineMesh.SurfaceSetColor(color);
@@ -324,6 +324,23 @@ namespace QDND.Combat.Arena
                 _lineMesh.SurfaceSetColor(color);
                 _lineMesh.SurfaceAddVertex(pos + new Vector3(0, 0, dotSize));
             }
+        }
+
+        private void AddPathStrokeSegment(Vector3 start, Vector3 end, Vector3 direction, Color color)
+        {
+            var lateral = new Vector3(-direction.Z, 0f, direction.X) * PathStrokeHalfWidth;
+
+            AddLineSegment(start, end, color);
+            AddLineSegment(start + lateral, end + lateral, color);
+            AddLineSegment(start - lateral, end - lateral, color);
+        }
+
+        private void AddLineSegment(Vector3 start, Vector3 end, Color color)
+        {
+            _lineMesh.SurfaceSetColor(color);
+            _lineMesh.SurfaceAddVertex(start);
+            _lineMesh.SurfaceSetColor(color);
+            _lineMesh.SurfaceAddVertex(end);
         }
         
         private void AnimatePulsingWarning()

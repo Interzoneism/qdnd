@@ -190,6 +190,12 @@ namespace QDND.Combat.Services
                     ? $"{SourceName} loses {Data.GetValueOrDefault("contestType", "contest")} vs {TargetName}"
                     : $"{SourceName} wins {Data.GetValueOrDefault("contestType", "contest")} vs {TargetName}",
                 CombatLogEntryType.AbilityUsed => $"{SourceName} uses {Data.GetValueOrDefault("actionName", "an ability")}",
+                CombatLogEntryType.ReactionTriggered =>
+                    $"{SourceName} can react with {Data.GetValueOrDefault("reactionName", "a reaction")}",
+                CombatLogEntryType.ReactionUsed =>
+                    $"{SourceName} uses reaction {Data.GetValueOrDefault("reactionName", "Reaction")}",
+                CombatLogEntryType.ReactionDeclined =>
+                    $"{SourceName} declines reaction {Data.GetValueOrDefault("reactionName", "Reaction")}",
                 CombatLogEntryType.RoundStarted => $"Round {Round} begins",
                 CombatLogEntryType.StatusApplied => $"{TargetName} is affected by {Data.GetValueOrDefault("statusId", "status")}",
                 CombatLogEntryType.TurnStarted => $"{SourceName}'s turn begins",

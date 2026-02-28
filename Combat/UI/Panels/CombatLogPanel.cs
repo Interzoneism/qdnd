@@ -201,6 +201,9 @@ namespace QDND.Combat.UI.Panels
                 CombatLogEntryType.DamageDealt => FormatDamageDealt(entry),
                 CombatLogEntryType.HealingDone => FormatHealingDone(entry),
                 CombatLogEntryType.CombatantDowned => FormatCombatantDowned(entry),
+                CombatLogEntryType.ReactionTriggered => FormatReactionTriggered(entry),
+                CombatLogEntryType.ReactionUsed => FormatReactionUsed(entry),
+                CombatLogEntryType.ReactionDeclined => FormatReactionDeclined(entry),
                 CombatLogEntryType.StatusApplied => FormatStatusApplied(entry),
                 CombatLogEntryType.StatusRemoved => FormatStatusRemoved(entry),
                 CombatLogEntryType.CombatStarted => FormatCombatMarker(entry, "Combat started"),
@@ -369,6 +372,36 @@ namespace QDND.Combat.UI.Panels
         {
             string redHex = HudTheme.EnemyRed.ToHtml(false);
             return $"[color=#{redHex}][b]{EscapeBbCode(entry.TargetName ?? "???")} is downed![/b][/color]";
+        }
+
+        private string FormatReactionTriggered(CombatLogEntry entry)
+        {
+            string reactionName = entry.Data.TryGetValue("reactionName", out var rn) ? rn?.ToString() : "Reaction";
+            string dimHex = HudTheme.MutedBeige.ToHtml(false);
+            return $"{ColorName(entry.SourceName)} [color=#{dimHex}]can react with[/color] {ColorSpell(reactionName)}";
+        }
+
+        private string FormatReactionUsed(CombatLogEntry entry)
+        {
+            string reactionName = entry.Data.TryGetValue("reactionName", out var rn) ? rn?.ToString() : "Reaction";
+            string dimHex = HudTheme.MutedBeige.ToHtml(false);
+            if (!string.IsNullOrWhiteSpace(entry.TargetName))
+            {
+                return $"{ColorName(entry.SourceName)} [color=#{dimHex}]uses[/color] {ColorSpell(reactionName)} [color=#{dimHex}]against[/color] {ColorName(entry.TargetName, false)}";
+            }
+            return $"{ColorName(entry.SourceName)} [color=#{dimHex}]uses[/color] {ColorSpell(reactionName)}";
+        }
+
+        private string FormatReactionDeclined(CombatLogEntry entry)
+        {
+            string reactionName = entry.Data.TryGetValue("reactionName", out var rn) ? rn?.ToString() : "Reaction";
+            string reason = entry.Data.TryGetValue("reason", out var rs) ? rs?.ToString() : null;
+            string dimHex = HudTheme.TextDim.ToHtml(false);
+            if (!string.IsNullOrWhiteSpace(reason))
+            {
+                return $"[color=#{dimHex}]{EscapeBbCode(entry.SourceName ?? "Unknown")} declines {EscapeBbCode(reactionName)} ({EscapeBbCode(reason)})[/color]";
+            }
+            return $"[color=#{dimHex}]{EscapeBbCode(entry.SourceName ?? "Unknown")} declines {EscapeBbCode(reactionName)}[/color]";
         }
 
         private string FormatStatusApplied(CombatLogEntry entry)

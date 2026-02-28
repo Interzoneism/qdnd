@@ -378,6 +378,220 @@ namespace QDND.Combat.AI
         private void ScoreCandidate(MovementCandidate candidate, Combatant actor,
             List<Combatant> enemies, List<Combatant> allies, AIProfile profile)
         {
+            var bg3 = profile?.BG3Profile;
+
+            if (bg3 != null)
+            {
+                ScoreCandidateBG3(candidate, actor, enemies, allies, profile, bg3);
+            }
+            else
+            {
+                ScoreCandidateLegacy(candidate, actor, enemies, allies, profile);
+            }
+        }
+
+        /// <summary>
+        /// BG3 end-position scoring using archetype profile parameters.
+        /// </summary>
+        private void ScoreCandidateBG3(MovementCandidate candidate, Combatant actor,
+            List<Combatant> enemies, List<Combatant> allies,
+            AIProfile profile, BG3ArchetypeProfile bg3)
+        {
+            float score = 0;
+            var breakdown = candidate.ScoreBreakdown;
+            // BG3: ScoreMod — normalize multipliers so ScoreMod=100 maps to 1.0
+            float scoreMod = bg3.ScoreMod / 100f;
+
+            // --- Shared tactical info ---
+            var threatInfo = _threatMap.CalculateThreatAt(candidate.Position, enemies);
+            candidate.Threat = threatInfo.TotalThreat;
+            candidate.DistanceToNearestEnemy = threatInfo.NearestEnemyDistance;
+            candidate.InMeleeRange = threatInfo.IsInMeleeRange;
+            candidate.EnemiesInRange = threatInfo.MeleeThreats + threatInfo.RangedThreats;
+
+            // BG3: MultiplierEndposEnemiesNearby — positive = approach, negative = flee
+            float enemiesNearbyFactor = 0f;
+            int enemyNearbyCount = 0;
+            foreach (var enemy in enemies)
+            {
+                float dist = candidate.Position.DistanceTo(enemy.Position);
+                if (dist > bg3.EndposEnemiesNearbyMaxDistance) continue; // BG3: EndposEnemiesNearbyMaxDistance
+                enemyNearbyCount++;
+                // Clamp minimum distance; closer = higher factor
+                float clampedDist = Math.Max(dist, bg3.EndposEnemiesNearbyMinDistance); // BG3: EndposEnemiesNearbyMinDistance
+                float range = bg3.EndposEnemiesNearbyMaxDistance - bg3.EndposEnemiesNearbyMinDistance;
+                float factor = range > 0f ? 1f - ((clampedDist - bg3.EndposEnemiesNearbyMinDistance) / range) : 1f;
+                enemiesNearbyFactor += factor;
+            }
+            if (enemyNearbyCount > 0)
+            {
+                float enemyScore = bg3.MultiplierEndposEnemiesNearby * enemiesNearbyFactor * scoreMod;
+                breakdown["bg3_enemies_nearby"] = enemyScore;
+                score += enemyScore;
+            }
+
+            // BG3: MultiplierEndposAlliesNearby — grouping value
+            float alliesNearbyFactor = 0f;
+            int allyNearbyCount = 0;
+            foreach (var ally in allies)
+            {
+                float dist = candidate.Position.DistanceTo(ally.Position);
+                if (dist > bg3.EndposAlliesNearbyMaxDistance) continue; // BG3: EndposAlliesNearbyMaxDistance
+                allyNearbyCount++;
+                float clampedDist = Math.Max(dist, bg3.EndposAlliesNearbyMinDistance); // BG3: EndposAlliesNearbyMinDistance
+                float range = bg3.EndposAlliesNearbyMaxDistance - bg3.EndposAlliesNearbyMinDistance;
+                float factor = range > 0f ? 1f - ((clampedDist - bg3.EndposAlliesNearbyMinDistance) / range) : 1f;
+                alliesNearbyFactor += factor;
+            }
+            if (allyNearbyCount > 0)
+            {
+                float allyScore = bg3.MultiplierEndposAlliesNearby * alliesNearbyFactor * scoreMod;
+                breakdown["bg3_allies_nearby"] = allyScore;
+                score += allyScore;
+            }
+            candidate.AlliesNearby = allyNearbyCount;
+
+            // BG3: MultiplierEnemyHeightDifference / EnemyHeightDifferenceClamp — seek high ground vs enemies
+            if (_height != null && enemies.Count > 0)
+            {
+                float maxEnemyY = float.MinValue;
+                foreach (var enemy in enemies)
+                {
+                    float dist = new Vector2(candidate.Position.X - enemy.Position.X, candidate.Position.Z - enemy.Position.Z).Length();
+                    if (dist <= bg3.EnemyHeightScoreRadiusXz)
+                    {
+                        if (enemy.Position.Y > maxEnemyY) maxEnemyY = enemy.Position.Y;
+                    }
+                }
+                if (maxEnemyY > float.MinValue)
+                {
+                    float heightDiff = candidate.Position.Y - maxEnemyY;
+                    // BG3: EnemyHeightDifferenceClamp — cap height seeking benefit
+                    float clampedHeight = Math.Clamp(heightDiff, -bg3.EnemyHeightDifferenceClamp, bg3.EnemyHeightDifferenceClamp);
+                    float heightScore = clampedHeight * bg3.MultiplierEnemyHeightDifference * scoreMod;
+                    breakdown["bg3_enemy_height_diff"] = heightScore;
+                    candidate.HeightAdvantage = heightDiff;
+                    score += heightScore;
+                }
+
+                // BG3: MultiplierEndposHeightDifference — raw height advantage over actor origin
+                float endposHeightDiff = candidate.Position.Y - actor.Position.Y;
+                if (Math.Abs(endposHeightDiff) > 0.5f)
+                {
+                    float endposHeightScore = endposHeightDiff * bg3.MultiplierEndposHeightDifference * scoreMod;
+                    breakdown["bg3_endpos_height"] = endposHeightScore;
+                    score += endposHeightScore;
+                }
+
+                // Extra bonus if position reached by jump offers height advantage over enemies
+                if (candidate.RequiresJump && candidate.Position.Y - actor.Position.Y > 1f)
+                {
+                    float jumpHeightBonus = AIWeights.JumpToHeightBonus * profile.GetWeight("positioning");
+                    breakdown["jump_height_bonus"] = jumpHeightBonus;
+                    score += jumpHeightBonus;
+                }
+            }
+
+            // BG3: MultiplierEndposFlanked — flanking value
+            foreach (var ally in allies)
+            {
+                foreach (var enemy in enemies.Take(3))
+                {
+                    if (IsFlankingPosition(candidate.Position, enemy.Position, ally.Position))
+                    {
+                        candidate.CanFlank = true;
+                        float flankScore = bg3.MultiplierEndposFlanked * scoreMod;
+                        breakdown["bg3_flanking"] = flankScore;
+                        score += flankScore;
+                        break;
+                    }
+                }
+                if (candidate.CanFlank) break;
+            }
+
+            // BG3: MultiplierEndposNotInDangerousSurface — surface avoidance
+            // TODO: BG3 MULTIPLIER_ENDPOS_NOT_IN_DANGEROUS_SURFACE needs real surface detection.
+            // Approximate: melee threats at this position suggest proximity to hazards.
+            if (threatInfo.MeleeThreats > 0)
+            {
+                float surfacePenalty = bg3.MultiplierEndposNotInDangerousSurface * scoreMod;
+                breakdown["bg3_dangerous_surface"] = -surfacePenalty;
+                score -= surfacePenalty;
+            }
+
+            // BG3: MultiplierEndposNotInSmoke — smoke avoidance (ranged penalty)
+            // TODO: integrate real smoke detection; placeholder
+            // if (positionInSmoke) score -= bg3.MultiplierEndposNotInSmoke * scoreMod;
+
+            // BG3: DangerousItemNearby — avoid exploding barrels
+            // TODO: integrate real hazardous item detection
+            // if (dangerousItemNear) score -= bg3.DangerousItemNearby * scoreMod;
+
+            // BG3: AvoidClimbableLedges — penalty for floating feet/ledges
+            // TODO: integrate ledge detection surface query
+            // score -= ledgePenalty * bg3.AvoidClimbableLedges * scoreMod;
+
+            // BG3: EnableMovementAvoidAOO — opportunity attack avoidance
+            if (bg3.EnableMovementAvoidAOO > 0.5f)
+            {
+                // Apply threat penalty (each melee threat = potential AoO)
+                float selfPres = profile.GetWeight("self_preservation");
+                float aooPenalty = threatInfo.MeleeThreats * 2f * selfPres;
+                breakdown["bg3_aoo_penalty"] = -aooPenalty;
+                score -= aooPenalty;
+            }
+            // If EnableMovementAvoidAOO <= 0.5, skip AoO penalties entirely
+
+            // BG3: MaxDistanceToClosestEnemy / MultiplierNoEnemiesInMaxDistance — no enemies fallback
+            if (threatInfo.NearestEnemyDistance > bg3.MaxDistanceToClosestEnemy)
+            {
+                // No enemy within max distance — tiny score to approach
+                float closerFactor = 1f - (threatInfo.NearestEnemyDistance / (bg3.MaxDistanceToClosestEnemy * 2f));
+                closerFactor = Math.Max(0f, closerFactor);
+                float noEnemyScore = bg3.MultiplierNoEnemiesInMaxDistance * closerFactor * scoreMod;
+                breakdown["bg3_no_enemies_approach"] = noEnemyScore;
+                score += noEnemyScore;
+            }
+
+            // Jump-only position bonus (valuable positions only reachable by jumping)
+            if (candidate.RequiresJump && score > 0)
+            {
+                float jumpOnlyBonus = AIWeights.JumpOnlyPositionBonus * profile.GetWeight("positioning");
+                breakdown["jump_only_position"] = jumpOnlyBonus;
+                score += jumpOnlyBonus;
+            }
+
+            // Movement cost (prefer efficient movement)
+            float moveCost = actor.Position.DistanceTo(candidate.Position);
+            candidate.MoveCost = moveCost;
+            float efficiency = (1f - (moveCost / CombatRules.DefaultMovementBudgetMeters)) * 0.5f;
+            breakdown["efficiency"] = efficiency;
+            score += efficiency;
+
+            // Shove opportunity scoring
+            var shoveOpportunities = EvaluateShoveOpportunities(actor, candidate.Position, enemies);
+            var bestShove = shoveOpportunities.FirstOrDefault();
+            if (bestShove != null && bestShove.Score > 0)
+            {
+                candidate.HasShoveOpportunity = true;
+                candidate.ShoveTargetId = bestShove.Target.Id;
+                candidate.ShovePushDirection = bestShove.PushDirection;
+                candidate.EstimatedFallDamage = bestShove.EstimatedFallDamage;
+
+                float shoveBonus = bestShove.Score * profile.GetWeight("damage");
+                breakdown["shove_opportunity"] = shoveBonus;
+                score += shoveBonus;
+            }
+
+            candidate.Score = Math.Max(0, score);
+        }
+
+        /// <summary>
+        /// Legacy scoring using hardcoded constants and simple role-based preferences.
+        /// </summary>
+        private void ScoreCandidateLegacy(MovementCandidate candidate, Combatant actor,
+            List<Combatant> enemies, List<Combatant> allies, AIProfile profile)
+        {
             float score = 0;
             var breakdown = candidate.ScoreBreakdown;
 
@@ -417,7 +631,6 @@ namespace QDND.Combat.AI
             // Jump-only position bonus (valuable positions only reachable by jumping)
             if (candidate.RequiresJump && score > 0)
             {
-                // Bonus for positions that are valuable and require jump
                 float jumpOnlyBonus = AIWeights.JumpOnlyPositionBonus * (profile?.GetWeight("positioning") ?? 1f);
                 breakdown["jump_only_position"] = jumpOnlyBonus;
                 score += jumpOnlyBonus;
@@ -427,7 +640,6 @@ namespace QDND.Combat.AI
             if (_los != null)
             {
                 // Check if position has cover from enemies - LOS.GetCover needs Combatants so skip for now
-                // This would require creating temporary combatants at candidate positions
             }
 
             // Ally proximity (support roles want to be near allies)
@@ -467,7 +679,7 @@ namespace QDND.Combat.AI
             // Movement cost (prefer efficient movement)
             float moveCost = actor.Position.DistanceTo(candidate.Position);
             candidate.MoveCost = moveCost;
-            float efficiency = (1f - (moveCost / CombatRules.DefaultMovementBudgetMeters)) * 0.5f; // Small bonus for short moves
+            float efficiency = (1f - (moveCost / CombatRules.DefaultMovementBudgetMeters)) * 0.5f;
             breakdown["efficiency"] = efficiency;
             score += efficiency;
 
@@ -503,6 +715,171 @@ namespace QDND.Combat.AI
             }
 
             candidate.Score = Math.Max(0, score);
+        }
+
+        /// <summary>
+        /// BG3 fallback position scoring for when no good action is available and the AI just needs to move.
+        /// Uses BG3 fallback parameters to decide approach/flee/jump behavior.
+        /// </summary>
+        public MovementCandidate ScoreFallbackPosition(Combatant actor, AIProfile profile, int maxCandidates = 5)
+        {
+            var bg3 = profile?.BG3Profile;
+            if (bg3 == null) return null; // Fallback scoring only supported with BG3 profiles
+
+            var enemies = GetEnemies(actor);
+            var allies = GetAllies(actor);
+            float movementRange = actor.ActionBudget?.RemainingMovement ?? CombatRules.DefaultMovementBudgetMeters;
+
+            // BG3: ScoreMod normalization
+            float scoreMod = bg3.ScoreMod / 100f;
+
+            // Generate walk candidates
+            var candidates = GenerateCandidates(actor.Position, movementRange);
+
+            // Generate jump candidates if available
+            List<MovementCandidate> jumpCandidates = null;
+            if (_specialMovement != null)
+            {
+                jumpCandidates = GenerateJumpCandidates(actor, movementRange);
+            }
+
+            // Score walk candidates
+            foreach (var candidate in candidates)
+            {
+                float score = 0f;
+                var breakdown = candidate.ScoreBreakdown;
+
+                // BG3: MultiplierFallbackEnemiesNearby — melee=1.0 (charge), ranged=-0.50 (flee)
+                float enemyFactor = 0f;
+                foreach (var enemy in enemies)
+                {
+                    float dist = candidate.Position.DistanceTo(enemy.Position);
+                    if (dist > bg3.FallbackEnemiesNearbyMaxDistance) continue; // BG3: FallbackEnemiesNearbyMaxDistance
+                    float clampedDist = Math.Max(dist, bg3.FallbackEnemiesNearbyMinDistance); // BG3: FallbackEnemiesNearbyMinDistance
+                    float range = bg3.FallbackEnemiesNearbyMaxDistance - bg3.FallbackEnemiesNearbyMinDistance;
+                    float factor = range > 0f ? 1f - ((clampedDist - bg3.FallbackEnemiesNearbyMinDistance) / range) : 1f;
+                    enemyFactor += factor;
+                }
+                if (Math.Abs(enemyFactor) > 0.001f)
+                {
+                    float enemyScore = bg3.MultiplierFallbackEnemiesNearby * enemyFactor * scoreMod;
+                    breakdown["bg3_fallback_enemies"] = enemyScore;
+                    score += enemyScore;
+                }
+
+                // BG3: MultiplierFallbackAlliesNearby
+                float allyFactor = 0f;
+                foreach (var ally in allies)
+                {
+                    float dist = candidate.Position.DistanceTo(ally.Position);
+                    if (dist > bg3.FallbackAlliesNearbyMaxDistance) continue; // BG3: FallbackAlliesNearbyMaxDistance
+                    float clampedDist = Math.Max(dist, bg3.FallbackAlliesNearbyMinDistance); // BG3: FallbackAlliesNearbyMinDistance
+                    float range = bg3.FallbackAlliesNearbyMaxDistance - bg3.FallbackAlliesNearbyMinDistance;
+                    float factor = range > 0f ? 1f - ((clampedDist - bg3.FallbackAlliesNearbyMinDistance) / range) : 1f;
+                    allyFactor += factor;
+                }
+                if (Math.Abs(allyFactor) > 0.001f)
+                {
+                    float allyScore = bg3.MultiplierFallbackAlliesNearby * allyFactor * scoreMod;
+                    breakdown["bg3_fallback_allies"] = allyScore;
+                    score += allyScore;
+                }
+
+                // BG3: FallbackHeightDifference
+                if (_height != null)
+                {
+                    float heightDiff = candidate.Position.Y - actor.Position.Y;
+                    if (Math.Abs(heightDiff) > 0.5f)
+                    {
+                        float heightScore = heightDiff * bg3.FallbackHeightDifference * scoreMod;
+                        breakdown["bg3_fallback_height"] = heightScore;
+                        score += heightScore;
+                    }
+                }
+
+                // BG3: FallbackFutureScore — bonus for positions that enable future actions
+                // Approximate by preferring positions closer to enemies when approach, farther when flee
+                if (enemies.Count > 0 && bg3.FallbackFutureScore > 0)
+                {
+                    float nearestDist = enemies.Min(e => candidate.Position.DistanceTo(e.Position));
+                    float futureFactor = 1f - Math.Clamp(nearestDist / bg3.MaxDistanceToClosestEnemy, 0f, 1f);
+                    float futureScore = bg3.FallbackFutureScore * futureFactor * scoreMod * 0.01f;
+                    breakdown["bg3_fallback_future"] = futureScore;
+                    score += futureScore;
+                }
+
+                // BG3: FallbackAttackBlockerScore — attacking items blocking path
+                // TODO: integrate real blocker detection
+                // breakdown["bg3_fallback_blocker"] = bg3.FallbackAttackBlockerScore * scoreMod;
+
+                // Movement cost efficiency
+                float moveCost = actor.Position.DistanceTo(candidate.Position);
+                candidate.MoveCost = moveCost;
+                float efficiency = (1f - (moveCost / CombatRules.DefaultMovementBudgetMeters)) * 0.1f;
+                breakdown["efficiency"] = efficiency;
+                score += efficiency;
+
+                candidate.Score = score;
+            }
+
+            // BG3: FallbackJumpBaseScore / FallbackMultiplierVsFallbackJump — jump vs walk comparison
+            if (jumpCandidates != null && jumpCandidates.Count > 0)
+            {
+                foreach (var jc in jumpCandidates)
+                {
+                    // BG3: FallbackJumpBaseScore — any fallback jump scores at least this
+                    float jumpScore = bg3.FallbackJumpBaseScore * scoreMod * 0.01f;
+                    jc.ScoreBreakdown["bg3_fallback_jump_base"] = jumpScore;
+
+                    // Apply positional quality for jump destinations too
+                    // Enemy proximity factor
+                    float jumpEnemyFactor = 0f;
+                    foreach (var enemy in enemies)
+                    {
+                        float dist = jc.Position.DistanceTo(enemy.Position);
+                        if (dist > bg3.FallbackEnemiesNearbyMaxDistance) continue;
+                        float clampedDist = Math.Max(dist, bg3.FallbackEnemiesNearbyMinDistance);
+                        float range = bg3.FallbackEnemiesNearbyMaxDistance - bg3.FallbackEnemiesNearbyMinDistance;
+                        float factor = range > 0f ? 1f - ((clampedDist - bg3.FallbackEnemiesNearbyMinDistance) / range) : 1f;
+                        jumpEnemyFactor += factor;
+                    }
+                    if (Math.Abs(jumpEnemyFactor) > 0.001f)
+                    {
+                        float jumpEnemyScore = bg3.MultiplierFallbackEnemiesNearby * jumpEnemyFactor * scoreMod;
+                        jc.ScoreBreakdown["bg3_fallback_jump_enemies"] = jumpEnemyScore;
+                        jumpScore += jumpEnemyScore;
+                    }
+
+                    // Height bonus for jump destinations
+                    float jumpHeightGain = jc.Position.Y - actor.Position.Y;
+                    if (jumpHeightGain > 0)
+                    {
+                        float jumpHeightScore = jumpHeightGain * bg3.FallbackHeightDifference * scoreMod;
+                        jc.ScoreBreakdown["bg3_fallback_jump_height"] = jumpHeightScore;
+                        jumpScore += jumpHeightScore;
+                    }
+
+                    jc.Score = jumpScore;
+                    jc.MoveCost = actor.Position.DistanceTo(jc.Position);
+                }
+                candidates.AddRange(jumpCandidates);
+
+                // BG3: FallbackMultiplierVsFallbackJump — scale walk scores when jump is available
+                float bestJumpScore = jumpCandidates.Max(j => j.Score);
+                if (bestJumpScore > 0)
+                {
+                    foreach (var wc in candidates.Where(c => !c.RequiresJump))
+                    {
+                        wc.Score *= bg3.FallbackMultiplierVsFallbackJump;
+                        wc.ScoreBreakdown["bg3_fallback_walk_vs_jump_scale"] = bg3.FallbackMultiplierVsFallbackJump;
+                    }
+                }
+            }
+
+            return candidates
+                .OrderByDescending(c => c.Score)
+                .Take(maxCandidates)
+                .FirstOrDefault();
         }
 
         private List<MovementCandidate> GenerateCandidates(Vector3 origin, float maxRange)

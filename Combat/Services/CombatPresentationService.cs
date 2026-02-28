@@ -255,16 +255,78 @@ namespace QDND.Combat.Services
                         if (!_combatantVisuals.TryGetValue(t.Id, out var visual))
                             continue;
 
-                        if (result.AttackResult != null && !result.AttackResult.IsSuccess)
+                        var targetEffects = result.EffectResults
+                            .Where(e => e.TargetId == t.Id)
+                            .ToList();
+
+                        bool hasPerProjectileData = targetEffects.Any(e => TryGetProjectileIndex(e, out _));
+                        if (hasPerProjectileData)
+                        {
+                            var effectsByProjectile = targetEffects
+                                .Where(e => TryGetProjectileIndex(e, out _))
+                                .GroupBy(e => GetProjectileIndex(e))
+                                .OrderBy(group => group.Key);
+
+                            foreach (var projectileEffects in effectsByProjectile)
+                            {
+                                bool projectileHit = projectileEffects
+                                    .Select(effect => TryGetProjectileHit(effect, out var hit) ? (bool?)hit : null)
+                                    .FirstOrDefault(hit => hit.HasValue) ?? true;
+                                bool projectileCritical = projectileEffects
+                                    .Select(effect => TryGetProjectileCritical(effect, out var isCritical) ? (bool?)isCritical : null)
+                                    .FirstOrDefault(isCritical => isCritical.HasValue) ?? false;
+
+                                if (!projectileHit)
+                                {
+                                    visual.ShowMiss();
+                                    continue;
+                                }
+
+                                foreach (var effect in projectileEffects.Where(effect => effect.Success && effect.EffectType == "damage"))
+                                {
+                                    var dt = ParseDamageType(effect);
+                                    visual.ShowDamage((int)effect.Value, projectileCritical, dt);
+
+                                    var impactRequest = BuildVfxRequest(
+                                        correlationId,
+                                        action,
+                                        actor,
+                                        t,
+                                        new List<Combatant> { t },
+                                        options,
+                                        VfxEventPhase.Impact,
+                                        VfxTargetPattern.Point);
+                                    impactRequest.DamageType = dt;
+                                    impactRequest.IsCritical = projectileCritical;
+                                    impactRequest.Magnitude = effect.Value;
+                                    impactRequest.DidKill = !t.IsActive;
+                                    _presentationBus.Publish(impactRequest);
+
+                                    if (!t.IsActive)
+                                    {
+                                        var deathRequest = BuildVfxRequest(correlationId, action, actor, t, new List<Combatant> { t }, options, VfxEventPhase.Death, VfxTargetPattern.Point);
+                                        deathRequest.DidKill = true;
+                                        _presentationBus.Publish(deathRequest);
+                                    }
+                                }
+
+                                foreach (var effect in projectileEffects.Where(effect => effect.Success && effect.EffectType == "heal"))
+                                {
+                                    visual.ShowHealing((int)effect.Value);
+                                    var healRequest = BuildVfxRequest(correlationId, action, actor, t, new List<Combatant> { t }, options, VfxEventPhase.Heal, VfxTargetPattern.Point);
+                                    healRequest.Magnitude = effect.Value;
+                                    _presentationBus.Publish(healRequest);
+                                }
+                            }
+                        }
+                        else if (result.AttackResult != null && !result.AttackResult.IsSuccess)
                         {
                             visual.ShowMiss();
                         }
                         else
                         {
                             bool isCritical = result.AttackResult?.IsCritical ?? false;
-                            // Get effects for THIS target
-                            var targetEffects = result.EffectResults.Where(e => e.TargetId == t.Id);
-                            foreach (var effect in targetEffects)
+                            foreach (var effect in targetEffects.Where(effect => effect.Success))
                             {
                                 if (effect.EffectType == "damage")
                                 {
@@ -384,16 +446,30 @@ namespace QDND.Combat.Services
                             }
                         }
 
-                        // Only show save text for single-target effects (AoE per-target saves need SaveResultByTarget)
-                        if (result.SaveResult != null && !string.IsNullOrEmpty(action?.SaveType) && targetList.Count == 1)
+                        // Show save result for every affected target when available.
+                        if (!string.IsNullOrEmpty(action?.SaveType))
                         {
-                            int saveDC = result.SaveResult.Input?.DC ?? 0;
-                            int saveRoll = (int)result.SaveResult.FinalValue;
-                            bool saveSuccess = result.SaveResult.IsSuccess;
-                            string saveAbility = action.SaveType.Length >= 3
-                                ? action.SaveType.Substring(0, 3).ToUpperInvariant()
-                                : action.SaveType.ToUpperInvariant();
-                            visual.ShowSavingThrow(saveAbility, saveRoll, saveDC, saveSuccess);
+                            QueryResult saveResultForTarget = null;
+                            if (result.SaveResultsByTarget != null &&
+                                result.SaveResultsByTarget.TryGetValue(t.Id, out var perTargetSave))
+                            {
+                                saveResultForTarget = perTargetSave;
+                            }
+                            else if (result.SaveResult != null && targetList.Count == 1)
+                            {
+                                saveResultForTarget = result.SaveResult;
+                            }
+
+                            if (saveResultForTarget != null)
+                            {
+                                int saveDC = saveResultForTarget.Input?.DC ?? 0;
+                                int saveRoll = (int)saveResultForTarget.FinalValue;
+                                bool saveSuccess = saveResultForTarget.IsSuccess;
+                                string saveAbility = action.SaveType.Length >= 3
+                                    ? action.SaveType.Substring(0, 3).ToUpperInvariant()
+                                    : action.SaveType.ToUpperInvariant();
+                                visual.ShowSavingThrow(saveAbility, saveRoll, saveDC, saveSuccess);
+                            }
                         }
 
                         visual.UpdateFromEntity();
@@ -602,6 +678,82 @@ namespace QDND.Combat.Services
             }
 
             return DamageType.Slashing;
+        }
+
+        private static bool TryGetProjectileIndex(EffectResult effect, out int projectileIndex)
+        {
+            projectileIndex = -1;
+            if (effect?.Data == null || !effect.Data.TryGetValue("projectileIndex", out var raw))
+                return false;
+
+            if (raw is int directInt)
+            {
+                projectileIndex = directInt;
+                return true;
+            }
+
+            if (raw is long longValue && longValue >= int.MinValue && longValue <= int.MaxValue)
+            {
+                projectileIndex = (int)longValue;
+                return true;
+            }
+
+            if (int.TryParse(raw?.ToString(), out var parsedInt))
+            {
+                projectileIndex = parsedInt;
+                return true;
+            }
+
+            return false;
+        }
+
+        private static int GetProjectileIndex(EffectResult effect)
+        {
+            return TryGetProjectileIndex(effect, out var projectileIndex)
+                ? projectileIndex
+                : int.MaxValue;
+        }
+
+        private static bool TryGetProjectileHit(EffectResult effect, out bool hit)
+        {
+            hit = false;
+            if (effect?.Data == null || !effect.Data.TryGetValue("projectileAttackHit", out var raw))
+                return false;
+
+            if (raw is bool directBool)
+            {
+                hit = directBool;
+                return true;
+            }
+
+            if (bool.TryParse(raw?.ToString(), out var parsedBool))
+            {
+                hit = parsedBool;
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool TryGetProjectileCritical(EffectResult effect, out bool isCritical)
+        {
+            isCritical = false;
+            if (effect?.Data == null || !effect.Data.TryGetValue("projectileAttackCritical", out var raw))
+                return false;
+
+            if (raw is bool directBool)
+            {
+                isCritical = directBool;
+                return true;
+            }
+
+            if (bool.TryParse(raw?.ToString(), out var parsedBool))
+            {
+                isCritical = parsedBool;
+                return true;
+            }
+
+            return false;
         }
 
         private static string ResolveVariantVfxId(ActionDefinition action, string variantId)

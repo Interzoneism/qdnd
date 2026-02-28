@@ -17,10 +17,9 @@
   - scripts/ci-godot-log-check.sh — lightweight Godot startup smoke test; runs the engine headless for ~60 frames and fails if any `ERROR:`, `SCRIPT ERROR:`, or `Unhandled Exception:` lines appear in the log. Much faster than a full autobattle or headless test suite. Catches script parse errors, autoload failures, and `_Ready()` exceptions introduced by a change. Set `GODOT_BIN` if godot is not on PATH.
 - If you introduce new systems, update documentation in /docs.
 
-## Up to date code
-- Always use Context7 MCP when you need library/API documentation, code generation, setup or configuration steps without having to explicitly ask.
-- use library /supabase/supabase for API and docs.
-
+## Git / Source
+- Do not commit, the human user will do this
+- Do not push to git, the human user will do this
 
 ## Godot-specific commands
 ### Automation helpers

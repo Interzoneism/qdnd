@@ -2070,6 +2070,57 @@ namespace QDND.Combat.AI
                 }
             }
 
+            // BG3: First-action modifiers and free-action discount
+            if (profile.BG3Profile != null && action.IsValid && action.Score > 0)
+            {
+                var bg3 = profile.BG3Profile;
+
+                // BG3: MultiplierFirstActionBuff / MultiplierFirstActionInvisibility — first-action modifiers
+                bool isFirstAction = _currentPlan == null || _currentPlan.PlannedActions.Count == 0;
+                if (isFirstAction && action.ActionType == AIActionType.UseAbility && _effectPipeline != null)
+                {
+                    var firstActDef = _effectPipeline.GetAction(action.ActionId);
+                    if (firstActDef != null)
+                    {
+                        bool isBuff = firstActDef.Effects?.Any(e => e.Type == "apply_status") == true &&
+                                      (firstActDef.TargetType == TargetType.Self ||
+                                       firstActDef.TargetFilter.HasFlag(TargetFilter.Self) ||
+                                       firstActDef.TargetFilter.HasFlag(TargetFilter.Allies));
+                        bool isInvisibility = firstActDef.Effects?.Any(e =>
+                            e.StatusId?.Contains("invisible", StringComparison.OrdinalIgnoreCase) == true ||
+                            e.StatusId?.Contains("invisibility", StringComparison.OrdinalIgnoreCase) == true) ?? false;
+
+                        if (isInvisibility && Math.Abs(bg3.MultiplierFirstActionInvisibility - 1f) > 0.001f)
+                        {
+                            float invMult = bg3.MultiplierFirstActionInvisibility;
+                            float invDelta = action.Score * (invMult - 1f);
+                            action.AddScore("bg3_first_action_invisibility", invDelta);
+                        }
+                        else if (isBuff && Math.Abs(bg3.MultiplierFirstActionBuff - 1f) > 0.001f)
+                        {
+                            float buffMult = bg3.MultiplierFirstActionBuff;
+                            float buffDelta = action.Score * (buffMult - 1f);
+                            action.AddScore("bg3_first_action_buff", buffDelta);
+                        }
+                    }
+                }
+
+                // BG3: MultiplierFreeAction — slight discount for 0-AP cost actions
+                if (action.ActionType == AIActionType.UseAbility && _effectPipeline != null)
+                {
+                    var freeActDef = _effectPipeline.GetAction(action.ActionId);
+                    if (freeActDef?.Cost != null && !freeActDef.Cost.UsesAction && !freeActDef.Cost.UsesBonusAction)
+                    {
+                        float freeMult = bg3.MultiplierFreeAction;
+                        if (Math.Abs(freeMult - 1f) > 0.001f)
+                        {
+                            float freeDelta = action.Score * (freeMult - 1f);
+                            action.AddScore("bg3_free_action", freeDelta);
+                        }
+                    }
+                }
+            }
+
             // Apply random factor for variety
             if (profile.RandomFactor > 0)
             {
@@ -2817,8 +2868,29 @@ namespace QDND.Combat.AI
                     }
                     else if (currentConc != null)
                     {
-                        action.AddScore("concentration_break_cost", -AIWeights.BuffStatusValue);
+                        // BG3: ModifierConcentrationRemoveSelf — penalty for breaking own concentration
+                        var bg3 = profile.BG3Profile;
+                        if (bg3 != null)
+                        {
+                            float concPenalty = bg3.ModifierConcentrationRemoveSelf * bg3.ScoreMod / 100f;
+                            action.AddScore("concentration_break_cost", -concPenalty);
+                        }
+                        else
+                        {
+                            action.AddScore("concentration_break_cost", -AIWeights.BuffStatusValue);
+                        }
                     }
+                }
+            }
+
+            // BG3: Concentration-aware scoring (break enemy concentration bonus)
+            if (profile.BG3Profile != null && _scorer != null)
+            {
+                var concTarget = !string.IsNullOrEmpty(action.TargetId) ? GetCombatant(action.TargetId) : null;
+                float concAdj = _scorer.ScoreConcentrationAdjustment(actor, concTarget, action.ActionId, profile.BG3Profile);
+                if (Math.Abs(concAdj) > 0.001f)
+                {
+                    action.AddScore("bg3_concentration_adj", concAdj);
                 }
             }
         }

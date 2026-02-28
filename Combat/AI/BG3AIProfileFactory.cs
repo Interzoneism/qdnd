@@ -53,7 +53,12 @@ namespace QDND.Combat.AI
             var hitReasoning = Get(settings, "MODIFIER_HIT_CHANCE_STUPIDITY", 1f);
             profile.RandomFactor = Clamp(0.2f + (hitReasoning - 1f) * 0.25f, 0.02f, 0.6f);
 
-            // Keep raw BG3 values in the profile for future scorer integration.
+            // ── Phase 2: populate strongly-typed BG3 archetype profile ──
+            var bg3Profile = new BG3ArchetypeProfile();
+            bg3Profile.LoadFromSettings(settings);
+            profile.BG3Profile = bg3Profile;
+
+            // Keep raw BG3 values in the profile for backward compatibility.
             foreach (var kvp in settings)
             {
                 var rawKey = $"bg3:{kvp.Key.ToLowerInvariant()}";

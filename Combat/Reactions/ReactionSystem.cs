@@ -4,6 +4,7 @@ using System.Linq;
 using Godot;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
+using QDND.Combat.Services;
 
 namespace QDND.Combat.Reactions
 {
@@ -18,6 +19,7 @@ namespace QDND.Combat.Reactions
         private readonly IReactionAliasResolver _aliasResolver;
 
         private readonly List<ReactionPrompt> _pendingPrompts = new();
+        private const int MaxSpellSlotLevel = 9;
 
         /// <summary>
         /// If true, grants to unknown reactions throw instead of being ignored.
@@ -133,7 +135,7 @@ namespace QDND.Combat.Reactions
                     continue;
 
                 // Check if they have reaction budget
-                if (combatant.ActionBudget != null && !combatant.ActionBudget.HasReaction)
+                if (combatant.ActionBudget == null || !combatant.ActionBudget.HasReaction)
                     continue;
 
                 // Get their reactions
@@ -157,6 +159,9 @@ namespace QDND.Combat.Reactions
         /// </summary>
         public bool CanTrigger(ReactionDefinition reaction, ReactionTriggerContext context, Combatant reactor)
         {
+            if (reaction == null || context == null || reactor == null)
+                return false;
+
             // Check trigger type matches
             if (!reaction.Triggers.Contains(context.TriggerType))
                 return false;
@@ -174,6 +179,9 @@ namespace QDND.Combat.Reactions
                 context.Data != null &&
                 context.Data.TryGetValue("attackWouldHit", out var hitObj) &&
                 hitObj is bool hitVal && !hitVal)
+                return false;
+
+            if (!HasRequiredResources(reactor, reaction))
                 return false;
 
             return true;
@@ -214,10 +222,23 @@ namespace QDND.Combat.Reactions
         /// <summary>
         /// Use a reaction (consume budget, fire event).
         /// </summary>
-        public void UseReaction(Combatant reactor, ReactionDefinition reaction, ReactionTriggerContext context)
+        public bool UseReaction(Combatant reactor, ReactionDefinition reaction, ReactionTriggerContext context)
         {
+            if (reactor == null || reaction == null || context == null)
+                return false;
+
+            if (reactor.ActionBudget == null || !reactor.ActionBudget.HasReaction)
+                return false;
+
+            if (!HasRequiredResources(reactor, reaction))
+                return false;
+
             // Consume reaction budget
-            reactor.ActionBudget?.ConsumeReaction();
+            if (!reactor.ActionBudget.ConsumeReaction())
+                return false;
+
+            if (!ConsumeRequiredResources(reactor, reaction))
+                return false;
 
             _events?.Dispatch(new RuleEvent
             {
@@ -233,6 +254,7 @@ namespace QDND.Combat.Reactions
             });
 
             OnReactionUsed?.Invoke(reactor.Id, reaction, context);
+            return true;
         }
 
         /// <summary>
@@ -258,6 +280,105 @@ namespace QDND.Combat.Reactions
         {
             _combatantReactions.Clear();
             _pendingPrompts.Clear();
+        }
+
+        private static bool HasRequiredResources(Combatant reactor, ReactionDefinition reaction)
+        {
+            if (reaction == null)
+                return true;
+
+            if (!TryGetSpellSlotRequirement(reaction, out int minLevel))
+                return true;
+
+            if (reactor?.ActionResources == null)
+                return false;
+
+            return HasSpellSlotAtOrAbove(reactor.ActionResources, minLevel);
+        }
+
+        private static bool ConsumeRequiredResources(Combatant reactor, ReactionDefinition reaction)
+        {
+            if (reaction == null)
+                return true;
+
+            if (!TryGetSpellSlotRequirement(reaction, out int minLevel))
+                return true;
+
+            if (reactor?.ActionResources == null)
+                return false;
+
+            return ConsumeSpellSlotAtOrAbove(reactor.ActionResources, minLevel);
+        }
+
+        private static bool TryGetSpellSlotRequirement(ReactionDefinition reaction, out int minLevel)
+        {
+            minLevel = 0;
+            if (reaction == null)
+                return false;
+
+            bool requiresSlot = reaction.Tags?.Contains("costs_spell_slot") == true ||
+                ContainsInvariant(reaction.Id, "counterspell") ||
+                ContainsInvariant(reaction.ActionId, "counterspell") ||
+                ContainsInvariant(reaction.Id, "shield") ||
+                ContainsInvariant(reaction.ActionId, "shield") ||
+                ContainsInvariant(reaction.Id, "hellish_rebuke") ||
+                ContainsInvariant(reaction.ActionId, "hellish_rebuke");
+
+            if (!requiresSlot)
+                return false;
+
+            if (ContainsInvariant(reaction.Id, "counterspell") || ContainsInvariant(reaction.ActionId, "counterspell"))
+            {
+                minLevel = 3;
+                return true;
+            }
+
+            minLevel = 1;
+            return true;
+        }
+
+        private static bool HasSpellSlotAtOrAbove(ResourcePool pool, int minLevel)
+        {
+            if (pool == null)
+                return false;
+
+            int startLevel = Math.Clamp(minLevel, 1, MaxSpellSlotLevel);
+            for (int level = startLevel; level <= MaxSpellSlotLevel; level++)
+            {
+                if (pool.Has("WarlockSpellSlot", 1, level) || pool.Has("SpellSlot", 1, level))
+                    return true;
+
+                string flatSlot = $"spell_slot_{level}";
+                if (pool.Has(flatSlot, 1))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static bool ConsumeSpellSlotAtOrAbove(ResourcePool pool, int minLevel)
+        {
+            if (pool == null)
+                return false;
+
+            int startLevel = Math.Clamp(minLevel, 1, MaxSpellSlotLevel);
+            for (int level = startLevel; level <= MaxSpellSlotLevel; level++)
+            {
+                if (pool.Consume("WarlockSpellSlot", 1, level) || pool.Consume("SpellSlot", 1, level))
+                    return true;
+
+                string flatSlot = $"spell_slot_{level}";
+                if (pool.Consume(flatSlot, 1))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static bool ContainsInvariant(string value, string token)
+        {
+            return !string.IsNullOrWhiteSpace(value) &&
+                value.IndexOf(token, StringComparison.OrdinalIgnoreCase) >= 0;
         }
     }
 }

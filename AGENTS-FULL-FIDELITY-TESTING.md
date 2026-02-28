@@ -262,6 +262,10 @@ System.NullReferenceException: Object reference not set to an instance of an obj
 
 ---
 
+### Game shutdown by user
+- Sometimes the game can be shutdown by the human user operating the computer
+- This can happen sometimes if an AI loop as gone on for a long time
+
 ## Seed-Based Reproduction
 
 Dynamic full-fidelity runs may use two seeds:

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Godot;
 using QDND.Combat.Entities;
 using QDND.Combat.Reactions;
+using QDND.Data.ActionResources;
 using Xunit;
 
 namespace QDND.Tests.Unit
@@ -122,6 +123,57 @@ namespace QDND.Tests.Unit
             Assert.Equal(2, result.ResolvedReactions.Count);
             Assert.Equal("a_enemy", result.ResolvedReactions[0].ReactorId);
             Assert.Equal("b_enemy", result.ResolvedReactions[1].ReactorId);
+        }
+
+        [Fact]
+        public void UseReaction_Counterspell_RequiresAndConsumesSpellSlot()
+        {
+            var reactions = new ReactionSystem();
+            reactions.RegisterReaction(new ReactionDefinition
+            {
+                Id = ReactionIds.Counterspell,
+                Name = "Counterspell",
+                Triggers = new List<ReactionTriggerType> { ReactionTriggerType.SpellCastNearby },
+                Tags = new HashSet<string> { "counterspell", "costs_spell_slot" },
+                ActionId = "counterspell",
+                Priority = 5
+            });
+
+            var reactor = CreateCombatant("slotless_enemy", Faction.Hostile);
+            reactions.GrantReaction(reactor.Id, ReactionIds.Counterspell);
+            var reaction = reactions.GetReactions(reactor.Id)[0];
+
+            var trigger = new ReactionTriggerContext
+            {
+                TriggerType = ReactionTriggerType.SpellCastNearby,
+                TriggerSourceId = "player_caster",
+                Position = Vector3.Zero,
+                IsCancellable = true
+            };
+
+            // No spell slots available -> cannot trigger.
+            Assert.False(reactions.CanTrigger(reaction, trigger, reactor));
+            Assert.False(reactions.UseReaction(reactor, reaction, trigger));
+            Assert.True(reactor.ActionBudget.HasReaction);
+
+            // Add one level 3 slot, then reaction should work and consume it.
+            reactor.ActionResources.AddResource(new ActionResourceDefinition
+            {
+                Name = "SpellSlot",
+                MaxLevel = 9,
+                ReplenishType = ReplenishType.Rest
+            });
+            reactor.ActionResources.SetMax("SpellSlot", 1, level: 3, refillCurrent: true);
+
+            Assert.True(reactions.CanTrigger(reaction, trigger, reactor));
+            Assert.True(reactions.UseReaction(reactor, reaction, trigger));
+            Assert.Equal(0, reactor.ActionResources.GetCurrent("SpellSlot", 3));
+            Assert.False(reactor.ActionBudget.HasReaction);
+
+            // After turn reset reaction returns, but no spell slot remains so it still cannot trigger.
+            reactor.ActionBudget.ResetReactionForRound();
+            Assert.True(reactor.ActionBudget.HasReaction);
+            Assert.False(reactions.CanTrigger(reaction, trigger, reactor));
         }
     }
 }

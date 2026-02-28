@@ -51,12 +51,24 @@ namespace QDND.Combat.AI
 
             float score = 0;
             var breakdown = action.ScoreBreakdown;
+            var bg3 = profile.BG3Profile;
+            float baseScale = bg3 != null ? bg3.ScoreMod / 10f : 0f;
+            var statusMgr = _context?.GetService<StatusManager>();
 
             // Base damage value
             float expectedDamage = CalculateExpectedDamage(actor, target, action.ActionId, action.VariantId);
             action.ExpectedValue = expectedDamage;
 
-            float damageScore = expectedDamage * _weights.Get("damage_per_point") * profile.GetWeight("damage");
+            // BG3: ScoreMod, MultiplierDamageEnemyPos — base damage value
+            float damageScore;
+            if (bg3 != null)
+            {
+                damageScore = expectedDamage * (bg3.ScoreMod / 100f) * bg3.MultiplierDamageEnemyPos;
+            }
+            else
+            {
+                damageScore = expectedDamage * _weights.Get("damage_per_point") * profile.GetWeight("damage");
+            }
             breakdown["damage_value"] = damageScore;
             score += damageScore;
 
@@ -64,27 +76,58 @@ namespace QDND.Combat.AI
             float hitChance = CalculateHitChance(actor, target, action.ActionId);
             action.HitChance = hitChance;
 
-            if (hitChance < AIWeights.LowHitChanceThreshold)
+            // BG3: ModifierHitChanceStupidity — AI's perception of hit chance
+            if (bg3 != null)
             {
-                float penalty = score * (1 - AIWeights.LowHitChancePenalty);
-                breakdown["low_hit_chance_penalty"] = -penalty;
-                score *= AIWeights.LowHitChancePenalty;
+                float adjustedHitChance = hitChance + (1f - bg3.ModifierHitChanceStupidity) * 0.15f;
+                adjustedHitChance = Math.Clamp(adjustedHitChance, 0.05f, 0.95f);
+                breakdown["hit_chance_adjusted"] = adjustedHitChance;
+                score *= adjustedHitChance;
             }
             else
             {
-                score *= hitChance;
+                if (hitChance < AIWeights.LowHitChanceThreshold)
+                {
+                    float penalty = score * (1 - AIWeights.LowHitChancePenalty);
+                    breakdown["low_hit_chance_penalty"] = -penalty;
+                    score *= AIWeights.LowHitChancePenalty;
+                }
+                else
+                {
+                    score *= hitChance;
+                }
             }
 
             // Kill potential
             if (target.Resources.CurrentHP <= expectedDamage)
             {
-                float killBonus = _weights.Get("kill_bonus") * profile.GetWeight("kill_potential");
+                // BG3: InstakillBaseScore, MultiplierKillEnemy — kill bonus
+                float killBonus;
+                if (bg3 != null)
+                {
+                    killBonus = bg3.InstakillBaseScore * bg3.MultiplierKillEnemy * baseScale;
+                }
+                else
+                {
+                    killBonus = _weights.Get("kill_bonus") * profile.GetWeight("kill_potential");
+                }
                 breakdown["kill_potential"] = killBonus;
                 score += killBonus;
             }
 
             // Focus fire bonus
-            if (profile.FocusFire)
+            // BG3: MultiplierTargetHealthBias — focus fire on low HP targets (0 = disabled in base)
+            if (bg3 != null)
+            {
+                if (bg3.MultiplierTargetHealthBias > 0f && target.Resources.MaxHP > 0)
+                {
+                    float hpPercent = (float)target.Resources.CurrentHP / target.Resources.MaxHP;
+                    float focusBonus = bg3.MultiplierTargetHealthBias * (1f - hpPercent) * baseScale;
+                    breakdown["focus_fire"] = focusBonus;
+                    score += focusBonus;
+                }
+            }
+            else if (profile.FocusFire && target.Resources.MaxHP > 0)
             {
                 float hpPercent = (float)target.Resources.CurrentHP / target.Resources.MaxHP;
                 if (hpPercent < 0.5f)
@@ -123,14 +166,21 @@ namespace QDND.Combat.AI
 
             // Condition-aware scoring: bonus for attacking debuffed targets
             // In D&D 5e/BG3, paralyzed/stunned/prone targets are high-value opportunities
-            var statusSystem = _context?.GetService<StatusManager>();
-            if (statusSystem != null)
+            if (statusMgr != null)
             {
-                var targetStatuses = statusSystem.GetStatuses(target.Id);
+                var targetStatuses = statusMgr.GetStatuses(target.Id);
                 bool isMelee = actor.Position.DistanceTo(target.Position) <= 2f;
                 foreach (var status in targetStatuses)
                 {
                     string sid = status.Definition.Id;
+
+                    // BG3: Skip generic advantage/autocrit for prone/knocked_down —
+                    // MultiplierTargetKnockedDown handles this without double-counting
+                    bool isProneOrKD = sid.Equals("prone", StringComparison.OrdinalIgnoreCase) ||
+                                       sid.Equals("knocked_down", StringComparison.OrdinalIgnoreCase);
+                    if (bg3 != null && isProneOrKD)
+                        continue;
+
                     if (ConditionEffects.ShouldAttackerHaveAdvantage(sid, isMelee))
                     {
                         // Advantage: ~85% hit chance instead of ~65%, effectively +30% damage
@@ -164,6 +214,91 @@ namespace QDND.Combat.AI
                 }
             }
 
+            // BG3: MultiplierTargetKnockedDown — bonus when target is knocked down/prone
+            if (bg3 != null)
+            {
+                if (statusMgr != null &&
+                    (statusMgr.HasStatus(target.Id, "prone") || statusMgr.HasStatus(target.Id, "knocked_down")))
+                {
+                    float knockedDownBonus = score * (bg3.MultiplierTargetKnockedDown - 1f);
+                    breakdown["bg3_target_knocked_down"] = knockedDownBonus;
+                    score *= bg3.MultiplierTargetKnockedDown;
+                }
+            }
+
+            // BG3: Resource cost awareness — penalize actions that consume scarce resources
+            if (bg3 != null)
+            {
+                float resourcePenalty = CalculateResourcePenalty(action, bg3);
+                if (resourcePenalty > 0)
+                {
+                    breakdown["resource_cost"] = -resourcePenalty;
+                    score -= resourcePenalty;
+                }
+            }
+
+            // BG3: Resistance/Immunity awareness — reduce score when target resists or is immune
+            if (bg3 != null && target != null)
+            {
+                var effectPipelineForDmgType = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
+                var dmgActionDef = effectPipelineForDmgType?.GetAction(action.ActionId);
+                string? dmgType = dmgActionDef?.Effects?.FirstOrDefault(e =>
+                    e.Type == "damage" || e.Type == "deal_damage")?.DamageType;
+
+                if (!string.IsNullOrEmpty(dmgType) && statusMgr != null)
+                {
+                    // TODO: Check Combatant.DamageResistances/DamageImmunities when properties exist.
+                    // For now, check for resistance/immunity statuses via StatusManager.
+                    bool hasResistance = statusMgr.HasStatus(target.Id, $"resistance_{dmgType}") ||
+                                        statusMgr.HasStatus(target.Id, $"resistant_{dmgType}");
+                    bool hasImmunity = statusMgr.HasStatus(target.Id, $"immunity_{dmgType}") ||
+                                      statusMgr.HasStatus(target.Id, $"immune_{dmgType}");
+
+                    // BG3: MultiplierResistanceStupidity — at 1.0 (default), no penalty; <1 = AI ignores resistance
+                    if (hasResistance)
+                    {
+                        float resistPenalty = (1f - bg3.MultiplierResistanceStupidity) * 0.5f;
+                        if (resistPenalty > 0f)
+                        {
+                            breakdown["bg3_resistance_awareness"] = -resistPenalty * score;
+                            score *= (1f - resistPenalty);
+                        }
+                    }
+
+                    // BG3: MultiplierImmunityStupidity — at 0.0 (default), full penalty; at 1.0 no penalty
+                    if (hasImmunity)
+                    {
+                        float immunePenalty = 1f - bg3.MultiplierImmunityStupidity;
+                        if (immunePenalty > 0f)
+                        {
+                            breakdown["bg3_immunity_awareness"] = -immunePenalty * score;
+                            score *= (1f - immunePenalty);
+                        }
+                    }
+                }
+            }
+
+            // BG3: Faction-aware score modifiers — invert score for ally/neutral targets
+            if (bg3 != null && target != null)
+            {
+                bool isAlly = target.Faction == actor.Faction && target.Id != actor.Id;
+                bool isNeutral = target.Faction == Faction.Neutral && actor.Faction != Faction.Neutral;
+
+                if (isAlly)
+                {
+                    // BG3: MultiplierScoreOnAlly (default -1.1) — damaging allies inverts score
+                    breakdown["bg3_faction_ally"] = score * (bg3.MultiplierScoreOnAlly - 1f);
+                    score *= bg3.MultiplierScoreOnAlly;
+                }
+                else if (isNeutral)
+                {
+                    // BG3: MultiplierScoreOnNeutral (default -0.9) — attacking neutrals inverts score
+                    breakdown["bg3_faction_neutral"] = score * (bg3.MultiplierScoreOnNeutral - 1f);
+                    score *= bg3.MultiplierScoreOnNeutral;
+                }
+                // Enemy: no modifier (score remains positive)
+            }
+
             action.Score = Math.Max(0, score);
         }
 
@@ -175,6 +310,13 @@ namespace QDND.Combat.AI
             if (target == null || (!target.IsActive && target.LifeState != CombatantLifeState.Downed))
             {
                 action.IsValid = false;
+                return;
+            }
+
+            if (target.Resources.MaxHP <= 0)
+            {
+                action.IsValid = false;
+                action.InvalidReason = "Target has no HP pool";
                 return;
             }
 
@@ -194,8 +336,21 @@ namespace QDND.Combat.AI
             }
 
             action.ExpectedValue = effectiveHealing;
+            var bg3 = profile.BG3Profile;
 
-            float healScore = effectiveHealing * _weights.Get("healing_per_point") * profile.GetWeight("healing");
+            // BG3: ScoreMod, MultiplierHealSelfPos/MultiplierHealAllyPos — heal value
+            float healScore;
+            if (bg3 != null)
+            {
+                float healMult = (target.Id == actor.Id)
+                    ? bg3.MultiplierHealSelfPos
+                    : bg3.MultiplierHealAllyPos;
+                healScore = effectiveHealing * (bg3.ScoreMod / 100f) * healMult;
+            }
+            else
+            {
+                healScore = effectiveHealing * _weights.Get("healing_per_point") * profile.GetWeight("healing");
+            }
             breakdown["healing_value"] = healScore;
             score += healScore;
 
@@ -203,42 +358,100 @@ namespace QDND.Combat.AI
             float hpPercent = (float)target.Resources.CurrentHP / target.Resources.MaxHP;
             if (hpPercent < 0.25f && target.Id != actor.Id)
             {
-                float saveBonus = _weights.Get("save_ally_bonus") * profile.GetWeight("healing");
+                // BG3: MaxHealMultiplier — urgency for healing low-HP allies
+                float saveBonus;
+                if (bg3 != null)
+                {
+                    saveBonus = healScore * bg3.MaxHealMultiplier * (1f - hpPercent) * 4f;
+                }
+                else
+                {
+                    saveBonus = _weights.Get("save_ally_bonus") * profile.GetWeight("healing");
+                }
                 breakdown["save_ally"] = saveBonus;
                 score += saveBonus;
             }
 
-            // Self-healing is less valuable
+            // Self-healing urgency
             if (target.Id == actor.Id)
             {
-                float selfPenalty = score * (1 - AIWeights.HealSelfMultiplier);
-                breakdown["self_heal_reduction"] = -selfPenalty;
-                score *= AIWeights.HealSelfMultiplier;
-
-                // Urgency boost scales by how close to death
-                float actorHpPct = (float)actor.Resources.CurrentHP / actor.Resources.MaxHP;
-                if (actorHpPct < 0.5f)
+                if (bg3 != null)
                 {
-                    // Scale: 50% HP → 1.5x, 25% HP → 3x, 10% HP → 5x, 5% HP → 8x
-                    float urgencyMultiplier;
-                    if (actorHpPct < 0.1f)
-                        urgencyMultiplier = 8f;
-                    else if (actorHpPct < 0.25f)
-                        urgencyMultiplier = 3f + (0.25f - actorHpPct) / 0.15f * 2f;
-                    else
-                        urgencyMultiplier = 1.5f + (0.5f - actorHpPct) / 0.25f * 1.5f;
-
-                    float urgencyBoost = score * (urgencyMultiplier - 1f);
-                    breakdown["low_hp_self_urgency"] = urgencyBoost;
+                    // BG3: MaxHealSelfMultiplier — self-heal urgency (0-1, higher = more urgent at low HP)
+                    float actorHpPct = (float)actor.Resources.CurrentHP / actor.Resources.MaxHP;
+                    float urgencyScale = bg3.MaxHealSelfMultiplier * (1f - actorHpPct);
+                    float urgencyBoost = score * urgencyScale * 5f;
+                    breakdown["bg3_self_heal_urgency"] = urgencyBoost;
                     score += urgencyBoost;
+                }
+                else
+                {
+                    float selfPenalty = score * (1 - AIWeights.HealSelfMultiplier);
+                    breakdown["self_heal_reduction"] = -selfPenalty;
+                    score *= AIWeights.HealSelfMultiplier;
+
+                    // Urgency boost scales by how close to death
+                    float actorHpPct = (float)actor.Resources.CurrentHP / actor.Resources.MaxHP;
+                    if (actorHpPct < 0.5f)
+                    {
+                        // Scale: 50% HP → 1.5x, 25% HP → 3x, 10% HP → 5x, 5% HP → 8x
+                        float urgencyMultiplier;
+                        if (actorHpPct < 0.1f)
+                            urgencyMultiplier = 8f;
+                        else if (actorHpPct < 0.25f)
+                            urgencyMultiplier = 3f + (0.25f - actorHpPct) / 0.15f * 2f;
+                        else
+                            urgencyMultiplier = 1.5f + (0.5f - actorHpPct) / 0.25f * 1.5f;
+
+                        float urgencyBoost = score * (urgencyMultiplier - 1f);
+                        breakdown["low_hp_self_urgency"] = urgencyBoost;
+                        score += urgencyBoost;
+                    }
                 }
             }
 
             // Downed ally emergency healing — highest priority
             if (target.LifeState == CombatantLifeState.Downed)
             {
-                breakdown["downed_ally_emergency"] = 8.0f;
-                score += 8.0f;
+                // BG3: MultiplierTargetAllyDowned — downed ally priority
+                float downedBonus;
+                if (bg3 != null)
+                {
+                    downedBonus = bg3.MultiplierTargetAllyDowned * (bg3.ScoreMod / 100f) * 8f;
+                }
+                else
+                {
+                    downedBonus = 8.0f;
+                }
+                breakdown["downed_ally_emergency"] = downedBonus;
+                score += downedBonus;
+            }
+
+            // BG3: MultiplierResurrect — resurrect bonus
+            if (bg3 != null && action.ActionId != null)
+            {
+                var effectPipelineForResurrect = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
+                var resurrectActionDef = effectPipelineForResurrect?.GetAction(action.ActionId);
+                bool isResurrect = resurrectActionDef?.Effects?.Any(e =>
+                    e.Type?.Contains("resurrect", StringComparison.OrdinalIgnoreCase) == true ||
+                    e.Type?.Contains("revive", StringComparison.OrdinalIgnoreCase) == true) ?? false;
+                if (isResurrect)
+                {
+                    float resurrectBonus = score * (bg3.MultiplierResurrect - 1f);
+                    breakdown["bg3_resurrect"] = resurrectBonus;
+                    score += resurrectBonus;
+                }
+            }
+
+            // BG3: Resource cost awareness
+            if (bg3 != null)
+            {
+                float resourcePenalty = CalculateResourcePenalty(action, bg3);
+                if (resourcePenalty > 0)
+                {
+                    breakdown["resource_cost"] = -resourcePenalty;
+                    score -= resourcePenalty;
+                }
             }
 
             action.Score = score;
@@ -341,43 +554,145 @@ namespace QDND.Combat.AI
             bool isBuff = !isControl && !isDebuff && statusDef != null &&
                 statusDef.StatusType == BG3StatusType.BOOST;
 
-            if (isControl)
-                statusValue = _weights.Get("control_status");
-            else if (isDebuff)
-                statusValue = _weights.Get("debuff_status");
-            else if (isBuff)
-                statusValue = _weights.Get("buff_status");
+            var bg3 = profile.BG3Profile;
+
+            if (bg3 != null)
+            {
+                // BG3-style status scoring
+                bool targetIsEnemy = target != null && target.Faction != actor.Faction;
+                bool targetIsSelf = target != null && target.Id == actor.Id;
+                bool targetIsAlly = target != null && target.Faction == actor.Faction && target.Id != actor.Id;
+                float baseMod = bg3.ScoreMod / 100f;
+                float baseScale = bg3.ScoreMod / 10f;
+
+                if (isControl)
+                {
+                    // BG3: MultiplierControlEnemyPos/MultiplierControlSelfNeg — control effects
+                    if (targetIsEnemy)
+                        statusValue = baseMod * bg3.MultiplierControlEnemyPos * baseScale;
+                    else if (targetIsSelf)
+                        statusValue = -baseMod * bg3.MultiplierControlSelfNeg * baseScale;
+                    else
+                        statusValue = -baseMod * bg3.MultiplierControlAllyNeg * baseScale;
+
+                    // BG3: MultiplierIncapacitate, MultiplierKnockdown, MultiplierFear, MultiplierBlind
+                    string lower = effectType.ToLowerInvariant();
+                    if (lower.Contains("incapacitat") || lower.Contains("stun") || lower.Contains("paralyz"))
+                        statusValue *= bg3.MultiplierIncapacitate;
+                    else if (lower.Contains("knock") || lower.Contains("prone"))
+                        statusValue *= bg3.MultiplierKnockdown;
+                    else if (lower.Contains("fear") || lower.Contains("frighten"))
+                        statusValue *= bg3.MultiplierFear;
+                    else if (lower.Contains("blind"))
+                        statusValue *= bg3.MultiplierBlind;
+                }
+                else if (isBuff)
+                {
+                    // BG3: MultiplierBoostSelfPos/MultiplierBoostAllyPos/MultiplierBoostEnemyPos — boost effects
+                    if (targetIsSelf)
+                        statusValue = baseMod * bg3.MultiplierBoostSelfPos * baseScale;
+                    else if (targetIsAlly)
+                        statusValue = baseMod * bg3.MultiplierBoostAllyPos * baseScale;
+                    else if (targetIsEnemy)
+                        statusValue = baseMod * bg3.MultiplierBoostEnemyPos * baseScale;
+                    else
+                        statusValue = baseMod * baseScale;
+
+                    // BG3: MultiplierInvisible — specific boost type
+                    if (effectType.Contains("invisible", StringComparison.OrdinalIgnoreCase))
+                        statusValue *= bg3.MultiplierInvisible;
+                }
+                else
+                {
+                    // Debuff or unknown — treat as control-like on enemy, penalty on self/ally
+                    if (targetIsEnemy)
+                        statusValue = baseMod * bg3.MultiplierControlEnemyPos * 0.7f * baseScale;
+                    else if (targetIsSelf)
+                        statusValue = -baseMod * bg3.MultiplierControlSelfNeg * 0.7f * baseScale;
+                    else
+                        statusValue = baseMod * 0.5f * baseScale;
+
+                    // BG3: MultiplierFear, MultiplierBlind — specific debuff type bonuses
+                    string lower = effectType.ToLowerInvariant();
+                    if (lower.Contains("fear") || lower.Contains("frighten"))
+                        statusValue *= bg3.MultiplierFear;
+                    else if (lower.Contains("blind"))
+                        statusValue *= bg3.MultiplierBlind;
+                }
+
+                breakdown["status_value"] = statusValue;
+                score += statusValue;
+
+                // Higher value on dangerous targets (BG3)
+                if (target != null && isControl && targetIsEnemy)
+                {
+                    float threatBonus = baseMod * 0.5f * baseScale;
+                    breakdown["high_threat_control"] = threatBonus;
+                    score += threatBonus;
+                }
+            }
             else
             {
-                // Fallback: try to infer category from the status ID name
-                string lower = effectType.ToLowerInvariant();
-                if (lower.Contains("stun") || lower.Contains("paralyz") || lower.Contains("incapacitat") ||
-                    lower.Contains("sleep") || lower.Contains("hold") || lower.Contains("petrif"))
+                // Legacy scoring
+                if (isControl)
                     statusValue = _weights.Get("control_status");
-                else if (lower.Contains("blind") || lower.Contains("slow") || lower.Contains("weakness") ||
-                         lower.Contains("frighten") || lower.Contains("poison") || lower.Contains("curse"))
+                else if (isDebuff)
                     statusValue = _weights.Get("debuff_status");
-                else if (lower.Contains("advantage") || lower.Contains("protect") || lower.Contains("resist") ||
-                         lower.Contains("bless") || lower.Contains("shield") || lower.Contains("armor") ||
-                         lower.Contains("haste") || lower.Contains("barkskin") ||
-                         lower.Contains("dodg") || lower.Contains("dash") || lower.Contains("disengage") ||
-                         lower.Contains("ward") || lower.Contains("regenerat") || lower.Contains("raging"))
+                else if (isBuff)
                     statusValue = _weights.Get("buff_status");
                 else
-                    statusValue = 2f;
+                {
+                    // Fallback: try to infer category from the status ID name
+                    string lower = effectType.ToLowerInvariant();
+                    if (lower.Contains("stun") || lower.Contains("paralyz") || lower.Contains("incapacitat") ||
+                        lower.Contains("sleep") || lower.Contains("hold") || lower.Contains("petrif"))
+                        statusValue = _weights.Get("control_status");
+                    else if (lower.Contains("blind") || lower.Contains("slow") || lower.Contains("weakness") ||
+                             lower.Contains("frighten") || lower.Contains("poison") || lower.Contains("curse"))
+                        statusValue = _weights.Get("debuff_status");
+                    else if (lower.Contains("advantage") || lower.Contains("protect") || lower.Contains("resist") ||
+                             lower.Contains("bless") || lower.Contains("shield") || lower.Contains("armor") ||
+                             lower.Contains("haste") || lower.Contains("barkskin") ||
+                             lower.Contains("dodg") || lower.Contains("dash") || lower.Contains("disengage") ||
+                             lower.Contains("ward") || lower.Contains("regenerat") || lower.Contains("raging"))
+                        statusValue = _weights.Get("buff_status");
+                    else
+                        statusValue = 2f;
+                }
+
+                statusValue *= profile.GetWeight("status_value");
+                breakdown["status_value"] = statusValue;
+                score += statusValue;
+
+                // Higher value on dangerous targets
+                if (target != null && (effectType.Contains("stun") || effectType.Contains("paralyze")))
+                {
+                    // Would calculate target threat level
+                    float threatBonus = 2f;
+                    breakdown["high_threat_control"] = threatBonus;
+                    score += threatBonus;
+                }
             }
 
-            statusValue *= profile.GetWeight("status_value");
-            breakdown["status_value"] = statusValue;
-            score += statusValue;
-
-            // Higher value on dangerous targets
-            if (target != null && (effectType.Contains("stun") || effectType.Contains("paralyze")))
+            // BG3: Faction-aware score modifiers — invert score for ally/neutral targets
+            if (bg3 != null && target != null)
             {
-                // Would calculate target threat level
-                float threatBonus = 2f;
-                breakdown["high_threat_control"] = threatBonus;
-                score += threatBonus;
+                bool isAlly = target.Faction == actor.Faction && target.Id != actor.Id;
+                bool isNeutral = target.Faction == Faction.Neutral && actor.Faction != Faction.Neutral;
+
+                if (isAlly)
+                {
+                    // BG3: MultiplierScoreOnAlly (default -1.1) — applying status on ally inverts score
+                    breakdown["bg3_faction_ally"] = score * (bg3.MultiplierScoreOnAlly - 1f);
+                    score *= bg3.MultiplierScoreOnAlly;
+                }
+                else if (isNeutral)
+                {
+                    // BG3: MultiplierScoreOnNeutral (default -0.9) — targeting neutrals inverts score
+                    breakdown["bg3_faction_neutral"] = score * (bg3.MultiplierScoreOnNeutral - 1f);
+                    score *= bg3.MultiplierScoreOnNeutral;
+                }
+                // Enemy: no modifier (score remains positive)
             }
 
             action.Score = score;
@@ -395,30 +710,80 @@ namespace QDND.Combat.AI
             int alliesHit = allies.Count(a => center.DistanceTo(a.Position) <= radius);
 
             var breakdown = action.ScoreBreakdown;
+            var bg3 = profile.BG3Profile;
 
-            float baseScore = enemiesHit * 5f * profile.GetWeight("damage");
-            breakdown["enemies_hit"] = baseScore;
-
-            if (alliesHit > 0 && profile.AvoidFriendlyFire)
-            {
-                float ffPenalty = alliesHit * _weights.Get("friendly_fire_penalty");
-                breakdown["friendly_fire"] = -ffPenalty;
-                baseScore -= ffPenalty;
-            }
-
-            // Self-damage check: caster is excluded from GetAllies(), so check separately
+            // Count neutrals for BG3 scoring
+            var all = _context?.GetAllCombatants() ?? new List<Combatant>();
+            int neutralsInAoe = all.Count(c => c.Faction != actor.Faction &&
+                !enemies.Contains(c) && c.IsActive &&
+                center.DistanceTo(c.Position) <= radius);
             bool selfHit = center.DistanceTo(actor.Position) <= radius;
-            if (selfHit)
+
+            float baseScore;
+            if (bg3 != null)
             {
-                float selfPenalty = _weights.Get("self_aoe_penalty");
-                float hpFraction = actor.Resources.MaxHP > 0
-                    ? (float)actor.Resources.CurrentHP / actor.Resources.MaxHP
-                    : 1f;
-                // Low HP makes the penalty much worse
-                if (hpFraction <= 0.5f)
-                    selfPenalty *= 2f;
-                breakdown["self_in_aoe"] = -selfPenalty;
-                baseScore -= selfPenalty;
+                float baseMod = bg3.ScoreMod / 100f;
+
+                float baseScale = bg3.ScoreMod / 10f;
+
+                // BG3: MultiplierDamageEnemyPos — enemy damage value (baseScale keeps ratio with penalties)
+                float enemyScore = enemiesHit * baseMod * bg3.MultiplierDamageEnemyPos * baseScale;
+                breakdown["enemies_hit"] = enemyScore;
+                baseScore = enemyScore;
+
+                // BG3: MultiplierDamageAllyNeg — friendly fire penalty from archetype
+                if (alliesHit > 0)
+                {
+                    float ffPenalty = alliesHit * baseMod * bg3.MultiplierDamageAllyNeg * baseScale;
+                    breakdown["friendly_fire"] = -ffPenalty;
+                    baseScore -= ffPenalty;
+                }
+
+                // BG3: MultiplierDamageNeutralNeg — neutral damage penalty
+                if (neutralsInAoe > 0)
+                {
+                    float neutralPenalty = neutralsInAoe * baseMod * bg3.MultiplierDamageNeutralNeg * baseScale;
+                    breakdown["neutral_damage"] = -neutralPenalty;
+                    baseScore -= neutralPenalty;
+                }
+
+                // BG3: MultiplierDamageSelfNeg — self-in-AoE penalty
+                if (selfHit)
+                {
+                    float selfPenalty = baseMod * bg3.MultiplierDamageSelfNeg * baseScale;
+                    float hpFraction = actor.Resources.MaxHP > 0
+                        ? (float)actor.Resources.CurrentHP / actor.Resources.MaxHP
+                        : 1f;
+                    if (hpFraction <= 0.5f)
+                        selfPenalty *= 2f;
+                    breakdown["self_in_aoe"] = -selfPenalty;
+                    baseScore -= selfPenalty;
+                }
+            }
+            else
+            {
+                // Legacy scoring
+                baseScore = enemiesHit * 5f * profile.GetWeight("damage");
+                breakdown["enemies_hit"] = baseScore;
+
+                if (alliesHit > 0 && profile.AvoidFriendlyFire)
+                {
+                    float ffPenalty = alliesHit * _weights.Get("friendly_fire_penalty");
+                    breakdown["friendly_fire"] = -ffPenalty;
+                    baseScore -= ffPenalty;
+                }
+
+                if (selfHit)
+                {
+                    float selfPenalty = _weights.Get("self_aoe_penalty");
+                    float hpFraction = actor.Resources.MaxHP > 0
+                        ? (float)actor.Resources.CurrentHP / actor.Resources.MaxHP
+                        : 1f;
+                    if (hpFraction <= 0.5f)
+                        selfPenalty *= 2f;
+                    breakdown["self_in_aoe"] = -selfPenalty;
+                    baseScore -= selfPenalty;
+                }
             }
 
             action.Score = Math.Max(0.01f, baseScore);
@@ -438,6 +803,7 @@ namespace QDND.Combat.AI
 
             float score = 0;
             var breakdown = action.ScoreBreakdown;
+            var bg3 = profile.BG3Profile;
 
             // Check distance (horizontal only - vertical doesn't matter for shove range)
             var horizontalDistance = new Vector3(
@@ -497,7 +863,16 @@ namespace QDND.Combat.AI
 
                     if (fallDamage > 0)
                     {
-                        float fallBonus = fallDamage * _weights.Get("shove_fall_damage") * 0.1f * profile.GetWeight("damage");
+                        // BG3: MultiplierFallDamageEnemy — fall damage on enemy
+                        float fallBonus;
+                        if (bg3 != null)
+                        {
+                            fallBonus = fallDamage * bg3.MultiplierFallDamageEnemy;
+                        }
+                        else
+                        {
+                            fallBonus = fallDamage * _weights.Get("shove_fall_damage") * 0.1f * profile.GetWeight("damage");
+                        }
                         breakdown["fall_damage_potential"] = fallBonus;
                         score += fallBonus;
                     }
@@ -513,7 +888,16 @@ namespace QDND.Combat.AI
                     // Lethal fall bonus
                     if (fallResult.IsLethal)
                     {
-                        float killBonus = _weights.Get("kill_bonus") * profile.GetWeight("kill_potential");
+                        // BG3: InstakillBaseScore, MultiplierKillEnemy — kill bonus
+                        float killBonus;
+                        if (bg3 != null)
+                        {
+                            killBonus = bg3.InstakillBaseScore * bg3.MultiplierKillEnemy * (bg3.ScoreMod / 10f);
+                        }
+                        else
+                        {
+                            killBonus = _weights.Get("kill_bonus") * profile.GetWeight("kill_potential");
+                        }
                         breakdown["lethal_fall"] = killBonus;
                         score += killBonus;
                     }
@@ -926,52 +1310,235 @@ namespace QDND.Combat.AI
             int enemiesInZone = enemies.Count(e => center.DistanceTo(e.Position) <= radius);
             int alliesInZone = allies.Count(a => center.DistanceTo(a.Position) <= radius);
 
-            // Base zone value
-            float baseWeight;
-            if (isDamaging)
+            var bg3 = profile.BG3Profile;
+
+            if (bg3 != null)
             {
-                baseWeight = _weights.Get("surface_damage_zone");
-                breakdown["surface_zone_type"] = baseWeight;
-            }
-            else if (isControl)
-            {
-                baseWeight = _weights.Get("surface_control_zone");
-                breakdown["surface_zone_type"] = baseWeight;
+                // BG3: TurnsCap — cap duration for scoring
+                int cappedDuration = (int)Math.Min(duration, bg3.TurnsCap);
+                float baseMod = bg3.ScoreMod / 100f;
+
+                // BG3: MultiplierComboScoreInteraction — surface/combo multiplier
+                float baseWeight = isDamaging ? 4f : (isControl ? 3f : 2f);
+                float zoneScore = baseWeight * baseMod * bg3.MultiplierComboScoreInteraction;
+                breakdown["surface_zone_type"] = zoneScore;
+
+                // Enemy presence
+                float enemyFactor = Math.Max(enemiesInZone, 0.3f);
+                float enemyScore = zoneScore * enemyFactor;
+                breakdown["surface_enemies"] = enemyScore;
+                score += enemyScore;
+
+                // Duration bonus (capped by TurnsCap)
+                if (cappedDuration > 1)
+                {
+                    float durBonus = (cappedDuration - 1) * baseMod * 0.5f;
+                    breakdown["surface_duration"] = durBonus;
+                    score += durBonus;
+                }
+
+                // Area bonus
+                float areaBonus = Math.Max(0f, radius - 1.5f) * baseMod * 0.3f;
+                breakdown["surface_area"] = areaBonus;
+                score += areaBonus;
+
+                // BG3: MultiplierDamageAllyNeg — friendly fire
+                if (alliesInZone > 0)
+                {
+                    float ffPenalty = alliesInZone * baseMod * bg3.MultiplierDamageAllyNeg;
+                    breakdown["surface_friendly_fire"] = -ffPenalty;
+                    score -= ffPenalty;
+                }
+
+                // BG3: MultiplierSurfaceRemove — value for removing surfaces (used elsewhere)
+
+                // BG3: Combo scoring — bonus for surface interactions and positioning
+                // TODO: Full combo detection requires checking BG3AISurfaceComboDefinition entries
+                // against the current surface state at the target position. For now, use heuristic:
+                // damaging surfaces placed where other surfaces exist may trigger combos.
+                {
+                    // BG3: MultiplierComboScoreInteraction — surface-on-surface combo bonus
+                    // e.g., casting fire on oil-covered ground triggers ignite combo
+                    float comboInteractionBonus = bg3.MultiplierComboScoreInteraction * baseMod;
+                    if (comboInteractionBonus > 0f)
+                    {
+                        // TODO: Check SurfaceManager for existing surfaces at 'center' to confirm
+                        // an actual combo would occur. For now, add as scaled placeholder.
+                        breakdown["bg3_combo_interaction_potential"] = comboInteractionBonus;
+                        // Not added to score yet — uncomment when combo detection is implemented:
+                        // score += comboInteractionBonus;
+                    }
+
+                    // BG3: MultiplierPosSecondarySurface — secondary surface positioning benefit
+                    if (bg3.MultiplierPosSecondarySurface > 0f)
+                    {
+                        // TODO: Detect if this surface placement creates a secondary benefit
+                        // for ally positioning (e.g., water surface for lightning follow-up)
+                        breakdown["bg3_combo_positioning_potential"] = bg3.MultiplierPosSecondarySurface;
+                        // Not added to score yet — uncomment when positioning detection is implemented:
+                        // score += bg3.MultiplierPosSecondarySurface;
+                    }
+                }
             }
             else
             {
-                baseWeight = _weights.Get("surface_utility_zone");
-                breakdown["surface_zone_type"] = baseWeight;
-            }
+                // Legacy scoring
+                float baseWeight;
+                if (isDamaging)
+                {
+                    baseWeight = _weights.Get("surface_damage_zone");
+                    breakdown["surface_zone_type"] = baseWeight;
+                }
+                else if (isControl)
+                {
+                    baseWeight = _weights.Get("surface_control_zone");
+                    breakdown["surface_zone_type"] = baseWeight;
+                }
+                else
+                {
+                    baseWeight = _weights.Get("surface_utility_zone");
+                    breakdown["surface_zone_type"] = baseWeight;
+                }
 
-            // Enemy threat scoring
-            float enemyFactor = Math.Max(enemiesInZone, 0.3f);
-            float zoneScore = baseWeight * enemyFactor;
-            breakdown["surface_enemies"] = zoneScore;
-            score += zoneScore;
+                // Enemy threat scoring
+                float enemyFactor = Math.Max(enemiesInZone, 0.3f);
+                float zoneScore = baseWeight * enemyFactor;
+                breakdown["surface_enemies"] = zoneScore;
+                score += zoneScore;
 
-            // Duration bonus
-            if (duration > 1)
-            {
-                float durBonus = Math.Min(duration - 1, 5) * _weights.Get("surface_duration_bonus");
-                breakdown["surface_duration"] = durBonus;
-                score += durBonus;
-            }
+                // Duration bonus
+                if (duration > 1)
+                {
+                    float durBonus = Math.Min(duration - 1, 5) * _weights.Get("surface_duration_bonus");
+                    breakdown["surface_duration"] = durBonus;
+                    score += durBonus;
+                }
 
-            // Area bonus
-            float areaBonus = Math.Max(0f, radius - 1.5f) * _weights.Get("surface_area_bonus");
-            breakdown["surface_area"] = areaBonus;
-            score += areaBonus;
+                // Area bonus
+                float areaBonus = Math.Max(0f, radius - 1.5f) * _weights.Get("surface_area_bonus");
+                breakdown["surface_area"] = areaBonus;
+                score += areaBonus;
 
-            // Friendly fire penalty — matches ScoreAoE weight so persistent surfaces are equally penalised
-            if (alliesInZone > 0)
-            {
-                float ffPenalty = alliesInZone * _weights.Get("friendly_fire_penalty");
-                breakdown["surface_friendly_fire"] = -ffPenalty;
-                score -= ffPenalty;
+                // Friendly fire penalty
+                if (alliesInZone > 0)
+                {
+                    float ffPenalty = alliesInZone * _weights.Get("friendly_fire_penalty");
+                    breakdown["surface_friendly_fire"] = -ffPenalty;
+                    score -= ffPenalty;
+                }
             }
 
             action.Score += Math.Max(0f, score);
+        }
+
+        /// <summary>
+        /// Get a resource cost multiplier based on replenishment type.
+        /// Uses BG3 archetype parameters when available.
+        /// </summary>
+        public float GetResourceCostMultiplier(BG3ArchetypeProfile bg3, string replenishType)
+        {
+            if (bg3 == null)
+                return 1f;
+
+            return replenishType?.ToLowerInvariant() switch
+            {
+                "never" => bg3.MultiplierResourceReplenishTypeNever,
+                "combat" => bg3.MultiplierResourceReplenishTypeCombat,
+                "rest" or "longrest" => bg3.MultiplierResourceReplenishTypeRest,
+                "shortrest" => bg3.MultiplierResourceReplenishTypeShortRest,
+                "turn" => bg3.MultiplierResourceReplenishTypeTurn,
+                _ => 1f
+            };
+        }
+
+        /// <summary>
+        /// Calculate a resource cost penalty for BG3 scoring.
+        /// Higher-cost actions using scarce resources get penalized more.
+        /// </summary>
+        private float CalculateResourcePenalty(AIAction action, BG3ArchetypeProfile bg3)
+        {
+            if (bg3 == null || string.IsNullOrEmpty(action.ActionId))
+                return 0f;
+
+            var effectPipeline = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
+            var actionDef = effectPipeline?.GetAction(action.ActionId);
+            if (actionDef?.Cost?.ResourceCosts == null || actionDef.Cost.ResourceCosts.Count == 0)
+                return 0f;
+
+            float baseScale = bg3.ScoreMod / 10f;
+            float totalPenalty = 0f;
+            foreach (var (resourceName, amount) in actionDef.Cost.ResourceCosts)
+            {
+                if (amount <= 0) continue;
+                string replenishType = InferReplenishType(resourceName);
+                float replenishMult = GetResourceCostMultiplier(bg3, replenishType);
+                totalPenalty += amount * bg3.MultiplierActionResourceCost * replenishMult * baseScale;
+            }
+
+            return totalPenalty;
+        }
+
+        /// <summary>
+        /// Infer replenishment type from common BG3 resource names.
+        /// </summary>
+        private static string InferReplenishType(string resourceName)
+        {
+            string lower = resourceName.ToLowerInvariant();
+            if (lower.Contains("spellslot") || lower.Contains("spell_slot"))
+                return "rest";
+            if (lower.Contains("actionpoint") || lower.Contains("bonusaction") || lower.Contains("reaction"))
+                return "turn";
+            if (lower.Contains("rage") || lower.Contains("ki") || lower.Contains("sorcery") || lower.Contains("bardic"))
+                return "rest";
+            if (lower.Contains("channeldivinity") || lower.Contains("channel_divinity"))
+                return "shortrest";
+            if (lower.Contains("wildshape") || lower.Contains("wild_shape"))
+                return "shortrest";
+            return "rest"; // Default: treat as long-rest resource
+        }
+
+        /// <summary>
+        /// Score adjustment for concentration-related considerations.
+        /// Penalizes casting a new concentration spell when already concentrating on something valuable.
+        /// Rewards actions that break enemy concentration.
+        /// </summary>
+        public float ScoreConcentrationAdjustment(Combatant actor, Combatant target, string actionId, BG3ArchetypeProfile bg3)
+        {
+            if (bg3 == null)
+                return 0f;
+
+            float adjustment = 0f;
+            var concSystem = _context?.GetService<ConcentrationSystem>();
+            var effectPipeline = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
+
+            // BG3: ModifierConcentrationRemoveSelf — penalty for breaking own concentration
+            if (concSystem != null && effectPipeline != null)
+            {
+                var actionDef = effectPipeline.GetAction(actionId);
+
+                // 1. Penalize casting a new concentration spell when already concentrating
+                if (actionDef?.RequiresConcentration == true && concSystem.IsConcentrating(actor.Id))
+                {
+                    var currentConc = concSystem.GetConcentratedEffect(actor.Id);
+                    // Don't double-penalize re-casting the same spell (handled elsewhere)
+                    if (currentConc == null || !string.Equals(currentConc.ActionId, actionId, StringComparison.OrdinalIgnoreCase))
+                    {
+                        adjustment -= bg3.ModifierConcentrationRemoveSelf * bg3.ScoreMod / 100f;
+                    }
+                }
+
+                // 2. Reward actions that could break enemy concentration (damage forces CON save)
+                if (target != null && target.Faction != actor.Faction && concSystem.IsConcentrating(target.Id))
+                {
+                    bool dealsDamage = actionDef?.Effects?.Any(e => e.Type == "damage") ?? false;
+                    if (dealsDamage && bg3.ModifierConcentrationRemoveTarget > 0f)
+                    {
+                        adjustment += bg3.ModifierConcentrationRemoveTarget * bg3.ScoreMod / 10f;
+                    }
+                }
+            }
+
+            return adjustment;
         }
 
         private List<Combatant> GetEnemies(Combatant actor)

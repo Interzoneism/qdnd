@@ -89,6 +89,12 @@ namespace QDND.Combat.AI
         /// </summary>
         public float RandomFactor { get; set; } = 0.2f;
 
+        /// <summary>
+        /// BG3 archetype scoring profile with all ~180 parameters.
+        /// Null when using legacy internal archetype system.
+        /// </summary>
+        public BG3ArchetypeProfile BG3Profile { get; set; }
+
         public AIProfile()
         {
             InitializeDefaultWeights();

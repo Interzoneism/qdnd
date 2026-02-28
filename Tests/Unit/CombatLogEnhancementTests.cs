@@ -253,6 +253,29 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
+        public void LogReactionUsed_CreatesCorrectEntry()
+        {
+            var log = new CombatLog();
+
+            log.LogReactionUsed(
+                reactorId: "enemy1",
+                reactorName: "Warlock",
+                reactionId: "reaction.counterspell",
+                reactionName: "Counterspell",
+                triggerType: "SpellCastNearby",
+                triggerSourceId: "player1",
+                triggerSourceName: "Wizard");
+
+            var entries = log.GetEntries();
+            Assert.Single(entries);
+            var entry = entries[0];
+            Assert.Equal(CombatLogEntryType.ReactionUsed, entry.Type);
+            Assert.Equal("Warlock", entry.SourceName);
+            Assert.Equal("Wizard", entry.TargetName);
+            Assert.Equal("Counterspell", entry.Data["reactionName"]);
+        }
+
+        [Fact]
         public void LogTurnStart_CreatesCorrectEntry()
         {
             // Arrange

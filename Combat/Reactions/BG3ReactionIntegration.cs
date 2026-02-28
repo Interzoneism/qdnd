@@ -313,7 +313,7 @@ namespace QDND.Combat.Reactions
                 Range = 0f,
                 CanCancel = false,
                 CanModify = true,
-                Tags = new HashSet<string> { "shield", "spell", "ac_boost", "requires_hit", "bg3" },
+                Tags = new HashSet<string> { "shield", "spell", "ac_boost", "requires_hit", "costs_spell_slot", "bg3" },
                 AIPolicy = ReactionAIPolicy.Always,
                 ActionId = "shield"
             };
@@ -353,7 +353,7 @@ namespace QDND.Combat.Reactions
                 Range = CombatRules.CounterspellRangeMeters,
                 CanCancel = true,
                 CanModify = false,
-                Tags = new HashSet<string> { "counterspell", "spell", "cancel", "bg3" },
+                Tags = new HashSet<string> { "counterspell", "spell", "cancel", "costs_spell_slot", "bg3" },
                 AIPolicy = ReactionAIPolicy.PriorityTargets,
                 ActionId = "counterspell"
             };

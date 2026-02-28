@@ -120,6 +120,16 @@ namespace QDND.Combat.Services
                 return;
             }
 
+            var triggerSource = _combatContext.GetCombatant(triggerContext.TriggerSourceId);
+            GetCombatLog()?.LogReactionUsed(
+                reactor.Id,
+                reactor.Name,
+                reaction.Id,
+                reaction.Name,
+                triggerContext.TriggerType.ToString(),
+                triggerSource?.Id ?? triggerContext.TriggerSourceId,
+                triggerSource?.Name ?? triggerContext.TriggerSourceId);
+
             // Explicit, deterministic reaction execution path for OA-like effects.
             if (TryExecuteExplicitReaction(reaction, reactor, triggerContext))
             {
@@ -271,6 +281,16 @@ namespace QDND.Combat.Services
                 return;
             }
 
+            var triggerSource = _combatContext.GetCombatant(prompt.TriggerContext?.TriggerSourceId ?? string.Empty);
+            GetCombatLog()?.LogReactionTriggered(
+                reactor.Id,
+                reactor.Name,
+                prompt.Reaction?.Id ?? string.Empty,
+                prompt.Reaction?.Name ?? "Reaction",
+                prompt.TriggerContext?.TriggerType.ToString() ?? "Unknown",
+                triggerSource?.Id ?? prompt.TriggerContext?.TriggerSourceId,
+                triggerSource?.Name ?? prompt.TriggerContext?.TriggerSourceId);
+
             if (reactor.IsPlayerControlled && (!_isAutoBattleMode() || QDND.Tools.DebugFlags.IsFullFidelity))
             {
                 // Player-controlled in normal play: show UI and pause combat
@@ -325,11 +345,38 @@ namespace QDND.Combat.Services
 
             if (useReaction)
             {
-                _reactionSystem.UseReaction(reactor, prompt.Reaction, prompt.TriggerContext);
-                _log($"{reactor.Name} used {prompt.Reaction.Name}");
+                bool used = _reactionSystem.UseReaction(reactor, prompt.Reaction, prompt.TriggerContext);
+                if (used)
+                {
+                    _log($"{reactor.Name} used {prompt.Reaction.Name}");
+                }
+                else
+                {
+                    var triggerSource = _combatContext.GetCombatant(prompt.TriggerContext?.TriggerSourceId ?? string.Empty);
+                    GetCombatLog()?.LogReactionDeclined(
+                        reactor.Id,
+                        reactor.Name,
+                        prompt.Reaction?.Id ?? string.Empty,
+                        prompt.Reaction?.Name ?? "Reaction",
+                        prompt.TriggerContext?.TriggerType.ToString() ?? "Unknown",
+                        triggerSource?.Id ?? prompt.TriggerContext?.TriggerSourceId,
+                        triggerSource?.Name ?? prompt.TriggerContext?.TriggerSourceId,
+                        "Reaction or required resources unavailable");
+                    _log($"{reactor.Name} could not use {prompt.Reaction.Name}: missing reaction/resource budget");
+                }
             }
             else
             {
+                var triggerSource = _combatContext.GetCombatant(prompt.TriggerContext?.TriggerSourceId ?? string.Empty);
+                GetCombatLog()?.LogReactionDeclined(
+                    reactor.Id,
+                    reactor.Name,
+                    prompt.Reaction?.Id ?? string.Empty,
+                    prompt.Reaction?.Name ?? "Reaction",
+                    prompt.TriggerContext?.TriggerType.ToString() ?? "Unknown",
+                    triggerSource?.Id ?? prompt.TriggerContext?.TriggerSourceId,
+                    triggerSource?.Name ?? prompt.TriggerContext?.TriggerSourceId,
+                    "Declined");
                 _log($"{reactor.Name} skipped {prompt.Reaction.Name}");
             }
 
@@ -446,5 +493,7 @@ namespace QDND.Combat.Services
                 }
             }
         }
+
+        private CombatLog GetCombatLog() => _combatContext?.GetService<CombatLog>();
     }
 }

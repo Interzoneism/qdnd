@@ -87,6 +87,81 @@ namespace QDND.Combat.Services
             LogEntry(entry);
         }
 
+        public void LogReactionTriggered(
+            string reactorId,
+            string reactorName,
+            string reactionId,
+            string reactionName,
+            string triggerType,
+            string triggerSourceId = null,
+            string triggerSourceName = null)
+        {
+            var entry = new CombatLogEntry
+            {
+                Type = CombatLogEntryType.ReactionTriggered,
+                Severity = LogSeverity.Normal,
+                SourceId = reactorId,
+                SourceName = reactorName,
+                TargetId = triggerSourceId,
+                TargetName = triggerSourceName
+            };
+            entry.Data["reactionId"] = reactionId ?? string.Empty;
+            entry.Data["reactionName"] = reactionName ?? reactionId ?? "Reaction";
+            entry.Data["triggerType"] = triggerType ?? "Unknown";
+            LogEntry(entry);
+        }
+
+        public void LogReactionUsed(
+            string reactorId,
+            string reactorName,
+            string reactionId,
+            string reactionName,
+            string triggerType,
+            string triggerSourceId = null,
+            string triggerSourceName = null)
+        {
+            var entry = new CombatLogEntry
+            {
+                Type = CombatLogEntryType.ReactionUsed,
+                Severity = LogSeverity.Important,
+                SourceId = reactorId,
+                SourceName = reactorName,
+                TargetId = triggerSourceId,
+                TargetName = triggerSourceName
+            };
+            entry.Data["reactionId"] = reactionId ?? string.Empty;
+            entry.Data["reactionName"] = reactionName ?? reactionId ?? "Reaction";
+            entry.Data["triggerType"] = triggerType ?? "Unknown";
+            LogEntry(entry);
+        }
+
+        public void LogReactionDeclined(
+            string reactorId,
+            string reactorName,
+            string reactionId,
+            string reactionName,
+            string triggerType,
+            string triggerSourceId = null,
+            string triggerSourceName = null,
+            string reason = null)
+        {
+            var entry = new CombatLogEntry
+            {
+                Type = CombatLogEntryType.ReactionDeclined,
+                Severity = LogSeverity.Normal,
+                SourceId = reactorId,
+                SourceName = reactorName,
+                TargetId = triggerSourceId,
+                TargetName = triggerSourceName
+            };
+            entry.Data["reactionId"] = reactionId ?? string.Empty;
+            entry.Data["reactionName"] = reactionName ?? reactionId ?? "Reaction";
+            entry.Data["triggerType"] = triggerType ?? "Unknown";
+            if (!string.IsNullOrWhiteSpace(reason))
+                entry.Data["reason"] = reason;
+            LogEntry(entry);
+        }
+
         public void LogRoundStarted(int round)
         {
             SetContext(round, _currentTurn);

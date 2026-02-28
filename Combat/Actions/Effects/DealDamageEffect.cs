@@ -698,11 +698,14 @@ namespace QDND.Combat.Actions.Effects
                 }
 
                 // Dispatch event with actual damage dealt
+                string resolvedDamageType = string.IsNullOrWhiteSpace(effectiveDamageType)
+                    ? definition.DamageType
+                    : effectiveDamageType;
                 context.Rules.Events.DispatchDamage(
                     context.Source.Id,
                     target.Id,
                     actualDamageDealt,
-                    definition.DamageType,
+                    resolvedDamageType,
                     context.Ability?.Id
                 );
 
@@ -729,7 +732,10 @@ namespace QDND.Combat.Actions.Effects
                 }
                 context.Rules?.RuleWindows.Dispatch(RuleWindow.AfterDamage, afterDamageContext);
 
-                string msg = $"{context.Source.Name} deals {finalDamage} {definition.DamageType ?? ""}damage to {target.Name}";
+                string damageTypeText = string.IsNullOrWhiteSpace(resolvedDamageType)
+                    ? string.Empty
+                    : $"{resolvedDamageType} ";
+                string msg = $"{context.Source.Name} deals {finalDamage} {damageTypeText}damage to {target.Name}";
                 if (appliedSneakAttack) msg += " (SNEAK ATTACK)";
                 if (appliedAgonizingBlast) msg += " (AGONIZING BLAST)";
                 if (appliedRepellingBlast) msg += " (REPELLING BLAST)";
@@ -739,7 +745,7 @@ namespace QDND.Combat.Actions.Effects
                 if (killed) msg += " (KILLED)";
 
                 var result = EffectResult.Succeeded(Type, context.Source.Id, target.Id, finalDamage, msg);
-                result.Data["damageType"] = definition.DamageType;
+                result.Data["damageType"] = resolvedDamageType;
                 result.Data["wasCritical"] = context.IsCritical;
                 result.Data["killed"] = killed;
                 result.Data["actualDamageDealt"] = actualDamageDealt;

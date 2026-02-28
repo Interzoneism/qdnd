@@ -103,8 +103,8 @@ namespace QDND.Combat.AI
                 if (opportunity != null && opportunity.ShouldReact)
                 {
                     // AI decided to react — execute it
-                    _reactionSystem.UseReaction(combatant, reaction, triggerContext);
-                    return (combatantId, reaction);
+                    if (_reactionSystem.UseReaction(combatant, reaction, triggerContext))
+                        return (combatantId, reaction);
                 }
             }
 

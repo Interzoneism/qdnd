@@ -108,6 +108,9 @@ namespace QDND.Combat.Arena
         private readonly Dictionary<string, string> _resolvedAnimationNames = new(StringComparer.OrdinalIgnoreCase);
         private const float HP_BAR_PIXEL_SIZE = 0.015f;
         private const float HP_BAR_TEXTURE_WIDTH = 116f;
+        private const int FLOAT_POOL_SIZE = 16;
+        private const float CombatPopupDurationSeconds = 3.0f;
+        private const float DefaultPopupDurationSeconds = 0.9f;
         private const string AnimationIdle = "Idle";
         private const string AnimationDeath = "Death01";
         private const string AnimationMelee = "Punch_Jab";
@@ -345,7 +348,7 @@ namespace QDND.Combat.Arena
             // Float pool (6 independently-tweened Label3D slots for overlapping popups)
             if (_floatPool.Count == 0)
             {
-                for (int i = 0; i < 6; i++)
+                for (int i = 0; i < FLOAT_POOL_SIZE; i++)
                 {
                     var slot = new Label3D { Name = $"FloatSlot{i}" };
                     slot.Position = new Vector3(0, BaseActiveStatusYOffset * ModelScale, 0);
@@ -359,7 +362,7 @@ namespace QDND.Combat.Arena
                     AddChild(slot);
                     _floatPool.Add(slot);
                 }
-                _floatPoolTweens = new Tween[6];
+                _floatPoolTweens = new Tween[FLOAT_POOL_SIZE];
             }
 
             // HP bar using SubViewport for 2D control in 3D
@@ -733,19 +736,35 @@ namespace QDND.Combat.Arena
             Color dmgColor = DamageTypeColor(damageType);
             if (isCritical)
             {
-                ShowFloatingText($"CRITICAL! -{amount}", new Color(1.0f, 0.84f, 0.0f), fontSize: 18, outlineSize: 4, critical: true);
+                ShowFloatingText(
+                    $"CRITICAL! -{amount}",
+                    new Color(1.0f, 0.84f, 0.0f),
+                    fontSize: 18,
+                    outlineSize: 4,
+                    critical: true,
+                    durationSeconds: CombatPopupDurationSeconds);
                 AnimateHit(isCritical: true);
             }
             else
             {
-                ShowFloatingText($"-{amount}", dmgColor, fontSize: 15, outlineSize: 3);
+                ShowFloatingText(
+                    $"-{amount}",
+                    dmgColor,
+                    fontSize: 15,
+                    outlineSize: 3,
+                    durationSeconds: CombatPopupDurationSeconds);
                 AnimateHit(isCritical: false);
             }
         }
 
         public void ShowMiss()
         {
-            ShowFloatingText("MISS", Colors.Gray, fontSize: 15, outlineSize: 3);
+            ShowFloatingText(
+                "Miss",
+                Colors.Gray,
+                fontSize: 15,
+                outlineSize: 3,
+                durationSeconds: CombatPopupDurationSeconds);
             PlayDodgeAnimation();
         }
 
@@ -770,11 +789,11 @@ namespace QDND.Combat.Arena
         public void ShowSavingThrow(string abilityShort, int roll, int dc, bool success)
         {
             string result = success ? "SUCCESS" : "FAIL";
-            string text = $"{abilityShort} SAVE\n{roll} vs DC {dc}\n{result}";
+            string text = $"Saving throw: {result}";
             Color color = success
                 ? new Color(0.40f, 0.73f, 0.42f)   // #66BB6A green
                 : new Color(0.94f, 0.33f, 0.31f);   // #EF5350 red
-            ShowFloatingText(text, color, fontSize: 12, outlineSize: 2);
+            ShowFloatingText(text, color, fontSize: 14, outlineSize: 3, durationSeconds: CombatPopupDurationSeconds);
         }
 
         /// <summary>
@@ -816,7 +835,13 @@ namespace QDND.Combat.Arena
             deathSaveLabel.Visible = true;
         }
 
-        private void ShowFloatingText(string text, Color color, int fontSize = 14, int outlineSize = 3, bool critical = false)
+        private void ShowFloatingText(
+            string text,
+            Color color,
+            int fontSize = 14,
+            int outlineSize = 3,
+            bool critical = false,
+            float durationSeconds = DefaultPopupDurationSeconds)
         {
             if (_floatPool.Count == 0) return;
             int slotIdx = _nextFloatIndex;
@@ -825,7 +850,7 @@ namespace QDND.Combat.Arena
 
             slot.Text = text;
             slot.FontSize = fontSize;
-            slot.Modulate = color;
+            slot.Modulate = new Color(color.R, color.G, color.B, 1f);
             slot.OutlineSize = outlineSize;
             slot.OutlineModulate = Colors.Black;
             slot.Scale = Vector3.One;
@@ -835,6 +860,9 @@ namespace QDND.Combat.Arena
             float endY = startY + (BaseFloatingTextRise * ModelScale);
             slot.Position = new Vector3(0f, startY, 0f);
             slot.Visible = true;
+            float popupDuration = Mathf.Max(0.12f, durationSeconds);
+            float fadeDuration = Mathf.Clamp(popupDuration * 0.35f, 0.20f, 1.05f);
+            float holdDuration = Mathf.Max(0.01f, popupDuration - fadeDuration);
 
             // Kill any previous tween on this slot before starting a new one.
             _floatPoolTweens[slotIdx]?.Kill();
@@ -842,8 +870,7 @@ namespace QDND.Combat.Arena
             var tween = CreateTween();
             _floatPoolTweens[slotIdx] = tween;
             tween.SetParallel(true);
-            tween.TweenProperty(slot, "position:y", endY, 0.9f).From(startY);
-            tween.TweenProperty(slot, "modulate:a", 0.0f, 0.9f).From(1.0f);
+            tween.TweenProperty(slot, "position:y", endY, popupDuration).From(startY);
 
             // Add scale animation for critical hits
             if (critical)
@@ -853,6 +880,8 @@ namespace QDND.Combat.Arena
             }
 
             tween.SetParallel(false);
+            tween.TweenInterval(holdDuration);
+            tween.TweenProperty(slot, "modulate:a", 0.0f, fadeDuration).From(1.0f);
             tween.TweenCallback(Callable.From(() => slot.Visible = false));
         }
 

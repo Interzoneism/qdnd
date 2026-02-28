@@ -71,6 +71,12 @@ namespace QDND.Combat.Actions
         /// Null or empty for single-projectile/non-attack spells.
         /// </summary>
         public List<QueryResult> ProjectileAttackResults { get; set; }
+
+        /// <summary>
+        /// Per-target saving throw outcomes keyed by target combatant ID.
+        /// Empty when the action has no save component.
+        /// </summary>
+        public Dictionary<string, QueryResult> SaveResultsByTarget { get; set; } = new();
         public string ErrorMessage { get; set; }
         public long ExecutedAt { get; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
@@ -1215,6 +1221,11 @@ namespace QDND.Combat.Actions
             }
 
             // Handle concentration abilities
+            if (context.PerTargetSaveResults.Count > 0)
+            {
+                result.SaveResultsByTarget = new Dictionary<string, QueryResult>(context.PerTargetSaveResults);
+            }
+
             if (action.RequiresConcentration && Concentration != null)
             {
                 string concentrationStatusId = action.ConcentrationStatusId;
@@ -1888,9 +1899,11 @@ namespace QDND.Combat.Actions
                     var effectResults = handler.Execute(effectDef, projectileContext);
 
                     // Attach per-projectile attack result to each effect result for logging
-                    if (projectileContext.AttackResult != null)
+                    foreach (var er in effectResults)
                     {
-                        foreach (var er in effectResults)
+                        er.Data["projectileIndex"] = i;
+
+                        if (projectileContext.AttackResult != null)
                         {
                             er.Data["projectileAttackNatural"] = projectileContext.AttackResult.NaturalRoll;
                             er.Data["projectileAttackTotal"] = (int)projectileContext.AttackResult.FinalValue;

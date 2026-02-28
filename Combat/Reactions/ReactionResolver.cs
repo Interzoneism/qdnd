@@ -154,7 +154,19 @@ namespace QDND.Combat.Reactions
                     StackItem reactionItem = PushReactionStackItem(triggerContext, reactor, reaction);
                     // Inject reactor reference so effect handlers (e.g. BG3ReactionIntegration) can access the combatant
                     triggerContext.Data["reactor"] = reactor;
-                    _reactions.UseReaction(reactor, reaction, triggerContext);
+                    bool used = _reactions.UseReaction(reactor, reaction, triggerContext);
+                    if (!used)
+                    {
+                        PopStackItem(reactionItem);
+                        result.ResolvedReactions.Add(new ResolvedReaction
+                        {
+                            ReactorId = reactor.Id,
+                            ReactionId = reaction.Id,
+                            WasUsed = false,
+                            StackDepth = _stack?.CurrentDepth ?? 0
+                        });
+                        continue;
+                    }
                     consumedReactors.Add(reactor.Id);
 
                     bool cancelled = triggerContext.IsCancellable && triggerContext.WasCancelled;
