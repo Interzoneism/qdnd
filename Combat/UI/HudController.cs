@@ -44,6 +44,10 @@ namespace QDND.Combat.UI
         private TextureRect _portraitTextureRect;
         private Label _portraitHpLabel;
 
+        // ── Concentration indicator above portrait ───────────────
+        private Control _concentrationContainer;
+        private TextureRect _concentrationIcon;
+
         // ── Reaction Icons (right side of hotbar) ─────────────────
         private HBoxContainer _reactionIconContainer;
 
@@ -104,7 +108,9 @@ namespace QDND.Combat.UI
         private TurnQueueService _turnQueue;
         private CombatLog _combatLog;
         private StatusManager _statusManager;
+        private ConcentrationSystem _concentrationSystem;
         private bool _statusManagerSubscribed;
+        private bool _concentrationSystemSubscribed;
         private bool _turnTrackerSubscribed;
         private bool _resourceModelSubscribed;
         private bool _actionModelSubscribed;
@@ -270,6 +276,37 @@ void fragment() {
             float portraitX = actionBarX - hotbarGap - portraitCircleSize;
             float portraitY = screenSize.Y - 30 - portraitCircleSize;
             _portraitContainer.GlobalPosition = new Vector2(portraitX, portraitY);
+
+            // ── Concentration Spell — centered above the portrait circle ────
+            const float concIconSize = 40;
+            _concentrationContainer = new Control();
+            _concentrationContainer.CustomMinimumSize = new Vector2(concIconSize, concIconSize);
+            _concentrationContainer.Size = new Vector2(concIconSize, concIconSize);
+            _concentrationContainer.Visible = false;
+            _concentrationContainer.MouseFilter = MouseFilterEnum.Stop;
+            AddChild(_concentrationContainer);
+
+            var concBg = new ColorRect();
+            concBg.SetAnchorsPreset(LayoutPreset.FullRect);
+            concBg.Color = new Color(0.45f, 0.18f, 0.75f, 0.7f);
+            concBg.MouseFilter = MouseFilterEnum.Ignore;
+            _concentrationContainer.AddChild(concBg);
+
+            _concentrationIcon = new TextureRect();
+            _concentrationIcon.SetAnchorsPreset(LayoutPreset.FullRect);
+            _concentrationIcon.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+            _concentrationIcon.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
+            _concentrationIcon.MouseFilter = MouseFilterEnum.Ignore;
+            _concentrationContainer.AddChild(_concentrationIcon);
+
+            var concBorder = new PanelContainer();
+            concBorder.SetAnchorsPreset(LayoutPreset.FullRect);
+            concBorder.MouseFilter = MouseFilterEnum.Ignore;
+            concBorder.AddThemeStyleboxOverride("panel",
+                HudTheme.CreatePanelStyle(Colors.Transparent, new Color(0.6f, 0.3f, 1.0f), cornerRadius: 4, borderWidth: 1, contentMargin: 0));
+            _concentrationContainer.AddChild(concBorder);
+
+            UpdateConcentrationIndicatorPosition(portraitX, portraitY, portraitCircleSize, concIconSize);
 
             // ── Resource Bar — centered above hotbar, 4px margin ───
             _resourceBarPanel = new ResourceBarPanel();
@@ -652,6 +689,23 @@ void fragment() {
                 boundNew = true;
             }
 
+            if (_concentrationSystem == null)
+            {
+                _concentrationSystem = Arena.Context.GetService<ConcentrationSystem>();
+                if (_concentrationSystem != null)
+                {
+                    boundNew = true;
+                }
+            }
+
+            if (_concentrationSystem != null && !_concentrationSystemSubscribed)
+            {
+                _concentrationSystem.OnConcentrationStarted += OnConcentrationChanged;
+                _concentrationSystem.OnConcentrationBroken += OnConcentrationBrokenHandler;
+                _concentrationSystemSubscribed = true;
+                boundNew = true;
+            }
+
             if (_combatLog != null && !_combatLogBackfilled)
             {
                 foreach (var entry in _combatLog.GetRecentEntries(100))
@@ -722,6 +776,11 @@ void fragment() {
                 _statusManager.OnStatusApplied -= OnStatusApplied;
                 _statusManager.OnStatusRemoved -= OnStatusRemoved;
             }
+            if (_concentrationSystem != null && _concentrationSystemSubscribed)
+            {
+                _concentrationSystem.OnConcentrationStarted -= OnConcentrationChanged;
+                _concentrationSystem.OnConcentrationBroken -= OnConcentrationBrokenHandler;
+            }
 
             if (Arena != null)
             {
@@ -751,6 +810,7 @@ void fragment() {
             _resourceModelSubscribed = false;
             _actionModelSubscribed = false;
             _statusManagerSubscribed = false;
+            _concentrationSystemSubscribed = false;
             _combatLogBackfilled = false;
             _syncedCombatLogEntries = 0;
 
@@ -858,6 +918,7 @@ void fragment() {
             SyncResources();
             SyncCharacterSheetForCurrentTurn();
             UpdatePortraitHp();
+            RefreshConcentrationIndicator();
 
             // Subscribe to spell slot tracking for active combatant
             var initialCombatant = Arena?.ActiveCombatantId != null
@@ -891,22 +952,26 @@ void fragment() {
             _partyPanel.SetPartyMembers(partyMembers);
         }
 
-        private List<string> GetPortraitConditionIndicators(Combatant combatant)
+        private List<ConditionIndicator> GetPortraitConditionIndicators(Combatant combatant)
         {
             if (combatant == null || Arena?.Context == null)
-                return new List<string>();
+                return new List<ConditionIndicator>();
 
             var manager = _statusManager ?? Arena.Context.GetService<StatusManager>();
             if (manager == null)
-                return new List<string>();
+                return new List<ConditionIndicator>();
 
             return manager.GetStatuses(combatant.Id)
                 .Where(s => s?.Definition != null && StatusPresentationPolicy.ShowInPortraitIndicators(s.Definition))
-                .Select(s => !string.IsNullOrWhiteSpace(s.Definition.Icon)
-                    ? s.Definition.Icon
-                    : StatusPresentationPolicy.GetDisplayName(s.Definition))
-                .Where(token => !string.IsNullOrWhiteSpace(token))
-                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Select(s => new ConditionIndicator
+                {
+                    IconPath = !string.IsNullOrWhiteSpace(s.Definition.Icon) ? s.Definition.Icon : null,
+                    DisplayName = StatusPresentationPolicy.GetDisplayName(s.Definition),
+                    Description = s.Definition.Description ?? string.Empty,
+                })
+                .Where(c => !string.IsNullOrWhiteSpace(c.DisplayName))
+                .GroupBy(c => c.DisplayName, StringComparer.OrdinalIgnoreCase)
+                .Select(g => g.First())
                 .ToList();
         }
 
@@ -963,10 +1028,12 @@ void fragment() {
                         : HudTheme.EnemyRed;
                 }
                 // Load portrait texture from combatant's assigned portrait
-                if (_portraitTextureRect != null && !string.IsNullOrEmpty(combatant.PortraitPath))
+                if (_portraitTextureRect != null)
                 {
-                    if (ResourceLoader.Exists(combatant.PortraitPath))
+                    if (!string.IsNullOrEmpty(combatant.PortraitPath) && ResourceLoader.Exists(combatant.PortraitPath))
                         _portraitTextureRect.Texture = GD.Load<Texture2D>(combatant.PortraitPath);
+                    else
+                        _portraitTextureRect.Texture = null;
                 }
             }
             else
@@ -976,6 +1043,71 @@ void fragment() {
                 if (_portraitTextureRect != null)
                     _portraitTextureRect.Texture = null;
             }
+        }
+
+        private void RefreshConcentrationIndicator()
+        {
+            if (_concentrationContainer == null)
+                return;
+
+            var combatant = GetActivePlayerCombatant();
+            if (combatant == null)
+            {
+                _concentrationContainer.Visible = false;
+                return;
+            }
+
+            var concentrationSystem = _concentrationSystem ?? Arena?.Context?.GetService<ConcentrationSystem>();
+            var info = concentrationSystem?.GetConcentratedEffect(combatant.Id);
+            if (info == null)
+            {
+                _concentrationContainer.Visible = false;
+                return;
+            }
+
+            var action = Arena?.GetActionById(info.ActionId);
+            if (action == null)
+            {
+                _concentrationContainer.Visible = false;
+                return;
+            }
+
+            if (_concentrationIcon != null)
+            {
+                if (!string.IsNullOrWhiteSpace(action.Icon) && ResourceLoader.Exists(action.Icon))
+                    _concentrationIcon.Texture = GD.Load<Texture2D>(action.Icon);
+                else
+                    _concentrationIcon.Texture = null;
+            }
+
+            string tooltip = action.Name ?? info.ActionId;
+            if (!string.IsNullOrWhiteSpace(action.Description))
+                tooltip += "\n" + action.Description;
+
+            _concentrationContainer.TooltipText = "Concentrating: " + tooltip;
+            _concentrationContainer.Visible = true;
+        }
+
+        private void OnConcentrationChanged(string combatantId, ConcentrationInfo info)
+        {
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree()) return;
+            CallDeferred(nameof(RefreshConcentrationIndicator));
+        }
+
+        private void OnConcentrationBrokenHandler(string combatantId, ConcentrationInfo info, string reason)
+        {
+            if (_disposed || !IsInstanceValid(this) || !IsInsideTree()) return;
+            CallDeferred(nameof(RefreshConcentrationIndicator));
+        }
+
+        private void UpdateConcentrationIndicatorPosition(float portraitX, float portraitY, float portraitCircleSize, float concIconSize)
+        {
+            if (_concentrationContainer == null)
+                return;
+
+            float concX = portraitX + (portraitCircleSize - concIconSize) / 2f;
+            float concY = portraitY - concIconSize - 4f;
+            _concentrationContainer.GlobalPosition = new Vector2(concX, concY);
         }
 
         private void SyncResources()
@@ -1171,6 +1303,7 @@ void fragment() {
                 _partyPanel?.SetSelectedMember(evt.CurrentCombatant.Id);
 
             UpdatePortraitHp();
+            RefreshConcentrationIndicator();
 
             // Turn announcement overlay
             if (evt.CurrentCombatant != null)
@@ -1254,6 +1387,7 @@ void fragment() {
             if (_disposed || !IsInstanceValid(this) || !IsInsideTree()) return;
             SyncCharacterSheetForCurrentTurn();
             UpdatePortraitHp();
+            RefreshConcentrationIndicator();
         }
 
         private void OnActionsChanged()
@@ -1448,9 +1582,14 @@ void fragment() {
             _actionBarPanel.Size = new Vector2(newWidth, actionBarHeight);
             _actionBarPanel.SetScreenPosition(new Vector2(actionBarX, actionBarY));
 
-            _portraitContainer.GlobalPosition = new Vector2(
-                actionBarX - hotbarGap - portraitCircleSize,
-                screenSize.Y - 30 - portraitCircleSize);
+            float portraitX = actionBarX - hotbarGap - portraitCircleSize;
+            float portraitY = screenSize.Y - 30 - portraitCircleSize;
+            _portraitContainer.GlobalPosition = new Vector2(portraitX, portraitY);
+            UpdateConcentrationIndicatorPosition(
+                portraitX,
+                portraitY,
+                portraitCircleSize,
+                _concentrationContainer?.Size.X ?? 40f);
 
             if (_resourceBarPanel != null)
             {
