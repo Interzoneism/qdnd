@@ -416,7 +416,12 @@ namespace QDND.Combat.AI
                 teamState.RecordActed(actor.Id);
                 if (result.ChosenAction.TargetId != null && result.ChosenAction.ExpectedValue > 0)
                 {
-                    teamState.RecordDamage(result.ChosenAction.TargetId, result.ChosenAction.ExpectedValue);
+                    // Only record damage dealt to actual enemies (not self-heals / ally buffs)
+                    var chosenTarget = GetCombatant(result.ChosenAction.TargetId);
+                    if (chosenTarget != null && chosenTarget.Faction != actor.Faction)
+                    {
+                        teamState.RecordDamage(result.ChosenAction.TargetId, result.ChosenAction.ExpectedValue);
+                    }
                 }
 
                 // Build a turn plan for efficient multi-action turns
@@ -2027,29 +2032,33 @@ namespace QDND.Combat.AI
                     break;
             }
 
-            // Team coordination: focus fire bonus
+            // Team coordination: focus fire bonus (only for actual enemy targets)
             if (action.TargetId != null && profile.FocusFire)
             {
                 var teamState = GetTeamState(actor.Faction);
-                var enemies = GetEnemies(actor);
-                
-                // Only apply team focus fire if there's meaningful coordination
-                // (damage dealt or HP differences between enemies)
-                bool hasCoordinationContext = teamState.DamageDealtThisRound.Count > 0 ||
-                                              enemies.Any(e => e.Resources?.CurrentHP < e.Resources?.MaxHP);
-                
-                if (hasCoordinationContext)
+                var focusTarget = GetCombatant(action.TargetId);
+                if (focusTarget != null && focusTarget.Faction != actor.Faction)
                 {
-                    teamState.DetermineFocusTarget(enemies);
+                    var enemies = GetEnemies(actor);
                     
-                    float focusBonus = teamState.GetFocusFireBonus(action.TargetId);
-                    if (focusBonus > 0)
+                    // Only apply team focus fire if there's meaningful coordination
+                    // (damage dealt or HP differences between enemies)
+                    bool hasCoordinationContext = teamState.DamageDealtThisRound.Count > 0 ||
+                                                  enemies.Any(e => e.Resources?.CurrentHP < e.Resources?.MaxHP);
+                    
+                    if (hasCoordinationContext)
                     {
-                        action.AddScore("team_focus_fire", focusBonus * GetEffectiveWeight(profile, "kill_potential"));
+                        teamState.DetermineFocusTarget(enemies);
+                        
+                        float focusBonus = teamState.GetFocusFireBonus(action.TargetId);
+                        if (focusBonus > 0)
+                        {
+                            action.AddScore("team_focus_fire", focusBonus * GetEffectiveWeight(profile, "kill_potential"));
+                        }
                     }
                 }
                 
-                // Avoid redundant CC
+                // Avoid redundant CC (applies to all targets including enemies)
                 if (action.ActionType == AIActionType.UseAbility && teamState.IsAlreadyCCd(action.TargetId))
                 {
                     var actionDef = _effectPipeline?.GetAction(action.ActionId);
