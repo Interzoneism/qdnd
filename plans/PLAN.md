@@ -124,9 +124,7 @@ Magic Missile vs Shield reaction, silenced reactor cannot trigger shield/counter
 `./scripts/run_autobattle.sh --full-fidelity --seed 42`.
 
 ## Rollout Order
-1. Ship `P0` in one PR (reaction legality + shield auto-hit + blockedActions normalization).
-2. Ship `P1` in second PR (death saves + concentration/prone + attack-pool fix).
-3. Ship `P2` in third PR (height damage parity + targeted boost parser subset).
+1. Complete every phase and deliver everything when done.
 
 ## Assumptions and Defaults
 1. Surprise/ambush remains excluded from this plan.
