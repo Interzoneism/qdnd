@@ -1,6 +1,6 @@
 # QDND Copilot Instructions
 
-**Godot 4.6 C# tactical RPG with BG3-faithful combat rules.** Read [AGENTS.md](../AGENTS.md) and [CODING_STANDARDS.md](../CODING_STANDARDS.md) before any change; they are the authority. Do not commit or push — the user does that.
+**Godot 4.6 C# tactical RPG with BG3-faithful combat rules.** Read [AGENTS.md](../AGENTS.md) and [CODING_STANDARDS.md](../CODING_STANDARDS.md) before any change; they are the authority. Do not commit or push — the user does that!
 
 ---
 
