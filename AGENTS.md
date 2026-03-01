@@ -65,6 +65,65 @@ BG3 combat parity. Explicitly excluded: resting outside combat, ambush, dialog, 
 - `mcp_vision-bridge_vision_ocr`: supply the screenshot path and ask for any readable text; useful when you need labels or log output captured in the image.
 - `mcp_vision-bridge_vision_ui_spec`: send the screenshot and request the UI structure; it returns a JSON-style spec that you can use to reconstruct or compare layouts.
 
+## CodeGraphContext (CGC) — code graph queries
+CGC builds a graph of all classes, functions, and call relationships across the 610-file codebase and lets you query it. Use it for impact analysis, tracing call chains, and finding integration points — much faster than grep for structural questions.
+
+### IMPORTANT: use the CLI, not the MCP tools
+The MCP tools (`mcp_codegraphcont_*`) work, but `add_code_to_graph` starts a background job you then have to poll with `check_job_status` repeatedly — it will appear to hang. **Prefer the CLI** which is synchronous:
+
+```bash
+CGC=".mcp/cgc/.venv/bin/cgc"
+```
+
+The repo is already indexed (610 files, 8325 functions, 1027 classes). You only need to re-index if you add/change many files:
+```bash
+.mcp/cgc/.venv/bin/cgc list          # verify it's indexed
+.mcp/cgc/.venv/bin/cgc stats         # see counts
+.mcp/cgc/.venv/bin/cgc index .       # re-index if needed (synchronous, ~90s)
+```
+
+### Key commands
+
+**Find code:**
+```bash
+cgc find pattern "SurfaceManager"          # substring match across all element names
+cgc find name MyClass                      # exact name
+cgc find name MyFunc --type function       # exact name, filtered by type
+cgc find content "some string in source"   # full-text search of source/docstrings
+```
+
+**Analyze relationships:**
+```bash
+cgc analyze callers CreateSurface          # who calls this function?
+cgc analyze calls CreateSurface            # what does this function call?
+cgc analyze chain StartTurn ProcessTurnStart --depth 8   # call path between two functions
+cgc analyze tree SurfaceManager            # inheritance hierarchy
+cgc analyze overrides Execute              # all implementations of a method
+cgc analyze dead-code                      # find unreachable code
+cgc analyze complexity MyClass            # cyclomatic complexity
+```
+
+**Raw Cypher queries** (most flexible — FalkorDB/Neo4j):
+```bash
+cgc query "MATCH (c:Class) WHERE c.name CONTAINS 'Surface' MATCH (f:File)-[:CONTAINS]->(c) RETURN c.name, f.path ORDER BY c.name"
+cgc query "MATCH (f:Function)-[:CALLS]->(g:Function) WHERE g.name = 'CreateSurface' RETURN f.name, f.file"
+```
+Node labels: `File`, `Class`, `Function`, `Module`. Relationships: `[:CONTAINS]`, `[:CALLS]`, `[:IMPORTS]`, `[:INHERITS]`.
+
+**Note:** `c.file` / `f.file` are often `null` in direct property access — join via `(file:File)-[:CONTAINS]->(node)` to get paths.
+
+### Watch directory (auto-update index)
+The MCP server is configured with `ENABLE_AUTO_WATCH: true`, so it automatically watches the repo and re-indexes changed files whenever VS Code is open. No action needed by agents.
+
+If for some reason the watch is not running (e.g. after a server restart), you can verify with:
+```bash
+.mcp/cgc/.venv/bin/cgc watching   # in MCP mode — check via list_watched_paths MCP tool
+```
+Or trigger a one-shot re-index via the CLI if many files changed:
+```bash
+.mcp/cgc/.venv/bin/cgc index .
+```
+
 ## Common Gotchas
 - Ring mesh orientation: `TorusMesh` is already ground-aligned in Godot. Do **not** rotate range/selection/target torus indicators by 90 degrees unless you have verified the mesh orientation in-scene. A forced X-axis 90 rotation will put rings on the wrong axis.
 - Test-host interop: In `dotnet test` (`testhost`/`vstest`) processes, direct Godot interop calls like `Godot.GD.Print/PrintErr` (and sometimes `Godot.FileAccess`/`DirAccess`) can crash the host. For parser/data paths exercised by unit tests, guard for testhost and fall back to `Console` + `System.IO`.
