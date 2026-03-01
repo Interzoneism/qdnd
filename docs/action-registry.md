@@ -416,4 +416,3 @@ Console.WriteLine($"Init took {stopwatch.ElapsedMilliseconds}ms");
 
 - [BG3 Action Converter](bg3-action-converter.md)
 - [BG3 Spell Parser](bg3-spell-parser.md)
-- [Action Registry Quick Reference](ACTION_REGISTRY_QUICK_REFERENCE.md)

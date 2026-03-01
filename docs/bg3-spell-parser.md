@@ -1,6 +1,6 @@
 # BG3 Spell Parser
 
-A comprehensive parser for Baldur's Gate 3 spell definition files (Stats TXT format) for use in the QDND Godot 4.5 C# game project.
+A comprehensive parser for Baldur's Gate 3 spell definition files (Stats TXT format) for use in the QDND Godot 4.6 C# game project.
 
 ## Overview
 

@@ -1,7 +1,7 @@
 # BG3 Deep Combat Mechanics Audit
 
 **Date:** 2025-01-XX  
-**Scope:** Seven areas NOT well-covered by `docs/BG3_FULL_GAP_ANALYSIS.md`  
+**Scope:** Seven areas requiring deep source-level audit  
 **Method:** Line-by-line source read of core combat files  
 
 ---

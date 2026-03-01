@@ -2,7 +2,7 @@
 
 ## Overview
 
-A complete parser and integration system for Baldur's Gate 3 status effects in the Godot 4.5 C# combat engine. This system enables loading BG3 status definitions from data files and automatically applying their boost effects to combatants.
+A complete parser and integration system for Baldur's Gate 3 status effects in the Godot 4.6 C# combat engine. This system enables loading BG3 status definitions from data files and automatically applying their boost effects to combatants.
 
 ## Architecture
 
@@ -311,7 +311,7 @@ Console.WriteLine($"Warnings: {statusRegistry.Warnings.Count}");
 
 ## Related Systems
 
-- **Action Registry**: [ACTION_REGISTRY_QUICK_REFERENCE.md](ACTION_REGISTRY_QUICK_REFERENCE.md)
+- **Action Registry**: [action-registry.md](action-registry.md)
 - **BG3 Spell Parser**: Similar parsing pattern for spells
 
 ## Files Created

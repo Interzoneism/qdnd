@@ -34,7 +34,7 @@ If a system is broken, **fix that system**. The test exists to prove the game wo
 
 | Requirement | Check | Install |
 |---|---|---|
-| Godot 4.5+ with .NET | `godot --version` | Download from godotengine.org |
+| Godot 4.6+ with .NET | `godot --version` | Download from godotengine.org |
 | .NET 8 SDK | `dotnet --version` | `sudo apt install dotnet-sdk-8.0` |
 | Xvfb (headless servers) | `which Xvfb` | `sudo apt install xvfb` |
 | Project builds | `./scripts/ci-build.sh` | Fix any build errors first |

@@ -1,9 +1,21 @@
 # Agent Rules (Godot 4.6 C#)
 
 ## Governance
-- **[PROJECT_STATUS.md](PROJECT_STATUS.md)** — Single source of truth for project state, architecture, and technical debt
 - **[CODING_STANDARDS.md](CODING_STANDARDS.md)** — Mandatory coding standards (naming, namespaces, patterns, events, error handling)
-- All documentation referenced in `PROJECT_STATUS.md § Deprecated Documentation` is **banned** — do not follow those docs
+- **[.github/copilot-instructions.md](.github/copilot-instructions.md)** — AI agent architecture guide
+
+### Deprecated Documentation
+These files have been **removed** and must **not** be recreated:
+- `docs/RULES-WINDOWS-PASSIVES.md` (deleted PassiveRuleService system)
+- `docs/ACTION_REGISTRY_QUICK_REFERENCE.md` (redundant with action-registry.md)
+- `docs/bg3-status-system-quick-reference.md` (redundant with bg3-status-system.md)
+- `docs/special_spells.md` (raw list, data in ActionRegistry)
+- `Data/IMPLEMENTATION_OVERVIEW.txt` (one-time receipt)
+- `Data/LSX_PARSER_QUICKSTART.md` (redundant with README_LSX_PARSER.md)
+- `Examples/` folder (demo code, not part of game)
+
+## Project scope
+BG3 combat parity. Explicitly excluded: resting outside combat, ambush, dialog, quests, world map, journal, illithid powers, any gameplay outside tactical combat.
 
 ## Scope & safety
 - Operate strictly within /workspace (repo root). Never write outside the repo.

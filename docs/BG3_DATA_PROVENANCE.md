@@ -217,8 +217,6 @@ Simplified, gameplay-focused data derived from `BG3_Data/` or hand-authored for 
    - Update parity allowlist if necessary (with justification)
 
 5. **Documentation**:
-   - Update `BG3_PARITY_CONTRACT.md` with scope changes
-   - Update `ROADMAP.md` with new measured counts
    - Tag repository with extraction version (e.g., `bg3-data-patch-6`)
 
 ---
@@ -301,7 +299,5 @@ Simplified, gameplay-focused data derived from `BG3_Data/` or hand-authored for 
 ## References
 
 - [BG3_Data/README.md](../BG3_Data/README.md) — Extraction details and file format specifications
-- [docs/BG3_PARITY_CONTRACT.md](BG3_PARITY_CONTRACT.md) — Scope and enforcement rules
-- [docs/ROADMAP.md](ROADMAP.md) — Measured baseline and execution plan
 - [docs/parity-validation.md](parity-validation.md) — CI gate implementation
 - https://bg3.wiki — Primary behavioral reference and content enumeration

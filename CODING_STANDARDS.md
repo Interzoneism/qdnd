@@ -135,12 +135,15 @@ public event EventHandler<DamageEventArgs>? OnDamageDealt;
 | Rule | Authority |
 |---|---|
 | Stats come from `CharacterSheet` / `CharacterResolver` only | No `CombatantStats` class |
-| Passives use `PassiveRegistry` → `BoostApplicator` | ~~`PassiveRuleService`~~ is deleted |
+| Passives: `PassiveRegistry` → `PassiveManager` → `BoostApplicator` pipeline → `BoostEvaluator` for queries | Sole passives authority |
 | Conditions: `ConditionEffects.cs` is the **sole** mechanical authority | All 16 D&D conditions |
 | Actions: `ActionRegistry` is the only action store | Fed by `ActionRegistryInitializer` |
-| Equipment: 12-slot `EquipSlot` enum via `InventoryService` | ~~`EquipmentLoadout`~~ is deleted |
+| Equipment: 12-slot `EquipSlot` enum via `InventoryService` | Sole equipment authority |
 | Ability modifier: `Math.Floor((score - 10) / 2.0)` | In `CharacterResolver` |
 | Save DC: `8 + proficiency + abilityModifier` | **Never hardcode a DC value** |
+| Reactions: `ReactionSystem` → `ReactionResolver` → `ReactionCoordinator` | `BG3ReactionIntegration` for definitions |
+| Surfaces: `SurfaceManager` is the sole surface authority | Element interactions, turn triggers |
+| AI: `AIDecisionPipeline` → `AIScorer` → `AITurnPlan` | `BG3ArchetypeProfile` for BG3-faithful scoring |
 
 ---
 
