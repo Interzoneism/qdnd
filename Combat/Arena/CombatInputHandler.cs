@@ -60,6 +60,7 @@ namespace QDND.Combat.Arena
 
         private TargetingMode _currentMode = TargetingMode.None;
         private string _movingActorId;
+        private bool _jumpTargetingPreviewVisible;
 
         public override void _Ready()
         {
@@ -105,7 +106,13 @@ namespace QDND.Combat.Arena
                         Arena.Targeting.CurrentPreview,
                         Camera,
                         id => Arena.GetCombatantVisual(id));
+
+                    UpdateJumpTargetingPreview(hover);
                 }
+            }
+            else if (_jumpTargetingPreviewVisible)
+            {
+                HideJumpTargetingPreview();
             }
 
             // Update movement preview if in movement mode
@@ -862,6 +869,61 @@ namespace QDND.Combat.Arena
             _multiPickAbilityId = null;
             _multiPickActorId = null;
             _hudController?.HideMultiTargetPrompt();
+        }
+
+        private void UpdateJumpTargetingPreview(HoverData hover)
+        {
+            if (Arena?.Targeting == null || Arena.Targeting.CurrentPhase == TargetingPhase.Inactive)
+            {
+                HideJumpTargetingPreview();
+                return;
+            }
+
+            string actionId = Arena.Targeting.ActiveActionId;
+            if (string.IsNullOrWhiteSpace(actionId))
+            {
+                HideJumpTargetingPreview();
+                return;
+            }
+
+            var action = Arena.GetActionById(actionId);
+            if (!IsJumpAction(action) || !hover.IsGroundHit)
+            {
+                HideJumpTargetingPreview();
+                return;
+            }
+
+            string actorId = Arena.Targeting.ActiveActorId;
+            if (string.IsNullOrWhiteSpace(actorId))
+            {
+                HideJumpTargetingPreview();
+                return;
+            }
+
+            if (!Arena.TryBuildJumpPreviewPath(
+                actorId,
+                hover.CursorWorldPoint,
+                out var worldWaypoints,
+                out float pathLengthMeters,
+                out float jumpDistanceLimitMeters))
+            {
+                HideJumpTargetingPreview();
+                return;
+            }
+
+            Arena.ShowJumpTargetingPreview(worldWaypoints, jumpDistanceLimitMeters, pathLengthMeters);
+            _jumpTargetingPreviewVisible = true;
+        }
+
+        private void HideJumpTargetingPreview()
+        {
+            if (!_jumpTargetingPreviewVisible)
+            {
+                return;
+            }
+
+            Arena?.ClearJumpTargetingPreview();
+            _jumpTargetingPreviewVisible = false;
         }
 
         private bool TryGetWorldPointFromMouse(out Vector3 worldPoint, uint collisionMask = 1)

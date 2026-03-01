@@ -121,6 +121,10 @@ namespace QDND.Combat.Arena
         private ScenarioBootService _scenarioBootService;
         private SphereShape3D _navigationProbeShape;
         private SphereShape3D _jumpProbeShape;
+        private JumpPathResult _cachedJumpPreviewPath;
+        private string _cachedJumpPreviewActorId;
+        private Vector3 _cachedJumpPreviewWorldTarget;
+        private ulong _cachedJumpPreviewFrame;
         private int? _scenarioSeedOverride;
         private int _resolvedScenarioSeed;
         private int _dynamicCharacterLevel = 3;
@@ -798,6 +802,15 @@ namespace QDND.Combat.Arena
             return Mathf.Max(0.1f, jumpDistance);
         }
 
+        private JumpPathResult BuildJumpPathFromWorldTarget(Combatant combatant, Vector3 targetWorldPosition)
+        {
+            Vector3 targetGridPosition = new(
+                targetWorldPosition.X / TileSize,
+                targetWorldPosition.Y,
+                targetWorldPosition.Z / TileSize);
+            return BuildJumpPath(combatant, targetGridPosition);
+        }
+
         private JumpPathResult BuildJumpPath(Combatant combatant, Vector3 targetGridPosition)
         {
             if (combatant == null)
@@ -815,6 +828,36 @@ namespace QDND.Combat.Arena
                 startWorld,
                 targetWorld,
                 (point, radius) => IsWorldJumpBlocked(point, radius, combatant.Id));
+        }
+
+        private JumpPathResult GetCachedJumpPreviewPath(Combatant combatant, Vector3 targetWorldPosition)
+        {
+            if (combatant == null)
+            {
+                return new JumpPathResult
+                {
+                    Success = false,
+                    FailureReason = "No combatant selected"
+                };
+            }
+
+            ulong frame = Engine.GetProcessFrames();
+            bool cacheHit =
+                _cachedJumpPreviewPath != null &&
+                _cachedJumpPreviewFrame == frame &&
+                string.Equals(_cachedJumpPreviewActorId, combatant.Id, StringComparison.Ordinal) &&
+                _cachedJumpPreviewWorldTarget.DistanceSquaredTo(targetWorldPosition) <= 0.0004f;
+
+            if (cacheHit)
+            {
+                return _cachedJumpPreviewPath;
+            }
+
+            _cachedJumpPreviewFrame = frame;
+            _cachedJumpPreviewActorId = combatant.Id;
+            _cachedJumpPreviewWorldTarget = targetWorldPosition;
+            _cachedJumpPreviewPath = BuildJumpPathFromWorldTarget(combatant, targetWorldPosition);
+            return _cachedJumpPreviewPath;
         }
 
         public override void _Process(double delta)
@@ -2081,6 +2124,75 @@ namespace QDND.Combat.Arena
         public void ClearMovementPreview() => _movementCoordinator.ClearMovementPreview();
 
         /// <summary>
+        /// Build jump preview waypoints and metadata for a combatant aiming at a world-space point.
+        /// </summary>
+        public bool TryBuildJumpPreviewPath(
+            string combatantId,
+            Vector3 targetWorldPosition,
+            out List<Vector3> worldWaypoints,
+            out float pathLengthMeters,
+            out float jumpDistanceLimitMeters)
+        {
+            worldWaypoints = null;
+            pathLengthMeters = 0f;
+            jumpDistanceLimitMeters = 0f;
+
+            var combatant = _combatContext?.GetCombatant(combatantId);
+            if (combatant == null)
+            {
+                return false;
+            }
+
+            jumpDistanceLimitMeters = GetJumpDistanceLimit(combatant);
+            var jumpPath = GetCachedJumpPreviewPath(combatant, targetWorldPosition);
+            if (jumpPath == null || !jumpPath.Success || jumpPath.Waypoints.Count < 2)
+            {
+                return false;
+            }
+
+            worldWaypoints = new List<Vector3>(jumpPath.Waypoints);
+            pathLengthMeters = jumpPath.TotalLength;
+            return true;
+        }
+
+        /// <summary>
+        /// Get the dynamic jump distance limit (meters) for a combatant.
+        /// </summary>
+        public float GetJumpDistanceLimitForCombatant(string combatantId)
+        {
+            var combatant = _combatContext?.GetCombatant(combatantId);
+            return GetJumpDistanceLimit(combatant);
+        }
+
+        /// <summary>
+        /// Render jump targeting preview using the same visuals as normal movement preview.
+        /// </summary>
+        public void ShowJumpTargetingPreview(
+            IReadOnlyList<Vector3> worldWaypoints,
+            float jumpDistanceLimitMeters,
+            float pathLengthMeters)
+        {
+            if (_movementPreview == null || worldWaypoints == null || worldWaypoints.Count < 2)
+            {
+                return;
+            }
+
+            _movementPreview.Update(
+                worldWaypoints.ToList(),
+                Mathf.Max(0.1f, jumpDistanceLimitMeters),
+                Mathf.Max(0f, pathLengthMeters),
+                hasOpportunityThreat: false);
+        }
+
+        /// <summary>
+        /// Clear jump targeting preview path/label.
+        /// </summary>
+        public void ClearJumpTargetingPreview()
+        {
+            _movementPreview?.Clear();
+        }
+
+        /// <summary>
         /// Execute movement for an actor to target position.
         /// </summary>
         /// <summary>
@@ -2297,6 +2409,7 @@ namespace QDND.Combat.Arena
         {
             _targetingSystem?.ForceEnd();
             _targetingVisualSystem?.ClearAll();
+            ClearJumpTargetingPreview();
             _rangeIndicator?.Hide();
             ClearTargetHighlights();
         }
@@ -2334,7 +2447,11 @@ namespace QDND.Combat.Arena
 
             // Register all 12 targeting modes
             _targetingSystem.RegisterMode(new SingleTargetMode(_targetValidator, _rulesEngine, losService, getCombatant, getAllCombatants));
-            _targetingSystem.RegisterMode(new FreeAimGroundMode(_targetValidator, losService));
+            _targetingSystem.RegisterMode(new FreeAimGroundMode(
+                _targetValidator,
+                losService,
+                (source, targetWorldPoint) => GetCachedJumpPreviewPath(source, targetWorldPoint),
+                GetJumpDistanceLimit));
             _targetingSystem.RegisterMode(new StraightLineMode(_targetValidator, losService, getSpaceState, getCombatant, getAllCombatants));
             _targetingSystem.RegisterMode(new BallisticArcMode(_targetValidator, losService, getSpaceState, getCombatant));
             _targetingSystem.RegisterMode(new BezierCurveMode(_targetValidator, losService, getSpaceState, getCombatant));
@@ -2384,6 +2501,7 @@ namespace QDND.Combat.Arena
 
             // Clear all targeting visuals after dispatching execution
             _targetingVisualSystem?.ClearAll();
+            ClearJumpTargetingPreview();
         }
 
         public override void _ExitTree()

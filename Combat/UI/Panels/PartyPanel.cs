@@ -7,6 +7,13 @@ using QDND.Combat.UI.Base;
 
 namespace QDND.Combat.UI.Panels
 {
+    public class ConditionIndicator
+    {
+        public string IconPath { get; set; }
+        public string DisplayName { get; set; }
+        public string Description { get; set; }
+    }
+
     /// <summary>
     /// Data for a single party member.
     /// </summary>
@@ -16,7 +23,7 @@ namespace QDND.Combat.UI.Panels
         public string Name { get; set; }
         public int HpCurrent { get; set; }
         public int HpMax { get; set; }
-        public List<string> Conditions { get; set; } = new();
+        public List<ConditionIndicator> Conditions { get; set; } = new();
         public bool IsSelected { get; set; }
         public string RaceClass { get; set; }
         public string PortraitPath { get; set; }
@@ -95,7 +102,7 @@ namespace QDND.Combat.UI.Panels
         /// <summary>
         /// Update a member's HP and conditions.
         /// </summary>
-        public void UpdateMember(string id, int currentHp, int maxHp, List<string> conditions)
+        public void UpdateMember(string id, int currentHp, int maxHp, List<ConditionIndicator> conditions)
         {
             if (!_cards.TryGetValue(id, out var card)) return;
 
@@ -268,7 +275,7 @@ namespace QDND.Combat.UI.Panels
         /// Map conditions to 30×30 texture icons to the right of the portrait.
         /// Falls back to a centered 7×7 colored dot if no icon asset is found.
         /// </summary>
-        private static void RebuildConditionDots(PortraitCard card, List<string> conditions)
+        private static void RebuildConditionDots(PortraitCard card, List<ConditionIndicator> conditions)
         {
             foreach (var child in card.ConditionContainer.GetChildren())
             {
@@ -277,10 +284,20 @@ namespace QDND.Combat.UI.Panels
 
             if (conditions == null || conditions.Count == 0) return;
 
-            int count = System.Math.Min(conditions.Count, MaxVisibleConditionIcons);
-            for (int i = 0; i < count; i++)
+            foreach (var indicator in conditions.Where(c => c != null).Take(MaxVisibleConditionIcons))
             {
-                string iconPath = ResolveConditionIconPath(conditions[i]);
+                string iconPath = null;
+                if (!string.IsNullOrWhiteSpace(indicator.IconPath) &&
+                    indicator.IconPath.StartsWith("res://", StringComparison.OrdinalIgnoreCase) &&
+                    ResourceLoader.Exists(indicator.IconPath))
+                {
+                    iconPath = indicator.IconPath;
+                }
+
+                if (iconPath == null)
+                    iconPath = ResolveConditionIconPath(indicator.DisplayName);
+
+                string tooltip = BuildConditionTooltip(indicator);
                 if (iconPath != null)
                 {
                     var icon = new TextureRect();
@@ -288,7 +305,8 @@ namespace QDND.Combat.UI.Panels
                     icon.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
                     icon.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
                     icon.Texture = GD.Load<Texture2D>(iconPath);
-                    icon.MouseFilter = MouseFilterEnum.Ignore;
+                    icon.TooltipText = tooltip;
+                    icon.MouseFilter = MouseFilterEnum.Pass;
                     card.ConditionContainer.AddChild(icon);
                 }
                 else
@@ -296,16 +314,30 @@ namespace QDND.Combat.UI.Panels
                     // Fallback: 7×7 dot centered inside a 30×30 container
                     var container = new Control();
                     container.CustomMinimumSize = new Vector2(ConditionIconSize, ConditionIconSize);
-                    container.MouseFilter = MouseFilterEnum.Ignore;
+                    container.TooltipText = tooltip;
+                    container.MouseFilter = MouseFilterEnum.Pass;
                     var dot = new ColorRect();
                     dot.Position = new Vector2((ConditionIconSize - 7) / 2f, (ConditionIconSize - 7) / 2f);
                     dot.Size = new Vector2(7, 7);
-                    dot.Color = GetConditionDotColor(conditions[i]);
+                    dot.Color = GetConditionDotColor(indicator.DisplayName);
                     dot.MouseFilter = MouseFilterEnum.Ignore;
                     container.AddChild(dot);
                     card.ConditionContainer.AddChild(container);
                 }
             }
+        }
+
+        private static string BuildConditionTooltip(ConditionIndicator indicator)
+        {
+            string name = string.IsNullOrWhiteSpace(indicator?.DisplayName)
+                ? "Condition"
+                : indicator.DisplayName.Trim();
+
+            string description = indicator?.Description?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(description))
+                return name;
+
+            return $"{name}\n{description}";
         }
 
         /// <summary>
