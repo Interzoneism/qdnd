@@ -303,7 +303,7 @@ namespace QDND.Combat.AI
                     _activeWeightOverrides = null;
                 
                 // Step 1: Generate candidates
-                var candidates = GenerateCandidates(actor);
+                var candidates = GenerateCandidates(actor, profile);
                 result.AllCandidates = candidates;
 
                 if (DebugLogging)
@@ -478,7 +478,7 @@ namespace QDND.Combat.AI
         /// <summary>
         /// Generate all candidate actions for an actor.
         /// </summary>
-        public List<AIAction> GenerateCandidates(Combatant actor)
+        public List<AIAction> GenerateCandidates(Combatant actor, AIProfile profile = null)
         {
             var candidates = new List<AIAction>();
 
@@ -522,7 +522,7 @@ namespace QDND.Combat.AI
             }
 
             // Item candidates (potions, scrolls, throwables)
-            candidates.AddRange(GenerateItemCandidates(actor));
+            candidates.AddRange(GenerateItemCandidates(actor, profile));
 
             // Dash candidate
             if (actor.ActionBudget?.HasAction == true)
@@ -573,15 +573,28 @@ namespace QDND.Combat.AI
                 if (dip != null) candidates.Add(dip);
             }
 
+            // Weapon pickup candidates (costs action, requires GroundItemService)
+            if (actor.ActionBudget?.HasAction == true)
+            {
+                candidates.AddRange(GenerateWeaponPickupCandidates(actor, profile));
+            }
+
             return candidates;
         }
 
         /// <summary>
         /// Generate item-use candidates (potions, scrolls, throwables).
         /// </summary>
-        private List<AIAction> GenerateItemCandidates(Combatant actor)
+        private List<AIAction> GenerateItemCandidates(Combatant actor, AIProfile profile)
         {
             var candidates = new List<AIAction>();
+
+            // Resolve BG3 archetype profile for item-usage params
+            var bg3 = profile?.BG3Profile;
+
+            // BG3 gate: if item usage is disabled, return empty list
+            if (bg3 != null && bg3.UseInventoryItemsEnabled < 0.5f)
+                return candidates;
 
             if (_context == null || !_context.TryGetService<InventoryService>(out var inventoryService))
                 return candidates;
@@ -596,6 +609,10 @@ namespace QDND.Combat.AI
 
             var enemies = GetEnemies(actor);
 
+            // BG3: Cap throwable candidates evaluated
+            int throwableCount = 0;
+            int throwableLimit = bg3 != null ? (int)Math.Round(bg3.ThrowInventoryItemLimit) : int.MaxValue;
+
             foreach (var item in usableItems)
             {
                 var actionDef = _effectPipeline?.GetAction(item.UseActionId);
@@ -606,6 +623,13 @@ namespace QDND.Combat.AI
                 bool usesAction = actionDef.Cost?.UsesAction == true;
                 if (usesBonusAction && actor.ActionBudget?.HasBonusAction != true) continue;
                 if (usesAction && !usesBonusAction && actor.ActionBudget?.HasAction != true) continue;
+
+                // BG3: Enforce throwable candidate cap
+                if (item.Category == ItemCategory.Throwable)
+                {
+                    if (throwableCount >= throwableLimit) continue;
+                    throwableCount++;
+                }
 
                 float score = 0f;
 
@@ -641,6 +665,14 @@ namespace QDND.Combat.AI
 
                 if (score <= 0f) continue;
 
+                // BG3: UseItemRadius is reinterpreted as a max target-distance filter
+                // for item candidates (in BG3 data it is a search radius for finding items;
+                // here it gates how far away valid targets can be).  We clamp so the
+                // profile can never reduce range below the action's actual reach.
+                float effectiveRange = bg3 != null
+                    ? Math.Max(bg3.UseItemRadius, actionDef.Range)
+                    : (actionDef.Range + 0.5f);
+
                 // Determine target based on action TargetType
                 switch (actionDef.TargetType)
                 {
@@ -669,7 +701,8 @@ namespace QDND.Combat.AI
                         foreach (var target in validTargets)
                         {
                             float distance = actor.Position.DistanceTo(target.Position);
-                            if (distance > actionDef.Range + 0.5f) continue;
+                            if (distance > effectiveRange) continue;
+
                             var candidate = new AIAction
                             {
                                 ActionType = AIActionType.UseItem,
@@ -690,8 +723,11 @@ namespace QDND.Combat.AI
                     case TargetType.Charge:
                     case TargetType.WallSegment:
                     {
-                        // Target nearest enemy position
-                        var nearestEnemy = enemies.OrderBy(e => actor.Position.DistanceTo(e.Position)).FirstOrDefault();
+                        // Target nearest enemy position within effective range
+                        var nearestEnemy = enemies
+                            .Where(e => actor.Position.DistanceTo(e.Position) <= effectiveRange)
+                            .OrderBy(e => actor.Position.DistanceTo(e.Position))
+                            .FirstOrDefault();
                         if (nearestEnemy != null)
                         {
                             var candidate = new AIAction
@@ -1641,6 +1677,95 @@ namespace QDND.Combat.AI
         }
 
         // ============================================================
+        // Weapon Pickup Candidates
+        // ============================================================
+
+        /// <summary>
+        /// Generate weapon-pickup candidates scored using BG3 archetype parameters.
+        /// Requires a GroundItemService registered in the combat context.
+        /// </summary>
+        private List<AIAction> GenerateWeaponPickupCandidates(Combatant actor, AIProfile profile)
+        {
+            var candidates = new List<AIAction>();
+            var bg3 = profile?.BG3Profile;
+
+            // Gate: only BG3 profiles with positive pickup modifier
+            if (bg3 == null || bg3.WeaponPickupModifier <= 0f) return candidates;
+
+            // Get ground item service (null = no ground items in this combat)
+            if (_context == null || !_context.TryGetService<GroundItemService>(out var groundItemService))
+                return candidates;
+
+            // Find weapons within search radius
+            var weapons = groundItemService.GetWeaponsInRadius(actor.Position, bg3.WeaponPickupRadius);
+
+            foreach (var weapon in weapons)
+            {
+                float score = bg3.WeaponPickupModifier; // base (0.3)
+
+                // Damage scaling
+                score += bg3.WeaponPickupModifierDamage * weapon.AverageDamage;
+
+                // Preferred weapon type (ranged preference)
+                if (bg3.WeaponPickupPreferRangedEnabled > 0 && weapon.IsRanged)
+                    score *= bg3.WeaponPickupModifierPreferred; // 1.25x for preferred
+
+                // Previously equipped bonus
+                if (weapon.PreviousOwnerId == actor.Id)
+                    score *= bg3.WeaponPickupModifierPreviouslyEquipped; // 1.25x
+
+                // Party ally weapon penalty (0.0 = never pick up ally weapons)
+                if (!string.IsNullOrEmpty(weapon.PreviousOwnerFaction) &&
+                    weapon.PreviousOwnerFaction == actor.Faction.ToString() &&
+                    weapon.PreviousOwnerId != actor.Id)
+                    score *= bg3.WeaponPickupModifierPartyAlly; // 0.0 by default
+
+                // Proficiency penalty
+                if (weapon.RequiresProficiency && !ActorHasWeaponProficiency(actor, weapon))
+                    score *= bg3.WeaponPickupModifierNoProficiency; // 0.5x
+
+                if (score <= 0f) continue;
+
+                var action = new AIAction
+                {
+                    ActionType = AIActionType.PickupWeapon,
+                    TargetPosition = weapon.Position,
+                    ActionId = weapon.Id,
+                    Score = score
+                };
+                action.ScoreBreakdown["weapon_pickup_base"] = bg3.WeaponPickupModifier;
+                action.ScoreBreakdown["weapon_pickup_total"] = score;
+                candidates.Add(action);
+            }
+
+            return candidates;
+        }
+
+        /// <summary>
+        /// Check if an actor is proficient with a ground weapon.
+        /// Uses the character's ProficiencySet if available; otherwise assumes proficient.
+        /// </summary>
+        private static bool ActorHasWeaponProficiency(Combatant actor, GroundItemService.GroundWeapon weapon)
+        {
+            var profs = actor.ResolvedCharacter?.Proficiencies;
+            if (profs == null) return true; // monsters/NPCs without ResolvedCharacter are assumed proficient
+
+            // Check specific weapon type
+            if (!string.IsNullOrEmpty(weapon.WeaponType) &&
+                Enum.TryParse<QDND.Data.CharacterModel.WeaponType>(weapon.WeaponType, ignoreCase: true, out var wt) &&
+                profs.IsProficientWithWeapon(wt))
+                return true;
+
+            // Check weapon category (Simple / Martial)
+            if (!string.IsNullOrEmpty(weapon.WeaponCategory) &&
+                Enum.TryParse<QDND.Data.CharacterModel.WeaponCategory>(weapon.WeaponCategory, ignoreCase: true, out var wc) &&
+                profs.IsProficientWithWeaponCategory(wc))
+                return true;
+
+            return false;
+        }
+
+        // ============================================================
         // Common Action Scoring (Dodge, Hide, Help, Dip, Throw)
         // ============================================================
 
@@ -1911,6 +2036,92 @@ namespace QDND.Combat.AI
         }
 
         /// <summary>
+        /// Score UseItem: potions, scrolls, throwables. Applies BG3 UseItemModifier,
+        /// MultiplierSelfOnlyThrow, and UseItemModifierNoVisibility when a BG3 profile is present.
+        /// </summary>
+        private void ScoreItemUse(AIAction action, Combatant actor, AIProfile profile)
+        {
+            // Reconstruct the item-type-aware base score.
+            // ActionId is the item DefinitionId; look up the matching InventoryItem.
+            string itemDefId = action.ActionId;
+            InventoryItem item = null;
+            if (_context != null && _context.TryGetService<InventoryService>(out var invSvc))
+            {
+                item = invSvc.GetUsableItems(actor.Id)
+                    .FirstOrDefault(i => i.DefinitionId == itemDefId);
+            }
+
+            float hpPercent = actor.Resources != null && actor.Resources.MaxHP > 0
+                ? (float)actor.Resources.CurrentHP / actor.Resources.MaxHP
+                : 1f;
+
+            // Prefer the pre-seeded base score from candidate generation to avoid
+            // duplicating the per-category formula.  Fall back to re-derivation only
+            // when the breakdown entry is missing (shouldn't happen in normal flow).
+            float score = 0f;
+            if (action.ScoreBreakdown.TryGetValue("item_use", out float seededScore) && seededScore > 0f)
+            {
+                score = seededScore;
+            }
+            else if (item != null)
+            {
+                var actionDef = _effectPipeline?.GetAction(item.UseActionId);
+                switch (item.Category)
+                {
+                    case ItemCategory.Potion:
+                        if (item.DefinitionId?.Contains("healing") == true)
+                            score = (1.0f - hpPercent) * 8.0f;
+                        else
+                            score = 3.0f;
+                        break;
+                    case ItemCategory.Throwable:
+                        score = (actionDef?.AIBaseDesirability ?? 1f) * 3.0f;
+                        break;
+                    case ItemCategory.Scroll:
+                        score = (actionDef?.AIBaseDesirability ?? 1f) * 3.0f;
+                        break;
+                    default:
+                        score = actionDef?.AIBaseDesirability ?? 1f;
+                        break;
+                }
+            }
+            else
+            {
+                score = 0.5f; // Fallback when item lookup fails
+            }
+
+            if (score <= 0f)
+            {
+                action.IsValid = false;
+                action.InvalidReason = "Item score non-positive";
+                return;
+            }
+
+            // BG3: Apply item-usage modifiers
+            var bg3 = profile.BG3Profile;
+            if (bg3 != null)
+            {
+                score *= bg3.UseItemModifier;
+
+                // MultiplierSelfOnlyThrow for self-targeted throwables
+                if (item?.Category == ItemCategory.Throwable && action.TargetId == actor.Id)
+                    score *= bg3.MultiplierSelfOnlyThrow;
+
+                // UseItemModifierNoVisibility when target isn't visible
+                if (action.TargetId != null && _los != null)
+                {
+                    var target = GetCombatant(action.TargetId);
+                    if (target != null && target.Id != actor.Id && !_los.HasLineOfSight(actor, target))
+                        score *= bg3.UseItemModifierNoVisibility;
+                }
+                // TODO: For TargetPosition-based candidates, LOS check against position
+                // is not available here; consider adding point-based visibility if needed.
+            }
+
+            action.AddScore("item_use", score);
+        }
+
+        /// <summary>
         /// Check if a combatant is a Rogue class via tags or known abilities.
         /// </summary>
         private static bool IsRogueClass(Combatant actor)
@@ -1990,6 +2201,8 @@ namespace QDND.Combat.AI
         /// </summary>
         private void ScoreCandidate(AIAction action, Combatant actor, AIProfile profile)
         {
+            // Capture pre-computed score for action types that score during generation
+            float precomputedScore = action.Score;
             action.Score = 0;
             action.ScoreBreakdown.Clear();
 
@@ -2015,6 +2228,14 @@ namespace QDND.Combat.AI
                     break;
                 case AIActionType.Disengage:
                     ScoreDisengage(action, actor, profile);
+                    break;
+                case AIActionType.UseItem:
+                    ScoreItemUse(action, actor, profile);
+                    break;
+                case AIActionType.PickupWeapon:
+                    // Score already computed during candidate generation using all 8 BG3 params.
+                    // Restore the generation-time score.
+                    action.AddScore("weapon_pickup", precomputedScore);
                     break;
                 case AIActionType.EndTurn:
                     float endTurnScore = 0.1f;

@@ -1,11 +1,39 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Godot;
 using QDND.Combat.Entities;
 using QDND.Data;
 
 namespace QDND.Combat.Statuses
 {
+    /// <summary>
+    /// Lightweight data struct for AI aura queries. No Godot node dependencies.
+    /// </summary>
+    public readonly struct AuraInfo
+    {
+        public readonly Vector3 Position;
+        public readonly float Radius;
+        public readonly string StatusId;
+        public readonly string SourceCombatantId;
+        public readonly string SourceFaction;
+        public readonly string SourceTeam;
+        public readonly bool AffectsEnemiesOnly;
+
+        public AuraInfo(Vector3 position, float radius, string statusId,
+            string sourceCombatantId, string sourceFaction, string sourceTeam,
+            bool affectsEnemiesOnly)
+        {
+            Position = position;
+            Radius = radius;
+            StatusId = statusId;
+            SourceCombatantId = sourceCombatantId;
+            SourceFaction = sourceFaction;
+            SourceTeam = sourceTeam;
+            AffectsEnemiesOnly = affectsEnemiesOnly;
+        }
+    }
+
     /// <summary>
     /// Processes entity-attached auras: when a combatant has a status with AuraRadius > 0,
     /// nearby combatants within range receive (or lose) the AuraStatusId status.
@@ -126,6 +154,100 @@ namespace QDND.Combat.Statuses
                 RuntimeSafety.Log($"[AuraSystem] Removed '{childStatusId}' from {target.Id} " +
                     $"(left aura range of {auraSource.Id})");
             }
+        }
+
+        // ──────────────────────────────────────────────
+        //  Query API (read-only, used by AI)
+        // ──────────────────────────────────────────────
+
+        /// <summary>
+        /// Returns all active auras in combat (statuses with AuraRadius > 0 on living combatants).
+        /// </summary>
+        public List<AuraInfo> GetActiveAuras()
+        {
+            var result = new List<AuraInfo>();
+            var allCombatants = _getCombatants();
+
+            foreach (var combatant in allCombatants)
+            {
+                if (combatant.LifeState == CombatantLifeState.Dead) continue;
+
+                var auraStatuses = _statusManager.GetStatuses(combatant.Id)
+                    .Where(s => s.Definition.AuraRadius > 0f && !string.IsNullOrEmpty(s.Definition.AuraStatusId))
+                    .ToList();
+
+                foreach (var auraStatus in auraStatuses)
+                {
+                    result.Add(new AuraInfo(
+                        combatant.Position,
+                        auraStatus.Definition.AuraRadius,
+                        auraStatus.Definition.AuraStatusId,
+                        combatant.Id,
+                        combatant.Faction.ToString(),
+                        combatant.Team ?? "",
+                        auraStatus.Definition.AuraAffectsEnemiesOnly));
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Checks whether a position falls inside any friendly, hostile, or own aura
+        /// relative to the querying combatant.  Convenience overload that recomputes
+        /// the active-aura list on every call.
+        /// </summary>
+        public (bool InFriendly, bool InHostile, bool InOwnAura) IsPositionInAura(
+            Vector3 position, string combatantId, string combatantFaction, string combatantTeam = null)
+        {
+            return IsPositionInAura(position, combatantId, combatantFaction, combatantTeam, GetActiveAuras());
+        }
+
+        /// <summary>
+        /// Checks whether a position falls inside any friendly, hostile, or own aura
+        /// relative to the querying combatant.  Uses a pre-computed aura list to avoid
+        /// O(candidates × combatants × statuses) overhead when called in a tight loop.
+        /// </summary>
+        public (bool InFriendly, bool InHostile, bool InOwnAura) IsPositionInAura(
+            Vector3 position, string combatantId, string combatantFaction,
+            string combatantTeam, List<AuraInfo> cachedAuras)
+        {
+            bool inFriendly = false;
+            bool inHostile = false;
+            bool inOwnAura = false;
+
+            foreach (var aura in cachedAuras)
+            {
+                float dist = position.DistanceTo(aura.Position);
+                if (dist > aura.Radius) continue;
+
+                bool sameSource = string.Equals(aura.SourceCombatantId, combatantId, StringComparison.OrdinalIgnoreCase);
+                bool sameFaction = string.Equals(aura.SourceFaction, combatantFaction, StringComparison.OrdinalIgnoreCase);
+
+                // Team override: if both sides share a Team string, treat as friendly
+                // even when factions differ (mirrors ProcessSingleAura logic).
+                bool sameTeam = !string.IsNullOrEmpty(aura.SourceTeam)
+                    && !string.IsNullOrEmpty(combatantTeam)
+                    && string.Equals(aura.SourceTeam, combatantTeam, StringComparison.OrdinalIgnoreCase);
+
+                if (sameSource)
+                {
+                    inOwnAura = true;
+                }
+                else if (sameFaction || sameTeam)
+                {
+                    // Friendly aura — only counts if the aura doesn't exclusively affect enemies
+                    if (!aura.AffectsEnemiesOnly)
+                        inFriendly = true;
+                }
+                else
+                {
+                    // Different faction and different/no team — hostile aura
+                    inHostile = true;
+                }
+            }
+
+            return (inFriendly, inHostile, inOwnAura);
         }
 
         /// <summary>

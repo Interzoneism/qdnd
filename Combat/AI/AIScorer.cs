@@ -164,6 +164,16 @@ namespace QDND.Combat.AI
                 }
             }
 
+            // TODO: Target obscurement scoring (ObscurementService integration)
+            // When ObscurementService is available, check obscurement at target's position:
+            // - Heavily obscured targets impose disadvantage on attacks (lower hit chance penalty)
+            //   unless attacker has blindsight/truesight/devil's sight (future feature).
+            // - This connects to ModifierHitChanceStupidity — a "stupid" AI doesn't account
+            //   for obscurement miss chance.
+            // - Lightly obscured targets: minor penalty to perception-based attacks.
+            // Implementation deferred: requires the attack roll system to be aware of
+            // obscurement, which is a combat rules change, not just AI scoring.
+
             // Condition-aware scoring: bonus for attacking debuffed targets
             // In D&D 5e/BG3, paralyzed/stunned/prone targets are high-value opportunities
             if (statusMgr != null)
@@ -620,6 +630,60 @@ namespace QDND.Combat.AI
                         statusValue *= bg3.MultiplierBlind;
                 }
 
+                // Phase 3: DoT/HoT/Boost sub-multiplier override
+                // For non-Control statuses, refine the generic multiplier with a sub-type-specific one.
+                if (!isControl)
+                {
+                    var subType = AIStatusClassifier.ClassifyStatusSubType(effectType, _context);
+                    if (subType != StatusSubType.Unknown)
+                    {
+                        // Compute strict faction flags (separate neutral from enemy)
+                        bool isNeutralTarget = target != null &&
+                            target.Faction == Faction.Neutral &&
+                            actor.Faction != Faction.Neutral;
+                        bool isStrictEnemy = targetIsEnemy && !isNeutralTarget;
+
+                        // Determine polarity solely from subType + target relation.
+                        // DoT is damage → desirable on enemies.
+                        // HoT is healing → desirable on self/allies.
+                        // Boost is a beneficial stat buff → desirable on self/allies.
+                        bool isDesirable = subType switch
+                        {
+                            StatusSubType.DoT => isStrictEnemy,                             // DoT on enemy = good
+                            StatusSubType.HoT => targetIsSelf || targetIsAlly,              // HoT on self/ally = good
+                            StatusSubType.Boost => targetIsSelf || targetIsAlly,             // Boost on self/ally = good
+                            _ => isStrictEnemy
+                        };
+
+                        float subMult = AIStatusClassifier.GetSubMultiplier(
+                            subType, targetIsSelf, isStrictEnemy, targetIsAlly, isDesirable, bg3);
+
+                        if (subMult > 0f)
+                        {
+                            statusValue = isDesirable
+                                ? baseMod * subMult * baseScale
+                                : -baseMod * subMult * baseScale;
+                            breakdown["status_sub_type"] = (float)subType;
+                        }
+                    }
+                }
+
+                // BG3: Boost-type-specific scoring — differentiate by what the boost does
+                // Applied after sub-multiplier override so type scores ADD to the final base.
+                if (isBuff && statusDef != null && !string.IsNullOrEmpty(statusDef.Boosts))
+                {
+                    var boostMatches = AIBoostTypeClassifier.ClassifyBoosts(statusDef.Boosts, bg3);
+                    if (boostMatches.Count > 0)
+                    {
+                        float typeScore = 0f;
+                        foreach (var match in boostMatches)
+                            typeScore += match.multiplier;
+                        float boostTypeAdjustment = typeScore * bg3.ScoreMod;
+                        breakdown["boost_type_score"] = boostTypeAdjustment;
+                        statusValue += boostTypeAdjustment;
+                    }
+                }
+
                 breakdown["status_value"] = statusValue;
                 score += statusValue;
 
@@ -675,7 +739,9 @@ namespace QDND.Combat.AI
             }
 
             // BG3: Faction-aware score modifiers — invert score for ally/neutral targets
-            if (bg3 != null && target != null)
+            // Skip when a sub-type override was applied (sub-multipliers already encode faction polarity)
+            bool subTypeApplied = action.ScoreBreakdown.ContainsKey("status_sub_type");
+            if (bg3 != null && target != null && !subTypeApplied)
             {
                 bool isAlly = target.Faction == actor.Faction && target.Id != actor.Id;
                 bool isNeutral = target.Faction == Faction.Neutral && actor.Faction != Faction.Neutral;

@@ -17,7 +17,8 @@ namespace QDND.Combat.AI
         Dodge,
         Shove,
         Jump,
-        EndTurn
+        EndTurn,
+        PickupWeapon
     }
 
     /// <summary>

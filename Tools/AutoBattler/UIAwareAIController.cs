@@ -685,6 +685,14 @@ namespace QDND.Tools.AutoBattler
                             OnActionExecuted?.Invoke(actor.Id, $"UseItem:{action.ActionId} - failed", false);
                         }
                         break;
+
+                    case AIActionType.PickupWeapon:
+                        // TODO: Implement weapon pickup execution — move to weapon position,
+                        // equip weapon, remove from GroundItemService. Requires combat rules
+                        // for equip/swap interactions. For now, skip as not executable.
+                        Log($"PickupWeapon not yet implemented (weapon: {action.ActionId})");
+                        OnActionExecuted?.Invoke(actor.Id, $"PickupWeapon:{action.ActionId} - not implemented", false);
+                        break;
                     
                     default:
                         Log($"Unhandled action type: {action.ActionType}");

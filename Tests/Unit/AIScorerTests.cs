@@ -3,6 +3,8 @@ using QDND.Combat.AI;
 using QDND.Combat.Entities;
 using QDND.Combat.Environment;
 using QDND.Combat.Services;
+using QDND.Combat.Statuses;
+using QDND.Data.Statuses;
 using QDND.Tests.Helpers;
 using Godot;
 using System.Collections.Generic;
@@ -467,6 +469,292 @@ namespace QDND.Tests.Unit
                 Assert.True(action.ScoreBreakdown.ContainsKey("height_advantage"));
                 Assert.True(action.ScoreBreakdown["height_advantage"] > 0);
             }
+        }
+
+        // ──────────────────────────────────────────────
+        //  Phase 3: DoT / HoT / Boost sub-multiplier tests
+        // ──────────────────────────────────────────────
+
+        private AIProfile CreateBG3Profile(Dictionary<string, float> overrides = null)
+        {
+            var bg3 = new BG3ArchetypeProfile();
+            if (overrides != null)
+                bg3.LoadFromSettings(overrides);
+            var profile = new AIProfile { BG3Profile = bg3 };
+            return profile;
+        }
+
+        private HeadlessCombatContext CreateContextWithDoTStatus(string statusId)
+        {
+            var context = new HeadlessCombatContext();
+            var rules = new QDND.Combat.Rules.RulesEngine(42);
+            var statusMgr = new StatusManager(rules);
+            statusMgr.RegisterStatus(new StatusDefinition
+            {
+                Id = statusId,
+                Name = statusId,
+                TickEffects = new List<StatusTickEffect>
+                {
+                    new StatusTickEffect { EffectType = "damage", Value = 5, DamageType = "Fire" }
+                }
+            });
+            context.RegisterService<StatusManager>(statusMgr);
+            return context;
+        }
+
+        private HeadlessCombatContext CreateContextWithHoTStatus(string statusId)
+        {
+            var context = new HeadlessCombatContext();
+            var rules = new QDND.Combat.Rules.RulesEngine(42);
+            var statusMgr = new StatusManager(rules);
+            statusMgr.RegisterStatus(new StatusDefinition
+            {
+                Id = statusId,
+                Name = statusId,
+                TickEffects = new List<StatusTickEffect>
+                {
+                    new StatusTickEffect { EffectType = "heal", Value = 5 }
+                }
+            });
+            context.RegisterService<StatusManager>(statusMgr);
+            return context;
+        }
+
+        private HeadlessCombatContext CreateContextWithBoostStatus(string statusId)
+        {
+            var context = new HeadlessCombatContext();
+            // Register a BG3StatusData with BOOST type and no ticks
+            var statusReg = new StatusRegistry();
+            statusReg.RegisterStatus(new BG3StatusData
+            {
+                StatusId = statusId,
+                StatusType = BG3StatusType.BOOST
+            });
+            context.RegisterService<StatusRegistry>(statusReg);
+            return context;
+        }
+
+        [Fact]
+        public void ScoreStatusEffect_DoT_UsesMultiplierDotEnemyPos()
+        {
+            // Arrange
+            var context = CreateContextWithDoTStatus("BURNING");
+            var actor = CreateTestCombatant("actor", 50, 50, Vector3.Zero, Faction.Player);
+            var target = CreateTestCombatant("target", 30, 30, new Vector3(10, 0, 0), Faction.Hostile);
+            context.RegisterCombatant(actor);
+            context.RegisterCombatant(target);
+
+            var profile = CreateBG3Profile(new Dictionary<string, float>
+            {
+                ["MULTIPLIER_DOT_ENEMY_POS"] = 3.0f
+            });
+
+            var scorer = new AIScorer(context);
+            var action = new AIAction { ActionType = AIActionType.UseAbility, ActionId = "apply_burn" };
+
+            // Act
+            scorer.ScoreStatusEffect(action, actor, target, "BURNING", profile);
+
+            // Assert
+            Assert.True(action.Score > 0, "DoT on enemy should produce positive score");
+            Assert.True(action.ScoreBreakdown.ContainsKey("status_sub_type"), "Should have sub-type breakdown");
+            Assert.Equal((float)StatusSubType.DoT, action.ScoreBreakdown["status_sub_type"]);
+
+            // Verify that changing the sub-multiplier changes the score
+            var profileDefault = CreateBG3Profile();
+            var actionDefault = new AIAction { ActionType = AIActionType.UseAbility, ActionId = "apply_burn" };
+            scorer.ScoreStatusEffect(actionDefault, actor, target, "BURNING", profileDefault);
+            Assert.True(action.Score > actionDefault.Score,
+                "DoT score with 3.0x multiplier should exceed score with 1.0x default");
+        }
+
+        [Fact]
+        public void ScoreStatusEffect_HoT_UsesMultiplierHotAllyPos()
+        {
+            // Arrange
+            var context = CreateContextWithHoTStatus("REGENERATION");
+            var actor = CreateTestCombatant("actor", 50, 50, Vector3.Zero, Faction.Player);
+            var target = CreateTestCombatant("ally", 20, 50, new Vector3(5, 0, 0), Faction.Player);
+            context.RegisterCombatant(actor);
+            context.RegisterCombatant(target);
+
+            var profile = CreateBG3Profile(new Dictionary<string, float>
+            {
+                ["MULTIPLIER_HOT_ALLY_POS"] = 4.0f
+            });
+
+            var scorer = new AIScorer(context);
+            var action = new AIAction { ActionType = AIActionType.UseAbility, ActionId = "apply_regen" };
+
+            // Act
+            scorer.ScoreStatusEffect(action, actor, target, "REGENERATION", profile);
+
+            // Assert
+            Assert.True(action.Score > 0, "HoT on ally should produce positive score");
+            Assert.True(action.ScoreBreakdown.ContainsKey("status_sub_type"));
+            Assert.Equal((float)StatusSubType.HoT, action.ScoreBreakdown["status_sub_type"]);
+
+            // Higher multiplier → higher score
+            var profileDefault = CreateBG3Profile();
+            var actionDefault = new AIAction { ActionType = AIActionType.UseAbility, ActionId = "apply_regen" };
+            scorer.ScoreStatusEffect(actionDefault, actor, target, "REGENERATION", profileDefault);
+            Assert.True(action.Score > actionDefault.Score,
+                "HoT score with 4.0x multiplier should exceed score with default");
+        }
+
+        [Fact]
+        public void ScoreStatusEffect_Boost_UsesMultiplierBoostSelfPos()
+        {
+            // Arrange — BOOST type status on self
+            var context = CreateContextWithBoostStatus("BLESS");
+            // Also register in the main StatusRegistry so the BG3 branch recognizes it as BOOST
+            var statusReg = context.GetService<StatusRegistry>();
+            statusReg.RegisterStatus(new BG3StatusData
+            {
+                StatusId = "BLESS",
+                StatusType = BG3StatusType.BOOST,
+                Boosts = "Advantage(AttackRoll)"
+            }, overwrite: true);
+
+            var actor = CreateTestCombatant("actor", 50, 50, Vector3.Zero, Faction.Player);
+            context.RegisterCombatant(actor);
+
+            var profile = CreateBG3Profile(new Dictionary<string, float>
+            {
+                ["MULTIPLIER_BOOST_SELF_POS"] = 5.0f
+            });
+
+            var scorer = new AIScorer(context);
+            var action = new AIAction { ActionType = AIActionType.UseAbility, ActionId = "cast_bless" };
+
+            // Act
+            scorer.ScoreStatusEffect(action, actor, actor, "BLESS", profile);
+
+            // Assert
+            Assert.True(action.Score > 0, "Boost on self should produce positive score");
+            Assert.True(action.ScoreBreakdown.ContainsKey("status_sub_type"));
+            Assert.Equal((float)StatusSubType.Boost, action.ScoreBreakdown["status_sub_type"]);
+
+            // Higher multiplier → higher score
+            var profileDefault = CreateBG3Profile();
+            var actionDefault = new AIAction { ActionType = AIActionType.UseAbility, ActionId = "cast_bless" };
+            scorer.ScoreStatusEffect(actionDefault, actor, actor, "BLESS", profileDefault);
+            Assert.True(action.Score > actionDefault.Score,
+                "Boost score with 5.0x multiplier should exceed default");
+        }
+
+        [Fact]
+        public void ScoreStatusEffect_UnknownSubType_FallsBackToGeneric()
+        {
+            // Arrange — status with no tick effects, unknown type (not BOOST)
+            var context = new HeadlessCombatContext();
+            var actor = CreateTestCombatant("actor", 50, 50, Vector3.Zero, Faction.Player);
+            var target = CreateTestCombatant("target", 30, 30, new Vector3(10, 0, 0), Faction.Hostile);
+            context.RegisterCombatant(actor);
+            context.RegisterCombatant(target);
+
+            var profile = CreateBG3Profile();
+            var scorer = new AIScorer(context);
+            var action = new AIAction { ActionType = AIActionType.UseAbility, ActionId = "mystery_debuff" };
+
+            // Act
+            scorer.ScoreStatusEffect(action, actor, target, "MYSTERY_DEBUFF", profile);
+
+            // Assert — should still produce a score (generic fallback) and NOT have sub-type breakdown
+            Assert.True(action.ScoreBreakdown.ContainsKey("status_value"));
+            Assert.False(action.ScoreBreakdown.ContainsKey("status_sub_type"),
+                "Unknown sub-type should not add status_sub_type breakdown");
+        }
+
+        [Fact]
+        public void ClassifyStatusSubType_TickDamage_ReturnsDoT()
+        {
+            var context = CreateContextWithDoTStatus("POISON");
+            var result = AIStatusClassifier.ClassifyStatusSubType("POISON", context);
+            Assert.Equal(StatusSubType.DoT, result);
+        }
+
+        [Fact]
+        public void ClassifyStatusSubType_TickHeal_ReturnsHoT()
+        {
+            var context = CreateContextWithHoTStatus("REGEN");
+            var result = AIStatusClassifier.ClassifyStatusSubType("REGEN", context);
+            Assert.Equal(StatusSubType.HoT, result);
+        }
+
+        [Fact]
+        public void ClassifyStatusSubType_NoTicks_BoostType_ReturnsBoost()
+        {
+            var context = CreateContextWithBoostStatus("HASTE");
+            var result = AIStatusClassifier.ClassifyStatusSubType("HASTE", context);
+            Assert.Equal(StatusSubType.Boost, result);
+        }
+
+        [Fact]
+        public void ClassifyStatusSubType_NullContext_ReturnsUnknown()
+        {
+            var result = AIStatusClassifier.ClassifyStatusSubType("ANY_STATUS", null);
+            Assert.Equal(StatusSubType.Unknown, result);
+        }
+
+        [Fact]
+        public void ScoreStatusEffect_DoTOnAlly_ProducesNegativeScore()
+        {
+            // Arrange — DoT status applied to an ally should be undesirable (negative score)
+            var context = CreateContextWithDoTStatus("BURNING");
+            var actor = CreateTestCombatant("actor", 50, 50, Vector3.Zero, Faction.Player);
+            var ally = CreateTestCombatant("ally", 40, 50, new Vector3(5, 0, 0), Faction.Player);
+            context.RegisterCombatant(actor);
+            context.RegisterCombatant(ally);
+
+            var profile = CreateBG3Profile(new Dictionary<string, float>
+            {
+                ["MULTIPLIER_DOT_ALLY_NEG"] = 2.0f
+            });
+
+            var scorer = new AIScorer(context);
+            var action = new AIAction { ActionType = AIActionType.UseAbility, ActionId = "apply_burn" };
+
+            // Act
+            scorer.ScoreStatusEffect(action, actor, ally, "BURNING", profile);
+
+            // Assert
+            Assert.True(action.Score < 0, "DoT on ally should produce negative score");
+            Assert.True(action.ScoreBreakdown.ContainsKey("status_sub_type"), "Should have sub-type breakdown");
+            Assert.Equal((float)StatusSubType.DoT, action.ScoreBreakdown["status_sub_type"]);
+        }
+
+        [Fact]
+        public void ScoreStatusEffect_ControlStatus_NotAffectedBySubMultiplier()
+        {
+            // Arrange — Incapacitated control status should follow the control path, not the sub-multiplier path
+            var context = new HeadlessCombatContext();
+            var statusReg = new StatusRegistry();
+            statusReg.RegisterStatus(new BG3StatusData
+            {
+                StatusId = "STUNNED",
+                StatusType = BG3StatusType.INCAPACITATED,
+                StatusGroups = "SG_Incapacitated"
+            });
+            context.RegisterService<StatusRegistry>(statusReg);
+
+            var actor = CreateTestCombatant("actor", 50, 50, Vector3.Zero, Faction.Player);
+            var target = CreateTestCombatant("target", 30, 30, new Vector3(10, 0, 0), Faction.Hostile);
+            context.RegisterCombatant(actor);
+            context.RegisterCombatant(target);
+
+            var profile = CreateBG3Profile();
+            var scorer = new AIScorer(context);
+            var action = new AIAction { ActionType = AIActionType.UseAbility, ActionId = "stun" };
+
+            // Act
+            scorer.ScoreStatusEffect(action, actor, target, "STUNNED", profile);
+
+            // Assert — control scoring should fire, sub-multiplier should NOT
+            Assert.True(action.Score > 0, "Control on enemy should produce positive score");
+            Assert.True(action.ScoreBreakdown.ContainsKey("status_value"), "Should have status_value breakdown");
+            Assert.False(action.ScoreBreakdown.ContainsKey("status_sub_type"),
+                "Control status should NOT enter the sub-multiplier path");
         }
     }
 }

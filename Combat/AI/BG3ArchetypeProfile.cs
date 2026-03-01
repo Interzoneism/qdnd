@@ -504,36 +504,44 @@ namespace QDND.Combat.AI
         public float MultiplierBoostAbility { get; private set; } = 0.6f;
 
         /// <summary>Modifier for AbilityFailedSavingThrow boost.</summary>
+        // Custom extension — not in BG3 base.txt
         public float MultiplierBoostAbilityFailedSavingThrow { get; private set; } = 0.085f;
 
         /// <summary>Modifier for ActionResource boost.</summary>
         public float MultiplierBoostActionResource { get; private set; } = 0.4f;
 
         /// <summary>Modifier for ActionResourceOverride boost.</summary>
+        // Custom extension — not in BG3 base.txt
         public float MultiplierBoostActionResourceOverride { get; private set; } = 0.4f;
 
         /// <summary>Modifier for ActionResourceMultiplier boost.</summary>
         public float MultiplierBoostActionResourceMultiplier { get; private set; } = 0.25f;
 
         /// <summary>Modifier for ActionResourceBlock boost.</summary>
+        // Custom extension — not in BG3 base.txt
         public float MultiplierBoostActionResourceBlock { get; private set; } = 0.4f;
 
         /// <summary>Modifier for IgnoreAOO boost.</summary>
+        // Custom extension — not in BG3 base.txt
         public float MultiplierBoostIgnoreAoo { get; private set; } = 0.03f;
 
         /// <summary>Minimum movement left to consider the IgnoreAOO boost.</summary>
         public float BoostIgnoreAooMinMovement { get; private set; } = 2.0f;
 
         /// <summary>Modifier for IgnoreFallDamage boost.</summary>
+        // Custom extension — not in BG3 base.txt
         public float MultiplierBoostIgnoreFallDamage { get; private set; } = -0.04f;
 
         /// <summary>Modifier for CannotHarmCauseEntity boost.</summary>
+        // Custom extension — not in BG3 base.txt
         public float MultiplierBoostCannotHarmCauseEntity { get; private set; } = 0.1f;
 
         /// <summary>Modifier for CriticalHit Never boost.</summary>
+        // Custom extension — not in BG3 base.txt
         public float MultiplierBoostCriticalHitNever { get; private set; } = 0.0125f;
 
         /// <summary>Modifier for CriticalHit Always boost.</summary>
+        // Custom extension — not in BG3 base.txt
         public float MultiplierBoostCriticalHitAlways { get; private set; } = 0.065f;
 
         /// <summary>Modifier for BlockSpellCast boost.</summary>
@@ -556,6 +564,27 @@ namespace QDND.Combat.AI
 
         /// <summary>Modifier for SightRange boosts.</summary>
         public float MultiplierBoostSightRange { get; private set; } = 0.08f;
+
+        /// <summary>Modifier for Resistance boosts.</summary>
+        public float MultiplierBoostResistance { get; private set; } = 0.15f;
+
+        /// <summary>Modifier for MovementSpeedBonus boosts.</summary>
+        public float MultiplierBoostMovement { get; private set; } = 0.05f;
+
+        /// <summary>Modifier for TemporaryHP boosts.</summary>
+        public float MultiplierBoostTemporaryHp { get; private set; } = 0.10f;
+
+        /// <summary>Modifier for DamageReduction boosts.</summary>
+        public float MultiplierBoostDamageReduction { get; private set; } = 0.10f;
+
+        /// <summary>Modifier for Initiative boosts.</summary>
+        public float MultiplierBoostInitiative { get; private set; } = 0.05f;
+
+        /// <summary>Modifier for SavingThrow boosts.</summary>
+        public float MultiplierBoostSavingThrow { get; private set; } = 0.10f;
+
+        /// <summary>Modifier for SpellSaveDC / spell resistance boosts.</summary>
+        public float MultiplierBoostSpellResistance { get; private set; } = 0.10f;
 
         // ──────────────────────────────────────────────
         //  Roll Bonus Modifiers
@@ -1007,6 +1036,13 @@ namespace QDND.Combat.AI
                 ["MULTIPLIER_BOOST_BLOCK_VERBAL_COMPONENT"] = (p, v) => p.MultiplierBoostBlockVerbalComponent = v,
                 ["MULTIPLIER_BOOST_BLOCK_SOMATIC_COMPONENT"] = (p, v) => p.MultiplierBoostBlockSomaticComponent = v,
                 ["MULTIPLIER_BOOST_SIGHT_RANGE"] = (p, v) => p.MultiplierBoostSightRange = v,
+                ["MULTIPLIER_BOOST_RESISTANCE"] = (p, v) => p.MultiplierBoostResistance = v,
+                ["MULTIPLIER_BOOST_MOVEMENT"] = (p, v) => p.MultiplierBoostMovement = v,
+                ["MULTIPLIER_BOOST_TEMPORARY_HP"] = (p, v) => p.MultiplierBoostTemporaryHp = v,
+                ["MULTIPLIER_BOOST_DAMAGE_REDUCTION"] = (p, v) => p.MultiplierBoostDamageReduction = v,
+                ["MULTIPLIER_BOOST_INITIATIVE"] = (p, v) => p.MultiplierBoostInitiative = v,
+                ["MULTIPLIER_BOOST_SAVING_THROW"] = (p, v) => p.MultiplierBoostSavingThrow = v,
+                ["MULTIPLIER_BOOST_SPELL_RESISTANCE"] = (p, v) => p.MultiplierBoostSpellResistance = v,
 
                 // Roll Bonus
                 ["MODIFIER_BOOST_ROLLBONUS_ATTACK"] = (p, v) => p.ModifierBoostRollbonusAttack = v,
@@ -1295,6 +1331,13 @@ namespace QDND.Combat.AI
                 ["MULTIPLIER_BOOST_BLOCK_VERBAL_COMPONENT"] = p => p.MultiplierBoostBlockVerbalComponent,
                 ["MULTIPLIER_BOOST_BLOCK_SOMATIC_COMPONENT"] = p => p.MultiplierBoostBlockSomaticComponent,
                 ["MULTIPLIER_BOOST_SIGHT_RANGE"] = p => p.MultiplierBoostSightRange,
+                ["MULTIPLIER_BOOST_RESISTANCE"] = p => p.MultiplierBoostResistance,
+                ["MULTIPLIER_BOOST_MOVEMENT"] = p => p.MultiplierBoostMovement,
+                ["MULTIPLIER_BOOST_TEMPORARY_HP"] = p => p.MultiplierBoostTemporaryHp,
+                ["MULTIPLIER_BOOST_DAMAGE_REDUCTION"] = p => p.MultiplierBoostDamageReduction,
+                ["MULTIPLIER_BOOST_INITIATIVE"] = p => p.MultiplierBoostInitiative,
+                ["MULTIPLIER_BOOST_SAVING_THROW"] = p => p.MultiplierBoostSavingThrow,
+                ["MULTIPLIER_BOOST_SPELL_RESISTANCE"] = p => p.MultiplierBoostSpellResistance,
 
                 // Roll Bonus
                 ["MODIFIER_BOOST_ROLLBONUS_ATTACK"] = p => p.ModifierBoostRollbonusAttack,

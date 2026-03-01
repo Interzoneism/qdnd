@@ -402,6 +402,14 @@ namespace QDND.Tools.AutoBattler
                         OnTurnEnded?.Invoke(actor.Id);
                         CallEndTurn();
                         return; // Don't set isActing = false, turn is over
+
+                    case AIActionType.PickupWeapon:
+                        // TODO: Implement weapon pickup execution — move to position,
+                        // equip weapon, remove from GroundItemService.
+                        if (VerboseActionLogging)
+                            GD.Print($"[RealtimeAIController] PickupWeapon not yet implemented (weapon: {action.ActionId})");
+                        OnActionExecuted?.Invoke(actor.Id, $"PickupWeapon:{action.ActionId} - not implemented", false);
+                        break;
                     
                     default:
                         if (VerboseActionLogging)

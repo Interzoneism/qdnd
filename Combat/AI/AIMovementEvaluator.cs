@@ -7,6 +7,7 @@ using QDND.Combat.Services;
 using QDND.Combat.Environment;
 using QDND.Combat.Movement;
 using QDND.Combat.Rules;
+using QDND.Combat.Statuses;
 
 namespace QDND.Combat.AI
 {
@@ -65,6 +66,8 @@ namespace QDND.Combat.AI
         private readonly LOSService _los;
         private readonly ThreatMap _threatMap;
         private readonly SpecialMovementService _specialMovement;
+        private readonly AuraSystem _auraSystem;
+        private readonly ObscurementService _obscurementService;
 
         private const float MELEE_RANGE = CombatRules.DefaultMeleeReachMeters;
         private const float OPTIMAL_RANGED_MIN = 10f;
@@ -72,13 +75,15 @@ namespace QDND.Combat.AI
         private const float LEDGE_DETECTION_RADIUS = 10f;
         private const float SHOVE_RANGE = 5f;
 
-        public AIMovementEvaluator(CombatContext context, HeightService height = null, LOSService los = null, SpecialMovementService specialMovement = null)
+        public AIMovementEvaluator(CombatContext context, HeightService height = null, LOSService los = null, SpecialMovementService specialMovement = null, AuraSystem auraSystem = null, ObscurementService obscurementService = null)
         {
             _context = context;
             _height = height;
             _los = los;
             _threatMap = new ThreatMap();
             _specialMovement = specialMovement;
+            _auraSystem = auraSystem;
+            _obscurementService = obscurementService;
         }
 
         /// <summary>
@@ -104,10 +109,14 @@ namespace QDND.Combat.AI
                 candidates.AddRange(jumpCandidates);
             }
 
+            // Pre-compute aura list once for the entire evaluation
+            // (avoids O(candidates × combatants × statuses) per-candidate cost)
+            List<AuraInfo> cachedAuras = _auraSystem?.GetActiveAuras();
+
             // Score each candidate
             foreach (var candidate in candidates)
             {
-                ScoreCandidate(candidate, actor, enemies, allies, profile);
+                ScoreCandidate(candidate, actor, enemies, allies, profile, cachedAuras);
             }
 
             // Sort by score and return top candidates
@@ -324,7 +333,7 @@ namespace QDND.Combat.AI
 
             foreach (var candidate in candidates)
             {
-                ScoreCandidate(candidate, actor, enemies, allies, null);
+                ScoreCandidate(candidate, actor, enemies, allies, null, null);
             }
 
             return candidates.OrderByDescending(c => c.Score).FirstOrDefault();
@@ -376,13 +385,14 @@ namespace QDND.Combat.AI
         }
 
         private void ScoreCandidate(MovementCandidate candidate, Combatant actor,
-            List<Combatant> enemies, List<Combatant> allies, AIProfile profile)
+            List<Combatant> enemies, List<Combatant> allies, AIProfile profile,
+            List<AuraInfo> cachedAuras = null)
         {
             var bg3 = profile?.BG3Profile;
 
             if (bg3 != null)
             {
-                ScoreCandidateBG3(candidate, actor, enemies, allies, profile, bg3);
+                ScoreCandidateBG3(candidate, actor, enemies, allies, profile, bg3, cachedAuras);
             }
             else
             {
@@ -395,7 +405,8 @@ namespace QDND.Combat.AI
         /// </summary>
         private void ScoreCandidateBG3(MovementCandidate candidate, Combatant actor,
             List<Combatant> enemies, List<Combatant> allies,
-            AIProfile profile, BG3ArchetypeProfile bg3)
+            AIProfile profile, BG3ArchetypeProfile bg3,
+            List<AuraInfo> cachedAuras = null)
         {
             float score = 0;
             var breakdown = candidate.ScoreBreakdown;
@@ -507,6 +518,54 @@ namespace QDND.Combat.AI
                     }
                 }
                 if (candidate.CanFlank) break;
+            }
+
+            // BG3: Aura awareness — friendly/hostile/own aura scoring
+            if (_auraSystem != null)
+            {
+                var (inFriendly, inHostile, inOwnAura) = cachedAuras != null
+                    ? _auraSystem.IsPositionInAura(
+                        candidate.Position, actor.Id, actor.Faction.ToString(), actor.Team, cachedAuras)
+                    : _auraSystem.IsPositionInAura(
+                        candidate.Position, actor.Id, actor.Faction.ToString(), actor.Team);
+
+                if (inFriendly)
+                {
+                    float friendlyAuraScore = bg3.MultiplierPosInAura * scoreMod;
+                    breakdown["bg3_friendly_aura"] = friendlyAuraScore;
+                    score += friendlyAuraScore;
+                }
+                if (inOwnAura)
+                {
+                    float ownAuraScore = bg3.ModifierOwnAura * scoreMod;
+                    breakdown["bg3_own_aura"] = ownAuraScore;
+                    score += ownAuraScore;
+                }
+                if (inHostile)
+                {
+                    float hostileAuraPenalty = bg3.ModifierMoveIntoDangerousAura * scoreMod;
+                    breakdown["bg3_hostile_aura"] = -hostileAuraPenalty;
+                    score -= hostileAuraPenalty;
+                }
+            }
+
+            // Obscurement awareness — uses MultiplierDarknessClear/Light/Heavy
+            if (_obscurementService != null)
+            {
+                var obscurement = _obscurementService.GetObscurementAt(candidate.Position);
+                float obscurementMod = obscurement switch
+                {
+                    ObscurementLevel.Clear => bg3.MultiplierDarknessClear,
+                    ObscurementLevel.Light => bg3.MultiplierDarknessLight,
+                    ObscurementLevel.Heavy => bg3.MultiplierDarknessHeavy,
+                    _ => 0f
+                };
+                if (obscurementMod != 0f)
+                {
+                    float obscurementScore = obscurementMod * scoreMod;
+                    score += obscurementScore;
+                    breakdown["bg3_obscurement"] = obscurementScore;
+                }
             }
 
             // BG3: MultiplierEndposNotInDangerousSurface — surface avoidance
