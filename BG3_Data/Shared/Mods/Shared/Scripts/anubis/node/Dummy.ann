@@ -1,0 +1,8 @@
+game.states.Dummy = State{function ()
+
+    description = [[Dummy state that does not do anything]]
+    -- public API
+    nodes.Idling = function()
+        WaitForInterrupt()
+    end
+end}

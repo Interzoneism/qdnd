@@ -1,0 +1,32 @@
+game.configs.Helper_PlaySFX = Config{
+    params={
+        SFX = {
+            type = EParamType.String,
+            help = [[SFX to play.]],
+            required = true,
+        },
+        StopSFX = {
+            type = EParamType.String,
+            help = [[SFX to "play" to stop the first effect.]],
+            required = false,
+            default = ""
+        },
+        TargetEntity = {
+            type = EParamType.String,
+            help = [[Entity on which to play the SFX.]],
+            required = false,
+            default = [[me]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.PlaySFX,
+            SFX = params.SFX,
+            StopSFX = params.StopSFX,
+            SFXTarget = params.TargetEntity,
+        },
+    },
+    inputs={
+        PlaySFX=ExtSocket{description=[[Play the SFX]],{SocketRef{[[root.logic.inputs.PlaySFX]]}}},
+        StopSFX=ExtSocket{description=[[Play the 'stop' SFX]],{SocketRef{[[root.logic.inputs.StopSFX]]}}},
+    }
+}

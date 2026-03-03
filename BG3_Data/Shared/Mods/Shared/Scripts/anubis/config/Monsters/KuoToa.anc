@@ -1,0 +1,6 @@
+game.configs.KuoToa = Config{
+    root=StateRef{game.roots.DefaultCharacter,
+        idle = StateRef{game.states.KuoToa},
+        genericBehaviours = StateRef{game.states.CrimesHumanoid},
+    }
+}

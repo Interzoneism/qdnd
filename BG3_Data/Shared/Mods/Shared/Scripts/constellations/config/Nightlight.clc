@@ -1,0 +1,79 @@
+game.configs.Nightlight = Config{
+    params={
+        DC = {
+            type = EParamType.String,
+            help = [[Difficulty class to gather this item (Nature Check). Must be provided as a DC GUID]],
+            required = false,
+            default = [[Gather_Nightlight_007e3653-e338-4728-bfe0-ab53288f8532]]
+        },
+        RewardTemplate = {
+            type = EParamType.String,
+            help = [[Reward added for the gatherer when this item is gathered.]],
+            required = true,
+        },
+        LightEffect = {
+            type = EParamType.String,
+            help = [[VFX while item is lit.]],
+            required = false,
+            default = [[VFX_LightSources_Underdark_Mushroom_Nightlight_B_01_fa489d1e-5762-ed5e-4b19-0b01fdf4d5c1]]
+        },
+        GameplayLight = {
+            type = EParamType.Bool,
+            help = [[Does the item cast a gameplay light, or is purely decorative?]],
+            required = false,
+            default = true
+        },
+        GameplayLightRadius = {
+            type = EParamType.Number,
+            help = [[Radius of gameplay light]],
+            required = false,
+            default = 5
+        },
+        GameplayLightSharpness = {
+            type = EParamType.Number,
+            help = [[Sharpness of gameplay light]],
+            required = false,
+            default = 0.1
+        },
+        LightEffectBone = {
+            type = EParamType.String,
+            help = [[Bone on which the VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        GameplayLightOffsetFallback = {
+            type = EParamType.Vector3,
+            help = [[Places the gameplay light at this position if the provided bone is not valid for the entity.]],
+            required = false,
+            default = Vector3(0, 0, 0)
+        },
+        GameplayLightPointLightVerticalLimit = {
+            type = EParamType.Number,
+            help = [[Vertical limit of a point light that does not check line-of-sight]],
+            required = false,
+            default = 2.5
+        }
+    },
+    root=StateRef{
+        game.roots.DefaultTrap,
+        logic = StateRef {
+            game.states.Nightlight,
+            DC = params.DC,
+            RewardTemplate = params.RewardTemplate,
+            GameplayLight = params.GameplayLight,
+            GameplayLightRadius = params.GameplayLightRadius,
+            GameplayLightSharpness = params.GameplayLightSharpness,
+            LightEffect = params.LightEffect,
+            LightEffectBone = params.LightEffectBone,
+            GameplayLightOffsetFallback = params.GameplayLightOffsetFallback,
+            GameplayLightPointLightVerticalLimit = params.GameplayLightPointLightVerticalLimit
+        },
+    },
+    inputs={
+        Gather=ExtSocket{description=[[Try to gather this item. Expects an Entity parameter (the Gatherer). Can be nil.]],{SocketRef{[[root.logic.inputs.Gather]]}}},
+    },
+    outputs={
+        Attempted=ExtSocket{description=[[We attempted to gather from this item, the reward might or might not have been emitted]],{SocketRef{[[root.logic.outputs.Attempted]]}}},
+        Gathered=ExtSocket{description=[[This item has been gathered successfully and the reward was emitted.]],{SocketRef{[[root.logic.outputs.Gathered]]}}},
+    }
+}

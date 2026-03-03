@@ -1,0 +1,128 @@
+game.configs.VFXDoor = Config{
+    params={
+        DC = {
+            type = EParamType.String,
+            help = [[The skill check DC.]],
+            required = false,
+            default = [[HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f]]
+        },
+        DoorVFX = {
+            type = EParamType.String,
+            help = [[Name_UUID of vfx to play while door is open]],
+            required = true,
+        },
+        Key = {
+            type = EParamType.String,
+            help = [[Key]],
+            required = false,
+            default = [[STORYLOCK]]
+        },
+        MinDistance = {
+            type = EParamType.Number,
+            help = [[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]],
+            required = false,
+            default = 6
+        },
+        OneShot = {
+            type = EParamType.Bool,
+            help = [[The trap activates only the first time on use (e.g. explodes chest), rather than every time (e.g. a chest with spikes that come out)]],
+            required = false,
+            default = true
+        },
+        Skill = {
+            type = EParamType.String,
+            help = [[The skill checked for discovering the container and/or its trapped nature if the 'Type' is not 'None'.]],
+            required = false,
+            default = [[Perception]]
+        },
+        SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when trap is turned off]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_Off]]
+        },
+        SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when trap is turned on]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_On]]
+        },
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the trap start enabled? (will it trigger when using the item?)]],
+            required = false,
+            default = true
+        },
+        Type = {
+            type = EParamType.String,
+            help = [[            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[None]]
+        },
+        VFXOff = {
+            type = EParamType.String,
+            help = [[VFX while the trap is disabled and has been spotted.]],
+            required = false,
+            default = [[]]
+        },
+        VFXOffBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOff' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while the trap is enabled and has been spotted.]],
+            required = false,
+            default = [[VFX_Script_Trap_Overlay_Red_01_a7361f25-e942-e071-7ce3-7a8182f4e0ef]]
+        },
+        VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOn' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.VFXDoor,
+            DC = params.DC,
+            DoorVFX = params.DoorVFX,
+            Key = params.Key,
+            MinDistance = params.MinDistance,
+            OneShot = params.OneShot,
+            Skill = params.Skill,
+            SoundOff = params.SoundOff,
+            SoundOn = params.SoundOn,
+            StartEnabled = params.StartEnabled,
+            Type = params.Type,
+            VFXOff = params.VFXOff,
+            VFXOffBone = params.VFXOffBone,
+            VFXOn = params.VFXOn,
+            VFXOnBone = params.VFXOnBone,
+        },
+    },
+    inputs={
+        Disable=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+        Close=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Close]]}}},
+        Enable=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+        Unlock=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Unlock]]}}},
+        Reveal=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Reveal]]}}},
+        Open=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Open]]}}},
+        Lock=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Lock]]}}},
+    },
+    outputs={
+        Opening=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Opening]]}}},
+        Closed=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Closed]]}}},
+        TrapTriggered=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Activate]]}}},
+        Opened=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Opened]]}}},
+        Closing=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Closing]]}}},
+        Destroyed=ExtSocket{description=[[Door is destroyed]],{SocketRef{[[root.logic.outputs.Destroyed]]}}},
+    }
+}

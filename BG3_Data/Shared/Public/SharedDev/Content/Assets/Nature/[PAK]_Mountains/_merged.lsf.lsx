@@ -1,0 +1,2431 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="MaterialBank">
+		<node id="MaterialBank">
+			<children>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="09c5075d-395f-59fa-d95d-292ee28a7bfc" />
+					<attribute id="MaterialType" type="uint8" value="6" />
+					<attribute id="Name" type="LSString" value="NAT_Mountain_Granite_Vista_F" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Vista/VISTA_Tileable_Projection_HeightGradient.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.3" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Projection" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionTiling" />
+							<attribute id="Value" type="float" value="0.05" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="2" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ParameterName" type="FixedString" value="TileableTiling" />
+							<attribute id="Value" type="float" value="5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ParameterName" type="FixedString" value="TileableRotation" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="SlopeMask" />
+							<attribute id="ParameterName" type="FixedString" value="SmoothStep_Min" />
+							<attribute id="Value" type="float" value="0.8" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="SlopeMask" />
+							<attribute id="ParameterName" type="FixedString" value="SmoothStep_Max" />
+							<attribute id="Value" type="float" value="0.6" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.28" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightLines" />
+							<attribute id="ParameterName" type="FixedString" value="LineTiling" />
+							<attribute id="Value" type="float" value="0.28" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="3" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightLines" />
+							<attribute id="ParameterName" type="FixedString" value="LineContrast" />
+							<attribute id="Value" type="float" value="3" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightGradient" />
+							<attribute id="ParameterName" type="FixedString" value="Offset" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.2" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightGradient" />
+							<attribute id="ParameterName" type="FixedString" value="Spread" />
+							<attribute id="Value" type="float" value="0.2" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightGradient" />
+							<attribute id="ParameterName" type="FixedString" value="Intensity" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Projection" />
+							<attribute id="ID" type="FixedString" value="903624f0-d8f2-4cbf-937d-903baebebbdc" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionNM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ID" type="FixedString" value="5a228298-be6e-a282-da12-ccb8368e9a6e" />
+							<attribute id="ParameterName" type="FixedString" value="TileableNM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="bf1e127e-6276-f1d8-3c84-341dacd43135" />
+							<attribute id="ParameterName" type="FixedString" value="NormalMap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="ProjectionNoise" />
+							<attribute id="ID" type="FixedString" value="eb7dee69-9e11-4f1e-93f3-62ab892a05b2" />
+							<attribute id="ParameterName" type="FixedString" value="Projection_NoiseBM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Projection" />
+							<attribute id="ID" type="FixedString" value="1c1ceeeb-48e3-923e-2ca4-82b966e08fbf" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionBM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="ProjectionNoise" />
+							<attribute id="ID" type="FixedString" value="28b10374-729f-7d65-d901-af67a7ebc22a" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionNoise" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture" />
+							<attribute id="ID" type="FixedString" value="11fe798f-2f8d-491f-87e6-defe7853ce43" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture" />
+							<attribute id="ID" type="FixedString" value="dbd4babf-d924-0a52-4ad0-081afbbb007d" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ID" type="FixedString" value="53fe9f2e-2ae4-643c-bd3f-0ad23ecfd33f" />
+							<attribute id="ParameterName" type="FixedString" value="TileableBM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Projection" />
+							<attribute id="ID" type="FixedString" value="80561a65-bc7f-4312-231a-8b324942d653" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionPM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ID" type="FixedString" value="d0099191-0f31-f003-6877-6a5a61c7fe42" />
+							<attribute id="ParameterName" type="FixedString" value="TileablePM" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0 0 0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="ProjectionNoise" />
+							<attribute id="IsColor" type="bool" value="False" />
+							<attribute id="ParameterName" type="FixedString" value="Projection_NoiseColor" />
+							<attribute id="Value" type="fvec3" value="0.1869885 0.16687226 0.07805659" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.3111805 0.26735806 0.15728073" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightLines" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="LineColor" />
+							<attribute id="Value" type="fvec3" value="0 0 0" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.12324927 0.13340789 0.05287595" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightGradient" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="BottomHeightColor" />
+							<attribute id="Value" type="fvec3" value="0.12324927 0.13340789 0.05287595" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="3101093c-58c3-5def-324d-eb462c101f0b" />
+					<attribute id="MaterialType" type="uint8" value="6" />
+					<attribute id="Name" type="LSString" value="NAT_Mountain_Granite_Vista_F_Limestone_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Environment/ENV_Base_TileBlend_ColorVar.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ParameterName" type="FixedString" value="03_Tiling" />
+							<attribute id="Value" type="float" value="15" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Base" />
+							<attribute id="ParameterName" type="FixedString" value="01_Tiling" />
+							<attribute id="Value" type="float" value="4" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ParameterName" type="FixedString" value="02_Tiling" />
+							<attribute id="Value" type="float" value="11" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="100" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="NoiseTile" />
+							<attribute id="ParameterName" type="FixedString" value="NoiseTile" />
+							<attribute id="Value" type="float" value="250" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ParameterName" type="FixedString" value="Blue_Mask_Range" />
+							<attribute id="Value" type="float" value="0.15" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ParameterName" type="FixedString" value="Blue_Mask_Contrast" />
+							<attribute id="Value" type="float" value="-7" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ParameterName" type="FixedString" value="Green_Mask_Range" />
+							<attribute id="Value" type="float" value="0.85" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ParameterName" type="FixedString" value="Green_Mask_Contrast" />
+							<attribute id="Value" type="float" value="1.5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ParameterName" type="FixedString" value="Clamp_Min" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ParameterName" type="FixedString" value="Clamp_Max" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="ParameterName" type="FixedString" value="ColourVarInsensity" />
+							<attribute id="Value" type="float" value="0.87" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.33" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="ParameterName" type="FixedString" value="ColourVarTile" />
+							<attribute id="Value" type="float" value="0.1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="ParameterName" type="FixedString" value="ColorEdgeDistortion" />
+							<attribute id="Value" type="float" value="0.1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Red" />
+							<attribute id="ParameterName" type="FixedString" value="Red_Mask_Strength" />
+							<attribute id="Value" type="float" value="0.25" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="ParameterName" type="FixedString" value="ColourDarkInsensity" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Height Gradient" />
+							<attribute id="ParameterName" type="FixedString" value="HeightGradientOffset" />
+							<attribute id="Value" type="float" value="-65" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Height Gradient" />
+							<attribute id="ParameterName" type="FixedString" value="GradientSharpness" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.22" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Height Gradient" />
+							<attribute id="ParameterName" type="FixedString" value="GradientRoughness" />
+							<attribute id="Value" type="float" value="0.22" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ID" type="FixedString" value="cd2bf331-26ab-dfc2-82e4-5361150b13d0" />
+							<attribute id="ParameterName" type="FixedString" value="03_NormalMap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Base" />
+							<attribute id="ID" type="FixedString" value="0a493721-e1ae-586b-4ffa-db6ae6a26f97" />
+							<attribute id="ParameterName" type="FixedString" value="normalmap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ID" type="FixedString" value="75f2f27f-2e9d-0978-3f17-a28fd9e7ae8d" />
+							<attribute id="ParameterName" type="FixedString" value="02_NormalMap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="BaseTextures" />
+							<attribute id="ID" type="FixedString" value="5d74dfb3-6e6f-15bf-c8e3-dddd99349493" />
+							<attribute id="ParameterName" type="FixedString" value="baseMasks" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="BaseTextures" />
+							<attribute id="ID" type="FixedString" value="41e21502-8e7b-52e4-2132-069fef61f99c" />
+							<attribute id="ParameterName" type="FixedString" value="baseMaps_RGB" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="BaseTextures" />
+							<attribute id="ID" type="FixedString" value="bf1e127e-6276-f1d8-3c84-341dacd43135" />
+							<attribute id="ParameterName" type="FixedString" value="baseMaps_Normals" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="ID" type="FixedString" value="2c284d42-2602-4f28-247c-aa6d365686c0" />
+							<attribute id="ParameterName" type="FixedString" value="ColourVarNoise" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ID" type="FixedString" value="387e3a6f-9b65-1a7f-3060-8f47d83fef0e" />
+							<attribute id="ParameterName" type="FixedString" value="03_BaseColor" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Base" />
+							<attribute id="ID" type="FixedString" value="ad9241e5-3e53-1394-db4d-84128232c16f" />
+							<attribute id="ParameterName" type="FixedString" value="basecolor" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ID" type="FixedString" value="f12c94b0-fefd-6388-bb39-2c7703b311d6" />
+							<attribute id="ParameterName" type="FixedString" value="02_BaseColor" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ID" type="FixedString" value="80561a65-bc7f-4312-231a-8b324942d653" />
+							<attribute id="ParameterName" type="FixedString" value="03_PhysicalMap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Base" />
+							<attribute id="ID" type="FixedString" value="4aeb3723-b6f3-338f-df8a-b489898a151c" />
+							<attribute id="ParameterName" type="FixedString" value="physicalmap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ID" type="FixedString" value="a4a8e04f-8d13-7bf8-9e39-c49ff921e9fb" />
+							<attribute id="ParameterName" type="FixedString" value="02_PhysicalMap" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.32005292 0.14382759 0.13066553" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="IsColor" type="bool" value="False" />
+							<attribute id="ParameterName" type="FixedString" value="ColourVarRed" />
+							<attribute id="Value" type="fvec3" value="0.23489526 0.0824142 0.035614368" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.32005292 0.29738498 0.13066553" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="IsColor" type="bool" value="False" />
+							<attribute id="ParameterName" type="FixedString" value="ColourVarGreen" />
+							<attribute id="Value" type="fvec3" value="0.4877652 0.4877652 0.4877652" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.02969712 0.02969712 0.02969712" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Height Gradient" />
+							<attribute id="IsColor" type="bool" value="False" />
+							<attribute id="ParameterName" type="FixedString" value="HeightGradientColour" />
+							<attribute id="Value" type="fvec3" value="0.02969712 0.02969712 0.02969712" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="4827bab7-ec2e-6ee5-a79b-975ccfd32884" />
+					<attribute id="MaterialType" type="uint8" value="6" />
+					<attribute id="Name" type="LSString" value="NAT_Mountain_Granite_Vista_D" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Vista/VISTA_Tileable_Projection_HeightGradient.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.3" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Projection" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionTiling" />
+							<attribute id="Value" type="float" value="0.05" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="2" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ParameterName" type="FixedString" value="TileableTiling" />
+							<attribute id="Value" type="float" value="5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ParameterName" type="FixedString" value="TileableRotation" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="SlopeMask" />
+							<attribute id="ParameterName" type="FixedString" value="SmoothStep_Min" />
+							<attribute id="Value" type="float" value="0.8" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="SlopeMask" />
+							<attribute id="ParameterName" type="FixedString" value="SmoothStep_Max" />
+							<attribute id="Value" type="float" value="0.6" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.28" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightLines" />
+							<attribute id="ParameterName" type="FixedString" value="LineTiling" />
+							<attribute id="Value" type="float" value="0.28" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="3" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightLines" />
+							<attribute id="ParameterName" type="FixedString" value="LineContrast" />
+							<attribute id="Value" type="float" value="3" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightGradient" />
+							<attribute id="ParameterName" type="FixedString" value="Offset" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.2" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightGradient" />
+							<attribute id="ParameterName" type="FixedString" value="Spread" />
+							<attribute id="Value" type="float" value="0.2" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightGradient" />
+							<attribute id="ParameterName" type="FixedString" value="Intensity" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Projection" />
+							<attribute id="ID" type="FixedString" value="903624f0-d8f2-4cbf-937d-903baebebbdc" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionNM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ID" type="FixedString" value="5a228298-be6e-a282-da12-ccb8368e9a6e" />
+							<attribute id="ParameterName" type="FixedString" value="TileableNM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="16b434a3-6119-7392-2b0a-365332f29fca" />
+							<attribute id="ParameterName" type="FixedString" value="NormalMap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="ProjectionNoise" />
+							<attribute id="ID" type="FixedString" value="eb7dee69-9e11-4f1e-93f3-62ab892a05b2" />
+							<attribute id="ParameterName" type="FixedString" value="Projection_NoiseBM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Projection" />
+							<attribute id="ID" type="FixedString" value="1c1ceeeb-48e3-923e-2ca4-82b966e08fbf" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionBM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="ProjectionNoise" />
+							<attribute id="ID" type="FixedString" value="28b10374-729f-7d65-d901-af67a7ebc22a" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionNoise" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture" />
+							<attribute id="ID" type="FixedString" value="11fe798f-2f8d-491f-87e6-defe7853ce43" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture" />
+							<attribute id="ID" type="FixedString" value="dbd4babf-d924-0a52-4ad0-081afbbb007d" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ID" type="FixedString" value="53fe9f2e-2ae4-643c-bd3f-0ad23ecfd33f" />
+							<attribute id="ParameterName" type="FixedString" value="TileableBM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Projection" />
+							<attribute id="ID" type="FixedString" value="80561a65-bc7f-4312-231a-8b324942d653" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionPM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ID" type="FixedString" value="d0099191-0f31-f003-6877-6a5a61c7fe42" />
+							<attribute id="ParameterName" type="FixedString" value="TileablePM" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0 0 0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="ProjectionNoise" />
+							<attribute id="IsColor" type="bool" value="False" />
+							<attribute id="ParameterName" type="FixedString" value="Projection_NoiseColor" />
+							<attribute id="Value" type="fvec3" value="0.1869885 0.16687226 0.07805659" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.3111805 0.26735806 0.15728073" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightLines" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="LineColor" />
+							<attribute id="Value" type="fvec3" value="0 0 0" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.12324927 0.13340789 0.05287595" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightGradient" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="BottomHeightColor" />
+							<attribute id="Value" type="fvec3" value="0.12324927 0.13340789 0.05287595" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="6402bc60-9004-a180-d0f1-b022c9f06541" />
+					<attribute id="MaterialType" type="uint8" value="6" />
+					<attribute id="Name" type="LSString" value="NAT_Gith_Creche_Vista_D_04" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Environment/ENV_Base_TileBlend_ColorVar.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ParameterName" type="FixedString" value="03_Tiling" />
+							<attribute id="Value" type="float" value="8" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Base" />
+							<attribute id="ParameterName" type="FixedString" value="01_Tiling" />
+							<attribute id="Value" type="float" value="5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ParameterName" type="FixedString" value="02_Tiling" />
+							<attribute id="Value" type="float" value="15" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="100" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="NoiseTile" />
+							<attribute id="ParameterName" type="FixedString" value="NoiseTile" />
+							<attribute id="Value" type="float" value="100" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ParameterName" type="FixedString" value="Blue_Mask_Range" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ParameterName" type="FixedString" value="Blue_Mask_Contrast" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ParameterName" type="FixedString" value="Green_Mask_Range" />
+							<attribute id="Value" type="float" value="0.75" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ParameterName" type="FixedString" value="Green_Mask_Contrast" />
+							<attribute id="Value" type="float" value="2" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ParameterName" type="FixedString" value="Clamp_Min" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ParameterName" type="FixedString" value="Clamp_Max" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="ParameterName" type="FixedString" value="ColourVarInsensity" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.33" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="ParameterName" type="FixedString" value="ColourVarTile" />
+							<attribute id="Value" type="float" value="0.005" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="ParameterName" type="FixedString" value="ColorEdgeDistortion" />
+							<attribute id="Value" type="float" value="0.01" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Red" />
+							<attribute id="ParameterName" type="FixedString" value="Red_Mask_Strength" />
+							<attribute id="Value" type="float" value="0.42" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="ParameterName" type="FixedString" value="ColourDarkInsensity" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Height Gradient" />
+							<attribute id="ParameterName" type="FixedString" value="HeightGradientOffset" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Height Gradient" />
+							<attribute id="ParameterName" type="FixedString" value="GradientSharpness" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.22" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Height Gradient" />
+							<attribute id="ParameterName" type="FixedString" value="GradientRoughness" />
+							<attribute id="Value" type="float" value="0.25" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ID" type="FixedString" value="80b34bd4-7f08-83d0-7ea7-1cf42ec38af7" />
+							<attribute id="ParameterName" type="FixedString" value="03_NormalMap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Base" />
+							<attribute id="ID" type="FixedString" value="1ddfa6b4-f78d-4238-a324-a33e73d3c2da" />
+							<attribute id="ParameterName" type="FixedString" value="normalmap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ID" type="FixedString" value="0a493721-e1ae-586b-4ffa-db6ae6a26f97" />
+							<attribute id="ParameterName" type="FixedString" value="02_NormalMap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="BaseTextures" />
+							<attribute id="ID" type="FixedString" value="5d74dfb3-6e6f-15bf-c8e3-dddd99349493" />
+							<attribute id="ParameterName" type="FixedString" value="baseMasks" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="BaseTextures" />
+							<attribute id="ID" type="FixedString" value="7cb9828c-b776-26c9-4067-76faa4f2c6e6" />
+							<attribute id="ParameterName" type="FixedString" value="baseMaps_RGB" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="BaseTextures" />
+							<attribute id="ID" type="FixedString" value="126ae898-1300-69e2-d96d-09122a1ad07c" />
+							<attribute id="ParameterName" type="FixedString" value="baseMaps_Normals" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="ID" type="FixedString" value="2c284d42-2602-4f28-247c-aa6d365686c0" />
+							<attribute id="ParameterName" type="FixedString" value="ColourVarNoise" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ID" type="FixedString" value="7fc940a8-61e9-4481-813b-b525ff776dfe" />
+							<attribute id="ParameterName" type="FixedString" value="03_BaseColor" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Base" />
+							<attribute id="ID" type="FixedString" value="44f393a4-af7d-4f8a-80bb-24e35c7dbd07" />
+							<attribute id="ParameterName" type="FixedString" value="basecolor" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ID" type="FixedString" value="ad9241e5-3e53-1394-db4d-84128232c16f" />
+							<attribute id="ParameterName" type="FixedString" value="02_BaseColor" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ID" type="FixedString" value="c09998f1-52fe-f7c4-67b8-e999cbe7457d" />
+							<attribute id="ParameterName" type="FixedString" value="03_PhysicalMap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Base" />
+							<attribute id="ID" type="FixedString" value="6f303c3f-718d-474b-a792-1a8465010931" />
+							<attribute id="ParameterName" type="FixedString" value="physicalmap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ID" type="FixedString" value="4aeb3723-b6f3-338f-df8a-b489898a151c" />
+							<attribute id="ParameterName" type="FixedString" value="02_PhysicalMap" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.32005292 0.14382759 0.13066553" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="IsColor" type="bool" value="False" />
+							<attribute id="ParameterName" type="FixedString" value="ColourVarRed" />
+							<attribute id="Value" type="fvec3" value="0.2195197 0.19751643 0.051122047" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.32005292 0.29738498 0.13066553" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="IsColor" type="bool" value="False" />
+							<attribute id="ParameterName" type="FixedString" value="ColourVarGreen" />
+							<attribute id="Value" type="fvec3" value="0.32005292 0.29738498 0.13066553" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.02969712 0.02969712 0.02969712" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Height Gradient" />
+							<attribute id="IsColor" type="bool" value="False" />
+							<attribute id="ParameterName" type="FixedString" value="HeightGradientColour" />
+							<attribute id="Value" type="fvec3" value="0.02969712 0.02969712 0.02969712" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="66f5921c-bff9-13a7-8404-4140eb3f10d4" />
+					<attribute id="MaterialType" type="uint8" value="6" />
+					<attribute id="Name" type="LSString" value="NAT_Gith_Creche_Vista_D" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Vista/VISTA_Tileable_Projection_HeightGradient.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.3" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Projection" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionTiling" />
+							<attribute id="Value" type="float" value="0.05" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="2" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ParameterName" type="FixedString" value="TileableTiling" />
+							<attribute id="Value" type="float" value="5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ParameterName" type="FixedString" value="TileableRotation" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="SlopeMask" />
+							<attribute id="ParameterName" type="FixedString" value="SmoothStep_Min" />
+							<attribute id="Value" type="float" value="0.9" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="SlopeMask" />
+							<attribute id="ParameterName" type="FixedString" value="SmoothStep_Max" />
+							<attribute id="Value" type="float" value="0.6" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.28" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightLines" />
+							<attribute id="ParameterName" type="FixedString" value="LineTiling" />
+							<attribute id="Value" type="float" value="0.28" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="3" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightLines" />
+							<attribute id="ParameterName" type="FixedString" value="LineContrast" />
+							<attribute id="Value" type="float" value="3" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightGradient" />
+							<attribute id="ParameterName" type="FixedString" value="Offset" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.2" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightGradient" />
+							<attribute id="ParameterName" type="FixedString" value="Spread" />
+							<attribute id="Value" type="float" value="0.2" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightGradient" />
+							<attribute id="ParameterName" type="FixedString" value="Intensity" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Projection" />
+							<attribute id="ID" type="FixedString" value="903624f0-d8f2-4cbf-937d-903baebebbdc" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionNM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ID" type="FixedString" value="5a228298-be6e-a282-da12-ccb8368e9a6e" />
+							<attribute id="ParameterName" type="FixedString" value="TileableNM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="126ae898-1300-69e2-d96d-09122a1ad07c" />
+							<attribute id="ParameterName" type="FixedString" value="NormalMap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="ProjectionNoise" />
+							<attribute id="ID" type="FixedString" value="eb7dee69-9e11-4f1e-93f3-62ab892a05b2" />
+							<attribute id="ParameterName" type="FixedString" value="Projection_NoiseBM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Projection" />
+							<attribute id="ID" type="FixedString" value="1c1ceeeb-48e3-923e-2ca4-82b966e08fbf" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionBM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="ProjectionNoise" />
+							<attribute id="ID" type="FixedString" value="28b10374-729f-7d65-d901-af67a7ebc22a" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionNoise" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture" />
+							<attribute id="ID" type="FixedString" value="11fe798f-2f8d-491f-87e6-defe7853ce43" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture" />
+							<attribute id="ID" type="FixedString" value="dbd4babf-d924-0a52-4ad0-081afbbb007d" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ID" type="FixedString" value="53fe9f2e-2ae4-643c-bd3f-0ad23ecfd33f" />
+							<attribute id="ParameterName" type="FixedString" value="TileableBM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Projection" />
+							<attribute id="ID" type="FixedString" value="80561a65-bc7f-4312-231a-8b324942d653" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionPM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ID" type="FixedString" value="d0099191-0f31-f003-6877-6a5a61c7fe42" />
+							<attribute id="ParameterName" type="FixedString" value="TileablePM" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0 0 0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="ProjectionNoise" />
+							<attribute id="IsColor" type="bool" value="False" />
+							<attribute id="ParameterName" type="FixedString" value="Projection_NoiseColor" />
+							<attribute id="Value" type="fvec3" value="0.1869885 0.16687226 0.07805659" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.3111805 0.26735806 0.15728073" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightLines" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="LineColor" />
+							<attribute id="Value" type="fvec3" value="0 0 0" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.12324927 0.13340789 0.05287595" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightGradient" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="BottomHeightColor" />
+							<attribute id="Value" type="fvec3" value="0.12324927 0.13340789 0.05287595" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="90485da5-aab8-853d-859d-4a64d29c2130" />
+					<attribute id="MaterialType" type="uint8" value="6" />
+					<attribute id="Name" type="LSString" value="NAT_Mountain_Granite_Vista_D_Limestone_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Environment/ENV_Base_TileBlend_ColorVar.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ParameterName" type="FixedString" value="03_Tiling" />
+							<attribute id="Value" type="float" value="15" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Base" />
+							<attribute id="ParameterName" type="FixedString" value="01_Tiling" />
+							<attribute id="Value" type="float" value="6" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ParameterName" type="FixedString" value="02_Tiling" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="100" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="NoiseTile" />
+							<attribute id="ParameterName" type="FixedString" value="NoiseTile" />
+							<attribute id="Value" type="float" value="100" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ParameterName" type="FixedString" value="Blue_Mask_Range" />
+							<attribute id="Value" type="float" value="0.15" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ParameterName" type="FixedString" value="Blue_Mask_Contrast" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ParameterName" type="FixedString" value="Green_Mask_Range" />
+							<attribute id="Value" type="float" value="0.85" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ParameterName" type="FixedString" value="Green_Mask_Contrast" />
+							<attribute id="Value" type="float" value="1.5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ParameterName" type="FixedString" value="Clamp_Min" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ParameterName" type="FixedString" value="Clamp_Max" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="ParameterName" type="FixedString" value="ColourVarInsensity" />
+							<attribute id="Value" type="float" value="0.87" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.33" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="ParameterName" type="FixedString" value="ColourVarTile" />
+							<attribute id="Value" type="float" value="0.1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="ParameterName" type="FixedString" value="ColorEdgeDistortion" />
+							<attribute id="Value" type="float" value="0.1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Red" />
+							<attribute id="ParameterName" type="FixedString" value="Red_Mask_Strength" />
+							<attribute id="Value" type="float" value="0.25" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="ParameterName" type="FixedString" value="ColourDarkInsensity" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Height Gradient" />
+							<attribute id="ParameterName" type="FixedString" value="HeightGradientOffset" />
+							<attribute id="Value" type="float" value="-65" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Height Gradient" />
+							<attribute id="ParameterName" type="FixedString" value="GradientSharpness" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.22" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Height Gradient" />
+							<attribute id="ParameterName" type="FixedString" value="GradientRoughness" />
+							<attribute id="Value" type="float" value="0.22" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ID" type="FixedString" value="cd2bf331-26ab-dfc2-82e4-5361150b13d0" />
+							<attribute id="ParameterName" type="FixedString" value="03_NormalMap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Base" />
+							<attribute id="ID" type="FixedString" value="0a493721-e1ae-586b-4ffa-db6ae6a26f97" />
+							<attribute id="ParameterName" type="FixedString" value="normalmap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ID" type="FixedString" value="75f2f27f-2e9d-0978-3f17-a28fd9e7ae8d" />
+							<attribute id="ParameterName" type="FixedString" value="02_NormalMap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="BaseTextures" />
+							<attribute id="ID" type="FixedString" value="5d74dfb3-6e6f-15bf-c8e3-dddd99349493" />
+							<attribute id="ParameterName" type="FixedString" value="baseMasks" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="BaseTextures" />
+							<attribute id="ID" type="FixedString" value="ede33bbb-31db-a03b-75f2-0fbe86b6c7b0" />
+							<attribute id="ParameterName" type="FixedString" value="baseMaps_RGB" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="BaseTextures" />
+							<attribute id="ID" type="FixedString" value="16b434a3-6119-7392-2b0a-365332f29fca" />
+							<attribute id="ParameterName" type="FixedString" value="baseMaps_Normals" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="ID" type="FixedString" value="2c284d42-2602-4f28-247c-aa6d365686c0" />
+							<attribute id="ParameterName" type="FixedString" value="ColourVarNoise" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ID" type="FixedString" value="387e3a6f-9b65-1a7f-3060-8f47d83fef0e" />
+							<attribute id="ParameterName" type="FixedString" value="03_BaseColor" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Base" />
+							<attribute id="ID" type="FixedString" value="ad9241e5-3e53-1394-db4d-84128232c16f" />
+							<attribute id="ParameterName" type="FixedString" value="basecolor" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ID" type="FixedString" value="f12c94b0-fefd-6388-bb39-2c7703b311d6" />
+							<attribute id="ParameterName" type="FixedString" value="02_BaseColor" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ID" type="FixedString" value="80561a65-bc7f-4312-231a-8b324942d653" />
+							<attribute id="ParameterName" type="FixedString" value="03_PhysicalMap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Base" />
+							<attribute id="ID" type="FixedString" value="4aeb3723-b6f3-338f-df8a-b489898a151c" />
+							<attribute id="ParameterName" type="FixedString" value="physicalmap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ID" type="FixedString" value="a4a8e04f-8d13-7bf8-9e39-c49ff921e9fb" />
+							<attribute id="ParameterName" type="FixedString" value="02_PhysicalMap" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.32005292 0.14382759 0.13066553" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="IsColor" type="bool" value="False" />
+							<attribute id="ParameterName" type="FixedString" value="ColourVarRed" />
+							<attribute id="Value" type="fvec3" value="0.23489526 0.0824142 0.035614368" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.32005292 0.29738498 0.13066553" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Colour Variation" />
+							<attribute id="IsColor" type="bool" value="False" />
+							<attribute id="ParameterName" type="FixedString" value="ColourVarGreen" />
+							<attribute id="Value" type="fvec3" value="0.4877652 0.4877652 0.4877652" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.02969712 0.02969712 0.02969712" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Height Gradient" />
+							<attribute id="IsColor" type="bool" value="False" />
+							<attribute id="ParameterName" type="FixedString" value="HeightGradientColour" />
+							<attribute id="Value" type="fvec3" value="0.02969712 0.02969712 0.02969712" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="bd2c516a-aa7b-290b-61dd-a5c8af81d33f" />
+					<attribute id="MaterialType" type="uint8" value="6" />
+					<attribute id="Name" type="LSString" value="NAT_Gith_Creche_Vista_D_03" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Environment/ENV_Base_TileBlend_Test_DirtGradient.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ParameterName" type="FixedString" value="03_Tiling" />
+							<attribute id="Value" type="float" value="8" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Base" />
+							<attribute id="ParameterName" type="FixedString" value="01_Tiling" />
+							<attribute id="Value" type="float" value="5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ParameterName" type="FixedString" value="02_Tiling" />
+							<attribute id="Value" type="float" value="15" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="100" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="NoiseTile" />
+							<attribute id="ParameterName" type="FixedString" value="NoiseTile" />
+							<attribute id="Value" type="float" value="100" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ParameterName" type="FixedString" value="Blue_Mask_Range" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ParameterName" type="FixedString" value="Blue_Mask_Contrast" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ParameterName" type="FixedString" value="Green_Mask_Range" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ParameterName" type="FixedString" value="Green_Mask_Contrast" />
+							<attribute id="Value" type="float" value="2" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ParameterName" type="FixedString" value="Clamp_Min" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ParameterName" type="FixedString" value="Clamp_Max" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Red" />
+							<attribute id="ParameterName" type="FixedString" value="Red_Mask_Strength" />
+							<attribute id="Value" type="float" value="0.11" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ID" type="FixedString" value="80b34bd4-7f08-83d0-7ea7-1cf42ec38af7" />
+							<attribute id="ParameterName" type="FixedString" value="03_NormalMap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Base" />
+							<attribute id="ID" type="FixedString" value="1ddfa6b4-f78d-4238-a324-a33e73d3c2da" />
+							<attribute id="ParameterName" type="FixedString" value="normalmap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ID" type="FixedString" value="0a493721-e1ae-586b-4ffa-db6ae6a26f97" />
+							<attribute id="ParameterName" type="FixedString" value="02_NormalMap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="BaseTextures" />
+							<attribute id="ID" type="FixedString" value="5d74dfb3-6e6f-15bf-c8e3-dddd99349493" />
+							<attribute id="ParameterName" type="FixedString" value="baseMasks" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="BaseTextures" />
+							<attribute id="ID" type="FixedString" value="7cb9828c-b776-26c9-4067-76faa4f2c6e6" />
+							<attribute id="ParameterName" type="FixedString" value="baseMaps_RGB" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="BaseTextures" />
+							<attribute id="ID" type="FixedString" value="126ae898-1300-69e2-d96d-09122a1ad07c" />
+							<attribute id="ParameterName" type="FixedString" value="baseMaps_Normals" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ID" type="FixedString" value="7fc940a8-61e9-4481-813b-b525ff776dfe" />
+							<attribute id="ParameterName" type="FixedString" value="03_BaseColor" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Base" />
+							<attribute id="ID" type="FixedString" value="44f393a4-af7d-4f8a-80bb-24e35c7dbd07" />
+							<attribute id="ParameterName" type="FixedString" value="basecolor" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ID" type="FixedString" value="ad9241e5-3e53-1394-db4d-84128232c16f" />
+							<attribute id="ParameterName" type="FixedString" value="02_BaseColor" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Green" />
+							<attribute id="ID" type="FixedString" value="c09998f1-52fe-f7c4-67b8-e999cbe7457d" />
+							<attribute id="ParameterName" type="FixedString" value="03_PhysicalMap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Base" />
+							<attribute id="ID" type="FixedString" value="6f303c3f-718d-474b-a792-1a8465010931" />
+							<attribute id="ParameterName" type="FixedString" value="physicalmap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Layer_Blue" />
+							<attribute id="ID" type="FixedString" value="4aeb3723-b6f3-338f-df8a-b489898a151c" />
+							<attribute id="ParameterName" type="FixedString" value="02_PhysicalMap" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="c10dd433-5bc2-220a-d037-0ec191427b87" />
+					<attribute id="MaterialType" type="uint8" value="6" />
+					<attribute id="Name" type="LSString" value="NAT_Mountain_Granite_Vista_E" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Vista/VISTA_Tileable_Projection_HeightGradient.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.3" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Projection" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionTiling" />
+							<attribute id="Value" type="float" value="0.05" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="2" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ParameterName" type="FixedString" value="TileableTiling" />
+							<attribute id="Value" type="float" value="5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ParameterName" type="FixedString" value="TileableRotation" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="SlopeMask" />
+							<attribute id="ParameterName" type="FixedString" value="SmoothStep_Min" />
+							<attribute id="Value" type="float" value="0.8" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="SlopeMask" />
+							<attribute id="ParameterName" type="FixedString" value="SmoothStep_Max" />
+							<attribute id="Value" type="float" value="0.6" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.28" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightLines" />
+							<attribute id="ParameterName" type="FixedString" value="LineTiling" />
+							<attribute id="Value" type="float" value="0.28" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="3" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightLines" />
+							<attribute id="ParameterName" type="FixedString" value="LineContrast" />
+							<attribute id="Value" type="float" value="3" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightGradient" />
+							<attribute id="ParameterName" type="FixedString" value="Offset" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.2" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightGradient" />
+							<attribute id="ParameterName" type="FixedString" value="Spread" />
+							<attribute id="Value" type="float" value="0.2" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightGradient" />
+							<attribute id="ParameterName" type="FixedString" value="Intensity" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Projection" />
+							<attribute id="ID" type="FixedString" value="903624f0-d8f2-4cbf-937d-903baebebbdc" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionNM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ID" type="FixedString" value="5a228298-be6e-a282-da12-ccb8368e9a6e" />
+							<attribute id="ParameterName" type="FixedString" value="TileableNM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="48c22b52-24cb-5c21-9a4c-d563afe727cc" />
+							<attribute id="ParameterName" type="FixedString" value="NormalMap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="ProjectionNoise" />
+							<attribute id="ID" type="FixedString" value="eb7dee69-9e11-4f1e-93f3-62ab892a05b2" />
+							<attribute id="ParameterName" type="FixedString" value="Projection_NoiseBM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Projection" />
+							<attribute id="ID" type="FixedString" value="1c1ceeeb-48e3-923e-2ca4-82b966e08fbf" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionBM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="ProjectionNoise" />
+							<attribute id="ID" type="FixedString" value="28b10374-729f-7d65-d901-af67a7ebc22a" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionNoise" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture" />
+							<attribute id="ID" type="FixedString" value="11fe798f-2f8d-491f-87e6-defe7853ce43" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture" />
+							<attribute id="ID" type="FixedString" value="dbd4babf-d924-0a52-4ad0-081afbbb007d" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ID" type="FixedString" value="53fe9f2e-2ae4-643c-bd3f-0ad23ecfd33f" />
+							<attribute id="ParameterName" type="FixedString" value="TileableBM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Projection" />
+							<attribute id="ID" type="FixedString" value="80561a65-bc7f-4312-231a-8b324942d653" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionPM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ID" type="FixedString" value="d0099191-0f31-f003-6877-6a5a61c7fe42" />
+							<attribute id="ParameterName" type="FixedString" value="TileablePM" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0 0 0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="ProjectionNoise" />
+							<attribute id="IsColor" type="bool" value="False" />
+							<attribute id="ParameterName" type="FixedString" value="Projection_NoiseColor" />
+							<attribute id="Value" type="fvec3" value="0.1869885 0.16687226 0.07805659" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.3111805 0.26735806 0.15728073" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightLines" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="LineColor" />
+							<attribute id="Value" type="fvec3" value="0 0 0" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.12324927 0.13340789 0.05287595" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightGradient" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="BottomHeightColor" />
+							<attribute id="Value" type="fvec3" value="0.12324927 0.13340789 0.05287595" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="c8067462-af88-3314-89fa-20802d4f4bf0" />
+					<attribute id="MaterialType" type="uint8" value="6" />
+					<attribute id="Name" type="LSString" value="NAT_Gith_Creche_Vista_D_02" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Vista/VISTA_Tileable_Projection_HeightGradient.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.3" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Projection" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionTiling" />
+							<attribute id="Value" type="float" value="0.05" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="2" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ParameterName" type="FixedString" value="TileableTiling" />
+							<attribute id="Value" type="float" value="25" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ParameterName" type="FixedString" value="TileableRotation" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="SlopeMask" />
+							<attribute id="ParameterName" type="FixedString" value="SmoothStep_Min" />
+							<attribute id="Value" type="float" value="0.9" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="SlopeMask" />
+							<attribute id="ParameterName" type="FixedString" value="SmoothStep_Max" />
+							<attribute id="Value" type="float" value="0.6" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.28" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightLines" />
+							<attribute id="ParameterName" type="FixedString" value="LineTiling" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="3" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightLines" />
+							<attribute id="ParameterName" type="FixedString" value="LineContrast" />
+							<attribute id="Value" type="float" value="5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightGradient" />
+							<attribute id="ParameterName" type="FixedString" value="Offset" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.2" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightGradient" />
+							<attribute id="ParameterName" type="FixedString" value="Spread" />
+							<attribute id="Value" type="float" value="0.2" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightGradient" />
+							<attribute id="ParameterName" type="FixedString" value="Intensity" />
+							<attribute id="Value" type="float" value="1" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Projection" />
+							<attribute id="ID" type="FixedString" value="903624f0-d8f2-4cbf-937d-903baebebbdc" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionNM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ID" type="FixedString" value="1db0a397-a81b-6b45-135e-f70e5f3e4a33" />
+							<attribute id="ParameterName" type="FixedString" value="TileableNM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="126ae898-1300-69e2-d96d-09122a1ad07c" />
+							<attribute id="ParameterName" type="FixedString" value="NormalMap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="ProjectionNoise" />
+							<attribute id="ID" type="FixedString" value="eb7dee69-9e11-4f1e-93f3-62ab892a05b2" />
+							<attribute id="ParameterName" type="FixedString" value="Projection_NoiseBM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Projection" />
+							<attribute id="ID" type="FixedString" value="1c1ceeeb-48e3-923e-2ca4-82b966e08fbf" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionBM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="ProjectionNoise" />
+							<attribute id="ID" type="FixedString" value="28b10374-729f-7d65-d901-af67a7ebc22a" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionNoise" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture" />
+							<attribute id="ID" type="FixedString" value="11fe798f-2f8d-491f-87e6-defe7853ce43" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture" />
+							<attribute id="ID" type="FixedString" value="dbd4babf-d924-0a52-4ad0-081afbbb007d" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ID" type="FixedString" value="1f79bf95-4a7e-ff25-546b-96e593aebbc3" />
+							<attribute id="ParameterName" type="FixedString" value="TileableBM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Projection" />
+							<attribute id="ID" type="FixedString" value="80561a65-bc7f-4312-231a-8b324942d653" />
+							<attribute id="ParameterName" type="FixedString" value="ProjectionPM" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Tileable" />
+							<attribute id="ID" type="FixedString" value="0749e939-2334-aa97-7497-2bbc8c04227a" />
+							<attribute id="ParameterName" type="FixedString" value="TileablePM" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0 0 0" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="ProjectionNoise" />
+							<attribute id="IsColor" type="bool" value="False" />
+							<attribute id="ParameterName" type="FixedString" value="Projection_NoiseColor" />
+							<attribute id="Value" type="fvec3" value="0.1869885 0.16687226 0.07805659" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.3111805 0.26735806 0.15728073" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightLines" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="LineColor" />
+							<attribute id="Value" type="fvec3" value="0.23882797 0.23882797 0.23882797" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.12324927 0.13340789 0.05287595" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="HeightGradient" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="BottomHeightColor" />
+							<attribute id="Value" type="fvec3" value="0.12324927 0.13340789 0.05287595" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="TextureBank">
+		<node id="TextureBank">
+			<children>
+				<node id="Resource">
+					<attribute id="Depth" type="int32" value="1" />
+					<attribute id="Height" type="int32" value="4096" />
+					<attribute id="ID" type="FixedString" value="126ae898-1300-69e2-d96d-09122a1ad07c" />
+					<attribute id="Name" type="LSString" value="NAT_Gith_Creche_Vista_D_NM" />
+					<attribute id="SRGB" type="bool" value="False" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Nature/Mountains/NAT_Gith_Creche_Vista_ABC/Resources/NAT_Gith_Creche_Vista_D_NM.DDS" />
+					<attribute id="Streaming" type="bool" value="True" />
+					<attribute id="Template" type="FixedString" value="NAT_Gith_Creche_Vista_D_NM" />
+					<attribute id="Type" type="int32" value="1" />
+					<attribute id="Width" type="int32" value="4096" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209018" />
+				</node>
+				<node id="Resource">
+					<attribute id="Depth" type="int32" value="1" />
+					<attribute id="Height" type="int32" value="2048" />
+					<attribute id="ID" type="FixedString" value="16b434a3-6119-7392-2b0a-365332f29fca" />
+					<attribute id="Name" type="LSString" value="NAT_Mountain_Granite_Vista_D_NM" />
+					<attribute id="SRGB" type="bool" value="False" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Nature/Mountains/NAT_Mountain_Granite_Vista_ABC/Resources/NAT_Mountain_Granite_Vista_D_NM.DDS" />
+					<attribute id="Streaming" type="bool" value="True" />
+					<attribute id="Template" type="FixedString" value="NAT_Mountain_Granite_Vista_D_NM" />
+					<attribute id="Type" type="int32" value="1" />
+					<attribute id="Width" type="int32" value="2048" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209012" />
+				</node>
+				<node id="Resource">
+					<attribute id="Depth" type="int32" value="1" />
+					<attribute id="Height" type="int32" value="2048" />
+					<attribute id="ID" type="FixedString" value="41e21502-8e7b-52e4-2132-069fef61f99c" />
+					<attribute id="Name" type="LSString" value="NAT_Mountain_Granite_Vista_F_MSK" />
+					<attribute id="SRGB" type="bool" value="False" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Nature/Mountains/NAT_Mountain_Granite_Vista_ABC/Resources/NAT_Mountain_Granite_Vista_F_MSK.DDS" />
+					<attribute id="Streaming" type="bool" value="True" />
+					<attribute id="Template" type="FixedString" value="NAT_Mountain_Granite_Vista_F_MSK" />
+					<attribute id="Type" type="int32" value="1" />
+					<attribute id="Width" type="int32" value="2048" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209012" />
+				</node>
+				<node id="Resource">
+					<attribute id="Depth" type="int32" value="1" />
+					<attribute id="Height" type="int32" value="256" />
+					<attribute id="ID" type="FixedString" value="48c22b52-24cb-5c21-9a4c-d563afe727cc" />
+					<attribute id="Name" type="LSString" value="NAT_Mountain_Granite_Vista_E_NM" />
+					<attribute id="SRGB" type="bool" value="False" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Nature/Mountains/NAT_Mountain_Granite_Vista_ABC/Resources/NAT_Mountain_Granite_Vista_E_NM.DDS" />
+					<attribute id="Streaming" type="bool" value="True" />
+					<attribute id="Template" type="FixedString" value="NAT_Mountain_Granite_Vista_E_NM" />
+					<attribute id="Type" type="int32" value="1" />
+					<attribute id="Width" type="int32" value="256" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209012" />
+				</node>
+				<node id="Resource">
+					<attribute id="Depth" type="int32" value="1" />
+					<attribute id="Height" type="int32" value="4096" />
+					<attribute id="ID" type="FixedString" value="7cb9828c-b776-26c9-4067-76faa4f2c6e6" />
+					<attribute id="Name" type="LSString" value="NAT_Gith_Creche_Vista_D_MSK" />
+					<attribute id="SRGB" type="bool" value="False" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Nature/Mountains/NAT_Gith_Creche_Vista_ABC/Resources/NAT_Gith_Creche_Vista_D_MSK.DDS" />
+					<attribute id="Streaming" type="bool" value="True" />
+					<attribute id="Template" type="FixedString" value="NAT_Gith_Creche_Vista_D_MSK" />
+					<attribute id="Type" type="int32" value="1" />
+					<attribute id="Width" type="int32" value="4096" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209018" />
+				</node>
+				<node id="Resource">
+					<attribute id="Depth" type="int32" value="1" />
+					<attribute id="Height" type="int32" value="2048" />
+					<attribute id="ID" type="FixedString" value="bf1e127e-6276-f1d8-3c84-341dacd43135" />
+					<attribute id="Name" type="LSString" value="NAT_Mountain_Granite_Vista_F_NM" />
+					<attribute id="SRGB" type="bool" value="False" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Nature/Mountains/NAT_Mountain_Granite_Vista_ABC/Resources/NAT_Mountain_Granite_Vista_F_NM.DDS" />
+					<attribute id="Streaming" type="bool" value="True" />
+					<attribute id="Template" type="FixedString" value="NAT_Mountain_Granite_Vista_F_NM" />
+					<attribute id="Type" type="int32" value="1" />
+					<attribute id="Width" type="int32" value="2048" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209012" />
+				</node>
+				<node id="Resource">
+					<attribute id="Depth" type="int32" value="1" />
+					<attribute id="Height" type="int32" value="2048" />
+					<attribute id="ID" type="FixedString" value="ede33bbb-31db-a03b-75f2-0fbe86b6c7b0" />
+					<attribute id="Name" type="LSString" value="NAT_Mountain_Granite_Vista_D_MSK" />
+					<attribute id="SRGB" type="bool" value="True" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Nature/Mountains/NAT_Mountain_Granite_Vista_ABC/Resources/NAT_Mountain_Granite_Vista_D_MSK.DDS" />
+					<attribute id="Streaming" type="bool" value="True" />
+					<attribute id="Template" type="FixedString" value="NAT_Mountain_Granite_Vista_D_MSK" />
+					<attribute id="Type" type="int32" value="1" />
+					<attribute id="Width" type="int32" value="2048" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209012" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="34.79283 47.479115 35.40071" />
+					<attribute id="BoundsMin" type="fvec3" value="-35.865322 -0.049739875 -42.59491" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="0260935e-8991-40ad-397f-36b828d2e25a" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="NAT_Mountain_Granite_Vista_F" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Nature/Mountains/NAT_Mountain_Granite_Vista_ABC/Resources/NAT_Mountain_Granite_Vista_F.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Nature/Mountains/NAT_Mountain_Granite_Vista_ABC/Resources/NAT_Mountain_Granite_Vista_F.Dummy_NAT_Mountain_Granite_Vista_F.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="09c5075d-395f-59fa-d95d-292ee28a7bfc" />
+							<attribute id="ObjectID" type="FixedString" value="NAT_Mountain_Granite_Vista_F.NAT_Mountain_Granite_Vista_F_Mesh.0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="62.438988 24.751886 62.5" />
+					<attribute id="BoundsMin" type="fvec3" value="-62.5 9.45515 -62.438988" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="108f56d9-0595-42dd-de84-9c6b9cfd7fad" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="NAT_Mountain_Granite_Vista_E" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Nature/Mountains/NAT_Mountain_Granite_Vista_ABC/Resources/NAT_Mountain_Granite_Vista_E.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Nature/Mountains/NAT_Mountain_Granite_Vista_ABC/Resources/NAT_Mountain_Granite_Vista_E.Dummy_NAT_Mountain_Granite_Vista_E.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="c10dd433-5bc2-220a-d037-0ec191427b87" />
+							<attribute id="ObjectID" type="FixedString" value="NAT_Mountain_Granite_Vista_E.NAT_Mountain_Granite_Vista_E_Mesh.0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="34.79283 47.479115 35.40071" />
+					<attribute id="BoundsMin" type="fvec3" value="-35.865322 -0.049739875 -42.59491" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="2c420a03-2199-baf2-fb78-b46bc2b838a2" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="NAT_Mountain_Granite_Vista_F_Limestone_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Nature/Mountains/NAT_Mountain_Granite_Vista_ABC/Resources/NAT_Mountain_Granite_Vista_F.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Nature/Mountains/NAT_Mountain_Granite_Vista_ABC/Resources/NAT_Mountain_Granite_Vista_F.Dummy_NAT_Mountain_Granite_Vista_F.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="3101093c-58c3-5def-324d-eb462c101f0b" />
+							<attribute id="ObjectID" type="FixedString" value="NAT_Mountain_Granite_Vista_F.NAT_Mountain_Granite_Vista_F_Mesh.0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="62.438988 47.723946 62.21296" />
+					<attribute id="BoundsMin" type="fvec3" value="-62.5 1.9824995 -57.82712" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="39c6e132-7233-cedf-4a20-5c02a882de9a" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="NAT_Mountain_Granite_Vista_D" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Nature/Mountains/NAT_Mountain_Granite_Vista_ABC/Resources/NAT_Mountain_Granite_Vista_D.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Nature/Mountains/NAT_Mountain_Granite_Vista_ABC/Resources/NAT_Mountain_Granite_Vista_D.Dummy_NAT_Mountain_Granite_Vista_D.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="4827bab7-ec2e-6ee5-a79b-975ccfd32884" />
+							<attribute id="ObjectID" type="FixedString" value="NAT_Mountain_Granite_Vista_D.NAT_Mountain_Granite_Vista_D_Mesh.0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="62.438988 47.723946 62.21296" />
+					<attribute id="BoundsMin" type="fvec3" value="-62.5 1.9824995 -57.82712" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="a0a3334c-4887-1ef4-23fd-0a53d163d09a" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="NAT_Mountain_Granite_Vista_D_Limestone_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Nature/Mountains/NAT_Mountain_Granite_Vista_ABC/Resources/NAT_Mountain_Granite_Vista_D.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Nature/Mountains/NAT_Mountain_Granite_Vista_ABC/Resources/NAT_Mountain_Granite_Vista_D.Dummy_NAT_Mountain_Granite_Vista_D.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="90485da5-aab8-853d-859d-4a64d29c2130" />
+							<attribute id="ObjectID" type="FixedString" value="NAT_Mountain_Granite_Vista_D.NAT_Mountain_Granite_Vista_D_Mesh.0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="16.2365 15.547 16.9995" />
+					<attribute id="BoundsMin" type="fvec3" value="-16.873499 -0.32899997 -16.597" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="f70fc3ab-e4a8-b998-c629-6760a7de79cd" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="NAT_Gith_Creche_Vista_D" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Nature/Mountains/NAT_Gith_Creche_Vista_ABC/Resources/NAT_Gith_Creche_Vista_D.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Nature/Mountains/NAT_Gith_Creche_Vista_ABC/Resources/NAT_Gith_Creche_Vista_D.Dummy_NAT_Gith_Creche_Vista_D.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144678138029277384" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="6402bc60-9004-a180-d0f1-b022c9f06541" />
+							<attribute id="ObjectID" type="FixedString" value="NAT_Gith_Creche_Vista_D.NAT_Gith_Creche_Vista_D_Mesh.0" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

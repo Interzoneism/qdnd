@@ -1,0 +1,48 @@
+game.states.GlyphOfWarding = State{
+    function()
+
+        params.MineRadius = {
+            type = EParamType.Number,
+            help = [[Maximum distance from centre of mine that counts as stepping on it (capped by the bounds of the mine object)]],
+            default = 4.0,
+        }
+
+        params.Projectile = {
+            type = EParamType.String,
+            default = "Projectile_Fireball_Trap",
+            help = [[The projectile that explodes]],
+            default_value_provider = [[spell_projectile]]
+        }
+
+        inputs.EntityOnTopUpdate = {internal = true}
+
+        outputs.Explode = {internal=true}
+        outputs.DeactivateOnTopTrigger = {internal=true}
+
+        nodes.OnTopTrigger = Proxy{
+            game.states.OnTopTrigger,
+            params = {EntityFilter = "Characters",
+                      CheckInterval = 0.5,
+                      MaxDistanceFromCentre = params.MineRadius},
+            inputs = {Deactivate = {outputs.DeactivateOnTopTrigger}},
+            outputs = {EntityOnTopUpdate = {inputs.EntityOnTopUpdate} }
+        }
+
+        nodes.Explode = Proxy{
+            game.states.Explode,
+            params = {Projectile = params.Projectile},
+            inputs = {Explode = {outputs.Explode}}
+        }
+
+        socketEvents.EntityOnTopUpdate = function(ev)
+            local caster = GetStatusSource(me, "EXPLOSIVE_RUNES")
+            local newCharacter = Entity(ev.Object).Character
+            if not newCharacter.IsDead and
+               IsEnemy(newCharacter, caster.Character) then
+                TriggerOutput(outputs.Explode, caster.EntityRef)
+                TriggerOutput(outputs.DeactivateOnTopTrigger, caster.EntityRef)
+            end
+        end
+
+    end
+}

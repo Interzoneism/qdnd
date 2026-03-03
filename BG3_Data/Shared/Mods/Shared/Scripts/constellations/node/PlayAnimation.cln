@@ -1,0 +1,38 @@
+game.states.PlayAnimation = State{
+    function()
+        description = "Play an animation"
+
+        params.Animation = {type = EParamType.String, required=true, help = [[Animation to play.]]}
+
+        inputs.PlayAnimation = {help = "Play the Animation"}
+        inputs.StopAnimation = {help = "Stop the Animation (if it was a looping one)"}
+
+        local target
+
+        self.OnEditorChanges = function()
+            if (me.Blackboard.GetFact("Cnst.PlayAnimation.On") == 1) then
+                StopAnimation(me, true)
+                me.Blackboard.ClearFact("Cnst.PlayAnimation.On")
+            end
+        end
+
+        self.OnInit = function()
+            target = me
+        end
+
+        socketEvents.PlayAnimation = function()
+            if (me.Blackboard.GetFact("Cnst.PlayAnimation.On") ~= 1) then
+                PlayItemAnimationImmediate(target, Animation(params.Animation), {})
+                me.Blackboard.SetFact("Cnst.PlayAnimation.On", 1)
+            end
+        end
+
+        socketEvents.StopAnimation = function()
+            if (me.Blackboard.GetFact("Cnst.PlayAnimation.On") == 1) then
+                StopAnimation(target)
+                me.Blackboard.ClearFact("Cnst.PlayAnimation.On")
+            end
+        end
+
+    end
+}

@@ -1,0 +1,199 @@
+game.states.Button = State{
+    function()
+
+        modules = {"shared.items"}
+
+        params.DC = {
+            type = EParamType.String,
+            default="HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f",
+            help=[[Perception check DC.]]
+        }
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            required=false,
+            default=6.0,
+            help=[[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]]
+        }
+
+        params.OneShot = {
+            type = EParamType.Bool,
+            default = false,
+            help =[[Does the button disable itself after the first successful use?]]
+        }
+
+        params.Skill = {
+            type = EParamType.String,
+            default="Perception",
+            help=[[The skill checked for discovering the button if the 'Type' is not 'None'.]]
+        }
+
+        params.ActivatedSound = {
+            type = EParamType.String,
+            default="II_Generic_Button",
+            help=[[Sounds when the button is activated.]]
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_Off",
+            help =[[Sound when button is disabled.]]
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_On",
+            help =[[Sound when button is enabled.]]
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Does the button start enabled? (enabled = pressing it will trigger the 'Pressed' output; disabled = pressing it will the the CantUseAD, if any).]]
+        }
+
+        params.Type = {
+            type = EParamType.String,
+            default="Interactable",
+            help=[[
+            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]]
+        }
+
+        params.VFXOff = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = [[VFX while button is disabled and has been spotted.]]
+        }
+
+        params.VFXOffBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = [[Bone on which the 'VFXOff' VFX is played.]]
+        }
+
+        params.VFXOn = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = [[VFX while button is enabled and has been spotted.]]
+        }
+
+        params.VFXOnBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = [[Bone on which the enabled-VFX is played.]]
+        }
+
+        inputs.Enable = {help = "Enable button"}
+        inputs.Disable = {help = "Disable button"}
+
+        outputs.Enable = {internal = true}
+        outputs.Disable = {internal = true}
+
+        outputs.TryActivateInt = {internal = true}
+        outputs.ActivatedInt = {internal = true}
+
+        outputs.Pressed = {help = "The button was triggered."}
+
+        inputs.Reveal = {help = [[Reveals the Button]]}
+        outputs.Reveal = {internal = true}
+
+        inputs.UseBlockedFromStory = {help = [[Button use was blocked from story (because it was not enabled)]]}
+        outputs.UseBlockedFromStoryInt = {internal = true}
+
+        outputs.ActivateAttemptFailed = {help = [[Button was used while disabled]]}
+
+        inputs.ActivateAttemptFailedInt = {internal = true}
+
+        outputs.ForceActivateInt = {internal = true}
+        inputs.PressedInt = {internal = true}
+        inputs.ActivatedInt = {internal = true}
+
+        inputs.ForceActivate = {help = "External press of the button."}
+
+        outputs.UseBlockedFromStoryInt = {internal = true}
+
+        nodes.LeverTrigger = Proxy{
+            game.states.LeverTrigger,
+            inputs = {ForceActivate = {outputs.ForceActivateInt}},
+            outputs = {Activated = {inputs.PressedInt}}
+        }
+
+        nodes.PerceptionDisarmOnOff = Proxy{
+            game.states.PerceptionDisarmOnOff,
+            params = {StartEnabled = params.StartEnabled,
+                      DC = params.DC,
+                      MinDistance = params.MinDistance,
+                      Skill = params.Skill,
+                      Type = params.Type,
+                      VFXOn= params.VFXOn,
+                      VFXOff = params.VFXOff,
+                      VFXOnBone = params.VFXOnBone,
+                      VFXOffBone = params.VFXOffBone,
+                      IsTrap = false,
+                      SoundOn = params.SoundOn,
+                      SoundOff = params.SoundOff,
+                      DestroyOnDisarm = false},
+            inputs = {Enable = {outputs.Enable},
+                      Disable = {outputs.Disable},
+                      Reveal = {outputs.Reveal},
+                      TryActivate = {outputs.TryActivateInt}},
+            outputs = {ActivateAttemptFailed = {inputs.ActivateAttemptFailedInt},
+                       Activate = {inputs.ActivatedInt}}
+        }
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.Enable, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.Disable, ev.Object, ev.Param)
+        end
+
+        socketEvents.UseBlockedFromStory = function(ev)
+            TriggerOutput(outputs.UseBlockedFromStoryInt, ev.Object, ev.Param)
+        end
+
+        socketEvents.Reveal = function(ev)
+            TriggerOutput(outputs.Reveal, ev.Object, ev.Param)
+        end
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.Enable, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.Disable, ev.Object, ev.Param)
+        end
+
+        socketEvents.ActivatedInt = function(ev)
+            PlaySound(me, params.ActivatedSound)
+            DebugText(me, "Pressed")
+            TriggerOutput(outputs.Pressed, ev.Object, ev.Param)
+            TriggerOutput(outputs.Reveal, ev.Object, true)
+            if params.OneShot then
+                TriggerOutput(outputs.Disable,ev.Object, ev.Param)
+            end
+        end
+
+        socketEvents.PressedInt = function(ev)
+            TriggerOutput(outputs.TryActivateInt, ev.Object, ev.Param)
+        end
+
+        socketEvents.ForceActivate = function(ev)
+            TriggerOutput(outputs.ForceActivateInt, ev.Object, ev.Param)
+        end
+
+        socketEvents.ActivateAttemptFailedInt = function(ev)
+            StartAutomatedDialogImmediate(Dialog("GLO_AD_MechanicalClunk_a96814b5-9d5b-cf71-b0c3-39d4aea3dfd6"), me)
+            TriggerOutput(outputs.ActivateAttemptFailed, ev.Object, ev.Param)
+        end
+
+    end
+
+}

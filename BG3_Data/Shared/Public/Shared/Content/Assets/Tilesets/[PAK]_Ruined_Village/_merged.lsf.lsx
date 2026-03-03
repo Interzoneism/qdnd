@@ -1,0 +1,245 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="VirtualTextureBank">
+		<node id="VirtualTextureBank">
+			<children>
+				<node id="Resource">
+					<attribute id="GTexFileName" type="FixedString" value="a332d6f6f3af7e39d0a06384a0ee0072" />
+					<attribute id="ID" type="FixedString" value="1a363996-a987-c12d-fd26-c39a20e78df4" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="BLD_HUM_RuinedVillage_Stone_A" />
+					<attribute id="Prefetch" type="bool" value="False" />
+					<attribute id="PrefetchMipLevel" type="int8" value="-1" />
+					<attribute id="ReferencedColorSpaces" type="uint32" value="6" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="VirtualTextureLayerConfig" type="uint32" value="3" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115198813274313" />
+				</node>
+				<node id="Resource">
+					<attribute id="GTexFileName" type="FixedString" value="4ef03cf68a0f26eb55b6f861df48f728" />
+					<attribute id="ID" type="FixedString" value="676bcb25-295d-ea2d-60ad-294266af3a5b" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="BLD_HUM_RuinedVillage_Wood_A" />
+					<attribute id="Prefetch" type="bool" value="False" />
+					<attribute id="PrefetchMipLevel" type="int8" value="-1" />
+					<attribute id="ReferencedColorSpaces" type="uint32" value="6" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="VirtualTextureLayerConfig" type="uint32" value="3" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115198813274313" />
+				</node>
+				<node id="Resource">
+					<attribute id="GTexFileName" type="FixedString" value="a2b7e85c4a2c07a74a919b6fec5b8cc3" />
+					<attribute id="ID" type="FixedString" value="cc3dfed3-1e56-fedd-f04f-483674aef2cc" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="BLD_HUM_RuinedVillage_Wall_A" />
+					<attribute id="Prefetch" type="bool" value="False" />
+					<attribute id="PrefetchMipLevel" type="int8" value="-1" />
+					<attribute id="ReferencedColorSpaces" type="uint32" value="6" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="VirtualTextureLayerConfig" type="uint32" value="3" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115198813274313" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="MaterialBank">
+		<node id="MaterialBank">
+			<children>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="2e464ae4-0e67-d570-cfff-ad7b4255bf43" />
+					<attribute id="MaterialType" type="uint8" value="6" />
+					<attribute id="Name" type="LSString" value="BLD_HUM_RuinedVillage_Wall_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Base/Base_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="cc3dfed3-1e56-fedd-f04f-483674aef2cc" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="8509f0d5-1bec-3d4a-49ba-9467cb817e24" />
+					<attribute id="MaterialType" type="uint8" value="5" />
+					<attribute id="Name" type="LSString" value="BLD_HUM_RuinedVillage_Wood_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Base/Base_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="676bcb25-295d-ea2d-60ad-294266af3a5b" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="c500b8a4-b19b-6684-a2ca-ac878ba680e4" />
+					<attribute id="MaterialType" type="uint8" value="6" />
+					<attribute id="Name" type="LSString" value="BLD_HUM_RuinedVillage_Stone_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Base/Base_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="1a363996-a987-c12d-fd26-c39a20e78df4" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="SplineSetBank">
+		<node id="SplineSetBank">
+			<children>
+				<node id="Resource">
+					<attribute id="EditorSourceFile" type="LSString" value="Editor/Mods/Shared/SplineSet/Ruined_Village/WALL_RuinedVillage_House_Base_A_2D_5H_A.set" />
+					<attribute id="ID" type="FixedString" value="b8197338-6e9a-a62d-5f28-92fd6c0c1f13" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="WALL_RuinedVillage_House_Base_A_2D_5H_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855880" />
+					<children>
+						<node id="TileSet">
+							<children>
+								<node id="Tile">
+									<attribute id="TileGUID" type="guid" value="5c9db81f-00aa-4a0e-9bcc-75f16488cdc0" />
+									<attribute id="VisualGUID" type="FixedString" value="1aae9e85-9f89-dd87-bc4b-3d1847d7437e" />
+								</node>
+								<node id="Tile">
+									<attribute id="TileGUID" type="guid" value="fdfb4d0d-7442-4f98-b713-23ee87a09712" />
+									<attribute id="VisualGUID" type="FixedString" value="29e872c1-3480-de8d-6f29-81ac9dbf6e95" />
+								</node>
+								<node id="Tile">
+									<attribute id="TileGUID" type="guid" value="c6851303-9f82-49fb-bc74-0051d8ccf425" />
+									<attribute id="VisualGUID" type="FixedString" value="4bd52fa9-6e2e-0412-842e-06b4ed9a4806" />
+								</node>
+								<node id="Tile">
+									<attribute id="TileGUID" type="guid" value="66f22207-5262-4a6c-991f-4b1b59880ace" />
+									<attribute id="VisualGUID" type="FixedString" value="68fff16b-8a6a-dc5f-18f3-7990c27b4d24" />
+								</node>
+								<node id="Tile">
+									<attribute id="TileGUID" type="guid" value="89f97d4b-e117-4112-a4ed-436635c36ba4" />
+									<attribute id="VisualGUID" type="FixedString" value="2864fd7f-e565-44a6-ee3d-ddf77917152b" />
+								</node>
+								<node id="Tile">
+									<attribute id="TileGUID" type="guid" value="5b4a7097-9ad8-4aa6-a9ae-b60caf3762e3" />
+									<attribute id="VisualGUID" type="FixedString" value="9e6890a1-6129-cf94-017a-1ff0ab6a3963" />
+								</node>
+								<node id="Tile">
+									<attribute id="TileGUID" type="guid" value="71911954-be42-475b-8ed8-5f30a013e145" />
+									<attribute id="VisualGUID" type="FixedString" value="19aacb8e-1057-53e9-1236-32bb6dba7b4b" />
+								</node>
+								<node id="Tile">
+									<attribute id="TileGUID" type="guid" value="b170f6af-f4d6-4718-a653-4055c4350c84" />
+									<attribute id="VisualGUID" type="FixedString" value="a6c7b1af-173b-d920-1ec5-c9c38de7b02e" />
+								</node>
+								<node id="Tile">
+									<attribute id="TileGUID" type="guid" value="433128b1-51a7-4be3-878d-03edc694493c" />
+									<attribute id="VisualGUID" type="FixedString" value="e97b0f8e-4b01-5a37-777f-b7047ddb8a29" />
+								</node>
+								<node id="Tile">
+									<attribute id="TileGUID" type="guid" value="e2696ebe-b347-4d4b-8cf1-94decd5cba57" />
+									<attribute id="VisualGUID" type="FixedString" value="6ecc681f-2fb3-2625-f75a-3f0fdda374ec" />
+								</node>
+								<node id="Tile">
+									<attribute id="TileGUID" type="guid" value="1b693a5c-b534-4bd5-93b4-512ef0234782" />
+									<attribute id="VisualGUID" type="FixedString" value="feaf925f-c9c8-0d76-2835-9a2c35a5cc63" />
+								</node>
+								<node id="Tile">
+									<attribute id="TileGUID" type="guid" value="dfcaefff-895e-48ce-9f5a-343bc421baf1" />
+									<attribute id="VisualGUID" type="FixedString" value="2639863f-3183-b402-aaad-b6851d566b2b" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

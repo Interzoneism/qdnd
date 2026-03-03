@@ -1,0 +1,10 @@
+game.configs.WieldedOrDroppedStatus = Config{
+    params = {
+        Status = {type = EParamType.String, help = [[Status]]
+                    },
+    },
+    root = StateRef{game.roots.DefaultTrap,
+                    logic = StateRef{game.states.WieldedOrDroppedStatus,
+                                     Status = params.Status}
+                    }
+}

@@ -1,0 +1,28 @@
+game.states.OnOffStage = State{
+    function()
+
+        inputs.OnStage = {help = "Set object onstage"}
+        inputs.OffStage = {help = "Set object offstage"}
+
+        socketEvents.OnStage = function(ev)
+            if me.SubjectEntity.IsItem then
+                SetOnStage(me.SubjectEntity, true)
+            elseif me.SubjectEntity.IsPlatform then
+                SetPlatformOnStage(me.SubjectEntity, true)
+            else
+                DebugLogCritical("For object [1]_[2], the subject entity is neither an item nor a platform and is not supported.", me.Name, me.UUID)
+            end            
+        end
+
+        socketEvents.OffStage = function(ev)
+            if me.SubjectEntity.IsItem then
+                SetOnStage(me.SubjectEntity, false)
+            elseif me.SubjectEntity.IsPlatform then
+                SetPlatformOnStage(me.SubjectEntity, false)
+            else
+                DebugLogCritical("For object [1]_[2], the subject entity is neither an item nor a platform and is not supported.", me.Name, me.UUID)
+            end    
+        end
+
+    end
+}

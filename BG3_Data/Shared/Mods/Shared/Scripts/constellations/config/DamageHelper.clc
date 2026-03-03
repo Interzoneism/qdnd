@@ -1,0 +1,47 @@
+game.configs.DamageHelper = Config{
+    params={
+        Threshold = {
+            type = EParamType.Number,
+            help = [[            Minimum damage that needs to be done to the object. Percentage, so on a 0.0-1.0 range unless AbsoluteValueTreshold is true]],
+            required = false,
+            default = 0
+        },
+        AbsoluteValueThreshold = {
+            type = EParamType.Bool,
+            help = [[If true, treat the threshold as an absolute value rather than a medium value]],
+            required = false,
+            default = false
+        },
+        ExcludeDamageTypes = {
+            type = EParamType.Bool,
+            help = [[Instead of trying to match the damage types, ignore them (TODO)]],
+            required = false,
+            default = false
+        },
+        DamageTypes = {
+            type = EParamType.String,
+            help = [[Filter on these damage types]],
+            required = false,
+            arrayRange=[[0..2147483647]],
+            default = {
+            }
+        },
+        TargetEntity = {
+            type = EParamType.String,
+            help = [[Object to whose damage you're reacting.]],
+            required = false,
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.DamageTrigger,
+            AbsoluteValueThreshold = params.AbsoluteValueThreshold,
+            DamageTypes = params.DamageTypes,
+            ExcludeDamageTypes = params.ExcludeDamageTypes,
+            TargetEntity = params.TargetEntity,
+            Threshold = params.Threshold,
+        },
+    },
+    outputs={
+        TookDamage=ExtSocket{description=[[Object was damaged]],{SocketRef{[[root.logic.outputs.TookDamage]]}}},
+    }
+}

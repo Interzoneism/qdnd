@@ -1,0 +1,54 @@
+game.configs.Drop = Config{
+    params={
+        DestroyType = {
+            type = EParamType.String,
+            help = [[When explicitly destroying the item, use this death type. If not set, don't destroy after falling]],
+            required = false,
+            default_value_provider = [[deathtype]],
+        },
+        DropStopVFX = {
+            type = EParamType.String,
+            help = [[When the item stops falling/lands, play this VFX.]],
+            required = false,
+        },
+        DropStartVFX = {
+            type = EParamType.String,
+            help = [[When the item starts falling, play this VFX.]],
+            required = false,
+        },
+        DestroyProjectileSpell = {
+            type = EParamType.String,
+            help = [[The projectile (if any) that explodes when the item destroys itself.]],
+            required = false,
+            default_value_provider = [[spell_projectile]],
+        },
+        DropStartSound = {
+            type = EParamType.String,
+            help = [[When the item starts falling, play this sound.]],
+            required = false,
+        },
+        DropStopSound = {
+            type = EParamType.String,
+            help = [[When the item stops falling/lands, play this sound.
+                     Warning: will not work if the item gets destroyed at that point
+                     and has no destruct visual.]],
+            required = false,
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.Drop,
+            DestroyProjectileSpell = params.DestroyProjectileSpell,
+            DestroyType = params.DestroyType,
+            DropStartSound = params.DropStartSound,
+            DropStartVFX = params.DropStartVFX,
+            DropStopSound = params.DropStopSound,
+            DropStopVFX = params.DropStopVFX,
+        },
+    },
+    inputs={
+        Drop=ExtSocket{description=[[Make item fall. ev.Object is assumed to be the cause of falling]],{SocketRef{[[root.logic.inputs.Drop]]}}},
+    },
+    outputs={
+        Dropped=ExtSocket{description=[[Item fell (and is exploding)]],{SocketRef{[[root.logic.outputs.Dropped]]}}},
+    }
+}

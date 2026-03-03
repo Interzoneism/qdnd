@@ -1,0 +1,42 @@
+game.configs.GEN_Wander = Config{
+    params={
+        wanderMin = {
+            type = EParamType.Number,
+            help = [[Minimum amount of time (in seconds) spent patrolling]],
+            required = true,
+        },
+        sleepMax = {
+            type = EParamType.Number,
+            help = [[Maximum amount of time (in seconds) spent sleeping between patrols. Leave at 0 if no randomisation is needed.]],
+            required = false,
+            default = 0
+        },
+        trigger = {
+            type = EParamType.String,
+            help = [[trigger in which the cahracter patrols]],
+            required = true,
+        },
+        wanderMax = {
+            type = EParamType.Number,
+            help = [[Maximum amount of time (in seconds) spent patrolling. Leave at 0 if no randomisation is needed.]],
+            required = false,
+            default = 0
+        },
+        sleepMin = {
+            type = EParamType.Number,
+            help = [[Minimum amount of time (in seconds) spent sleeping between patrols]],
+            required = true,
+        },
+    },
+    root=StateRef{game.roots.DefaultCharacter,
+        genericBehaviours = StateRef{game.states.CrimesHumanoid},
+        combatCowerState = StateRef{game.states.CombatCower},
+        idle = StateRef{game.states.GEN_Wander,
+            wanderMin = params.wanderMin,
+            sleepMax = params.sleepMax,
+            trigger = params.trigger,
+            wanderMax = params.wanderMax,
+            sleepMin = params.sleepMin,
+        },
+    }
+}

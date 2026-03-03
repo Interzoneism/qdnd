@@ -1,0 +1,469 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="314" lslib_meta="v1,bswap_guids" />
+	<region id="TLScene">
+		<node id="TLScene">
+			<attribute id="Identifier" type="guid" value="e5692500-2d32-46df-2fb2-a70b1817bd37" />
+			<attribute id="SceneBounds" type="fvec3" value="1 0 1" />
+			<attribute id="SceneType" type="uint8" value="4" />
+			<children>
+				<node id="LightingSetups">
+					<children>
+						<node id="LightingSetup">
+							<attribute id="Id" type="guid" value="00000000-0000-0000-0000-000000000000" />
+							<attribute id="Name" type="LSString" value="Default" />
+						</node>
+					</children>
+				</node>
+				<node id="Lights">
+					<children>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="0773a8ba-7230-40e2-8f69-360da95a0f7b" />
+							<children>
+								<node id="Lights">
+									<attribute id="Id" type="guid" value="0773a8ba-7230-40e2-8f69-360da95a0f7b" />
+									<attribute id="Name" type="LSString" value="_Base_DNG_LAVA_Fill1" />
+									<attribute id="Type" type="uint8" value="5" />
+									<children>
+										<node id="Desc">
+											<children>
+												<node id="Color">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="fvec3" value="0.627451 0.8039216 1" />
+														</node>
+													</children>
+												</node>
+												<node id="DirectionLightAttenuationSide">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="float" value="0.25" />
+														</node>
+													</children>
+												</node>
+												<node id="DirectionLightDimensions">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="fvec3" value="4 4 8" />
+														</node>
+													</children>
+												</node>
+												<node id="Intensity">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="float" value="100" />
+														</node>
+													</children>
+												</node>
+												<node id="PreExpose">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="bool" value="True" />
+														</node>
+													</children>
+												</node>
+												<node id="ScatteringScale">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+												<node id="Type">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="uint8" value="2" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value=" 0.87  0.05  0.50 -0.80 &#xD;&#xA; 0.00  0.99 -0.10  1.57 &#xD;&#xA;-0.50  0.09  0.86  0.84 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="3f57f02c-ff12-4757-93f8-bc536a732e50" />
+							<children>
+								<node id="Lights">
+									<attribute id="Id" type="guid" value="3f57f02c-ff12-4757-93f8-bc536a732e50" />
+									<attribute id="Name" type="LSString" value="_Base_DNG_LAVA_Key1" />
+									<attribute id="Type" type="uint8" value="5" />
+									<children>
+										<node id="Desc">
+											<children>
+												<node id="CastShadow">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="bool" value="True" />
+														</node>
+													</children>
+												</node>
+												<node id="DirectionLightAttenuationSide">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="float" value="0.25" />
+														</node>
+													</children>
+												</node>
+												<node id="DirectionLightDimensions">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="fvec3" value="4 4 8" />
+														</node>
+													</children>
+												</node>
+												<node id="Intensity">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="float" value="750" />
+														</node>
+													</children>
+												</node>
+												<node id="Kelvin">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="float" value="2500" />
+														</node>
+													</children>
+												</node>
+												<node id="PreExpose">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="bool" value="True" />
+														</node>
+													</children>
+												</node>
+												<node id="ScatteringScale">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="float" value="0.125" />
+														</node>
+													</children>
+												</node>
+												<node id="Type">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="uint8" value="2" />
+														</node>
+													</children>
+												</node>
+												<node id="UseTemperature">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="bool" value="True" />
+														</node>
+													</children>
+												</node>
+												<node id="VolumetricShadow">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="bool" value="True" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value="-0.60 -0.08 -0.80  2.59 &#xD;&#xA; 0.00  0.99 -0.10  1.74 &#xD;&#xA; 0.80 -0.06 -0.60  4.04 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="e2c1719a-41b8-422e-b91d-55a575263c4f" />
+							<children>
+								<node id="Lights">
+									<attribute id="Id" type="guid" value="e2c1719a-41b8-422e-b91d-55a575263c4f" />
+									<attribute id="Name" type="LSString" value="_Base_DNG_LAVA_Rim1" />
+									<attribute id="Type" type="uint8" value="5" />
+									<children>
+										<node id="Desc">
+											<children>
+												<node id="CastShadow">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="bool" value="True" />
+														</node>
+													</children>
+												</node>
+												<node id="DirectionLightAttenuationSide">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+												<node id="DirectionLightDimensions">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="fvec3" value="4 4 8" />
+														</node>
+													</children>
+												</node>
+												<node id="Intensity">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="float" value="2500" />
+														</node>
+													</children>
+												</node>
+												<node id="Kelvin">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="float" value="2500" />
+														</node>
+													</children>
+												</node>
+												<node id="PreExpose">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="bool" value="True" />
+														</node>
+													</children>
+												</node>
+												<node id="ScatteringScale">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="float" value="0.125" />
+														</node>
+													</children>
+												</node>
+												<node id="Type">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="uint8" value="2" />
+														</node>
+													</children>
+												</node>
+												<node id="UseTemperature">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="bool" value="True" />
+														</node>
+													</children>
+												</node>
+												<node id="VolumetricShadow">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="bool" value="True" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value="-0.90  0.05  0.43 -1.47 &#xD;&#xA; 0.00  0.99 -0.10  1.65 &#xD;&#xA;-0.43 -0.09 -0.90  4.36 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Object">
+							<attribute id="MapKey" type="guid" value="e17d5f44-5daf-47c3-b33f-86f2f0dea85e" />
+							<children>
+								<node id="Lights">
+									<attribute id="Id" type="guid" value="e17d5f44-5daf-47c3-b33f-86f2f0dea85e" />
+									<attribute id="Name" type="LSString" value="_Base_DNG_LAVA_Fill2" />
+									<attribute id="Type" type="uint8" value="5" />
+									<children>
+										<node id="Desc">
+											<children>
+												<node id="Color">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="fvec3" value="0.627451 0.8039216 1" />
+														</node>
+													</children>
+												</node>
+												<node id="DirectionLightAttenuationSide">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="float" value="0.25" />
+														</node>
+													</children>
+												</node>
+												<node id="DirectionLightDimensions">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="fvec3" value="4 4 8" />
+														</node>
+													</children>
+												</node>
+												<node id="Intensity">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="float" value="250" />
+														</node>
+													</children>
+												</node>
+												<node id="Kelvin">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="float" value="2300" />
+														</node>
+													</children>
+												</node>
+												<node id="PreExpose">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="bool" value="True" />
+														</node>
+													</children>
+												</node>
+												<node id="ScatteringScale">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="float" value="1" />
+														</node>
+													</children>
+												</node>
+												<node id="Type">
+													<children>
+														<node id="Object">
+															<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+															<attribute id="MapValue" type="uint8" value="2" />
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+										<node id="Transforms">
+											<children>
+												<node id="Object">
+													<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+													<attribute id="MapValue" type="mat4x4" value=" 0.90 -0.04 -0.44  0.60 &#xD;&#xA; 0.02  1.00 -0.06  1.56 &#xD;&#xA; 0.44  0.04  0.90  0.74 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="TLActors">
+					<children>
+						<node id="TLActor">
+							<attribute id="ActorType" type="uint8" value="1" />
+							<attribute id="LookAtMode" type="uint8" value="4" />
+						</node>
+						<node id="TLActor">
+							<attribute id="ActorType" type="uint8" value="2" />
+							<attribute id="LookAtMode" type="uint8" value="4" />
+							<attribute id="TemplateId" type="guid" value="ad9af97d-75da-406a-ae13-7071c563f604" />
+							<children>
+								<node id="Transforms">
+									<children>
+										<node id="Object">
+											<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+											<attribute id="MapValue" type="mat4x4" value=" 1.00 -0.00  0.00  0.00 &#xD;&#xA; 0.00  1.00 -0.00  0.00 &#xD;&#xA; 0.00  0.00  1.00  2.00 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="TLActor">
+							<attribute id="ActorType" type="uint8" value="4" />
+							<attribute id="LookAtMode" type="uint8" value="4" />
+							<attribute id="TemplateId" type="guid" value="ad9af97d-75da-406a-ae13-7071c563f604" />
+							<children>
+								<node id="Transforms">
+									<children>
+										<node id="Object">
+											<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+											<attribute id="MapValue" type="mat4x4" value=" 1.00 -0.00  0.00 -1.00 &#xD;&#xA; 0.00  1.00 -0.00  0.00 &#xD;&#xA; 0.00  0.00  1.00  3.00 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="TLActor">
+							<attribute id="ActorType" type="uint8" value="4" />
+							<attribute id="LookAtMode" type="uint8" value="4" />
+							<attribute id="TemplateId" type="guid" value="3278f064-5353-4c08-ab96-c2f432d0fda0" />
+							<children>
+								<node id="Transforms">
+									<children>
+										<node id="Object">
+											<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+											<attribute id="MapValue" type="mat4x4" value=" 1.00 -0.00  0.00  1.00 &#xD;&#xA; 0.00  1.00 -0.00  0.00 &#xD;&#xA; 0.00  0.00  1.00  3.00 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="TLActor">
+							<attribute id="ActorType" type="uint8" value="4" />
+							<attribute id="LookAtMode" type="uint8" value="4" />
+							<attribute id="TemplateId" type="guid" value="3278f064-5353-4c08-ab96-c2f432d0fda0" />
+							<children>
+								<node id="Transforms">
+									<children>
+										<node id="Object">
+											<attribute id="MapKey" type="guid" value="00000000-0000-0000-0000-000000000000" />
+											<attribute id="MapValue" type="mat4x4" value=" 1.00 -0.00  0.00  0.00 &#xD;&#xA; 0.00  1.00 -0.00  0.00 &#xD;&#xA; 0.00  0.00  1.00  4.00 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

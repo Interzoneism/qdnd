@@ -1,0 +1,77 @@
+game.states.TeleportSource = State{
+    function()
+        description = [[Teleports the source to the target specified in the parameter]]
+
+        params.Target = {
+            type = EParamType.String,
+            required = true,
+            help = [[The target to which to teleport the source]]
+        }
+        params.TeleportLinkedCharacters = {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Teleport player characters linked to the source]]
+        }
+
+        params.TeleportPartyFollowers = {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Teleport party followers of the source or of teleported characters linked to the source]]
+        }
+
+        params.TeleportSummons = {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Teleport summons of the source or of teleported characters linked to the source]]
+        }
+
+        params.LeaveCombat = {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Teleported characters should leave any combat they are currently in]]
+        }
+
+        params.SourceVFX = {
+            type = EParamType.String,
+            help = [[VFX to play at the source location when teleporting]],
+            required = false
+        }
+
+        params.TargetVFX = {
+            type = EParamType.String,
+            help = [[VFX to play at the target location when teleporting]],
+            required = false
+        }
+
+        params.Sound = {
+            type = EParamType.String,
+            help = [[Sound to play when teleporting]],
+            required = false,
+        }
+
+        inputs.Teleport = {help = "Teleport the source of the input"}
+
+        socketEvents.Teleport = function(ev)
+            if ev.Object ~= nil then
+                local object = Entity(ev.Object)
+                local target = Entity(params.Target)
+                if (params.Sound ~= nil) and
+                   (params.Sound ~= "") then
+                    PlaySound(object, params.Sound)
+                end
+                if (params.SourceVFX ~= nil) and
+                   (params.SourceVFX ~= "") then
+                    PlayEffectAt(PrepareEffect(params.SourceVFX), object.Position)
+                end
+                if (params.TargetVFX ~= nil) and
+                   (params.TargetVFX ~= "") then
+                    PlayEffectAt(PrepareEffect(params.TargetVFX), target.Position)
+                end
+                TeleportTo(object, target, false, params.TeleportLinkedCharacters, params.TeleportPartyFollowers, params.TeleportSummons, params.LeaveCombat)
+            else
+                DebugLogCritical("Trying to teleport nil object, doing nothing")
+            end
+        end
+
+    end
+}

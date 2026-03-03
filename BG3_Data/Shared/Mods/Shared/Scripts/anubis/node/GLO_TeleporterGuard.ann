@@ -1,0 +1,74 @@
+game.states.GLO_TeleporterGuard = State{function ()
+
+    modules = { "shared.moveto"}
+
+    description = [[Works with the GLO_Checkpoints DB_CheckpointTeleporter in Story - normally the character is in Idle behaviour,
+                    but they follow trespassing characters through teleporters.]]
+
+    params.guardTrigger = {type = EParamType.String, help=[[
+        The trigger at which the character stands.
+    ]]}
+
+    params.idle = {type = EParamType.State, default = nil, required = false,  help=[[
+        What the character does when not chasing people through teleporters.
+    ]]}
+
+    local teleporter = nil
+    local guardTrigger = Entity(params.guardTrigger)
+    local GLO_TeleporterGuard_State_Investigating = Flag("GLO_TeleporterGuard_State_Investigating_be11f0db-6727-481d-aadd-20dbbcd59209")
+
+    self.OnInit = function()
+        me.Blackboard.SetFact("GLO_TeleporterGuard_GuardTrigger", guardTrigger)
+    end
+
+    events.EnteredCombat = function(e)
+        if e.Entity == me and
+           GetFlag(GLO_TeleporterGuard_State_Investigating, me) then
+            mod.moveto.MoveTo(guardTrigger, 1, 0.0, "Walk", "GLO_TeleportGuard_DoneInvestigating")
+        end
+    end
+
+    events.EntityEvent = function(e)
+        if e.TargetEntity ~= me then
+            return
+        end
+
+        if e.Event == "GLO_TeleportGuard_DoneInvestigating" then
+            teleporter = nil
+            ClearFlag(GLO_TeleporterGuard_State_Investigating, me)
+        elseif e.Event == "GLO_TeleportGuard_InvestigateTeleporter" then
+            teleporter = e.Params[1]
+        elseif e.Event == "GLO_TeleporterGuard_CancelHostility" then
+            mod.moveto.MoveTo(guardTrigger, 1, 0.0, "Walk", "GLO_TeleportGuard_DoneInvestigating")
+        end
+    end
+
+    nodes.ChaseCharacter = Action{
+        function()
+            Sleep(0.5)
+            UseItem(teleporter.Item)
+            Wander(4.0, 1.5+(math.random()), MovementSpeed.Run)
+            Sleep(0.5)
+            Wander(4.0, 3.5+(math.random()), MovementSpeed.Walk)
+            mod.moveto.MoveTo(guardTrigger, false, 1.0, "Walk", "GLO_TeleportGuard_DoneInvestigating", 2.5, true)
+        end,
+        Valid = function()
+            return teleporter ~= nil
+        end,
+        OnEnter = function()
+            SetFlag(GLO_TeleporterGuard_State_Investigating, me)
+        end
+    }
+
+    nodes.Idle = Proxy{
+        params.idle
+    }
+
+    nodes.DefaultIdle = Proxy{
+        game.states.GLO_StandAtTrigger,
+        params = {trigger = params.guardTrigger}
+    }
+
+
+end
+}

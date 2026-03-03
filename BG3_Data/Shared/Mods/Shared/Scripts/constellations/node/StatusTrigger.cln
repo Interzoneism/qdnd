@@ -1,0 +1,72 @@
+game.states.StatusTrigger = State{
+    function()
+
+        description = [[Area in which objects get the status specified in Params.Status.]]
+
+        inputs.Disable = {help = "Turn off. Also clears statuses from objects in the trigger"}
+        inputs.Enable = {help = "Turn on. Applies params.Status to objects in the trigger"}
+        
+        outputs.Off = {internal = true}
+        outputs.On = {internal = true}
+        
+        inputs.OnEnter = {internal = true}
+        inputs.OnLeave = {internal = true}
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the trigger start enabled?]],
+            required = false,
+            default = true
+        }
+
+        params.Status = {
+            type = EParamType.String,
+            help = [[Status to apply]]
+        }
+
+        params.EntityFilter = {
+            type = EParamType.String,
+            help = [[Types of Entities to check for. Options:
+            All - check for any kind of entities in the trigger
+            Characters - only check for characters in the trigger
+            LivingCharacters - only check for living characters in the trigger, and character will leave when it dies in the trigger
+            Items - only check for items in the trigger]],
+            required = false,
+            default = [[All]]
+        }
+
+        nodes.Trigger = Proxy{
+            game.states.Trigger,
+            params = {StartEnabled = params.StartEnabled,
+                        EntityFilter = params.EntityFilter},
+            inputs = {Disable = {outputs.Off},
+                      Enable = {outputs.On}},
+            outputs = {OnEnter = {inputs.OnEnter},
+                       OnLeave= {inputs.OnLeave}},
+        }
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.On, ev.Object)
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.Off, ev.Object)
+        end
+
+        socketEvents.OnEnter = function(ev)
+            DebugText(Entity(ev.Object), "Applying status")
+            ApplyStatus(Entity(ev.Object), params.Status, false, -1.0)
+        end
+
+        socketEvents.OnLeave = function(ev)
+            RemoveStatus(Entity(ev.Object), params.Status)
+        end
+
+        events.Resurrected = function(ev)
+            if (me.Blackboard.GetFact("Cnst.Trigger.On") == 1) and
+                IsInTrigger(ev.Target, me.Trigger) then
+                ApplyStatus(ev.Target, params.Status, true, -1.0)
+            end
+        end
+    end
+}

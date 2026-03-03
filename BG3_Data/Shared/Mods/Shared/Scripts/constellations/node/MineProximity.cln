@@ -1,0 +1,279 @@
+game.states.MineProximity = State{
+    function()
+
+        modules = {"shared.items"}
+
+        params.DamageTypes = {
+            type = EParamType.String,
+            arrayRange="0..",
+            help = [[Types of damage that affect the mine]],
+            default = {},
+        }
+
+        params.AbsoluteValueThreshold = {
+            type = EParamType.Bool,
+            default = false,
+            help = "If true, treat the threshold as an absolute value rather than a medium value"
+        }
+
+        params.ExcludeDamageTypes = {
+            type = EParamType.Bool,
+            default = false,
+            help = "Instead of trying to match the damage types, ignore them"
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = "Does the trap start on?"
+        }
+
+        params.Projectile = {
+            type = EParamType.String,
+            default = "Projectile_Fireball_Trap",
+            help = [[The projectile that explodes]]
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_Off",
+            help = "Sound when mine is disabled"
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_On",
+            help = "Sound when mine is enabled"
+        }
+
+        params.DamageThreshold = {type = EParamType.Number, default = 0.0, help = [[
+            Minimum damage that needs to be done to the the mine for it to explode. 
+            Percentage, so on a 0.0-1.0 range unless AbsoluteValueTreshold is true]]
+        }
+
+        params.VFXBone = {type = EParamType.String, required = false, default = "Dummy_FX",
+        help = "Bone on which the the VFX is played."}
+
+        params.GlowActive = {type = EParamType.String, default = "VFX_Script_Light_Mine_Green_01_96c29903-0613-cabd-8110-491f4534774d", 
+        help = [[VFX that plays on mine while it is active and not warning and not exploding.]]}
+
+        params.GlowWarning = {type = EParamType.String, default = "VFX_Script_Light_Mine_Yellow_01_aa29ff85-8912-d0f0-9e6a-186354d7adec", 
+        help = [[VFX that plays on mine while it is active and warning and not exploding.]]}
+
+        params.GlowPrimed = {type = EParamType.String, default = "VFX_Script_Light_Mine_Red_01_a8a269a9-6f65-02aa-471e-d61afb22bd5a", 
+        help = [[VFX that plays on mine while it is active and exploding.]]}
+
+        params.PrimeDelay = {type = EParamType.Number, default = 1.0, 
+        help = [[Amount of seconds it takes for the mine to prime. The character needs to stay near the mine before it is primed.]]}
+
+        params.ExplodeDelay = {type = EParamType.Number, default = 0.5, 
+        help = [[Amount of seconds it takes for the mine to explode after primed]]}
+
+        params.DestroyOnDisarm = {type=EParamType.Bool, default = true, help = "Does the item break on Disarm?"}
+
+        local preppedVFXActive = nil
+        local preppedVFXWarning = nil
+        local preppedVFXPrimed = nil
+
+        inputs.Enable = {help = "Turn mine on"}
+        inputs.Disable = {help = "Turn mine off"}
+        inputs.Prime = {help = "Makes mine explode if no PrimeOff is sent within PrimeDelay seconds"}
+        inputs.PrimeOff = {help = "Turn prime off so the mine does not explode."}
+        inputs.Warning = {help = "Makes mine glow in a warning color"}
+        inputs.WarningOff = {help = "Stops mine from glowing in a warning color"}
+        inputs.Explode = {help = "Immediatly explodes the mine"}
+
+        outputs.Explode = {help = "Mine is exploding"}
+        outputs.On = {help = "Mine is turned on"}
+        outputs.Off = {help = "Mine is turned off"}
+        outputs.Disarmed = {help = "Mine is turned off"}
+
+        outputs.StartPrimeTimer = {internal = true}
+        outputs.StopPrimeTimer = {internal = true}
+        outputs.TryActivate = {internal = true}
+
+        inputs.PrimeTimerTick = {internal = true}
+        inputs.Enabled = {internal = true}
+        inputs.Disabled = {internal = true}
+        inputs.TookDamage = {internal = true}
+        inputs.Activate = {internal = true}
+        inputs.Disarmed = {internal = true}
+        inputs.DisarmFailed = {internal = true}
+
+        self.OnInit = function()
+            helpers.PrefVFX()
+            helpers.UpdateVFX()
+        end
+
+        self.OnEditorChanges = function()
+            helpers.PrefVFX()
+            helpers.UpdateVFX()
+        end
+
+        helpers.PrefVFX = function()
+            if preppedVFXActive == nil and
+                params.GlowActive ~= "" then
+                preppedVFXActive = PrepareEffect(params.GlowActive)
+            end
+            if preppedVFXWarning == nil and
+                params.GlowWarning ~= "" then
+                preppedVFXWarning = PrepareEffect(params.GlowWarning)
+            end
+            if preppedVFXPrimed == nil and
+                params.GlowPrimed ~= "" then
+                preppedVFXPrimed = PrepareEffect(params.GlowPrimed)
+            end
+        end
+
+        helpers.UpdateVFX = function() 
+            local targetEntity = me.Blackboard.GetFact("TargetEntity")
+
+            if targetEntity ~= nil then
+                local playingVFX = me.Blackboard.GetFact("Cnst.MineProximity.PlayingVFX")
+                if  playingVFX ~= nil then
+                    StopEffect(PlayingEffect(playingVFX))
+                    me.Blackboard.ClearFact("Cnst.MineProximity.PlayingVFX")
+                    playingVFX = nil
+                end
+                if me.Blackboard.GetFact("On") == 1 or 
+                    (me.Blackboard.GetFact("On") == nil and params.StartEnabled) then
+                    if me.Blackboard.GetFact("Cnst.MineProximity.Primed") == 1 then
+                        playingVFX = PlayEffectAt(preppedVFXPrimed, targetEntity, params.VFXOffBone)
+                    elseif me.Blackboard.GetFact("Cnst.MineProximity.Warning") == 1 then
+                        playingVFX = PlayEffectAt(preppedVFXWarning, targetEntity, params.VFXOffBone)
+                    else
+                        playingVFX = PlayEffectAt(preppedVFXActive, targetEntity, params.VFXOffBone)
+                    end
+                    if playingVFX ~= nil then
+                        me.Blackboard.SetFact("Cnst.MineProximity.PlayingVFX", playingVFX.Handle)
+                    end
+                end
+            end
+        end
+
+        nodes.DisarmOnOff = Proxy{
+            game.states.DisarmOnOff,
+            params = {StartEnabled = params.StartEnabled,
+                      DestroyOnDisarm = params.DestroyOnDisarm},
+            inputs = {TryActivate = {outputs.TryActivate},
+                      Enable = {outputs.On},
+                      Disable = {outputs.Off}},
+            outputs = {Activate = {inputs.Activate},
+                       Disarmed = {inputs.Disarmed},
+                       DisarmFailed = {inputs.DisarmFailed},
+                       Enabled = {inputs.Enabled},
+                       Disabled = {inputs.Disabled}}
+        }
+
+        nodes.DamageTrigger = Proxy{
+            game.states.DamageTrigger,
+            params = {DamageTypes = params.DamageTypes,
+                      AbsoluteValueThreshold = params.AbsoluteValueThreshold,
+                      ExcludeDamageTypes = params.ExcludeDamageTypes,
+                      Threshold = params.DamageThreshold},
+            outputs = {TookDamage = {inputs.TookDamage}}
+        }
+
+        nodes.Explode = Proxy{
+            game.states.Explode,
+            params = {Projectile = params.Projectile},
+            inputs = {Explode = {outputs.Explode}}
+        }
+
+        nodes.Timer = Proxy{
+            game.states.Timer,
+            params = {TickLength = params.PrimeDelay,
+                    TargetEntity = "me"},
+            inputs = {Stop = {outputs.StopPrimeTimer},
+                    Start = {outputs.StartPrimeTimer}},
+            outputs = {Tick = {inputs.PrimeTimerTick}}
+        }
+
+        events.TimerFinished = function(ev)
+            if ev.TimerName == "Cnst.MineProximity.ExplodeTimer" then
+                TriggerOutput(outputs.TryActivate, me.EntityRef)
+            end
+        end
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.On, ev.Object)
+            if me.Blackboard.GetFact("Cnst.MineProximity.Primed") == 1 then
+                TriggerOutput(outputs.StartPrimeTimer, ev.Object)
+            end
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.Off, ev.Object)
+        end
+
+        socketEvents.Prime = function(ev)
+            local primed = me.Blackboard.GetFact("Cnst.MineProximity.Primed")
+            if primed == nil or primed == 0 then
+                me.Blackboard.SetFact("Cnst.MineProximity.Primed", 1)
+                helpers.UpdateVFX()
+                if me.Blackboard.GetFact("On") == 1 or 
+                (me.Blackboard.GetFact("On") == nil and params.StartEnabled) then
+                    TriggerOutput(outputs.StartPrimeTimer, ev.Object)
+                end
+            end
+        end
+
+        socketEvents.PrimeOff = function(ev)
+            local primed = me.Blackboard.GetFact("Cnst.MineProximity.Primed")
+            if primed == 1 then
+                me.Blackboard.SetFact("Cnst.MineProximity.Primed", 0)
+                helpers.UpdateVFX()
+                TriggerOutput(outputs.StopPrimeTimer, ev.Object)
+            end
+        end
+
+        socketEvents.Warning = function(ev)
+            local warning = me.Blackboard.GetFact("Cnst.MineProximity.Warning")
+            if warning == 0 or warning == nil then
+                me.Blackboard.SetFact("Cnst.MineProximity.Warning", 1)
+                helpers.UpdateVFX()
+            end
+        end
+
+        socketEvents.WarningOff = function(ev)
+            local primed = me.Blackboard.GetFact("Cnst.MineProximity.Warning")
+            if primed == 1 then
+                me.Blackboard.SetFact("Cnst.MineProximity.Warning", 0)
+                helpers.UpdateVFX()
+            end
+        end
+
+        socketEvents.Explode = function(ev)
+            TriggerOutput(outputs.Explode, ev.Object)
+        end
+
+        socketEvents.Enabled = function(ev)
+            helpers.UpdateVFX()
+        end
+
+        socketEvents.Disabled = function(ev)
+            helpers.UpdateVFX()
+        end
+
+        socketEvents.TookDamage = function(ev)
+            TriggerOutput(outputs.TryActivate, ev.Object)
+        end
+
+        socketEvents.Activate = function(ev)
+            TriggerOutput(outputs.Explode, ev.Object)
+        end
+
+        socketEvents.Disarmed = function(ev)
+            TriggerOutput(outputs.Disarmed, ev.Object)
+        end
+
+        socketEvents.DisarmFailed = function(ev)
+            TriggerOutput(outputs.Explode, ev.Object)
+        end
+
+        socketEvents.PrimeTimerTick = function(ev)
+            me.Blackboard.SetFact("Cnst.MineProximity.Exploding", 1)
+            StartRealtimeTimer(me, "Cnst.MineProximity.ExplodeTimer", params.ExplodeDelay, 0)
+        end
+    end
+}

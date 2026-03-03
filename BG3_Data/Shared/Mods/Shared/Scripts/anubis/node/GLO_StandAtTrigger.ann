@@ -1,0 +1,43 @@
+game.states.GLO_StandAtTrigger = State{function ()
+
+    modules = {"shared.moveto", "shared.util" }
+
+    params.trigger = {type = EParamType.String, help=[[The trigger which the character should reach.]]}
+    params.mustReach = {type = EParamType.Bool, default = false, help=[[Enforce that the NPC must reach the destination. Only then it finishes. It will keep trying indefinitely.]]}
+    params.alignWithTrigger = {type = EParamType.Bool, default = true, help=[[Should align with the trigger when reached?]]}
+    params.acceptanceRadius = {type = EParamType.Number, default = 2.0, help=[[Character cosideres point reached if within this distance.]]}
+    params.moveSpeed = {type = EParamType.String, default = "Walk", help=[[The speed at which to move towards the trigger.]]}
+    params.longPath = {type = EParamType.Bool, default = false, help=[[DON'T change if unnecessary. Ensures the path finding works on longer distances. More expensive execution.]]}
+
+    local trigger = Entity(params.trigger)
+
+    nodes.StandAtTrigger = Action{function()
+        local success = false
+        --close enough
+
+        if GetDistanceTo(me, trigger) < params.acceptanceRadius then
+            success = true
+        -- must reach
+        elseif params.mustReach then
+            while not mod.moveto.MoveToPoint(trigger, MovementSpeed[params.moveSpeed], me, nil, params.longPath) do
+                SteerTo(trigger)
+                mod.util.SleepRandom(5.0, 7.0)
+            end
+            success = true
+        -- try reach 
+        elseif mod.moveto.MoveToPoint(trigger, MovementSpeed[params.moveSpeed], me, nil, params.longPath) then
+            success = true
+        -- cannot reach
+        else
+            SteerTo(trigger)
+        end
+
+        if params.alignWithTrigger and success then
+            LookFrom(trigger)
+        end
+
+        mod.util.SleepRandom(2.0, 3.0)
+    end,
+    }
+end
+}

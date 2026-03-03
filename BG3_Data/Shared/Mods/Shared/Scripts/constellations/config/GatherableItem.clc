@@ -1,0 +1,27 @@
+game.configs.GatherableItem = Config{
+    params={
+        RewardTemplate = {
+            type = EParamType.String,
+            help = [[Reward added for the gatherer when this item is gathered.]],
+            required = true,
+        },
+        DC = {
+            type = EParamType.String,
+            help = [[Difficulty class to gather this item (Nature Check). Must be provided as a DC GUID]],
+            required = true,
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.GLO_GatherableItem,
+            DC = params.DC,
+            RewardTemplate = params.RewardTemplate,
+        },
+    },
+    inputs={
+        Gather=ExtSocket{description=[[Try to gather this item. User can be nil.]],{SocketRef{[[root.logic.inputs.Gather]]}}},
+    },
+    outputs={
+        Gathered=ExtSocket{description=[[This item has been gathered successfully and the reward was emitted.]],{SocketRef{[[root.logic.outputs.Gathered]]}}},
+        Attempted=ExtSocket{description=[[We attempted to gather from this item, the reward might or might not have been emitted]],{SocketRef{[[root.logic.outputs.Attempted]]}}},
+    }
+}

@@ -1,0 +1,95 @@
+game.configs.SightDetector = Config{
+    params={
+        DC = {
+            type = EParamType.String,
+            help = [[Perception check DC.]],
+            required = false,
+            default = [[HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f]]
+        },
+        DetectClosestOnly = {
+            type = EParamType.Bool,
+            help = [[Whether the detector only transmits the DetectedCharacter socket output for the closest detected character.]],
+            required = false,
+            default = false
+        },
+        DetectionDistance = {
+            type = EParamType.Number,
+            help = [[Maximum distance at which the target characters will be detected.]],
+            required = false,
+            default = 6
+        },
+        DetectorEntity = {
+            type = EParamType.String,
+            help = [[Object that functions as the detecting entity. Supports 'me'. Detector entity needs to be an item that has a sight range defined in its stats!]],
+            required = false,
+            default = [[me]]
+        },
+        MinSkillCheckDistance = {
+            type = EParamType.Number,
+            help = [[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]],
+            required = false,
+            default = 6
+        },
+        OneShot = {
+            type = EParamType.Bool,
+            help = [[Does the detector disable itself after the first successful use?]],
+            required = false,
+            default = false
+        },
+        OnlyDetectParty = {
+            type = EParamType.Bool,
+            help = [[Whether the item only detects party members (players, summons and followers).]],
+            required = false,
+            default = false
+        },
+        Skill = {
+            type = EParamType.String,
+            help = [[The skill checked for discovering the detector if the 'Type' is not 'None'.]],
+            required = false,
+            default = [[Perception]]
+        },
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the detector start enabled? (enabled = pressing it will trigger the 'Pressed' output; disabled = pressing it will the the CantUseAD, if any).]],
+            required = false,
+            default = true
+        },
+        Type = {
+            type = EParamType.String,
+            help = [[            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[Interactable]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.SightDetector,
+            DC = params.DC,
+            DetectClosestOnly = params.DetectClosestOnly,
+            DetectionDistance = params.DetectionDistance,
+            DetectorEntity = params.DetectorEntity,
+            MinSkillCheckDistance = params.MinSkillCheckDistance,
+            OneShot = params.OneShot,
+            OnlyDetectParty = params.OnlyDetectParty,
+            Skill = params.Skill,
+            StartEnabled = params.StartEnabled,
+            Type = params.Type,
+        },
+    },
+    inputs={
+        Enable=ExtSocket{description=[[Enable detector]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+        Reveal=ExtSocket{description=[[Reveals the detector]],{SocketRef{[[root.logic.inputs.Reveal]]}}},
+        Disable=ExtSocket{description=[[Disable detector]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+    },
+    outputs={
+        NoneDetected=ExtSocket{description=[[The detector is not detecting any target characters.]],{SocketRef{[[root.logic.outputs.NoneDetected]]}}},
+        DetectedCharacter=ExtSocket{description=[[Triggers when a character gets detected. Transmits the detected character entity as the Object parameter.]],{SocketRef{[[root.logic.outputs.DetectedCharacter]]}}},
+        UndetectedCharacter=ExtSocket{description=[[Triggers when a character is no longer detected. Transmits the detected character entity as the Object parameter.]],{SocketRef{[[root.logic.outputs.UndetectedCharacter]]}}},
+        AnyDetected=ExtSocket{description=[[The detector is detecting target characters.]],{SocketRef{[[root.logic.outputs.AnyDetected]]}}},
+    }
+}

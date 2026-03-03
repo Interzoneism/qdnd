@@ -13,6 +13,7 @@ using QDND.Data.CharacterModel;
 using QDND.Data.Interrupts;
 using QDND.Data.Passives;
 using QDND.Data.Stats;
+using QDND.Data.Icons;
 using QDND.Data.Statuses;
 
 namespace QDND.Data
@@ -40,6 +41,7 @@ namespace QDND.Data
             public PassiveRegistry PassiveRegistry;
             public InterruptRegistry InterruptRegistry;
             public FunctorExecutor FunctorExecutor;
+            public IconService IconService;
         }
 
         /// <summary>
@@ -199,6 +201,12 @@ namespace QDND.Data
             var onHitTriggerService = new OnHitTriggerService();
             OnHitTriggers.RegisterAll(onHitTriggerService, r.StatusManager, r.ConcentrationSystem);
             r.EffectPipeline.OnHitTriggerService = onHitTriggerService;
+
+            // Initialize BG3 Icon Atlas Service
+            r.IconService = new IconService();
+            r.IconService.LoadFromBG3Data(bg3DataPath);
+            log($"Icon Atlas Service: {r.IconService.EntryCount} icons across {r.IconService.AtlasCount} atlases");
+            combatContext.RegisterService(r.IconService);
 
             return r;
         }

@@ -1,0 +1,275 @@
+game.states.VFXDoor = State{
+    function()
+
+        modules = {"shared.items"}
+
+        inputs.Open = {help = [[Open the door]]}
+        inputs.Close = {help = [[Close the door]]}
+        inputs.Lock = {help = [[Lock the door]]}
+        inputs.Unlock = {help = [[Unlock the door]]}
+
+        outputs.Opening = { help = [[The door is opening]]}
+        outputs.Closing = { help = [[The door is closing]]}
+        outputs.Opened = { help = [[The door opened]]}
+        outputs.Closed = { help = [[The door closed]]}
+
+
+        params.Key = {
+            type = EParamType.String,
+            default="STORYLOCK",
+            help=[[Key]]
+        }
+
+        params.VFXOff = {
+            type = EParamType.String,
+            help = [[VFX while the trap is disabled and has been spotted.]],
+            required = false,
+            default = [[]]
+        }
+
+        params.VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOn' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        }
+
+        params.DC = {
+            type = EParamType.String,
+            help = [[The skill check DC.]],
+            required = false,
+            default = [[HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f]]
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the trap start enabled? (will it trigger when using the item?)]],
+            required = false,
+            default = true
+        }
+
+        params.VFXOffBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOff' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when trap is turned on]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_On]]
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when trap is turned off]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_Off]]
+        }
+
+        params.Skill = {
+            type = EParamType.String,
+            help = [[The skill checked for discovering the container and/or its trapped nature if the 'Type' is not 'None'.]],
+            required = false,
+            default = [[Perception]]
+        }
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            help = [[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]],
+            required = false,
+            default = 6
+        }
+
+        params.OneShot = {
+            type = EParamType.Bool,
+            help = [[The trap activates only the first time on use (e.g. explodes chest), rather than every time (e.g. a chest with spikes that come out)]],
+            required = false,
+            default = true
+        }
+
+        params.VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while the trap is enabled and has been spotted.]],
+            required = false,
+            default = [[VFX_Script_Trap_Overlay_Red_01_a7361f25-e942-e071-7ce3-7a8182f4e0ef]]
+        }
+
+        params.Type = {
+            type = EParamType.String,
+            help = [[            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[None]]
+        }
+
+        params.DoorVFX = {
+            type = EParamType.String,
+            help = "Name_UUID of vfx to play while door is open",
+            required = true
+        }
+
+        inputs.Enable = {help = "Turn trap on (item usage is always possible)"}
+        inputs.Disable = {help = "Turn trap off (item usage is always possible)"}
+
+        outputs.Enable = {internal = true}
+        outputs.Disable = {internal = true}
+        outputs.Activate = {help = [[The trap has activated]]}
+
+        inputs.Reveal = {help = [[Reveals the container]]}
+        outputs.Reveal = {internal = true}
+
+        inputs.Activate = {internal = true}
+
+        inputs.Open = {help = [[Open the door]]}
+        inputs.Close = {help = [[Close the door]]}
+        outputs.Open = { internal = true }
+        outputs.Close = { internal = true }
+
+        inputs.Lock = {help = [[Lock the door]]}
+        inputs.Unlock = {help = [[Unlock the door]]}
+
+        outputs.Lock = { internal = true }
+        outputs.Unlock = { internal = true }
+
+        outputs.Opening = { help = [[The door is opening]]}
+        outputs.Closing = { help = [[The door is closing]]}
+        outputs.Opened = { help = [[The door opened]]}
+        outputs.Closed = { help = [[The door closed]]}
+
+        inputs.Opened = { internal = true }
+        inputs.Closed = { internal = true }
+
+        inputs.Opening = { internal = true }
+        inputs.Closing = { internal = true }
+
+        inputs.Destroyed = { internal = true }
+        outputs.Destroyed = { help = "Door is destroyed" }
+
+        nodes.Door = Proxy{
+        game.states.Door,
+            params = {
+                DC = params.DC,
+                MinDistance = params.MinDistance,
+                zOneShot = params.OneShot,
+                Skill = params.Skill,
+                SoundOff = params.SoundOff,
+                SoundOn = params.SoundOn,
+                StartEnabled = params.StartEnabled,
+                Type = params.Type,
+                VFXOff = params.VFXOff,
+                VFXOffBone = params.VFXOffBone,
+                VFXOn = params.VFXOn,
+                VFXOnBone = params.VFXOnBone,
+                Key = params.Key
+            },
+            inputs = {
+                Enable = {outputs.Enable},
+                Disable = {outputs.Disable},
+                Reveal = {outputs.Reveal},
+                Lock = {outputs.Lock},
+                Unlock = {outputs.Unlock},
+                Open = {outputs.Open},
+                Close = {outputs.Close},
+            },
+            outputs = {
+                Activate = {inputs.Activate},
+                Opened = {inputs.Opened},
+                Opening = {inputs.Opening},
+                Closed = {inputs.Closed},
+                Closing = {inputs.Closing}
+            }
+        }
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.Enable, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.Disable, ev.Object, ev.Param)
+        end
+
+        socketEvents.Reveal = function(ev)
+            TriggerOutput(outputs.Reveal, ev.Object, ev.Param)
+        end
+
+        socketEvents.Activate = function(ev)
+            TriggerOutput(outputs.Activate, ev.Object, ev.Param)
+        end
+
+        socketEvents.Open = function(ev)
+            DebugText(me, "VFX Open")
+            TriggerOutput(outputs.Open, ev.Object, ev.Param)
+        end
+
+        socketEvents.Close = function(ev)
+            DebugText(me, "VFX Close")
+            TriggerOutput(outputs.Close, ev.Object, ev.Param)
+        end
+
+        socketEvents.Lock = function(ev)
+            TriggerOutput(outputs.Lock, ev.Object, ev.Param)
+        end
+
+        socketEvents.Unlock = function(ev)
+            TriggerOutput(outputs.Unlock, ev.Object, ev.Param)
+        end
+
+        socketEvents.Destroyed = function(ev)
+            TriggerOutput(outputs.Destroyed, ev.Object, ev.Param)
+        end
+
+        socketEvents.Opening = function(ev)
+            DebugText(me, "VFX Opening")
+            local activeEffect = PlayEffectAt(PrepareEffect(params.DoorVFX), me)
+            me.Blackboard.SetFact("Cnst.VFXDoor.ActiveEffect", activeEffect.Handle)
+            TriggerOutput(outputs.Opening, ev.Object, ev.Param)
+        end
+
+        socketEvents.Opened = function(ev)
+            if me.Blackboard.GetFact("Cnst.VFXDoor.ActiveEffect") == nil then
+                local activeEffect = PlayEffectAt(PrepareEffect(params.DoorVFX), me)
+                me.Blackboard.SetFact("Cnst.VFXDoor.ActiveEffect", activeEffect.Handle)
+            end
+            TriggerOutput(outputs.Opened, ev.Object, ev.Param)
+        end
+
+        socketEvents.Closing = function(ev)
+            DebugText(me, "VFX Closing")
+            local activeEffect = me.Blackboard.GetFact("Cnst.VFXDoor.ActiveEffect")
+            if activeEffect ~= nil then
+                StopEffect(PlayingEffect(activeEffect))
+            end
+            me.Blackboard.ClearFact("Cnst.VFXDoor.ActiveEffect")
+            TriggerOutput(outputs.Closing, ev.Object, ev.Param)
+        end
+
+        socketEvents.Closed = function(ev)
+            local activeEffect = me.Blackboard.GetFact("Cnst.VFXDoor.ActiveEffect")
+            if activeEffect ~= nil then
+                StopEffect(PlayingEffect(activeEffect))
+            end
+            me.Blackboard.ClearFact("Cnst.VFXDoor.ActiveEffect")
+            TriggerOutput(outputs.Closed, ev.Object, ev.Param)
+        end
+
+        self.OnInit = function()
+            local activeEffect = me.Blackboard.GetFact("Cnst.VFXDoor.ActiveEffect")
+            if activeEffect ~= nil then
+                StopEffect(PlayingEffect(activeEffect))
+            end
+            if me.Item.IsOpened then
+                local activeEffect = PlayEffectAt(PrepareEffect(params.DoorVFX), me)
+                me.Blackboard.SetFact("Cnst.VFXDoor.ActiveEffect", activeEffect.Handle)
+            end
+        end
+
+    end
+}

@@ -1,0 +1,241 @@
+game.states.PressurePlate = State{
+    function()
+
+        params.DC = {
+            type = EParamType.String,
+            default="DC_Legacy_15_bddbb9b8-a242-4c3e-a2eb-3fd274c0c539",
+            help=[[Perception check DC.]]
+        }
+
+        params.WeightLimit = {
+            type = EParamType.Number,
+            help = [[Max Weight]],
+            default = 50.0,
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = "Does the trap start on?"
+        }
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            required=false,
+            default=6.0,
+            help=[[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]]
+        }
+
+        params.Skill = {
+            type = EParamType.String,
+            default="Perception",
+            help=[[The skill checked.]]
+        }
+
+        params.Type = {
+            type = EParamType.String,
+            default="Interactable",
+            help=[[
+            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]]
+        }
+
+        params.IsTrap = {
+            type = EParamType.Bool,
+            default=true,
+            help=[[Is the pressure plate connected to a trap?]]
+        }
+
+        params.VFXOn = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = "VFX while item is on."
+        }
+
+
+        params.VFXOnBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = "Bone on which the the VFX is played."
+        }
+
+        params.VFXOff = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = "VFX while item is off."
+        }
+
+
+        params.VFXOffBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = "Bone on which the the VFX is played."
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_On",
+            help = "Sound when trap is turned on"
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_Off",
+            help = "Sound when trap is turned off"
+        }
+
+        params.DestroyOnDisarm = {
+            type=EParamType.Bool,
+            default = true,
+            help = "Does the item break on Disarm?"
+        }
+
+        inputs.Overweight = {help = [[Pressure plate goes over weight limit.]], internal = true}
+        inputs.Underweight = {help = [[Pressure plate goes under weight limit.]], internal = true}
+
+        inputs.Enable = {help = "Turn pressure plate on"}
+        inputs.Disable = {help = "Turn pressure plate off"}
+
+        outputs.On = {internal = true}
+        outputs.Off = {internal = true}
+
+        inputs.Reveal = {help = [[Reveals the Pressure Plate. The Object will do an AD unless the Param is true.]]}
+        outputs.Reveal = {internal = true}
+
+        outputs.Up = {help = [[Pressure plate goes up.]]}
+        outputs.Down = {help = [[Pressure plate pressure plate goes down.]]}
+
+        outputs.NextAnim = {help = [[Pressure plate animates to next state.]], internal = true}
+
+        inputs.DisarmFailed = {internal = true}
+        outputs.DisarmFailed = {help = [[Triggers when the disarm fails.]]}
+
+        inputs.DisarmedInt = {internal = true}
+        outputs.Disarmed = {help = [[Triggers when the disarm succeeds.]]}
+
+        outputs.TryActivate = {internal = true}
+        inputs.Activate = {internal = true}
+
+        helpers.SwitchAnimationState = function(down)
+            if down then
+                DebugText(me, "game.states.PressurePlate Activate -> Down.")
+                me.Blackboard.SetFact("Cnst.WeightTrigger.Overweight", 1)
+                if me.Blackboard.GetFact("AnimationState_State") ~= 1 and
+                   me.Blackboard.GetFact("AnimationState_State") ~= 2 then
+                    TriggerOutput(outputs.NextAnim, nil)
+                end
+            else
+                DebugText(me, "game.states.PressurePlate Activate -> Up.")
+                me.Blackboard.SetFact("Cnst.WeightTrigger.Overweight", 0)
+                if me.Blackboard.GetFact("AnimationState_State") ~= 0 and
+                   me.Blackboard.GetFact("AnimationState_State") ~= 3 then
+                    TriggerOutput(outputs.NextAnim, nil)
+                end
+            end
+        end
+
+        socketEvents.Activate = function(ev)
+            helpers.SwitchAnimationState(ev.Param)
+            if ev.Param then
+                TriggerOutput(outputs.Down, ev.Object)
+            else
+                TriggerOutput(outputs.Up, ev.Object)
+            end
+            try -- can fail if done in rapid succession
+                StartAutomatedDialogImmediate(Dialog("GLO_AD_MechanicalClick_fc8d3dc5-b947-6354-3aa9-d1f02fd51af4"), me)
+            end 
+            
+        end
+
+        -- 0 : Up
+        -- 1 : Down
+        -- 2 : Going Down
+        -- 3 : Going Up
+        nodes.AnimationState = Proxy{
+            game.states.AnimationStates,
+            params = {StateSequence = {0,2,1,3,0},
+                      DynamicStates = {2,3}},
+            inputs = {Activate = {outputs.NextAnim}},
+        }
+
+        nodes.PerceptionDisarmOnOff = Proxy{
+            game.states.PerceptionDisarmOnOff,
+            params = {StartEnabled = params.StartEnabled,
+                      DC = params.DC,
+                      MinDistance = params.MinDistance,
+                      Skill = params.Skill,
+                      Type = params.Type,
+                      VFXOn= params.VFXOn,
+                      VFXOff = params.VFXOff,
+                      VFXOnBone = params.VFXOnBone,
+                      VFXOffBone = params.VFXOffBone,
+                      IsTrap = params.IsTrap,
+                      SoundOn = params.SoundOn,
+                      SoundOff = params.SoundOff,
+                      DestroyOnDisarm = params.DestroyOnDisarm},
+            inputs = {TryActivate = {outputs.TryActivate},
+                      Enable = {outputs.On},
+                      Disable = {outputs.Off},
+                      Reveal = {outputs.Reveal}},
+            outputs = {Activate = {inputs.Activate},
+                       Disarmed = {inputs.DisarmedInt},
+                       DisarmFailed = {inputs.DisarmFailed}}
+        }
+
+        nodes.WeightTrigger = Proxy{
+            game.states.WeightTrigger,
+            params = {WeightLimit = params.WeightLimit},
+            outputs = {Overweight = {inputs.Overweight},
+                       Underweight = {inputs.Underweight}}
+        }
+
+
+        socketEvents.Overweight = function(ev)
+            if me.Blackboard.GetFact("Cnst.WeightTrigger.InitialWeightSet") == nil then
+                TriggerOutput(outputs.TryActivate, ev.Object, true)
+                TriggerOutput(outputs.Reveal, ev.Object, ev.Param)
+            else
+                -- don't activate when switching to the initial (de)pressed state
+                helpers.SwitchAnimationState(true)
+            end
+        end
+
+        socketEvents.Underweight = function(ev)
+            if me.Blackboard.GetFact("Cnst.WeightTrigger.InitialWeightSet") == nil then
+                TriggerOutput(outputs.TryActivate, ev.Object, false)
+                TriggerOutput(outputs.Reveal, ev.Object, ev.Param)
+            else
+                -- don't activate when switching to the initial (de)pressed state
+                helpers.SwitchAnimationState(false)
+            end
+        end
+
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.On, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.Off, ev.Object, ev.Param)
+        end
+
+        socketEvents.DisarmFailed = function(ev)
+            TriggerOutput(outputs.DisarmFailed, ev.Object, ev.Param)
+        end
+
+        socketEvents.DisarmedInt = function(ev)
+            TriggerOutput(outputs.Disarmed, ev.Object, ev.Param)
+        end
+
+        socketEvents.Reveal = function(ev)
+            TriggerOutput(outputs.Reveal, ev.Object, ev.Param)
+        end
+
+    end
+
+}

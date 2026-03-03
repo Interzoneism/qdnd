@@ -1,0 +1,47 @@
+game.states.TrappedAreaIndicator = State{
+    function()
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default=true,
+            help=[[Is the object enabled by default]]}
+
+
+        description = [[Indicates a trapped area to pathfinding & AI (for characters who avoid traps).]]
+
+        inputs.On = {help = [[Turn on.]]}
+        inputs.Off = {help = [[Turn off.]]}
+
+        outputs.Enabled = {help = [[Turned On]]}
+        outputs.Disabled = {help = [[Turned Off]]}
+
+        self.OnInit = function()
+            local storedOn = me.Blackboard.GetFact("On")
+            if storedOn == nil then
+                if params.StartEnabled then
+                    me.Blackboard.SetFact("On", 1)
+                    SetTrapDiscovered(me, true)
+                else
+                    me.Blackboard.SetFact("On", 0)
+                    SetTrapDiscovered(me, false)
+                end
+            end
+        end
+       
+
+        socketEvents.On = function(ev)
+            me.Blackboard.SetFact("On", 1)
+            TriggerOutput(outputs.Enabled, ev.Object, ev.Param)
+            SetTrapDiscovered(me, true)
+        end
+
+        
+        socketEvents.Off = function(ev)
+            me.Blackboard.SetFact("On", 0)
+            TriggerOutput(outputs.Disabled, ev.Object, ev.Param)
+            SetTrapDiscovered(me, false)
+        end
+
+
+    end
+}

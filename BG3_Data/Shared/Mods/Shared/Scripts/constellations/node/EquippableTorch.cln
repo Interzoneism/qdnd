@@ -1,0 +1,114 @@
+game.states.EquippableTorch = State{
+    function()
+        params.GameplayLight = {
+            type = EParamType.Bool,
+            required = false,
+            default = false,
+            help = "Does the item cast a gameplay light, or is purely decorative?"
+        }
+
+        params.GameplayLightRadius = {
+            type = EParamType.Number,
+            required = false,
+            default = 5.0,
+            help = "Radius of gameplay light"
+        }
+
+        params.GameplayLightSharpness = {
+            type = EParamType.Number,
+            required = false,
+            default = 0.1,
+            help = "Sharpness of gameplay light"
+        }
+
+        params.StartLit = {
+            type = EParamType.Bool,
+            required = false,
+            default = true,
+            help = "Does the item start lit?"
+        }
+
+        params.LightOnSound = {
+            type = EParamType.String,
+            required = false,
+            default = "",
+            help = "Sound played when this light is turned on."
+        }
+
+        params.LightOffSound = {
+            type = EParamType.String,
+            required = false,
+            default = "",
+            help = "Sound played when this light is turned off."
+        }
+
+        params.PreviewEffect = {
+            type = EParamType.String,
+            required = false,
+            default = "VFX_LightSources_GEN_Torch_A_01_0aee588d-ba2a-aa3b-a048-5fbc03779371",
+            help = "Effect played on the editor to preview the ingame visual."
+        }
+
+        params.PreviewEffectBone = {
+            type = EParamType.String,
+            required = false,
+            help = "Bone where to play the preview effect.",
+            default = "Dummy_FX_01"
+        }
+
+        params.GameplayLightPointLightVerticalLimit = {
+            type = EParamType.Number,
+            required = false,
+            default = 2.5,
+            help = "Vertical limit of a point light that does not check line-of-sight"
+        }
+
+        outputs.TurnOnInt = {internal = true}
+        outputs.ToggleInt = {internal = true}
+        outputs.TurnOffInt = {internal = true}
+
+        nodes.VisualPreview = Proxy {
+            game.states.VisualPreviewHelper,
+            params = {
+                PreviewEffect = params.PreviewEffect,
+                PreviewEffectBone = params.PreviewEffectBone
+            }
+        }
+
+        nodes.BurningItem = Proxy {
+            game.states.BurningItem,
+            params = {
+                BurnEffect = "",
+                BurnEffectBone = "",
+                GameplayLight = params.GameplayLight,
+                GameplayLightRadius = params.GameplayLightRadius,
+                GamplayLightSharpness = params.GameplayLightSharpness,
+                LightOnSound = params.LightOnSound,
+                LightOffSound = params.LightOffSound,
+                StartLit = params.StartLit,
+                GameplayLightPointLightVerticalLimit = params.GameplayLightPointLightVerticalLimit
+            },
+            inputs = {
+                TurnOn = {outputs.TurnOnInt},
+                Toggle = {outputs.ToggleInt},
+                TurnOff = {outputs.TurnOffInt}
+            }
+        }
+
+        self.OnLoaded = function()
+            -- Contrary to regular burning items, equippable torches still need to
+            -- go through Status VFXs. The issue is related to the fact that equipped items
+            -- cannot normally have a VFX - one exception being status VFXs.
+            EnableStatusVisual(me, "BURNING")
+        end
+
+        events.Equipped = function(ev)
+            TriggerOutput(outputs.TurnOnInt, nil, nil)
+        end
+
+        events.Unsheathed = function(ev)
+            TriggerOutput(outputs.TurnOnInt, nil, nil)
+        end
+        
+    end
+}

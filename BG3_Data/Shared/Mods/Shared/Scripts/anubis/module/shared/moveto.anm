@@ -1,0 +1,29 @@
+local m = AnubisModule()
+
+m.MoveToList = function(DestinationList, ForceUpdate, MinDistance, MovementSpeed, ArriveEvent, MaxDistance, LongPath, ShouldArrive)
+    SetUnicastEntityEvent(me, "gen_anubismovetolist", DestinationList, ForceUpdate, MinDistance, MovementSpeed, ArriveEvent, MaxDistance, LongPath, ShouldArrive)
+end
+
+m.MoveTo = function(Destination, ForceUpdate, MinDistance, MovementSpeed, ArriveEvent, MaxDistance, LongPath, ShouldArrive)
+    SetUnicastEntityEvent(me, "gen_anubismoveto", Destination, ForceUpdate, MinDistance, MovementSpeed, ArriveEvent, MaxDistance, LongPath, ShouldArrive)
+end
+
+m.CancelMoveTo = function()
+    SetUnicastEntityEvent(me, "gen_anubismovetocancel")
+end
+
+m.action.MoveToPoint = function(point, speed, entity, maxDist, longPath)
+    if (GetDistance2DTo(me, point) <= (maxDist or 1.0)) then
+        return true
+    elseif (not IsInDangerousSurfaceFor(point, entity.Character, 2.0)) then
+        local moveResult = MoveTo(point, speed, false, longPath == true, 1.0, maxDist or 1.0, false, PathClimbingMode.Enabled)
+        if moveResult ~= error.MovementError.None then
+            DebugText(entity, "mod.moveto.MoveToPoint: Move Failed [1]", tostring(moveResult))
+        else
+            return true
+        end
+    end
+    return false
+end
+
+return m

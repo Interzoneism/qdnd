@@ -1,0 +1,13 @@
+local m = AnubisModule()
+
+-- return random float number in range [lowerValue, upperValue)
+m.random = function(lowerValue, upperValue)
+    return math.random() * (upperValue - lowerValue) + lowerValue
+end
+
+m.CoinToss = function(winProbability)
+    winProbability = winProbability or 0.5
+    return math.random() < winProbability
+end
+
+return m

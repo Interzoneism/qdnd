@@ -1,0 +1,637 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="VirtualTextureBank">
+		<node id="VirtualTextureBank">
+			<children>
+				<node id="Resource">
+					<attribute id="GTexFileName" type="FixedString" value="2c1f815d390fa7c9a2d8ab067c27cf18" />
+					<attribute id="ID" type="FixedString" value="fe5d3bac-c362-fc26-0baa-e7fb6c3df754" />
+					<attribute id="Name" type="LSString" value="BIRD_Raven_White_A" />
+					<attribute id="Prefetch" type="bool" value="False" />
+					<attribute id="PrefetchMipLevel" type="int8" value="-1" />
+					<attribute id="ReferencedColorSpaces" type="uint32" value="6" />
+					<attribute id="VirtualTextureLayerConfig" type="uint32" value="3" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209031" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="MaterialBank">
+		<node id="MaterialBank">
+			<children>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="a38e24a3-5152-186c-d2e0-873cf46839b5" />
+					<attribute id="MaterialType" type="uint8" value="18" />
+					<attribute id="Name" type="LSString" value="BIRD_Raven_White_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Base/Base_AlphaTest_2s_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="145100352641826816" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.4" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="fe5d3bac-c362-fc26-0baa-e7fb6c3df754" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationSetBank">
+		<node id="AnimationSetBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="d0857a4b-e74e-5101-cc91-41ddab6fbf89" />
+					<attribute id="Name" type="LSString" value="BIRD_Raven_AnimO_RAGE_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725668" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="FallBackAnimation" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets">
+											<children>
+												<node id="Object">
+													<attribute id="FallBackSubSet" type="FixedString" value="" />
+													<attribute id="MapKey" type="FixedString" value="" />
+													<children>
+														<node id="Animation">
+															<children>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="87e58e1d-e631-941e-22bd-f8165c77062b" />
+																	<attribute id="MapKey" type="FixedString" value="7def448c-ee51-48da-a683-e8f8992efb82" />
+																</node>
+																<node id="Object">
+																	<attribute id="AlwaysIgnore" type="bool" value="True" />
+																	<attribute id="ID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+																	<attribute id="MapKey" type="FixedString" value="6dd3d472-9e11-47bf-8f7a-04e75ffe6c26" />
+																</node>
+																<node id="Object">
+																	<attribute id="AlwaysIgnore" type="bool" value="True" />
+																	<attribute id="ID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+																	<attribute id="MapKey" type="FixedString" value="1c364663-4698-4f11-a39a-85833e4d0d75" />
+																</node>
+																<node id="Object">
+																	<attribute id="AlwaysIgnore" type="bool" value="True" />
+																	<attribute id="ID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+																	<attribute id="MapKey" type="FixedString" value="07e81afc-95c4-452b-ac68-5cbb74710cca" />
+																</node>
+																<node id="Object">
+																	<attribute id="AlwaysIgnore" type="bool" value="True" />
+																	<attribute id="ID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+																	<attribute id="MapKey" type="FixedString" value="9e02c309-46c1-43ef-b47c-ad6983058c19" />
+																</node>
+																<node id="Object">
+																	<attribute id="AlwaysIgnore" type="bool" value="True" />
+																	<attribute id="ID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+																	<attribute id="MapKey" type="FixedString" value="b5d99946-0646-4bdd-88a0-9604872a0dd9" />
+																</node>
+																<node id="Object">
+																	<attribute id="AlwaysIgnore" type="bool" value="True" />
+																	<attribute id="ID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+																	<attribute id="MapKey" type="FixedString" value="5658922f-15c5-4729-b736-ca4456228628" />
+																</node>
+																<node id="Object">
+																	<attribute id="AlwaysIgnore" type="bool" value="True" />
+																	<attribute id="ID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+																	<attribute id="MapKey" type="FixedString" value="cacc8846-0ae5-47eb-9073-ee9166e4cb36" />
+																</node>
+																<node id="Object">
+																	<attribute id="AlwaysIgnore" type="bool" value="True" />
+																	<attribute id="ID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+																	<attribute id="MapKey" type="FixedString" value="5cff24c4-99d7-4205-9187-21eada3d1614" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="87e58e1d-e631-941e-22bd-f8165c77062b" />
+																	<attribute id="MapKey" type="FixedString" value="00800f03-ef99-4b9f-8511-6440ca697356" />
+																</node>
+																<node id="Object">
+																	<attribute id="AlwaysIgnore" type="bool" value="True" />
+																	<attribute id="ID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+																	<attribute id="MapKey" type="FixedString" value="f04c4e0b-c35a-47ef-8e7f-1036f690a665" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="87e58e1d-e631-941e-22bd-f8165c77062b" />
+																	<attribute id="MapKey" type="FixedString" value="ab6fb758-3ff1-42c9-9716-3372d1701a95" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationBank">
+		<node id="AnimationBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.0000002" />
+					<attribute id="ID" type="FixedString" value="03b0c861-6989-8626-6c3e-7c5bc825f6ec" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="BIRD_Raven_Rig_DFLT_STUB_Flying_01_Loop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="b9eb49a0-d114-dbe4-1cbb-3fbd26600a04" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="6e007290-de87-35b2-54b0-3a449883cfc2" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/BIRD_Raven_Rig_DFLT_STUB_Flying_01_Loop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/BIRD_Raven_Rig_DFLT_STUB_Flying_01_Loop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115209550692654" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.0000002" />
+					<attribute id="ID" type="FixedString" value="1448372d-e3ae-3c23-3f5d-1d3f46fd88d4" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="BIRD_Raven_Rig_DFLT_STUB_Flying_PitchD_01_Loop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="b9eb49a0-d114-dbe4-1cbb-3fbd26600a04" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="6e007290-de87-35b2-54b0-3a449883cfc2" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/BIRD_Raven_Rig_DFLT_STUB_Flying_PitchD_01_Loop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/BIRD_Raven_Rig_DFLT_STUB_Flying_PitchD_01_Loop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115209550692654" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.0000002" />
+					<attribute id="ID" type="FixedString" value="226a6586-efcc-334c-d03f-dab21013aa06" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="BIRD_Raven_Rig_DFLT_STUB_Flying_PitchU_01_Loop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="b9eb49a0-d114-dbe4-1cbb-3fbd26600a04" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="6e007290-de87-35b2-54b0-3a449883cfc2" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/BIRD_Raven_Rig_DFLT_STUB_Flying_PitchU_01_Loop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/BIRD_Raven_Rig_DFLT_STUB_Flying_PitchU_01_Loop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115209550692654" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.20000002" />
+					<attribute id="ID" type="FixedString" value="315da709-14f8-9bda-2041-44b78950e9b4" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="BIRD_Raven_Rig_DFLT_STUB_Flying_01_Takeoff" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="b9eb49a0-d114-dbe4-1cbb-3fbd26600a04" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="6e007290-de87-35b2-54b0-3a449883cfc2" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/BIRD_Raven_Rig_DFLT_STUB_Flying_01_Takeoff.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/BIRD_Raven_Rig_DFLT_STUB_Flying_01_Takeoff.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115209550692654" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.5" />
+					<attribute id="ID" type="FixedString" value="7e78a1f4-64fd-22e1-e7db-18a115e4b4a7" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="STUB_BIRD_Raven_Rig_DFLT_CMBT_Skill_Flying_01_BTilt" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="b9eb49a0-d114-dbe4-1cbb-3fbd26600a04" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="6e007290-de87-35b2-54b0-3a449883cfc2" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/STUB_BIRD_Raven_Rig_DFLT_CMBT_Skill_Flying_01_BTilt.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/STUB_BIRD_Raven_Rig_DFLT_CMBT_Skill_Flying_01_BTilt.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115209550692654" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="5.5000005" />
+					<attribute id="ID" type="FixedString" value="87e58e1d-e631-941e-22bd-f8165c77062b" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="BIRD_Raven_Rig_DFLT_IDLE_Still_Combat_01_Barbarian" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="b9eb49a0-d114-dbe4-1cbb-3fbd26600a04" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="6e007290-de87-35b2-54b0-3a449883cfc2" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/BIRD_Raven_Rig_DFLT_IDLE_Still_Combat_01_Barbarian.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/BIRD_Raven_Rig_DFLT_IDLE_Still_Combat_01_Barbarian.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115209550692654" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Foley_Soft_Medium" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="12" />
+							<attribute id="Time" type="float" value="0.31492066" />
+							<attribute id="Track" type="uint8" value="2" />
+							<children>
+								<node id="Properties">
+									<attribute id="EFoleyIntensity" type="uint8" value="0" />
+									<attribute id="EFoleyType" type="uint8" value="1" />
+									<attribute id="Resource" type="FixedString" value="" />
+									<attribute id="SoundObjectIndex" type="uint8" value="3" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Foley_Soft_Medium" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="12" />
+							<attribute id="Time" type="float" value="0.75464857" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="EFoleyIntensity" type="uint8" value="0" />
+									<attribute id="EFoleyType" type="uint8" value="1" />
+									<attribute id="Resource" type="FixedString" value="" />
+									<attribute id="SoundObjectIndex" type="uint8" value="3" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Foley_Soft_Medium" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="12" />
+							<attribute id="Time" type="float" value="1.1856691" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="EFoleyIntensity" type="uint8" value="0" />
+									<attribute id="EFoleyType" type="uint8" value="1" />
+									<attribute id="Resource" type="FixedString" value="" />
+									<attribute id="SoundObjectIndex" type="uint8" value="3" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Foley_Soft_Medium" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="12" />
+							<attribute id="Time" type="float" value="1.6747395" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="EFoleyIntensity" type="uint8" value="0" />
+									<attribute id="EFoleyType" type="uint8" value="1" />
+									<attribute id="Resource" type="FixedString" value="" />
+									<attribute id="SoundObjectIndex" type="uint8" value="3" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="7.766667" />
+					<attribute id="ID" type="FixedString" value="8f7bbb86-f332-9d85-7344-846ade24325a" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="STUB_BIRD_Raven_Rig_DFLT_CMBT_Skill_Flying_01_Flight" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="b9eb49a0-d114-dbe4-1cbb-3fbd26600a04" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="6e007290-de87-35b2-54b0-3a449883cfc2" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/STUB_BIRD_Raven_Rig_DFLT_CMBT_Skill_Flying_01_Flight.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/STUB_BIRD_Raven_Rig_DFLT_CMBT_Skill_Flying_01_Flight.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115209550692654" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.0000002" />
+					<attribute id="ID" type="FixedString" value="9e290cc9-4ae3-01c0-aec0-829467e4a585" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="BIRD_Raven_Rig_DFLT_STUB_Flying_RollL_01_Loop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="b9eb49a0-d114-dbe4-1cbb-3fbd26600a04" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="6e007290-de87-35b2-54b0-3a449883cfc2" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/BIRD_Raven_Rig_DFLT_STUB_Flying_RollL_01_Loop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/BIRD_Raven_Rig_DFLT_STUB_Flying_RollL_01_Loop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115209550692654" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.9666667" />
+					<attribute id="ID" type="FixedString" value="9e972279-815f-f0e1-d439-10a357bacee0" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="STUB_BIRD_Raven_Rig_DFLT_CMBT_Skill_Flying_Peace_01_Recover" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="b9eb49a0-d114-dbe4-1cbb-3fbd26600a04" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="6e007290-de87-35b2-54b0-3a449883cfc2" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/STUB_BIRD_Raven_Rig_DFLT_CMBT_Skill_Flying_Peace_01_Recover.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/STUB_BIRD_Raven_Rig_DFLT_CMBT_Skill_Flying_Peace_01_Recover.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115209550692654" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.5" />
+					<attribute id="ID" type="FixedString" value="9ffac427-ae3c-b7f1-dc38-cea39ef20091" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="STUB_BIRD_Raven_Rig_DFLT_CMBT_Skill_Flying_01_FTilt" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="b9eb49a0-d114-dbe4-1cbb-3fbd26600a04" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="6e007290-de87-35b2-54b0-3a449883cfc2" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/STUB_BIRD_Raven_Rig_DFLT_CMBT_Skill_Flying_01_FTilt.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/STUB_BIRD_Raven_Rig_DFLT_CMBT_Skill_Flying_01_FTilt.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115209550692654" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.0000002" />
+					<attribute id="ID" type="FixedString" value="a02ae43b-7e44-609b-3eed-ec3656448cd6" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="BIRD_Raven_Rig_DFLT_STUB_Flying_RollR_01_Loop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="b9eb49a0-d114-dbe4-1cbb-3fbd26600a04" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="6e007290-de87-35b2-54b0-3a449883cfc2" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/BIRD_Raven_Rig_DFLT_STUB_Flying_RollR_01_Loop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/BIRD_Raven_Rig_DFLT_STUB_Flying_RollR_01_Loop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115209550692654" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.5" />
+					<attribute id="ID" type="FixedString" value="d173e3b6-be8b-17ac-3eba-f32470169a20" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="STUB_BIRD_Raven_Rig_DFLT_CMBT_Skill_Flying_01_RTilt" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="b9eb49a0-d114-dbe4-1cbb-3fbd26600a04" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="6e007290-de87-35b2-54b0-3a449883cfc2" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/STUB_BIRD_Raven_Rig_DFLT_CMBT_Skill_Flying_01_RTilt.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/STUB_BIRD_Raven_Rig_DFLT_CMBT_Skill_Flying_01_RTilt.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115209550692654" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.9666667" />
+					<attribute id="ID" type="FixedString" value="d4f8eabb-0ff8-7aeb-2cc0-c19326835dbc" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="BIRD_Raven_Rig_DFLT_STUB_Flying_01_Landing" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="b9eb49a0-d114-dbe4-1cbb-3fbd26600a04" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="6e007290-de87-35b2-54b0-3a449883cfc2" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/BIRD_Raven_Rig_DFLT_STUB_Flying_01_Landing.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/BIRD_Raven_Rig_DFLT_STUB_Flying_01_Landing.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115209550692654" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.5" />
+					<attribute id="ID" type="FixedString" value="d5d75b8f-a1d3-22e0-bff2-3b9ee431089f" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="STUB_BIRD_Raven_Rig_DFLT_CMBT_Skill_Flying_01_LTilt" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="b9eb49a0-d114-dbe4-1cbb-3fbd26600a04" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="6e007290-de87-35b2-54b0-3a449883cfc2" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/STUB_BIRD_Raven_Rig_DFLT_CMBT_Skill_Flying_01_LTilt.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/STUB_BIRD_Raven_Rig_DFLT_CMBT_Skill_Flying_01_LTilt.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115209550692654" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.6333334" />
+					<attribute id="ID" type="FixedString" value="e438d3bf-1b70-5c8c-821d-121406aaf800" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="BIRD_Raven_Rig_DFLT_STUB_Flying_TPose_01_Additive" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="b9eb49a0-d114-dbe4-1cbb-3fbd26600a04" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="6e007290-de87-35b2-54b0-3a449883cfc2" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/BIRD_Raven_Rig_DFLT_STUB_Flying_TPose_01_Additive.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Bird_Raven/BIRD_Raven_Rig/BIRD_Raven_Rig_DFLT_STUB_Flying_TPose_01_Additive.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115209550692654" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="d169bd0f-802c-a1d4-7f32-2b0d0c8b6b50" />
+					<attribute id="BoundsMax" type="fvec3" value="0.09323298 0.7342574 -0.24273439" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.09323298 0.392299 -0.60898125" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="0ac6cffc-be20-5b07-5226-31ecdf2d2f94" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="BIRD_Raven_Head_White" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="d5aa1152-ddf0-964c-b5f5-e7983157dca8" />
+					<attribute id="SkeletonSlot" type="FixedString" value="1" />
+					<attribute id="Slot" type="FixedString" value="Head" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Anims/_Creatures/Bird_Raven/Resources/BIRD_Raven_Head_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Anims/_Creatures/Bird_Raven/Resources/BIRD_Raven_Head_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+					<children>
+						<node id="AnimationSetOverrides">
+							<attribute id="PairElement1" type="guid" value="b6aa23c3-c96d-42d5-8ffa-8d441d18faa7" />
+							<attribute id="PairElement2" type="FixedString" value="f297e517-18a1-d190-b440-92dd090b0d94" />
+							<attribute id="strAnimationSetOverrideType" type="int32" value="0" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="27791319-eb37-510b-e3a6-2677fa5e12bf" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="a38e24a3-5152-186c-d2e0-873cf46839b5" />
+							<attribute id="ObjectID" type="FixedString" value="BIRD_Raven_Head_A.BIRD_Raven_Head_A_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="b09f1893-d49d-483e-2dc7-0a989741aa9e" />
+							<attribute id="ObjectID" type="FixedString" value="BIRD_Raven_Head_A.BIRD_Raven_Head_A_EyeShadow_Mesh.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="24168466-e5aa-c93b-8c44-ba4d27ef22ef" />
+							<attribute id="ObjectID" type="FixedString" value="BIRD_Raven_Head_A.BIRD_Raven_Head_A_Eye_Mesh.2" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="a38e24a3-5152-186c-d2e0-873cf46839b5" />
+							<attribute id="ObjectID" type="FixedString" value="BIRD_Raven_Head_A.BIRD_Raven_Head_A_Mesh_LOD1.3" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="24168466-e5aa-c93b-8c44-ba4d27ef22ef" />
+							<attribute id="ObjectID" type="FixedString" value="BIRD_Raven_Head_A.BIRD_Raven_Head_A_Eye_Mesh_LOD1.4" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="a38e24a3-5152-186c-d2e0-873cf46839b5" />
+							<attribute id="ObjectID" type="FixedString" value="BIRD_Raven_Head_A.BIRD_Raven_Head_A_Mesh_LOD2.5" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="1.1995568 0.62236434 0.6184463" />
+					<attribute id="BoundsMin" type="fvec3" value="-1.1995568 -0.0069198194 -0.40457603" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="2ef3cea3-8a38-e08c-2499-ac3d2e318bf2" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="BIRD_Raven_Body_White" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="NakedBody" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Bird_Raven/Resources/BIRD_Raven_Body_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Bird_Raven/Resources/BIRD_Raven_Body_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+					<children>
+						<node id="AnimationSetOverrides">
+							<attribute id="PairElement1" type="guid" value="b6aa23c3-c96d-42d5-8ffa-8d441d18faa7" />
+							<attribute id="PairElement2" type="FixedString" value="d0857a4b-e74e-5101-cc91-41ddab6fbf89" />
+							<attribute id="strAnimationSetOverrideType" type="int32" value="0" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="a38e24a3-5152-186c-d2e0-873cf46839b5" />
+							<attribute id="ObjectID" type="FixedString" value="BIRD_Raven_Body_A.BIRD_Raven_Body_A_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="a38e24a3-5152-186c-d2e0-873cf46839b5" />
+							<attribute id="ObjectID" type="FixedString" value="BIRD_Raven_Body_A.BIRD_Raven_Body_A_Mesh_LOD1.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="a38e24a3-5152-186c-d2e0-873cf46839b5" />
+							<attribute id="ObjectID" type="FixedString" value="BIRD_Raven_Body_A.BIRD_Raven_Body_A_Mesh_LOD2.2" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

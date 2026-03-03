@@ -1,0 +1,67 @@
+game.configs.MovingPlatformOnSpline = Config{
+    params={
+        Speed = {
+            type = EParamType.Number,
+            help = [[The platform movement speed along the spline]],
+            required = false,
+            default = 1
+        },
+        SoundOnMovementStop = {
+            type = EParamType.String,
+            help = [[Sound to play when the platform stops moving]],
+            required = false,
+        },
+        ReverseAtEnd = {
+            type = EParamType.Bool,
+            help = [[If true, the platform starts moving backwards along the spline when reaching the end.
+                     If false, the platform moves back/along to the first splint point when reaching the end.]],
+            required = false,
+            default = false
+        },
+        SoundOnMovementStart = {
+            type = EParamType.String,
+            help = [[Sound to play when the platform starts moving]],
+            required = false,
+        },
+        PlatformSpline = {
+            type = EParamType.String,
+            help = [[The spline the platform has to follow]],
+            required = true,
+        },
+        PauseBetweenNodes = {
+            type = EParamType.Number,
+            help = [[Wait X seconds at each spline point]],
+            required = false,
+            default = 6
+        },
+        StartMovementOnActivation = {
+            type = EParamType.Bool,
+            help = [[The platform moves as long as it is active]],
+            required = false,
+            default = false
+        },
+        StartSplinePoint = {
+            type = EParamType.Int,
+            help = [[Spline point from which to start moving (zero-based)]],
+            required = false,
+            default = 0
+        },
+    },
+    root=StateRef{game.roots.PlatformSplineMovement,
+        PauseBetweenNodes = params.PauseBetweenNodes,
+        PlatformSpline = params.PlatformSpline,
+        ReverseAtEnd = params.ReverseAtEnd,
+        SoundOnMovementStart = params.SoundOnMovementStart,
+        SoundOnMovementStop = params.SoundOnMovementStop,
+        Speed = params.Speed,
+        StartMovementOnActivation = params.StartMovementOnActivation,
+        StartSplinePoint = params.StartSplinePoint,
+    },
+    inputs={
+        StopAfterCurrentMove=ExtSocket{description=[[Stop platform movement (at the next spline point, if it's currently moving)]],{SocketRef{[[root.inputs.StopAfterCurrentMove]]}}},
+        StartMoving=ExtSocket{description=[[Start platform movement]],{SocketRef{[[root.inputs.StartMoving]]}}},
+    },
+    outputs={
+        ReachedNode=ExtSocket{description=[[Reached a node of the spline. Parameter is the node number (zero-based)]],{SocketRef{[[root.outputs.ReachedNode]]}}},
+    }
+}

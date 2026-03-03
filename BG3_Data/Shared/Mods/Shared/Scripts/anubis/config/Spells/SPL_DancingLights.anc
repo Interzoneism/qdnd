@@ -1,0 +1,6 @@
+game.configs.SPL_DancingLights = Config{
+    root=StateRef{game.roots.DefaultItem,
+        idle = StateRef{game.states.SPL_DancingLights},
+        combat = StateRef{game.states.DefaultItemCombat},
+    }
+}

@@ -1,0 +1,7 @@
+game.configs.DefaultElemental = Config{
+    root=StateRef{game.roots.DefaultCharacter,
+        combat = StateRef{game.states.DefaultCombat},
+        genericBehaviours = StateRef{game.states.CrimesHumanoid},
+        idle = StateRef{game.states.Dummy},
+    }
+}

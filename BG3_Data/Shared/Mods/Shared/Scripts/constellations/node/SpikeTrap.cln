@@ -1,0 +1,221 @@
+game.states.SpikeTrap = State{
+    function()
+
+        inputs.NextStateReachedInt = {internal = true} -- [[Callback from Animation, when it's done]]
+        outputs.ToNextStateInt = {internal = true} -- [[Call to Animation to move to next state]]
+
+        inputs.Enable = {help = [[Turn spike trap on]]}
+        outputs.EnableInt = {internal = true}
+
+        inputs.Disable = {help = [[Turn spike trap off]]}
+        outputs.DisableInt = {internal = true}
+
+        outputs.TryActivateInt = {internal = true}
+        inputs.ActivatedInt = {internal = true}
+
+        inputs.DisabledInt = {internal = true}
+
+        inputs.EnabledInt = {internal = true}
+
+        outputs.ForceStateInt = {internal = true}
+
+        inputs.OverweightInt = {internal=true}
+
+        outputs.ExplodeInt = {internal = true}
+
+        params.StartEnabled = {type=EParamType.Bool, default = true, help = "Is the trap armed from game start?"}
+
+        params.Type = {
+            type = EParamType.String,
+            default="Invisible",
+            help=[[
+            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]]
+        }
+
+        params.DC = {
+            type = EParamType.String,
+            default="HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f",
+            help=[[Perception check DC.]]
+        }
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            required=false,
+            default=6.0,
+            help=[[Minimum distance that players are required to be in for the perception skill check. A distance of 0 disables the check.]]
+        }
+
+        params.Skill = {
+            type = EParamType.String,
+            default="Perception",
+            help=[[The skill checked for perception.]]
+        }
+
+        params.VFXOff = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = [[VFX while spikes are disabled and have been spotted.]]
+        }
+
+        params.VFXOffBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = [[Bone on which the 'VFXOff' VFX is played.]]
+        }
+
+        params.Projectile = {type = EParamType.String,
+            required = false,
+            default = "Projectile_SpikeTrap_Trap",
+            help = [[Projectile used to do the damage.]]
+        }
+
+        params.VFXOn = {type = EParamType.String,
+            required = false,
+            default = "VFX_Script_Trap_Overlay_Red_01_a7361f25-e942-e071-7ce3-7a8182f4e0ef",
+            help = [[VFX while spikes are enabled and have been spotted.]]
+        }
+
+        params.VFXOnBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = [[Bone on which the enabled-VFX is played.]]
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_Off",
+            help = "Sound when spike trap is disabled"
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_On",
+            help = "Sound when spike trap is enabled"
+        }
+
+        
+        params.WeightLimit = {
+            type = EParamType.Number,
+            help = [[Weight that sets off the trap (in grams).]],
+            default = 50000.0,
+        }
+
+        params.DestroyOnDisarm = {
+            type=EParamType.Bool,
+            default = true,
+            help = "Does the spike trap break on Disarm?"
+        }
+
+        params.DefaultState = {
+            type=EParamType.String,
+            default = "Down",
+            help = "Default state of the spikes. Accepts 'Up' or 'Down'",
+        }
+
+
+        nodes.PerceptionDisarmOnOff = Proxy{
+            game.states.PerceptionDisarmOnOff,
+            params = {StartEnabled = params.StartEnabled,
+                      Type = params.Type,
+                      Skill = params.Skill,
+                      MinDistance = params.MinDistance,
+                      VFXOn= params.VFXOn,
+                      VFXOff = params.VFXOff,
+                      VFXOnBone = params.VFXOnBone,
+                      VFXOffBone = params.VFXOffBone,
+                      SoundOn = params.SoundOn,
+                      SoundOff = params.SoundOff,
+                      IsTrap = true,
+                      DestroyOnDisarm = params.DestroyOnDisarm},
+            inputs = {Enable = {outputs.EnableInt},
+                      Disable = {outputs.DisableInt},
+                      TryActivate = {outputs.TryActivateInt},
+                      Reveal = {outputs.TryActivateInt}},
+            outputs = {Activate = {inputs.ActivatedInt},
+                       Disabled = {inputs.DisabledInt},
+                       Enabled = {inputs.EnabledInt}}
+                    }
+
+        nodes.AnimationState = Proxy{
+            game.states.AnimationStates,
+            params = {StateSequence = {2,5,0,4,2},
+                        DynamicStates = {4,5}},
+            inputs = {Activate = {outputs.ToNextStateInt},
+                      GoToState = {outputs.ForceStateInt}},
+            outputs = {NewState = {inputs.NextStateReachedInt}},
+        }
+
+            
+        nodes.WeightTrigger = Proxy{
+            game.states.WeightTrigger,
+            params = {WeightLimit = params.WeightLimit},
+            outputs = {Overweight = {inputs.OverweightInt}}
+        }
+
+        nodes.SpellCast = Proxy{
+            game.states.SpellCast,
+            params = {Spell = params.Projectile},
+            inputs = {Cast = {outputs.ExplodeInt}}
+        }
+
+        socketEvents.OverweightInt = function(ev)
+            if me.Blackboard.GetFact("Cnst.AnimationState.CurrentState") == 0 then
+                TriggerOutput(outputs.TryActivateInt, ev.Object, ev.Param)
+            end
+        end
+
+        socketEvents.ActivatedInt = function(ev)
+            if me.Blackboard.GetFact("Cnst.AnimationState.CurrentState") == 0 then
+                TriggerOutput(outputs.ExplodeInt, ev.Object, ev.Param)
+            end
+            TriggerOutput(outputs.ToNextStateInt, ev.Object, ev.Param)
+        end
+
+        socketEvents.NextStateReachedInt = function(ev)
+            if me.Blackboard.GetFact("Cnst.AnimationState.CurrentState") == 2 then
+                TriggerOutput(outputs.ToNextStateInt, ev.Object, ev.Param) --Go back to disarmed
+            end
+        end
+
+        self.OnInit = function()
+            if me.Blackboard.GetFact("Cnst.SpikeTrap.DidInit") == nil then
+                me.Blackboard.SetFact("Cnst.SpikeTrap.DidInit", 1)
+                if string.lower(params.DefaultState) == "down" then
+                    TriggerOutput(outputs.ForceStateInt, nil, 0)
+                elseif string.lower(params.DefaultState) == "up" then
+                    --Matches default animation state.
+                else
+                    DebugLogCritical("The Spike trap [1]_[2] default state parameter is neither 'up' nor 'down'.", me.Name, me.UUID)
+                end
+            end
+        end
+
+        socketEvents.DisabledInt = function(ev)
+            TriggerOutput(outputs.ForceStateInt, ev.Object, 0)
+        end
+
+        socketEvents.EnabledInt = function(ev)
+            if me.Blackboard.GetFact("Cnst.WeightTrigger.Overweight") == 1 and
+               me.Blackboard.GetFact("Cnst.AnimationState.CurrentState") == 0 then
+                TriggerOutput(outputs.TryActivateInt, ev.Object, ev.Param)
+            end
+        end
+
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.EnableInt, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.DisableInt, ev.Object, ev.Param)
+        end
+
+    end
+
+}

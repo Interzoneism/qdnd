@@ -1,0 +1,40 @@
+game.configs.Helper_ActiveRoll = Config{
+    params={
+        TargetEntity = {
+            type = EParamType.String,
+            required = true,
+            help = [[Object that is the roll subject.
+                     WARNING: Must be a character or item
+                   ]]
+        },
+        SkillOrAbility = { type = EParamType.String, default = "Strength", help = "Ability or skill."},
+        DC = {
+            type = EParamType.String,
+            default="DC_Legacy_15_bddbb9b8-a242-4c3e-a2eb-3fd274c0c539",
+            help="The roll DC."
+        },
+        RollerAdvantage  = {type = EParamType.String, default = "None"
+            , help = [[Advantage type of the roller:
+            None,
+            Advantage,
+            Disadvantage
+        ]]}
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.ActiveRoll,
+            TargetEntity = params.TargetEntity,
+            SkillOrAbility = params.SkillOrAbility,
+            DC = params.DC,
+            RollerAdvantage = params.RollerAdvantage
+        }
+    },
+    inputs={
+        PerformRoll=ExtSocket{description=[[Perform the roll]],{SocketRef{[[root.logic.inputs.PerformRoll]]}}},
+        Disable=ExtSocket{description=[[Disable the roll]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+    },
+    outputs={
+        SuccessfulRoll=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.OnRollSuccess]]}}},
+        FailedRoll=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.OnRollFailure]]}}},
+        CancelleddRoll=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.OnRollCancelled]]}}},
+    }
+}

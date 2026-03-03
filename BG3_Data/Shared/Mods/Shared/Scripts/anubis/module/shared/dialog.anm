@@ -1,0 +1,380 @@
+local m = AnubisModule()
+
+--[[
+    Example usage of the wrapper calls
+
+modules = { "shared.dialog" }
+
+...
+
+local retVal = mod.dialog.StartCheckedAutomatedDialogRateLimited(
+    dialog,
+    { maxDistance = 10.0,
+      checkSight = true,
+      ignoreCower = false,
+      waitForCompletion = true,
+      fallbackSoloDialog = fallbackDialog,
+      minDelay = 15.0,
+      cullingDistance = 5.0 },
+    me,
+    otherSpeaker1,
+    otherSpeaker2)
+if retVal ~= error.DialogRequestStopRepeated.None then
+    DebugText(me, "Oh no, we got a problem starting the AD")
+end
+]]
+
+m.DefaultDialogAvailabilityDistance = 10.0
+
+-- Converts varArg into a list. If the 1st argument is already a list, just returns it
+m.Inner_PrepareSpeakerList = function(...)
+    -- See http://lua-users.org/wiki/StoringNilsInTables for why we have to do it like this to support nil speakers
+    -- (the "explicit 'n' field" solution)
+    if (... ~= nil) and
+       (type(...) == 'table') then
+        -- if the user already passed a table, nil values are lost already and we can't do anything but represent their
+        -- table in our format
+        local retVal = ...
+        retVal["n"] = #retVal
+        return retVal
+    else
+        return { n = select('#', ...), ...}
+    end
+end
+
+-- Prepares a table of options for AD API calls, placing default values for missing parameters
+-- @param options A table of parameters
+-- options may have the following parameters
+--   maxDistance - maximum distance between main speaker and other speakers in AD
+--   checkSight  - check if main speaker can see other speakers
+--   ignoreCower - cowering speakers can take part in AD
+--   waitForCompletion - all dialog participants should block their behaviours during AD
+--   minDelay    - for Rated AD; minimal timeout in seconds to restart the AD
+--   cullingDistance - for RatedAD; The maximum distance that this AD can be heard from other ADs (attenuation distance, default 5 meters)
+--   fallbackSoloDialog - for Rated AD; a fallback AD with only main speaker to be used if other speakers are not available
+--   allowNilSpeakers - don't fail when a speaker is nil (unless all of them are nil or unavailable). Default: false.
+m.Inner_GetBaseOptions = function(options)
+    options = options or { }
+    if options.maxDistance == nil then
+        options.maxDistance = this.DefaultDialogAvailabilityDistance
+    end
+    if options.checkSight == nil then
+        options.checkSight = true
+    end
+    if options.ignoreCower == nil then
+        options.ignoreCower = false
+    end
+    if options.waitForCompletion == nil then
+        options.waitForCompletion =  true
+    end
+    if options.cullingDistance == nil then
+        options.cullingDistance = 5.0
+    end
+    if options.allowNilSpeakers == nil then
+        options.allowNilSpeakers = false
+    end
+    return options
+end
+
+-- Sends an event to all speakers that switches them to game.states.Waiting
+-- @param speakers Entities that will get the event
+-- @param dialogGuid Dialog that they're participating in, during which they switch to game.states.Waiting
+m.Inner_SendWaitOnDialog = function(speakers, dialogGuid)
+    for i = 1, speakers.n do
+        local speaker = speakers[i]
+        if speaker ~= nil then
+            SetUnicastEntityEvent(speaker, "WaitOnDialogEnd", dialogGuid)
+        end
+    end
+end
+
+-- Sends an event to all speakers to invalidate their game.states.Waiting state
+-- @param speakers Entities that will get the event
+m.Inner_StopWaitOnDialog = function(speakers)
+    for i = 1, speakers.n do
+        local speaker = speakers[i]
+        if speaker ~= nil then
+            SetUnicastEntityEvent(speaker, "StopWaitOnDialogEnd")
+        end
+    end
+end
+
+-- Checks if target entity is not dead/destroyed, not in combat, not in any dialog and not polymorphed
+-- @param entity Target entity to perform checks on
+-- @param ignoreCower Whether or not cowering state considered valid for AD
+m.IsSpeakerAvailable = function(entity, ignoreCower)
+    local GLO_State_Cowering = Flag("GLO_State_Cowering_cf16110e-3767-4585-8028-83cb9857adcd")
+    return ((entity.IsCharacter and
+             not entity.Character.IsDead and
+             not entity.Character.IsInteractionDisabled and
+             entity.CanSpeak and
+             (ignoreCower or not GetFlag(GLO_State_Cowering, entity))) or
+            (entity.IsItem and
+             not entity.Item.IsDestroyed))
+        and
+            not entity.IsInCombat and
+            not IsInDialog(entity, false, false, false) and
+            entity.OnStage
+end
+
+-- Checks same things as IsSpeakerAvailable + distance and optionally sight between speakers
+-- @param targetSpeaker Target entity to perform checks on
+-- @param sourceSpeaker Main speaker for distance and sight checks
+-- @param maxDistance Maximum valid distance between sourceSpeaker and targetSpeaker
+-- @param checkSight Whether or not sourceSpeaker should see targetSpeaker
+-- @param ignoreCower Whether or not cowering state considered valid for AD
+m.IsSpeakerAvailableAndNear = function(targetSpeaker, sourceSpeaker, maxDistance, checkSight, ignoreCower, allowNil)
+    local isAvailable = this.IsSpeakerAvailable(targetSpeaker, ignoreCower)
+    local dist = GetDistance2DTo(sourceSpeaker, targetSpeaker)
+    local canSee = not checkSight or CanSee(sourceSpeaker, targetSpeaker)
+    return isAvailable and (dist < maxDistance)
+        and canSee
+end
+
+-- Checks same things as IsSpeakerAvailableAndNear for every speaker in the list
+-- @param sourceSpeaker Main speaker for distance and sight checks
+-- @param maxDistance Maximum valid distance between sourceSpeaker and targetSpeaker
+-- @param checkSight Whether or not sourceSpeaker should see targetSpeaker
+-- @param ignoreCower Whether or not cowering state considered valid for AD
+-- @param ... List of speakers or varArg of speakers to perform check on
+m.AreSpeakersAvailableAndNear = function(sourceSpeaker, maxDistance, checkSight, ignoreCower, ignoreNil, ...)
+    local speakers = this.Inner_PrepareSpeakerList(...)
+
+    -- if we allow nil speakers and sourceSpeaker is nil, we can't use it for sight/distance checks -> pick
+    -- first non-nil speaker
+    local checkSpeaker = sourceSpeaker
+    if ignoreNil and
+       (checkSpeaker == nil) then
+        for i = 1, speakers.n do
+            local speaker = speakers[i]
+            if speaker ~= nil then
+                checkSpeaker = speaker
+                break
+            end
+        end
+        -- if all speakers are nil, the dialog won't be able to start in any case
+        if checkSpeaker == nil then
+            return false
+        end
+    end
+    if (not ignoreNil and (sourceSpeaker == nil)) or
+       ((sourceSpeaker ~= nil) and
+        not this.IsSpeakerAvailable(sourceSpeaker, ignoreCower)) then
+        return false
+    end
+
+    for i = 1, speakers.n do
+        local speaker = speakers[i]
+        if (not ignoreNil and (speaker == nil)) or
+           ((speaker ~= nil) and
+            not this.IsSpeakerAvailableAndNear(speaker, checkSpeaker, maxDistance, checkSight, ignoreCower)) then
+            return false
+        end
+    end
+    return true
+end
+
+-- LEGACY!
+-- Starts synchronous Automated Dialog call, switching all extra speakers to game.states.Waiting
+-- @param dialog Dialog structure for the Automated dialog
+-- @param initiator Main speaker for distance and sight checks
+-- @param ... List of extra speakers
+-- @return Result of the API call: boolean value
+m.action.StartAutomatedDialogWithWait = function(dialog, initiator, ...)
+    local speakers = this.Inner_PrepareSpeakerList(...)
+
+    this.Inner_SendWaitOnDialog(speakers, dialog.Guid)
+    local result = StartAutomatedDialog(dialog, true, initiator, table.unpack(speakers, 1, speakers.n))
+
+    if result == false then
+        this.Inner_StopWaitOnDialog(speakers)
+    end
+    return result
+end
+
+-- Starts synchronous Automated Dialog call with speaker checks (should be used instead of StartAutomatedDialogWithWait legacy call)
+-- @param dialog Dialog structure for the Automated dialog
+-- @param options Options table, see Inner_GetBaseOptions for more details
+-- @param initiator Main speaker for distance and sight checks
+-- @param ... List of extra speakers
+-- @return Result of the API call: boolean value
+m.action.StartCheckedAutomatedDialog = function(dialog, options, initiator, ...)
+    local speakers = this.Inner_PrepareSpeakerList(...)
+    local opt = this.Inner_GetBaseOptions(options)
+
+    if (opt.allowNilSpeakers or (initiator ~= nil)) and ((initiator == nil) or this.IsSpeakerAvailable(initiator, opt.ignoreCower)) then
+        -- don't check other speakers if there's a fallback dialog
+        if not this.AreSpeakersAvailableAndNear(initiator, opt.maxDistance, opt.checkSight, opt.ignoreCower, opt.allowNilSpeakers, speakers) then
+            if (options.fallbackSoloDialog ~= nil) and (initiator ~= nil) then
+                dialog = options.fallbackSoloDialog
+                speakers = {n = 0}
+            else
+                return
+            end
+        end
+
+        if opt.waitForCompletion then
+            this.Inner_SendWaitOnDialog(speakers, dialog.Guid)
+        end
+
+        local result = StartAutomatedDialog(dialog, opt.waitForCompletion, initiator, table.unpack(speakers, 1, speakers.n))
+
+        if opt.waitForCompletion and result == false then
+            this.Inner_StopWaitOnDialog(speakers)
+        end
+        return result
+    end
+    return false
+end
+
+-- Starts immediate (non waiting) Automated Dialog call with speaker checks. Can be used in events
+-- @param dialog Dialog structure for the Automated dialog
+-- @param options Options table, see Inner_GetBaseOptions for more details
+-- @param initiator Main speaker for distance and sight checks
+-- @param ... List of extra speakers
+-- @return Result of the API call: DialogInstance
+m.event.StartCheckedAutomatedDialogImmediate = function(dialog, options, initiator, ...)
+    if options.waitForCompletion == true then
+        DebugLogCritical("StartCheckedAutomatedDialogImmediate does not support waitForCompletion. Dialog: [1]",
+            tostring(dialog.Guid))
+    end
+
+    local speakers = this.Inner_PrepareSpeakerList(...)
+    local opt = this.Inner_GetBaseOptions(options)
+
+    if (opt.allowNilSpeakers or (initiator ~= nil)) and ((initiator == nil) or this.IsSpeakerAvailable(initiator, opt.ignoreCower)) then
+        -- don't check other speakers if there's a fallback dialog
+        if not this.AreSpeakersAvailableAndNear(initiator, opt.maxDistance, opt.checkSight, opt.ignoreCower, opt.allowNilSpeakers, speakers) then
+            if (options.fallbackSoloDialog ~= nil) and (initiator ~= nil) then
+                dialog = options.fallbackSoloDialog
+                speakers = {n = 0}
+            else
+                return
+            end
+        end
+        --
+        -- waitForCompletion doesn't make sense, cause we have no way to know if the dialog failed to start
+        --
+        -- if opt.waitForCompletion then
+        --     SetUnicastEntityEvent(initiator, "WaitOnDialogEnd", dialog.Guid)
+        --     this.Inner_SendWaitOnDialog(speakers, dialog.Guid)
+        -- end
+
+        local result = StartAutomatedDialogImmediate(dialog, initiator, table.unpack(speakers, 1, speakers.n))
+
+        -- if opt.waitForCompletion and result == nil then
+        --     SetUnicastEntityEvent(initiator, "StopWaitOnDialogEnd")
+        --     this.Inner_StopWaitOnDialog(speakers)
+        -- end
+        return result
+    end
+    return false
+end
+
+-- Starts synchronous rated Automated Dialog call with speaker checks. Consecutive calls will return
+--   error.RateLimitedAutomatedDialogError.ToEarly if less than options.minDelay has passed since previous call
+-- @param dialog Dialog object for the Automated dialog
+-- @param options Options table, see Inner_GetBaseOptions for more details
+-- @param initiator Main speaker for distance and sight checks
+-- @param ... List of extra speakers comma separated or packed in a table
+-- @return nil if speakers are not available and there's no fallback dialog provided
+-- @return Otherwise one of error.RateLimitedAutomatedDialogError enum values:
+-- @return None, DialogFailedToStart, TooEarly, NoSpeakersAvailable
+m.action.StartCheckedAutomatedDialogRateLimited = function(dialog, options, initiator, ...)
+    local speakers = this.Inner_PrepareSpeakerList(...)
+    local opt = this.Inner_GetBaseOptions(options)
+    -- options.minDelay MUST be provided (otherwise, use another call)
+    -- options.cullingDistance is optional, defaults to 5.0
+    -- options.fallbackSoloDialog is optional, defaults to nil
+
+    if (opt.allowNilSpeakers or (initiator ~= nil)) and
+       ((initiator == nil) or
+        this.IsSpeakerAvailable(initiator, opt.ignoreCower)) then
+        -- don't check other speakers if there's a fallback dialog
+        if not this.AreSpeakersAvailableAndNear(initiator, opt.maxDistance, opt.checkSight, opt.ignoreCower,
+            opt.allowNilSpeakers, speakers) then
+            if (options.fallbackSoloDialog ~= nil) and
+               (initiator ~= nil) then
+
+                dialog = options.fallbackSoloDialog
+                speakers = {n = 0}
+            else
+                return
+            end
+        end
+
+        if opt.waitForCompletion then
+            this.Inner_SendWaitOnDialog(speakers, dialog.Guid)
+        end
+
+        local result = StartAutomatedDialogRateLimited(
+            dialog,
+            opt.minDelay,
+            opt.cullingDistance,
+            opt.waitForCompletion,
+            initiator,
+            table.unpack(speakers, 1, speakers.n))
+
+        if opt.waitForCompletion and result ~= error.RateLimitedAutomatedDialogError.None then
+            this.Inner_StopWaitOnDialog(speakers)
+        end
+        return result
+    end
+    return false
+end
+
+-- Starts immediate (non waiting) rated Automated Dialog call with speaker checks. Consecutive calls will return
+--   error.RateLimitedAutomatedDialogError.ToEarly if less than options.minDelay has passed since previous call
+-- @param dialog Dialog object for the Automated dialog
+-- @param options Options table, see Inner_GetBaseOptions for more details
+-- @param initiator Main speaker for distance and sight checks
+-- @param ... List of extra speakers comma separated or packed in a table
+-- @return nil if speakers are not available and there's no fallback dialog provided
+-- @return Otherwise one of error.RateLimitedAutomatedDialogError enum values:
+-- @return None, DialogFailedToStart, TooEarly, NoSpeakersAvailable
+m.event.StartCheckedAutomatedDialogRateLimitedImmediate = function(dialog, options, initiator, ...)
+    if options.waitForCompletion == true then
+        DebugLogCritical("StartCheckedAutomatedDialogRateLimitedImmediate does not support waitForCompletion. Dialog: [1]",
+            tostring(dialog.Guid))
+    end
+
+    local speakers = this.Inner_PrepareSpeakerList(...)
+    local opt = this.Inner_GetBaseOptions(options)
+    -- options.minDelay MUST be provided (otherwise, use another call)
+    -- options.cullingDistance is optional, defaults to 5.0
+
+    if (opt.allowNilSpeakers or (initiator ~= nil)) and
+       ((initiator == nil) or
+        this.IsSpeakerAvailable(initiator, opt.ignoreCower)) then
+        -- don't check other speakers if there's a fallback dialog
+        if not this.AreSpeakersAvailableAndNear(initiator, opt.maxDistance, opt.checkSight, opt.ignoreCower,
+            opt.allowNilSpeakers, speakers) then
+            if (options.fallbackSoloDialog ~= nil) and
+               (initiator ~= nil) then
+                dialog = options.fallbackSoloDialog
+                speakers = {n = 0}
+            else
+                return false
+            end
+        end
+
+        --
+        -- waitForCompletion doesn't make sense, cause we have no way to know if the dialog failed to start
+        --
+        -- if opt.waitForCompletion then
+        --     SetUnicastEntityEvent(initiator, "WaitOnDialogEnd", dialog.Guid)
+        --     this.Inner_SendWaitOnDialog(speakers, dialog.Guid)
+        -- end
+
+        StartAutomatedDialogRateLimitedImmediate(
+            dialog,
+            opt.minDelay,
+            opt.cullingDistance,
+            initiator,
+            table.unpack(speakers, 1, speakers.n))
+        return true
+    end
+    return false
+end
+
+return m

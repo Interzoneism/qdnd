@@ -1,0 +1,18 @@
+game.configs.PlayAnimation = Config{
+    params={
+        Animation = {
+            type = EParamType.String,
+            help = [[Animation to play.]],
+            required = true,
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.PlayAnimation,
+            Animation = params.Animation
+        },
+    },
+    inputs={
+        PlayAnimation=ExtSocket{description=[[Play the Animation]],{SocketRef{[[root.logic.inputs.PlayAnimation]]}}},
+        StopAnimation=ExtSocket{description=[[Stop the animation (if it was a looping one)]],{SocketRef{[[root.logic.inputs.StopAnimation]]}}},
+    }
+}

@@ -1,0 +1,47 @@
+game.states.FTBTrigger = State{
+    function()
+
+        params.OneShot = {
+            type = EParamType.Bool,
+            help = [[Does it turn on only once, or every time?]],
+            default = true
+        }
+
+        inputs.FTBOn = {help = [[Disable trigger events]]}
+        inputs.FTBOff = {help = [[Disable trigger events]]}
+
+        socketEvents.FTBOn = function(ev)
+            if (not params.OneShot and
+                me.Blackboard.GetFact("Cnst.FTBTrigger.Triggered") == 0) or
+               me.Blackboard.GetFact("Cnst.FTBTrigger.Triggered") == nil then
+                me.Blackboard.SetFact("Cnst.FTBTrigger.Triggered", 1)
+                local triggerEntities = TriggerGetRegisteredEntitiesInside(me.Trigger)
+                if triggerEntities ~= nil then
+                    for _, entity in pairs(triggerEntities) do
+                        if entity.IsCharacter and
+                           entity.Character.IsPartyMember then
+                            ForceTurnBasedMode(entity, true)
+                        end
+                    end
+                end
+            end
+        end
+
+        socketEvents.FTBOff = function(ev)
+            if not params.OneShot or
+               me.Blackboard.GetFact("Cnst.FTBTrigger.Triggered") == nil or
+               me.Blackboard.GetFact("Cnst.FTBTrigger.Triggered") == 1 then
+                me.Blackboard.SetFact("Cnst.FTBTrigger.Triggered", 0)
+                local triggerEntities = TriggerGetRegisteredEntitiesInside(me.Trigger)
+                if triggerEntities ~= nil then
+                    for _, entity in pairs(triggerEntities) do
+                        if entity.IsCharacter and
+                           entity.Character.IsPartyMember then
+                            ForceTurnBasedMode(entity, false)
+                        end
+                    end
+                end
+            end
+        end
+    end
+}

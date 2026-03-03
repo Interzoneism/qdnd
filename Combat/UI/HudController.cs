@@ -1074,10 +1074,7 @@ void fragment() {
 
             if (_concentrationIcon != null)
             {
-                if (!string.IsNullOrWhiteSpace(action.Icon) && ResourceLoader.Exists(action.Icon))
-                    _concentrationIcon.Texture = GD.Load<Texture2D>(action.Icon);
-                else
-                    _concentrationIcon.Texture = null;
+                _concentrationIcon.Texture = HudIcons.LoadTextureSafe(action.Icon);
             }
 
             string tooltip = action.Name ?? info.ActionId;
@@ -2067,11 +2064,9 @@ void fragment() {
             _tooltipDesc.Text = "";
             _tooltipDesc.AppendText(action.Description ?? "No description available.");
 
-            if (!string.IsNullOrEmpty(action.IconPath) && action.IconPath.StartsWith("res://"))
+            if (!string.IsNullOrEmpty(action.IconPath))
             {
-                var tex = ResourceLoader.Exists(action.IconPath)
-                    ? ResourceLoader.Load<Texture2D>(action.IconPath)
-                    : null;
+                var tex = HudIcons.LoadTextureSafe(action.IconPath);
                 _tooltipIcon.Texture = tex;
                 _tooltipIcon.Visible = tex != null;
             }
@@ -2514,10 +2509,9 @@ void fragment() {
                     conditionBox.AddThemeConstantOverride("separation", 2);
                     conditionBox.MouseFilter = MouseFilterEnum.Ignore;
 
-                    if (!string.IsNullOrWhiteSpace(status.Definition.Icon) &&
-                        ResourceLoader.Exists(status.Definition.Icon))
+                    if (!string.IsNullOrWhiteSpace(status.Definition.Icon))
                     {
-                        var iconTex = ResourceLoader.Load<Texture2D>(status.Definition.Icon);
+                        var iconTex = HudIcons.LoadTextureSafe(status.Definition.Icon);
                         if (iconTex != null)
                         {
                             var iconRect = new TextureRect();
@@ -2571,8 +2565,8 @@ void fragment() {
 
             // Load action icon at 50% size (24×24 instead of 48×48)
             _hoverActionIcon.Texture = null;
-            if (!string.IsNullOrWhiteSpace(action.Icon) && ResourceLoader.Exists(action.Icon))
-                _hoverActionIcon.Texture = ResourceLoader.Load<Texture2D>(action.Icon);
+            if (!string.IsNullOrWhiteSpace(action.Icon))
+                _hoverActionIcon.Texture = HudIcons.LoadTextureSafe(action.Icon);
 
             string chanceText = "";
             if (action.AttackType.HasValue)

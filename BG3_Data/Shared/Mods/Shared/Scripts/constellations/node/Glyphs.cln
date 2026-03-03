@@ -1,0 +1,852 @@
+game.states.GenericGlyph = State{
+    function()
+
+        params.DC = {
+            type = EParamType.String,
+            help = [[Perception check DC.]],
+            required = false,
+            default = [[DC_Legacy_15_bddbb9b8-a242-4c3e-a2eb-3fd274c0c539]]
+        }
+
+        params.EntityFilter = {
+            type = EParamType.String,
+            help = [[Types of Entities to check for. Options:
+            All - check for any kind of entities on the glyph
+            Characters - only check for characters on the glyph
+            Items - only check for items on the glyp]],
+            required = false,
+            default = [[All]]
+        }
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            help = [[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]],
+            required = false,
+            default = 6
+        }
+
+        params.OneShot = {
+            type = EParamType.Bool,
+            help = [[The glyph activates only the first time on entry]],
+            required = false,
+            default = false
+        }
+
+        params.PerceptionSkill = {
+            type = EParamType.String,
+            help = [[The skill checked to detect the glyph.]],
+            required = false,
+            default = [[Investigation]]
+        }
+
+        params.PerceptionType = {
+            type = EParamType.String,
+            help = [[Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[Invisible]]
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when trap is turned off]],
+            required = false,
+            default = [[PUZ_Trap_Magical_Off]]
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when glyph is enabled]],
+            required = false,
+            default = [[PUZ_Trap_Magical_On]]
+        }
+
+        params.SoundWhenTriggered = {
+            type = EParamType.String,
+            help = [[Sound to play when the glyph triggers due to someone stepping on it/an item falls on it.]],
+            required = false
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the glyph start on?]],
+            required = false,
+            default = true
+        }
+
+        params.VFXOff = {
+            type = EParamType.String,
+            help = [[VFX while the glyph is disabled and has been spotted.]],
+            required = false,
+            default = [[]]
+        }
+
+        params.VFXOffBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOff' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        }
+
+        params.VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while the glyph is enabled and has been spotted.]],
+            required = false,
+            default = [[VFX_Script_Trap_Overlay_Red_01_a7361f25-e942-e071-7ce3-7a8182f4e0ef]]
+        }
+
+        params.VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOn' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        }
+
+        params.VFXWhenTriggered = {
+            type = EParamType.String,
+            help = [[VFX to play when the glyph triggers due to someone stepping on it/an item falls on it.]],
+            required = false
+        }
+
+        params.GlyphRadius = {
+            type = EParamType.Number,
+            help = [[Circular radius of the glyph (limited by standing bounds), -1.0 to disable and use standing bounds without limit.]],
+            default = 4.0
+        }
+
+        params.DestroyOnDisarm = {
+            type=EParamType.Bool,
+            default = true,
+            help = "Does the item break on Disarm?"
+        }
+
+        inputs.Enable = {help = [[Turn glyph on (item usage is always possible, if it has a use action)]]}
+        inputs.Disable = {help = [[Turn glyph off (item usage is always possible, if it has a use action)]]}
+
+        outputs.Enable = {internal = true}
+        outputs.Disable = {internal = true}
+        outputs.Disarm = {internal = true}
+
+        inputs.Reveal = {help = [[Reveals the glyph]]}
+        outputs.Reveal = {internal = true}
+
+        inputs.DisarmFailed = {internal = true}
+        outputs.DisarmFailed = {help = [[Disarm attempt failed]]}
+
+        outputs.TryActivate = {internal = true}
+        inputs.Activate = {internal = true}
+
+        inputs.NewEntityOnTop = {internal = true}
+        outputs.NewEntityOnTop = {help = [[A new entity was detected on the glyph]]}
+
+        inputs.Disarmed = {internal = true}
+
+        nodes.PerceptionDisarmOnOff = Proxy{
+            game.states.PerceptionDisarmOnOff,
+            params = {
+                StartEnabled = params.StartEnabled,
+                DC = params.DC,
+                MinDistance = params.MinDistance,
+                Skill = params.PerceptionSkill,
+                Type = params.PerceptionType,
+                VFXOn= params.VFXOn,
+                VFXOff = params.VFXOff,
+                VFXOnBone = params.VFXOnBone,
+                VFXOffBone = params.VFXOffBone,
+                IsTrap = true,
+                SoundOn = params.SoundOn,
+                SoundOff = params.SoundOff,
+                DestroyOnDisarm = params.DestroyOnDisarm
+            },
+            inputs = {
+                TryActivate = {outputs.TryActivate},
+                Enable = {outputs.Enable},
+                Disable = {outputs.Disable},
+                Reveal = {outputs.Reveal},
+                Disarm = {outputs.Disarm}
+            },
+            outputs = {
+                Activate = {inputs.Activate},
+                Disarmed = {inputs.Disarmed},
+                DisarmFailed = {inputs.DisarmFailed}
+            }
+        }
+
+        nodes.OnTopTrigger = Proxy{
+            game.states.OnTopTrigger,
+            params =
+            {
+                EntityFilter = params.EntityFilter,
+                MaxDistanceFromCentre = params.GlyphRadius
+            },
+            outputs =
+            {
+                NewEntityOnTop = {inputs.NewEntityOnTop}
+            }
+        }
+
+        helpers.Activate = function(Object, Param)
+            TriggerOutput(outputs.Reveal, Object, true)
+            if params.OneShot then
+                TriggerOutput(outputs.Disarm, Object, Param)
+                -- also switch off the VFX overlay, if any
+                TriggerOutput(outputs.Disable, Object, Param)
+            end
+        end
+
+        socketEvents.Activate = function(ev)
+            TriggerOutput(outputs.NewEntityOnTop, ev.Object, ev.Param)
+            helpers.Activate(ev.Object, ev.Param)
+        end
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.Enable, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disarmed = function(ev)
+            Die(me, DeathType.LIFETIME, Entity(ev.Object))
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.Disable, ev.Object, ev.Param)
+        end
+
+        socketEvents.DisarmFailed = function(ev)
+            helpers.Activate(ev.Object, ev.Param)
+            TriggerOutput(outputs.DisarmFailed, ev.Object, ev.Param)
+        end
+
+        socketEvents.Reveal = function(ev)
+            TriggerOutput(outputs.Reveal, ev.Object, ev.Param)
+        end
+
+        events.ArmedTrapUsed = function(ev)
+            TriggerOutput(outputs.TryActivate, ev.User.EntityRef)
+        end
+
+        socketEvents.NewEntityOnTop = function(ev)
+            TriggerOutput(outputs.TryActivate, ev.Object, ev.Param)
+        end
+
+    end
+
+}
+
+
+game.states.OnTopTrigger = State{
+    function()
+
+        modules = {"shared.items", "shared.util"}
+
+        params.EntityFilter = {
+            type = EParamType.String,
+            help = [[Types of Entities to check for. Options:
+            All - check for any kind of entities on the glyph
+            Characters - only check for characters on the glyph
+            Items - only check for items on the glyp]],
+            default = [[All]]
+        }
+
+        params.CheckInterval = {
+            type = EParamType.Number,
+            default = 0.5,
+            help = "Interval between checking whether something new is on top"
+        }
+
+        params.MaxDistanceFromCentre = {
+            type = EParamType.Number,
+            required = false,
+            default = -1.0,
+            help = "Maximum distance from centre of object to count as 'on the object'. Negative means no limit (apart from the bounds)."
+        }
+
+        params.TargetEntity = {type = EParamType.String, default = "me", help = "Object on which the weight is checked."}
+
+        outputs.NewEntityOnTop = {help = "A new entity is on top"}
+
+        outputs.EntityOnTopUpdate = {help = "An existing entity on top gets a timer tick"}
+
+        inputs.Deactivate = {help = [[Stop the on top checks]]}
+
+        local previousEntities = {}
+
+        helpers.Deactivate = function()
+            me.Blackboard.SetFact("Cnst.OnTopTrigger.ManuallyDeactivated", 1)
+            mod.util.ClearTableOnBlackboard(me, "Cnst.OnTopTrigger.PreviousEntities")
+            StopTimer(me.Blackboard.GetFact("TargetEntity"), "Cnst.OnTopTrigger.OnTopCheck")
+            me.Blackboard.ClearFact("Cnst.OnTopTrigger.TimerRunning")
+        end
+
+        helpers.Init = function(stopTimer)
+            local targetEntity
+
+            if me.Blackboard.GetFact("Cnst.OnTopTrigger.ManuallyDeactivated") == 1 then
+                return
+            end
+
+            if params.TargetEntity == "me" then
+                targetEntity = me
+            else
+                targetEntity = FindEntity(params.TargetEntity)
+            end
+            me.Blackboard.SetFact("TargetEntity", targetEntity)
+
+            if stopTimer then
+                StopTimer(targetEntity, "Cnst.OnTopTrigger.OnTopCheck")
+            end
+
+            StartRealtimeTimer(targetEntity, "Cnst.OnTopTrigger.OnTopCheck", params.CheckInterval, -1.0)
+            me.Blackboard.SetFact("Cnst.OnTopTrigger.TimerRunning", 1)
+        end
+
+        self.OnEditorChanges = function()
+            helpers.Init(true)
+            me.Blackboard.ClearFact("Cnst.OnTopTrigger.ManuallyDeactivated")
+            mod.util.ClearTableOnBlackboard(me.Blackboard.GetFact("TargetEntity"), "Cnst.OnTopTrigger.PreviousEntities")
+            previousEntities = {}
+        end
+
+        self.OnInit = function()
+            if me.Blackboard.GetFact("Cnst.OnTopTrigger.TimerRunning") ~= nil then
+                return
+            end
+
+            helpers.Init(false)
+        end
+
+        self.OnLoaded = function()
+            if me.Blackboard.GetFact("Cnst.OnTopTrigger.ManuallyDeactivated") == 1 then
+                return
+            end
+
+            local targetEntity = me.Blackboard.GetFact("TargetEntity")
+            if not mod.items.SafeIsDestroyed(targetEntity) then
+                previousEntities =
+                    mod.util.LoadTableFromBlackboard(
+                        targetEntity,
+                        "Cnst.OnTopTrigger.PreviousEntities",
+                        function(val) return (val == 0) and false or true end
+                    )
+            end
+        end
+
+        events.TimerFinished = function(ev)
+            if ev.TimerName == "Cnst.OnTopTrigger.OnTopCheck" then
+                local targetEntity = me.Blackboard.GetFact("TargetEntity")
+                if not mod.items.SafeIsDestroyed(targetEntity) then
+--                    DebugText(targetEntity, "Checking entities")
+                    local entities = GetEntitiesOn(targetEntity)
+                    local newEntities = {}
+                    mod.util.ClearTableOnBlackboard(me, "Cnst.OnTopTrigger.PreviousEntities")
+                    for _, entity in pairs(entities) do
+--                        DebugText(targetEntity, "Checking entity [1]", entity.Name)
+                        if ((params.EntityFilter == "All") or
+                              ((params.EntityFilter == "Characters") and
+                              entity.IsCharacter) or
+                              ((params.EntityFilter == "Items") and
+                              entity.IsItem)) and
+                              ((params.MaxDistanceFromCentre < 0) or
+                              (GetDistance2DTo(targetEntity, entity) <= params.MaxDistanceFromCentre)) then
+                            newEntities[entity.UUID.String] = true
+                            if not previousEntities[entity.UUID.String] then 
+--                                DebugText(targetEntity, "Triggering output for [1]", entity.Name)
+                                TriggerOutput(outputs.NewEntityOnTop, entity.EntityRef, nil)
+                            end
+                            TriggerOutput(outputs.EntityOnTopUpdate, entity.EntityRef, nil)
+                            mod.util.SetTableMapEntryOnBlackboard(me, "Cnst.OnTopTrigger.PreviousEntities", entity.UUID.String, 1)
+                        end
+                    end
+                    previousEntities = newEntities
+                else
+                    helpers.Deactivate()
+                end
+            end
+        end
+
+        socketEvents.Deactivate = function(ev)
+            helpers.Deactivate()
+        end
+
+    end
+}
+
+game.states.TeleportGlyph = State{
+    function()
+
+        -- Glyph parameters
+        params.DC = {
+            type = EParamType.String,
+            help = [[Perception check DC.]],
+            required = false,
+            default = [[DC_Legacy_15_bddbb9b8-a242-4c3e-a2eb-3fd274c0c539]]
+        }
+
+        params.EntityFilter = {
+            type = EParamType.String,
+            help = [[Types of Entities to check for. Options:
+            All - check for any kind of entities on the glyph
+            Characters - only check for characters on the glyph
+            Items - only check for items on the glyp]],
+            required = false,
+            default = [[All]]
+        }
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            help = [[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]],
+            required = false,
+            default = 6
+        }
+
+        params.OneShot = {
+            type = EParamType.Bool,
+            help = [[The glyph activates only the first time on entry]],
+            required = false,
+            default = true
+        }
+
+        params.PerceptionSkill = {
+            type = EParamType.String,
+            help = [[The skill checked to detect the glyph.]],
+            required = false,
+            default = [[Investigation]]
+        }
+
+        params.PerceptionType = {
+            type = EParamType.String,
+            help = [[Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[Invisible]]
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when trap is turned off]],
+            required = false,
+            default = [[PUZ_Trap_Magical_Off]]
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when glyph is enabled]],
+            required = false,
+            default = [[PUZ_Trap_Magical_On]]
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the glyph start on?]],
+            required = false,
+            default = true
+        }
+
+        params.VFXOff = {
+            type = EParamType.String,
+            help = [[VFX while the glyph is disabled and has been spotted.]],
+            required = false,
+            default = [[]]
+        }
+
+        params.VFXOffBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOff' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        }
+
+        params.VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while the glyph is enabled and has been spotted.]],
+            required = false,
+            default = [[VFX_Script_Trap_Overlay_Red_01_a7361f25-e942-e071-7ce3-7a8182f4e0ef]]
+        }
+
+        params.VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOn' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        }
+
+        -- Teleport parameters
+        params.TeleportTarget = {
+            type = EParamType.String,
+            required = true,
+            help = [[The target to which to teleport the source]]
+        }
+
+        params.TeleportLinkedCharacters = {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Teleport player characters linked to the source]]
+        }
+
+        params.TeleportPartyFollowers = {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Teleport party followers of the source or of teleported characters linked to the source]]
+        }
+
+        params.TeleportSummons = {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Teleport summons of the source or of teleported characters linked to the source]]
+        }
+
+        params.LeaveCombat = {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Teleported characters should leave any combat they are currently in]]
+        }
+
+        params.SourceVFX = {
+            type = EParamType.String,
+            help = [[VFX to play at the source location when teleporting]],
+            required = false
+        }
+
+        params.TargetVFX = {
+            type = EParamType.String,
+            help = [[VFX to play at the target location when teleporting]],
+            required = false
+        }
+
+        params.Sound = {
+            type = EParamType.String,
+            help = [[Sound to play when teleporting]],
+            required = false,
+        }
+
+        params.GlyphRadius = {
+            type = EParamType.Number,
+            help = [[Circular radius of the glyph (limited by standing bounds), -1.0 to disable and use standing bounds without limit.]],
+            default = 4.0
+        }
+
+        params.DestroyOnDisarm = {
+            type=EParamType.Bool,
+            default = true,
+            help = "Does the item break on Disarm?"
+        }
+
+        inputs.Enable = {help = [[Turn glyph on (item usage is always possible, if it has a use action)]]}
+        inputs.Disable = {help = [[Turn glyph off (item usage is always possible, if it has a use action)]]}
+
+        outputs.Enable = {internal = true}
+        outputs.Disable = {internal = true}
+
+        inputs.Reveal = {help = [[Reveals the glyph]]}
+        outputs.Reveal = {internal = true}
+
+        inputs.DisarmFailed = {internal = true}
+        outputs.DisarmFailed = {help = [[Disarm attempt failed]]}
+
+
+        inputs.NewEntityOnTop = {internal = true}
+        outputs.TeleportingEntity = {help = [[Entity is getting teleported by the glyph]]}
+
+        nodes.GenericGlyph = Proxy {
+            game.states.GenericGlyph,
+            params = {
+                DC = params.DC,
+                MinDistance = params.MinDistance,
+                OneShot = params.OneShot,
+                EntityFilter = params.EntityFilter,
+                PerceptionSkill = params.PerceptionSkill,
+                PerceptionType = params.PerceptionType,
+                SoundOff = params.SoundOff,
+                SoundOn = params.SoundOn,
+                -- Use Teleport version
+                -- SoundWhenTriggered = params.SoundWhenTriggered,
+                StartEnabled = params.StartEnabled,
+                VFXOff = params.VFXOff,
+                VFXOffBone = params.VFXOffBone,
+                VFXOn = params.VFXOn,
+                VFXOnBone = params.VFXOnBone,
+                -- Use Teleport version
+                -- VFXWhenTriggered = params.VFXWhenTriggered,
+                GlyphRadius = params.GlyphRadius,
+                DestroyOnDisarm = params.DestroyOnDisarm
+            },
+            inputs = {
+                Enable = {outputs.Enable},
+                Disable = {outputs.Disable},
+                Reveal = {outputs.Reveal}},
+            outputs = {
+                NewEntityOnTop = {inputs.NewEntityOnTop},
+                DisarmFailed = {inputs.DisarmFailed, inputs.NewEntityOnTop}
+            }
+        }
+
+        nodes.TeleportSource = Proxy {
+            game.states.TeleportSource,
+            params = {
+                LeaveCombat = params.LeaveCombat,
+                TeleportLinkedCharacters = params.TeleportLinkedCharacters,
+                TeleportPartyFollowers = params.TeleportPartyFollowers,
+                TeleportSummons = params.TeleportSummons,
+                Target = params.TeleportTarget,
+                SourceVFX = params.SourceVFX,
+                TargetVFX = params.TargetVFX,
+                Sound = params.Sound
+            },
+            inputs = {
+                Teleport = {outputs.TeleportingEntity}
+            }
+        }
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.Enable, ev.Object, ev.Param)
+        end
+
+        socketEvents.Reveal = function(ev)
+            TriggerOutput(outputs.Reveal, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.Disable, ev.Object, ev.Param)
+        end
+
+        socketEvents.NewEntityOnTop = function(ev)
+            TriggerOutput(outputs.TeleportingEntity, ev.Object, ev.Param)
+        end
+
+        socketEvents.DisarmFailed = function(ev)
+            TriggerOutput(outputs.DisarmFailed, ev.Object, ev.Param)
+        end
+
+    end
+}
+
+game.states.ExplodingGlyph = State{
+    function()
+
+        -- Glyph parameters
+        params.DC = {
+            type = EParamType.String,
+            help = [[Perception check DC.]],
+            required = false,
+            default = [[DC_Legacy_15_bddbb9b8-a242-4c3e-a2eb-3fd274c0c539]]
+        }
+
+        params.EntityFilter = {
+            type = EParamType.String,
+            help = [[Types of Entities to check for. Options:
+            All - check for any kind of entities on the glyph
+            Characters - only check for characters on the glyph
+            Items - only check for items on the glyp]],
+            required = false,
+            default = [[All]]
+        }
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            help = [[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]],
+            required = false,
+            default = 6
+        }
+
+        params.PerceptionSkill = {
+            type = EParamType.String,
+            help = [[The skill checked to detect the glyph.]],
+            required = false,
+            default = [[Investigation]]
+        }
+
+        params.PerceptionType = {
+            type = EParamType.String,
+            help = [[Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[Invisible]]
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when trap is turned off]],
+            required = false,
+            default = [[PUZ_Trap_Magical_Off]]
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when glyph is enabled]],
+            required = false,
+            default = [[PUZ_Trap_Magical_On]]
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the glyph start on?]],
+            required = false,
+            default = true
+        }
+
+        params.VFXOff = {
+            type = EParamType.String,
+            help = [[VFX while the glyph is disabled and has been spotted.]],
+            required = false,
+            default = [[]]
+        }
+
+        params.VFXOffBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOff' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        }
+
+        params.VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while the glyph is enabled and has been spotted.]],
+            required = false,
+            default = [[VFX_Script_Trap_Overlay_Red_01_a7361f25-e942-e071-7ce3-7a8182f4e0ef]]
+        }
+
+        params.VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOn' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        }
+
+        -- Explode parameters
+        params.DestroyType = {
+            type = EParamType.String,
+            help = [[Death type to use for the glyph when it explodes]],
+            required = false,
+            default_value_provider = [[deathtype]],
+            default = [[EXPLODE]]
+        }
+
+        params.DestroyProjectileSpell = {
+            type = EParamType.String,
+            help = [[The projectile (if any) that explodes when the glyph destroys itself]],
+            default_value_provider = [[spell_projectile]],
+            required = false
+        }
+
+        --Custom Exploding Glyph parameter
+        params.NotForOwnerAllies = {
+            type = EParamType.Bool,
+            help = [[If set, the glyph will not trigger for allies of its owner.]],
+            required = false,
+            default = true
+        }
+
+        params.GlyphRadius = {
+            type = EParamType.Number,
+            help = [[Circular radius of the glyph (limited by standing bounds), -1.0 to disable and use standing bounds without limit.]],
+            default = 4.0
+        }
+
+        params.DestroyOnDisarm = {
+            type=EParamType.Bool,
+            default = true,
+            help = "Does the item break on Disarm?"
+        }
+
+
+        inputs.Enable = {help = [[Turn glyph on (item usage is always possible, if it has a use action)]]}
+        inputs.Disable = {help = [[Turn glyph off (item usage is always possible, if it has a use action)]]}
+
+        outputs.Enable = {internal = true}
+        outputs.Disable = {internal = true}
+
+        inputs.Reveal = {help = [[Reveals the glyph]]}
+        outputs.Reveal = {internal = true}
+
+        inputs.Explode = {internal = true}
+        outputs.Exploding = {help = [[Glyph is exploding]]}
+
+        nodes.GenericGlyph = Proxy {
+            game.states.GenericGlyph,
+            params = {
+                DC = params.DC,
+                MinDistance = params.MinDistance,
+                EntityFilter = params.EntityFilter,
+                PerceptionSkill = params.PerceptionSkill,
+                PerceptionType = params.PerceptionType,
+                SoundOff = params.SoundOff,
+                SoundOn = params.SoundOn,
+                -- Overridden by explosion
+                -- SoundWhenTriggered = params.SoundWhenTriggered,
+                StartEnabled = params.StartEnabled,
+                VFXOff = params.VFXOff,
+                VFXOffBone = params.VFXOffBone,
+                VFXOn = params.VFXOn,
+                VFXOnBone = params.VFXOnBone,
+                -- Overridden by explosion
+                -- VFXWhenTriggered = params.VFXWhenTriggered,
+                GlyphRadius = params.GlyphRadius,
+                DestroyOnDisarm = params.DestroyOnDisarm
+            },
+            inputs = {
+                Enable = {outputs.Enable},
+                Disable = {outputs.Disable},
+                Reveal = {outputs.Reveal}},
+            outputs = {
+                NewEntityOnTop = {inputs.Explode},
+                DisarmFailed = {inputs.Explode}
+            }
+        }
+
+        nodes.Explode = Proxy {
+            game.states.Explode,
+            params = {
+                TargetEntity = "me",
+                Projectile = params.DestroyProjectileSpell,
+                DestroyType = params.DestroyType
+            },
+            inputs = {
+                Explode = {outputs.Exploding}
+            }
+        }
+
+        helpers.Explode = function(ev)
+            local source = me.Item.Owner
+            if (source ~= nil) then
+                if params.NotForOwnerAllies and
+                   (GetRelation(source.Faction, Entity(ev.Object).Faction) == FactionRelation.Ally) then
+                    return
+                end
+                TriggerOutput(outputs.Exploding, ev.Object, source.EntityRef)
+            else
+                TriggerOutput(outputs.Exploding, ev.Object, me.EntityRef)
+            end
+        end
+
+        socketEvents.Reveal = function(ev)
+            TriggerOutput(outputs.Reveal, ev.Object, ev.Param)
+        end
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.Enable, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.Disable, ev.Object, ev.Param)
+        end
+
+        socketEvents.Explode = function(ev)
+            helpers.Explode(ev)
+        end
+
+    end
+}

@@ -1,0 +1,7 @@
+game.configs.DefaultCrowdCharacter = Config{
+    params={
+    },
+    root=StateRef{game.roots.DefaultCrowdCharacter,
+        combatInSightRange = ExpressionRef{game.expressions.GLO_CombatInSightRange},
+    }
+}

@@ -1,0 +1,88 @@
+game.states.GLO_TimedActions = State{function ()
+
+    description = [[A hub state to run selection of timed actions.
+        Randomly choose among provided nodes.
+        Each action is valid for a set duration of time.
+    ]]
+
+    modules = { "shared.math", "shared.util" }
+
+    params.canRepeat = {type = EParamType.Bool, required = true,
+        help = [[Can reselect same action twice in a row?]]}
+
+    params.duration_01 = {type = EParamType.Number, arrayRange = "2..2",
+        help = [[A range for action's random duration]],
+        required = true}
+    params.action_01 = {type = EParamType.State, required = true}
+
+    params.duration_02 = {type = EParamType.Number, arrayRange = "2..2",
+        default = { 1.0, 2.0 },
+        help = [[A range for action's random duration]]}
+    params.action_02 = {type = EParamType.State, required = false}
+
+    params.duration_03 = {type = EParamType.Number, arrayRange = "2..2",
+        default = { 1.0, 2.0 },
+        help = [[A range for action's random duration]]}
+    params.action_03 = {type = EParamType.State, required = false}
+
+    params.duration_04 = {type = EParamType.Number, arrayRange = "2..2",
+        default = { 1.0, 2.0 },
+        help = [[A range for action's random duration]]}
+    params.action_04 = {type = EParamType.State, required = false}
+
+    local actions = {}
+    local action = "NOACTION"
+    local reselect = true
+
+    self.OnInit = function()
+        actions.Action_01 = params.duration_01
+        if params.action_02 ~= nil then
+            actions.Action_02 = params.duration_02
+        end
+        if params.action_03 ~= nil then
+            actions.Action_03 = params.duration_03
+        end
+        if params.action_04 ~= nil then
+            actions.Action_04 = params.duration_04
+        end
+        reselect = true
+    end
+
+    nodes = Selector{
+        function(nodes)
+            if reselect then
+                reselect = false
+                if params.canRepeat then
+                    action = FindRandomSelectable(nodes).Name
+                else
+                    action = FindDifferentRandomSelectable(nodes).Name
+                end
+                StartTimer(me, "Timer_GLO_TimedActions_Reselect", mod.math.random(actions[action][1], actions[action][2]), 0)
+            end
+            return nodes[action]
+        end
+    }
+
+    nodes.Action_01 = Proxy {
+        params.action_01
+    }
+
+    nodes.Action_02 = Proxy {
+        params.action_02
+    }
+
+    nodes.Action_03 = Proxy {
+        params.action_03
+    }
+
+    nodes.Action_04 = Proxy {
+        params.action_04
+    }
+
+
+    events.TimerFinished = function(ev)
+        if ev.TimerName == "Timer_GLO_TimedActions_Reselect" then
+            reselect = true
+        end
+    end
+end}

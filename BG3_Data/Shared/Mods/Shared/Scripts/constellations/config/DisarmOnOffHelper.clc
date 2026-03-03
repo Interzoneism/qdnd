@@ -1,0 +1,39 @@
+game.configs.DisarmOnOffHelper = Config{
+    params={
+        TargetEntity = {
+            type = EParamType.String,
+            help = [[Object which is (dis)armed.]],
+            required = false,
+        },
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the trap start on?]],
+            required = false,
+            default = true
+        },
+        DestroyOnDisarm = {
+            type = EParamType.Bool,
+            help = [[Does the item break on Disarm?]],
+            required = false,
+            default = true
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.DisarmOnOff,
+            DestroyOnDisarm = params.DestroyOnDisarm,
+            StartEnabled = params.StartEnabled,
+            TargetEntity = params.TargetEntity,
+        },
+    },
+    inputs={
+        TryActivate=ExtSocket{description=[[Trap tries to activate. Is blocked if trap is disarmed.]],{SocketRef{[[root.logic.inputs.TryActivate]]}}},
+        Enable=ExtSocket{description=[[Turns mine on]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+        Disable=ExtSocket{description=[[Turns mine on]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+        Disarm=ExtSocket{description=[[Disarm the object]],{SocketRef{[[root.logic.inputs.Disarm]]}}},
+    },
+    outputs={
+        Activate=ExtSocket{description=[[Trap activates.]],{SocketRef{[[root.logic.outputs.Activate]]}}},
+        Disarmed=ExtSocket{description=[[Object was disarmed.]],{SocketRef{[[root.logic.outputs.Disarmed]]}}},
+        DisarmFailed=ExtSocket{description=[[Attempt to disarm object failed.]],{SocketRef{[[root.logic.outputs.DisarmFailed]]}}},
+    }
+}

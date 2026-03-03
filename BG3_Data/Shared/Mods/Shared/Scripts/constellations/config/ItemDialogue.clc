@@ -1,0 +1,15 @@
+game.configs.ItemDialogue = Config{
+    params={
+        itemDialogue = {
+            type = EParamType.String,
+            help = [[Resource (format: name_GUID) to start]],
+            required = true,
+            default = [[]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.ItemDialogue,
+                itemDialogue = params.itemDialogue,
+        },
+    }
+}

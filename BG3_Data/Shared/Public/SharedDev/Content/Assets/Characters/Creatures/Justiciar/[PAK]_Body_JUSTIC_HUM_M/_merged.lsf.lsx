@@ -1,0 +1,723 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="CharacterVisualBank">
+		<node id="CharacterVisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="BaseVisual" type="FixedString" value="7f4e9396-49a6-dce5-ed35-661edc4ef0f5" />
+					<attribute id="BodySetVisual" type="FixedString" value="0bcb31ed-92a5-1840-b957-8cd37805fe4d" />
+					<attribute id="ID" type="FixedString" value="63a5a6f5-ffc9-0959-8a7c-df111aa93e65" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="JUSTIC_HUM_M_A" />
+					<attribute id="ShowEquipmentVisuals" type="bool" value="False" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725058" />
+					<children>
+						<node id="MaterialOverrides">
+							<attribute id="MaterialResource" type="FixedString" value="" />
+							<children>
+								<node id="ColorPreset">
+									<attribute id="ForcePresetValues" type="bool" value="False" />
+									<attribute id="GroupName" type="FixedString" value="" />
+									<attribute id="MaterialPresetResource" type="FixedString" value="" />
+								</node>
+								<node id="MaterialPresets" />
+								<node id="Vector3Parameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="Metal_Primary" />
+									<attribute id="Value" type="fvec3" value="0.8122415 0.8122415 0.8122415" />
+								</node>
+								<node id="Vector3Parameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="Metal_Secondary" />
+									<attribute id="Value" type="fvec3" value="0.93227684 0.4936162 0.3537409" />
+								</node>
+								<node id="Vector3Parameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="Metal_Tertiary" />
+									<attribute id="Value" type="fvec3" value="0.7299189 0.7299189 0.7299189" />
+								</node>
+							</children>
+						</node>
+						<node id="RealMaterialOverrides" />
+						<node id="Slots">
+							<attribute id="Bone" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="Footwear" />
+							<attribute id="VisualResource" type="FixedString" value="7f8e5551-e2e1-4776-af32-1bc586c5177b" />
+						</node>
+						<node id="Slots">
+							<attribute id="Bone" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="Gloves" />
+							<attribute id="VisualResource" type="FixedString" value="a9f8183c-e4f6-172a-c2b3-7dfc1ead80b2" />
+						</node>
+						<node id="Slots">
+							<attribute id="Bone" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="Body" />
+							<attribute id="VisualResource" type="FixedString" value="f93def09-d18b-d797-db76-048445792554" />
+						</node>
+						<node id="Slots">
+							<attribute id="Bone" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="Body" />
+							<attribute id="VisualResource" type="FixedString" value="5d803eed-6d35-af82-5aac-4b90d18120f1" />
+						</node>
+						<node id="Slots">
+							<attribute id="Bone" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="Body" />
+							<attribute id="VisualResource" type="FixedString" value="891f3b83-1ee6-81f6-5987-5984e0dfbc65" />
+						</node>
+						<node id="Slots">
+							<attribute id="Bone" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="Headwear" />
+							<attribute id="VisualResource" type="FixedString" value="77819cfc-c181-4d9f-ec84-d8eb615a225c" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationSetBank">
+		<node id="AnimationSetBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="63a09ae9-4ef0-b4d8-8171-a284c7b63758" />
+					<attribute id="Name" type="LSString" value="JUSTIC_HUM_M_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725669" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="FallBackAnimation" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets">
+											<children>
+												<node id="Object">
+													<attribute id="FallBackSubSet" type="FixedString" value="" />
+													<attribute id="MapKey" type="FixedString" value="" />
+													<children>
+														<node id="Animation">
+															<children>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="36b418a0-0f93-8d24-0b33-0976405c8c9e" />
+																	<attribute id="MapKey" type="FixedString" value="07eda68b-86c6-4c20-91f3-d6f9dd75d498" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="cf15a311-d7f8-77c0-9bb5-ab06038ccada" />
+																	<attribute id="MapKey" type="FixedString" value="1ff4d787-6f6e-44e2-94cd-0fba868ffe43" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="15b521e6-b6bd-4e51-4c4d-d5f664d5989a" />
+																	<attribute id="MapKey" type="FixedString" value="d9a28f36-9144-437a-a20b-56e9a3fabfdd" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="58afe335-4cfb-8189-3b85-f2eaa1761464" />
+																	<attribute id="MapKey" type="FixedString" value="1b4e6cc3-de1e-46f1-9757-4a0bb4748c69" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="fb8f9109-9a29-014e-2b0e-0bb4ff844988" />
+																	<attribute id="MapKey" type="FixedString" value="c004d63e-8906-4668-9fe3-ccffc87665ee" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="3c5b9156-3b9b-64e1-3b2c-38e394c3ea2a" />
+																	<attribute id="MapKey" type="FixedString" value="dec714b1-9cb6-482a-866c-7e853d164680" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="a6e38efe-e5a8-dc76-2505-865ef9765032" />
+																	<attribute id="MapKey" type="FixedString" value="510ff37e-0618-40e4-8ce0-236e3dc9c291" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="112a9049-56b5-b5a2-5ca2-59ae1c714c0e" />
+																	<attribute id="MapKey" type="FixedString" value="a11e38d7-0165-4736-8d6b-4ee6edcd4406" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="aa74a47b-1f86-fc51-2974-1a6307b11b8f" />
+																	<attribute id="MapKey" type="FixedString" value="f84f79b5-db4a-46f4-9a9f-c65d89ede3bb" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c18d697a-ffcc-0599-136d-2e8781d5c56d" />
+																	<attribute id="MapKey" type="FixedString" value="d26fdff7-3cfb-42f3-a129-af7f06385402" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationBank">
+		<node id="AnimationBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.6333334" />
+					<attribute id="ID" type="FixedString" value="112a9049-56b5-b5a2-5ca2-59ae1c714c0e" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_UntenableSecret_01_Attack" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="0c439477-e60e-2dad-c8b4-fdd393ae092c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="044ab023-7076-77e6-73c2-d0f26fca0776" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_UntenableSecret_01_Attack.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_UntenableSecret_01_Attack.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_L" />
+							<attribute id="Length" type="float" value="0.16666667" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.033333335" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="React" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="15" />
+							<attribute id="Time" type="float" value="0.21913834" />
+							<attribute id="Track" type="uint8" value="2" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Whoosh_Combat" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="1" />
+							<attribute id="Time" type="float" value="0.29387757" />
+							<attribute id="Track" type="uint8" value="3" />
+							<children>
+								<node id="Properties">
+									<attribute id="Resource" type="FixedString" value="726624f9-f7e5-42ff-ccf7-061a84f6237d" />
+									<attribute id="SoundObjectIndex" type="uint8" value="1" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Vocal_Attack" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="13" />
+							<attribute id="Time" type="float" value="0.34467122" />
+							<attribute id="Track" type="uint8" value="4" />
+							<children>
+								<node id="Properties">
+									<attribute id="EVocalType" type="uint8" value="1" />
+									<attribute id="Resource" type="FixedString" value="" />
+									<attribute id="SoundObjectIndex" type="uint8" value="4" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Cast" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="8" />
+							<attribute id="Time" type="float" value="0.4230386" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.3" />
+					<attribute id="ID" type="FixedString" value="15b521e6-b6bd-4e51-4c4d-d5f664d5989a" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_BeckoningDarkness_01_Dash" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="0c439477-e60e-2dad-c8b4-fdd393ae092c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="044ab023-7076-77e6-73c2-d0f26fca0776" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_BeckoningDarkness_01_Dash.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_BeckoningDarkness_01_Dash.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.33333334" />
+					<attribute id="ID" type="FixedString" value="1654121b-cb21-db85-c018-03e4df7d72cc" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_UntenableSecret_01_Dash" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="0c439477-e60e-2dad-c8b4-fdd393ae092c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="044ab023-7076-77e6-73c2-d0f26fca0776" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_UntenableSecret_01_Dash.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_UntenableSecret_01_Dash.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_R" />
+							<attribute id="Length" type="float" value="0.10000001" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.23333333" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.5666667" />
+					<attribute id="ID" type="FixedString" value="36b418a0-0f93-8d24-0b33-0976405c8c9e" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_BeckoningDarkness_01_Prepare" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="0c439477-e60e-2dad-c8b4-fdd393ae092c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="044ab023-7076-77e6-73c2-d0f26fca0776" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_BeckoningDarkness_01_Prepare.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_BeckoningDarkness_01_Prepare.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.6333334" />
+					<attribute id="ID" type="FixedString" value="3c5b9156-3b9b-64e1-3b2c-38e394c3ea2a" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_BeckoningDarkness_01_Antic" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="0c439477-e60e-2dad-c8b4-fdd393ae092c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="044ab023-7076-77e6-73c2-d0f26fca0776" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_BeckoningDarkness_01_Antic.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_BeckoningDarkness_01_Antic.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="5.0000005" />
+					<attribute id="ID" type="FixedString" value="58afe335-4cfb-8189-3b85-f2eaa1761464" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_BeckoningDarkness_01_Loop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="0c439477-e60e-2dad-c8b4-fdd393ae092c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="044ab023-7076-77e6-73c2-d0f26fca0776" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_BeckoningDarkness_01_Loop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_BeckoningDarkness_01_Loop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4.6000004" />
+					<attribute id="ID" type="FixedString" value="a6e38efe-e5a8-dc76-2505-865ef9765032" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="JUSTIC_HUM_M_Rig_DFLT_UTIL_Spawn_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="0c439477-e60e-2dad-c8b4-fdd393ae092c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="044ab023-7076-77e6-73c2-d0f26fca0776" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_UTIL_Spawn_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_UTIL_Spawn_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="SpawnBodyFX" />
+							<attribute id="Length" type="float" value="0.02" />
+							<attribute id="TextKeyType" type="uint8" value="2" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="2" />
+							<children>
+								<node id="Properties">
+									<attribute id="Bone" type="FixedString" value="Dummy_Root" />
+									<attribute id="Effect" type="FixedString" value="VFX_Script_Shadowquake_Spawn_01" />
+									<attribute id="HardAttach" type="bool" value="True" />
+									<attribute id="InterruptLoopAtEnd" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_L" />
+							<attribute id="Length" type="float" value="2.6333332" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="1.9666667" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_R" />
+							<attribute id="Length" type="float" value="0.20000005" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="2.0666666" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_R" />
+							<attribute id="Length" type="float" value="2.1999998" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="2.4" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.6666667" />
+					<attribute id="ID" type="FixedString" value="aa74a47b-1f86-fc51-2974-1a6307b11b8f" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_BeckoningDarkness_01_Attack" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="0c439477-e60e-2dad-c8b4-fdd393ae092c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="044ab023-7076-77e6-73c2-d0f26fca0776" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_BeckoningDarkness_01_Attack.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_BeckoningDarkness_01_Attack.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Vocal_Attack" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="13" />
+							<attribute id="Time" type="float" value="0.5093878" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="EVocalType" type="uint8" value="1" />
+									<attribute id="Resource" type="FixedString" value="" />
+									<attribute id="SoundObjectIndex" type="uint8" value="4" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="React" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="15" />
+							<attribute id="Time" type="float" value="0.90702957" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Cast" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="8" />
+							<attribute id="Time" type="float" value="1.044898" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.4000001" />
+					<attribute id="ID" type="FixedString" value="c18d697a-ffcc-0599-136d-2e8781d5c56d" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_BeckoningDarkness_01_Recover" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="0c439477-e60e-2dad-c8b4-fdd393ae092c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="044ab023-7076-77e6-73c2-d0f26fca0776" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_BeckoningDarkness_01_Recover.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_BeckoningDarkness_01_Recover.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_L" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.50793654" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Footstep_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.8896146" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.26666668" />
+					<attribute id="ID" type="FixedString" value="cf15a311-d7f8-77c0-9bb5-ab06038ccada" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_UntenableSecret_01_Antic" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="0c439477-e60e-2dad-c8b4-fdd393ae092c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="044ab023-7076-77e6-73c2-d0f26fca0776" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_UntenableSecret_01_Antic.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_UntenableSecret_01_Antic.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1" />
+					<attribute id="ID" type="FixedString" value="fb8f9109-9a29-014e-2b0e-0bb4ff844988" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_UntenableSecret_01_Recover" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="0c439477-e60e-2dad-c8b4-fdd393ae092c" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="044ab023-7076-77e6-73c2-d0f26fca0776" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_UntenableSecret_01_Recover.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Justiciar/JUSTIC_Rig/JUSTIC_HUM_M_Rig_DFLT_CMBT_Skill_UntenableSecret_01_Recover.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_R" />
+							<attribute id="Length" type="float" value="0.96666664" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.033333335" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="1" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="FootStep_L" />
+							<attribute id="Length" type="float" value="0.8" />
+							<attribute id="TextKeyType" type="uint8" value="3" />
+							<attribute id="Time" type="float" value="0.2" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="FootID" type="uint8" value="0" />
+									<attribute id="PlayHearingFX" type="bool" value="True" />
+									<attribute id="PlayScuff" type="bool" value="False" />
+									<attribute id="PlaySlideFX" type="bool" value="False" />
+									<attribute id="PlaySound" type="bool" value="True" />
+									<attribute id="PlayStepFX" type="bool" value="True" />
+									<attribute id="Slide" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="0f82feac-e658-3e15-c394-bb4972b5231e" />
+					<attribute id="BoundsMax" type="fvec3" value="0 0 0" />
+					<attribute id="BoundsMin" type="fvec3" value="0 0 0" />
+					<attribute id="Center" type="fvec3" value="0 0 0" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="7f4e9396-49a6-dce5-ed35-661edc4ef0f5" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="JUSTIC_HUM_M_Base" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="044ab023-7076-77e6-73c2-d0f26fca0776" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="EMPTY_VISUAL_TEMPLATE" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725058" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="63a09ae9-4ef0-b4d8-8171-a284c7b63758" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="9014253d-fe45-b2e2-6132-b68b3fd828fb" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="6f09ac8d-d423-3e33-60ad-4b4662f97c8a" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="da29fce1-056a-4f86-b110-d61679c21238" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="d4f89eca-c415-0e63-c9c2-fee20b4d31e8" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="8405f6a4-e695-c33a-d482-a4d9a472599e" />
+						</node>
+						<node id="Base" />
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

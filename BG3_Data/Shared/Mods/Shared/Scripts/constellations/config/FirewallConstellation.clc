@@ -1,0 +1,13 @@
+game.configs.FirewallConstellation = Config{
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.FirewallConstellation},
+    },
+    inputs={
+        Enable=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+        Disable=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+    },
+    outputs={
+        Off=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Off]]}}},
+        On=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.On]]}}},
+    }
+}

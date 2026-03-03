@@ -1,0 +1,37 @@
+game.configs.FirewallTrap = Config{
+    params={
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the trap start on?]],
+            required = false,
+            default = false
+        },
+        SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when trap is turned off]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_Off]]
+        },
+        SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when trap is turned on]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_On]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.FirewallTrap,
+            SoundOff = params.SoundOff,
+            SoundOn = params.SoundOn,
+            StartEnabled = params.StartEnabled,
+        },
+    },
+    inputs={
+        Enable=ExtSocket{description=[[Turns Firewall On]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+        Disable=ExtSocket{description=[[Turns Firewall Off]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+    },
+    outputs={
+        Enabled=ExtSocket{description=[[On desc]],{SocketRef{[[root.logic.outputs.Enabled]]}}},
+        Disabled=ExtSocket{description=[[Off desc]],{SocketRef{[[root.logic.outputs.Disabled]]}}},
+    }
+}

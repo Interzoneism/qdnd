@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="VirtualTextureBank">
+		<node id="VirtualTextureBank">
+			<children>
+				<node id="Resource">
+					<attribute id="GTexFileName" type="FixedString" value="e27d6b5c5ac302daf6329787649151ab" />
+					<attribute id="ID" type="FixedString" value="9eba5165-032a-4890-aa67-e4d9adfeb0f0" />
+					<attribute id="Name" type="LSString" value="PUZ_MoonLantern_Holder_A" />
+					<attribute id="Prefetch" type="bool" value="False" />
+					<attribute id="PrefetchMipLevel" type="int8" value="-1" />
+					<attribute id="ReferencedColorSpaces" type="uint32" value="6" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="VirtualTextureLayerConfig" type="uint32" value="3" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725656" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="PhysicsBank">
+		<node id="PhysicsBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="c852b904-aead-a233-eba0-e4d113247d93" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="PUZ_Moon_Lantern_A_Broken_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Puzzle/Drider/PUZ_Moon_Lantern_A_Broken_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Puzzle/Drider/PUZ_Moon_Lantern_A_Broken_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725059" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="fafccba5-92a0-d0e7-2c77-7f2d092a6b66" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="PUZ_Moon_Lantern_Holder_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Puzzle/Drider/PUZ_Moon_Lantern_Holder_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Puzzle/Drider/PUZ_Moon_Lantern_Holder_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725059" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="MaterialBank">
+		<node id="MaterialBank">
+			<children>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="fa3f4c8b-325e-fe14-c373-e7805afc880b" />
+					<attribute id="MaterialType" type="uint8" value="4" />
+					<attribute id="Name" type="LSString" value="PUZ_MoonLantern_Holder_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Base/Base_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="9eba5165-032a-4890-aa67-e4d9adfeb0f0" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.12610434 2.2285438 0.10837534" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.12525664 -0.062795654 -0.28744528" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="b85e02b4-3838-68e3-30eb-2cfdccdc481f" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="PUZ_Moon_Lantern_Holder_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Puzzle/Drider/PUZ_Moon_Lantern_Holder_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Puzzle/Drider/PUZ_Moon_Lantern_Holder_A.Dummy_PUZ_Moon_Lantern_Holder_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209012" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="916d34e6-62cc-bf53-5880-bd56e23de601" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_Moon_Lantern_Holder_A.PUZ_Drider_Moon_Lantern_A_mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="8bab8cba-c35d-ab63-3482-7a83ddf9c127" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_Moon_Lantern_Holder_A.PUZ_Drider_Moon_Lantern_Glass_A_mesh.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="916d34e6-62cc-bf53-5880-bd56e23de601" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_Moon_Lantern_Holder_A.PUZ_Drider_Moon_Lantern_deco_A_mesh.2" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="fa3f4c8b-325e-fe14-c373-e7805afc880b" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_Moon_Lantern_Holder_A.PUZ_Drider_Moon_Lantern_Holder_A_mesh.3" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="916d34e6-62cc-bf53-5880-bd56e23de601" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_Moon_Lantern_Holder_A.PUZ_Drider_Moon_Lantern_A_mesh_LOD1.4" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="8bab8cba-c35d-ab63-3482-7a83ddf9c127" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_Moon_Lantern_Holder_A.PUZ_Drider_Moon_Lantern_Glass_A_mesh_LOD1.5" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="916d34e6-62cc-bf53-5880-bd56e23de601" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_Moon_Lantern_Holder_A.PUZ_Drider_Moon_Lantern_deco_A_mesh_LOD1.6" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="fa3f4c8b-325e-fe14-c373-e7805afc880b" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_Moon_Lantern_Holder_A.PUZ_Drider_Moon_Lantern_Holder_A_mesh_LOD1.7" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

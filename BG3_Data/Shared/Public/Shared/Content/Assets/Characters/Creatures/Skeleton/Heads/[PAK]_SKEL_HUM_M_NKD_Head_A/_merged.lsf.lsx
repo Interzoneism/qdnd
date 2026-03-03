@@ -1,0 +1,944 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="SkeletonBank">
+		<node id="SkeletonBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="DynamicPhysicsResourceID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="644dee57-cf43-42b2-2be6-e289c00e7a9f" />
+					<attribute id="IKRigResourceID" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SKEL_HUM_M_NKD_Head_A_Base" />
+					<attribute id="PreviewAnimationResource" type="FixedString" value="" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RagdollResourceID" type="FixedString" value="" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Skeleton/_Male/SKEL_HUM_M_NKD_Head_A_Base.GR2" />
+					<attribute id="SpringResourceID" type="FixedString" value="" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Skeleton/_Male/SKEL_HUM_M_NKD_Head_A_Base.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241814" />
+					<children>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_MouthFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="4" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_BodyFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="3" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_R_HandFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_L_HandFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="2" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="MaterialBank">
+		<node id="MaterialBank">
+			<children>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="b768b258-aa72-efea-b8b9-cb3bc4842132" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="SKEL_HUM_M_NKD_Head_Oathbreaker" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Characters/CHAR_BASE_GM_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144678138029277484" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="GlowMultiplier" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.7" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Armor_Dirt_Sharpness" />
+							<attribute id="Value" type="float" value="0.7" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Armor_Blood_Sharpness" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="4" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Dirt_AO_Sharpness" />
+							<attribute id="Value" type="float" value="4" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="4" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Blood_AO_Sharpness" />
+							<attribute id="Value" type="float" value="4" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Dirt" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Blood" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="01 Texture Map" />
+							<attribute id="ID" type="FixedString" value="a175d259-c903-43c3-afc7-8149cafaa693" />
+							<attribute id="ParameterName" type="FixedString" value="Glowmap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="01 Texture Map" />
+							<attribute id="ID" type="FixedString" value="4ee46b58-caf0-e98a-a235-1375b43f5dca" />
+							<attribute id="ParameterName" type="FixedString" value="MSKColor" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="2765e270-52ce-6f45-eddf-d0451042b54c" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.85125166 0.101145156 0.0025858253" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="GlowColor" />
+							<attribute id="Value" type="fvec3" value="1 0.54179835 0.14198029" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.15105805 0.29321614 0.4877652" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Cloth_Primary" />
+							<attribute id="Value" type="fvec3" value="0.15105805 0.29321614 0.4877652" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.17013837 0.04614884 0.04614884" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Cloth_Secondary" />
+							<attribute id="Value" type="fvec3" value="0.17013837 0.04614884 0.04614884" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.071761444 0.06190747 0.106156066" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Cloth_Tertiary" />
+							<attribute id="Value" type="fvec3" value="0.071761444 0.06190747 0.106156066" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="1 1 1" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Accent_Color" />
+							<attribute id="Value" type="fvec3" value="1 1 1" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.23882797 0.10363409 0.060031604" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Leather_Primary" />
+							<attribute id="Value" type="fvec3" value="0.23882797 0.10363409 0.060031604" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.15105805 0.034230202 0.02654868" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Leather_Secondary" />
+							<attribute id="Value" type="fvec3" value="0.15105805 0.034230202 0.02654868" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.12198571 0.060031604 0.051122047" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Leather_Tertiary" />
+							<attribute id="Value" type="fvec3" value="0.12198571 0.060031604 0.051122047" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="1 1 1" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Custom_1" />
+							<attribute id="Value" type="fvec3" value="1 1 1" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.7667436 0.7667436 0.7667436" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Metal_Primary" />
+							<attribute id="Value" type="fvec3" value="0.7667436 0.7667436 0.7667436" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.6870308 0.6870308 0.6870308" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Metal_Secondary" />
+							<attribute id="Value" type="fvec3" value="0.6870308 0.6870308 0.6870308" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.6054843 0.6054843 0.6054843" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Metal_Tertiary" />
+							<attribute id="Value" type="fvec3" value="0.6054843 0.6054843 0.6054843" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="1 1 1" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Custom_2" />
+							<attribute id="Value" type="fvec3" value="1 1 1" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.11764706 0.06666667 0.047058824" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="08Dirt&amp;Blood&amp;Sweat" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="DirtColor" />
+							<attribute id="Value" type="fvec3" value="0.11764706 0.06666667 0.047058824" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.12941177 0.007843138 0.003921569" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="08Dirt&amp;Blood&amp;Sweat" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Blood_Color" />
+							<attribute id="Value" type="fvec3" value="0.12941177 0.007843138 0.003921569" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="01 Texture Map" />
+							<attribute id="ID" type="FixedString" value="4a0b1170-2221-0f09-e867-b88e0fe2aa33" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationSetBank">
+		<node id="AnimationSetBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="5f7b5166-c7d2-3a46-d887-f770734fb239" />
+					<attribute id="Name" type="LSString" value="SKEL_HUM_M_NKD_Head_A_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144959613005988540" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets">
+											<children>
+												<node id="Object">
+													<attribute id="FallBackSubSet" type="FixedString" value="" />
+													<attribute id="MapKey" type="FixedString" value="" />
+													<children>
+														<node id="Animation">
+															<children>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="1785b4aa-b7ea-bfa3-9065-fdea48d10b63" />
+																	<attribute id="MapKey" type="FixedString" value="92c00ae7-8f88-492a-b4c0-c133fc2ea745" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="7303c2b8-3f4f-9743-8188-17122a10f91c" />
+																	<attribute id="MapKey" type="FixedString" value="723cc87a-2cb3-4135-a0cf-ea1eea84c388" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5fd12a20-6ecc-e007-d183-f78aeaef38b9" />
+																	<attribute id="MapKey" type="FixedString" value="910641f1-74b6-47b3-ae5a-59a80dc24f9e" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="1aa1a2f7-19b9-c0ba-791b-a6ffca0d96d4" />
+																	<attribute id="MapKey" type="FixedString" value="52ccb093-20d4-474b-8eb8-8216b6dd1927" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="185aeadd-78fa-1412-1ab4-7acae945bfc4" />
+																	<attribute id="MapKey" type="FixedString" value="48074f62-465b-4765-bcad-77f1c73ec92c" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="56d7ea14-646d-f1db-c197-30756e4e50f9" />
+																	<attribute id="MapKey" type="FixedString" value="656a55f1-9824-4945-82d9-fe263800d892" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="876efa56-6cf6-c7fa-7c06-2ae2c225b4d4" />
+																	<attribute id="MapKey" type="FixedString" value="20915dc0-5ca5-4066-8dcd-06a0914ad12f" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="b46bec4d-0917-2ae4-f632-1176354b1c26" />
+																	<attribute id="MapKey" type="FixedString" value="2220f9e4-8731-4a56-b6bc-53dd9d4378bc" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationBank">
+		<node id="AnimationBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.033333335" />
+					<attribute id="ID" type="FixedString" value="5fd12a20-6ecc-e007-d183-f78aeaef38b9" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SKEL_HUM_M_Head_A_Rig_DFLT_EMOT_TPose" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Skeleton/_Male/SKEL_HUM_M_Head_A_Rig/SKEL_HUM_M_Head_A_Rig_DFLT_EMOT_TPose.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Skeleton/_Male/SKEL_HUM_M_Head_A_Rig/SKEL_HUM_M_Head_A_Rig_DFLT_EMOT_TPose.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241814" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="20.000002" />
+					<attribute id="ID" type="FixedString" value="d89ec509-055f-6054-b56f-5ea76fde4a04" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SKEL_HUM_M_Head_A_Rig_ROM_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="01bea878-2e89-019a-5183-c7cc54d4c15f" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Skeleton/_Male/SKEL_HUM_M_Head_A_Rig/SKEL_HUM_M_Head_A_Rig_ROM_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Skeleton/_Male/SKEL_HUM_M_Head_A_Rig/SKEL_HUM_M_Head_A_Rig_ROM_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241814" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="0f82feac-e658-3e15-c394-bb4972b5231e" />
+					<attribute id="BoundsMax" type="fvec3" value="0.07864821 1.8995556 0.081153564" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.07840315 1.6669707 -0.1187421" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="01bea878-2e89-019a-5183-c7cc54d4c15f" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="SKEL_HUM_M_NKD_Head_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="644dee57-cf43-42b2-2be6-e289c00e7a9f" />
+					<attribute id="SkeletonSlot" type="FixedString" value="1" />
+					<attribute id="Slot" type="FixedString" value="Head" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Anims/_Creatures/Skeleton/_Male/Resources/SKEL_HUM_M_NKD_Head_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Anims/_Creatures/Skeleton/_Male/Resources/SKEL_HUM_M_NKD_Head_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725669" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="5f7b5166-c7d2-3a46-d887-f770734fb239" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="6994d330-7203-0aab-2629-33d9ff0ffe29" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_NKD_Head_A.SKEL_HUM_M_NKD_Head_A_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="6994d330-7203-0aab-2629-33d9ff0ffe29" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_NKD_Head_A.SKEL_HUM_M_NKD_Head_A_Mesh_LOD1.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="6994d330-7203-0aab-2629-33d9ff0ffe29" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_NKD_Head_A.SKEL_HUM_M_NKD_Head_A_Mesh_LOD2.2" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="3" />
+							<attribute id="MaterialID" type="FixedString" value="6994d330-7203-0aab-2629-33d9ff0ffe29" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_NKD_Head_A.SKEL_HUM_M_NKD_Head_A_Mesh_LOD3.3" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="4" />
+							<attribute id="MaterialID" type="FixedString" value="6994d330-7203-0aab-2629-33d9ff0ffe29" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_NKD_Head_A.SKEL_HUM_M_NKD_Head_A_Mesh_LOD4.4" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="5" />
+							<attribute id="MaterialID" type="FixedString" value="6994d330-7203-0aab-2629-33d9ff0ffe29" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_NKD_Head_A.SKEL_HUM_M_NKD_Head_A_Mesh_LOD5.5" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.093646355 2.1123683 0.28474438" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.0927195 1.6378961 -0.19822264" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="05e4e896-1c6a-2204-f612-e2e67f3922c7" />
+					<attribute id="MaterialType" type="uint8" value="22" />
+					<attribute id="Name" type="LSString" value="SKEL_HUM_M_ARM_Headwear_Leather_D" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Headwear" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Skeleton/Resources/SKEL_HUM_M_ARM_Headwear_Leather_D.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Skeleton/Resources/SKEL_HUM_M_ARM_Headwear_Leather_D.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209006" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="9b88f876-892a-ebd4-e1f9-c3d53268f6d6" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Leather_D.SKEL_HUM_M_ARM_Headwear_Leather_D_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="5adc31a3-c3d3-b96c-a06b-ea069281cd42" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Leather_D.SKEL_HUM_M_ARM_Magic_Medium_Headwear_A_Feathers_Mesh.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="9b88f876-892a-ebd4-e1f9-c3d53268f6d6" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Leather_D.SKEL_HUM_M_ARM_Headwear_Leather_D_Mesh_LOD1.2" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="5adc31a3-c3d3-b96c-a06b-ea069281cd42" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Leather_D.SKEL_HUM_M_ARM_Magic_Medium_Headwear_A_Feathers_Mesh_LOD1.3" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="9b88f876-892a-ebd4-e1f9-c3d53268f6d6" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Leather_D.SKEL_HUM_M_ARM_Headwear_Leather_D_Mesh_LOD2.4" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="5adc31a3-c3d3-b96c-a06b-ea069281cd42" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Leather_D.SKEL_HUM_M_ARM_Magic_Medium_Headwear_A_Feathers_Mesh_LOD2.5" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="3" />
+							<attribute id="MaterialID" type="FixedString" value="9b88f876-892a-ebd4-e1f9-c3d53268f6d6" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Leather_D.SKEL_HUM_M_ARM_Headwear_Leather_D_Mesh_LOD3.6" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="3" />
+							<attribute id="MaterialID" type="FixedString" value="5adc31a3-c3d3-b96c-a06b-ea069281cd42" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Leather_D.SKEL_HUM_M_ARM_Magic_Medium_Headwear_A_Feathers_Mesh_LOD3.7" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="4" />
+							<attribute id="MaterialID" type="FixedString" value="9b88f876-892a-ebd4-e1f9-c3d53268f6d6" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Leather_D.SKEL_HUM_M_ARM_Headwear_Leather_D_Mesh_LOD4.8" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="4" />
+							<attribute id="MaterialID" type="FixedString" value="5adc31a3-c3d3-b96c-a06b-ea069281cd42" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Leather_D.SKEL_HUM_M_ARM_Magic_Medium_Headwear_A_Feathers_Mesh_LOD4.9" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.09119777 1.9176192 0.100344434" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.09120495 1.6575085 -0.14440441" />
+					<attribute id="Center" type="fvec3" value="-3.5911798E-06 1.7875638 -0.022029988" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="63d0ec07-a55b-6af8-b7ff-83ea14f42666" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="4" />
+					<attribute id="Name" type="LSString" value="SKEL_HUM_M_ARM_FlamingFist_Halfplate_C_0_Headwear" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.2005183" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Headwear" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Skeleton/Resources/SKEL_HUM_M_ARM_FlamingFist_Halfplate_C_0_Headwear.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Skeleton/Resources/SKEL_HUM_M_ARM_FlamingFist_Halfplate_C_0_Headwear.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241814" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="8c1613f1-928f-7c98-bfbb-13c3047adaf7" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_FlamingFist_Halfplate_C_0_Headwear.SKEL_HUM_M_ARM_FlamingFist_Halfplate_C_0_Headwear_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="8c1613f1-928f-7c98-bfbb-13c3047adaf7" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_FlamingFist_Halfplate_C_0_Headwear.SKEL_HUM_M_ARM_FlamingFist_Halfplate_C_0_Headwear_Mesh_LOD1.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="8c1613f1-928f-7c98-bfbb-13c3047adaf7" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_FlamingFist_Halfplate_C_0_Headwear.SKEL_HUM_M_ARM_FlamingFist_Halfplate_C_0_Headwear_Mesh_LOD2.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="3" />
+							<attribute id="MaterialID" type="FixedString" value="8c1613f1-928f-7c98-bfbb-13c3047adaf7" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_FlamingFist_Halfplate_C_0_Headwear.SKEL_HUM_M_ARM_FlamingFist_Halfplate_C_0_Headwear_Mesh_LOD3.3" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.09169054 1.9487343 0.10780983" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.093588606 1.5698521 -0.16107538" />
+					<attribute id="Center" type="fvec3" value="-0.0009490326 1.7592932 -0.026632778" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="65380633-268d-fcd1-3b0c-c5c3cfdd4bb9" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="4" />
+					<attribute id="Name" type="LSString" value="SKEL_HUM_M_ARM_Headwear_Metal_J" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.25008962" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Headwear" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Skeleton/Resources/SKEL_HUM_M_ARM_Headwear_Metal_J.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Skeleton/Resources/SKEL_HUM_M_ARM_Headwear_Metal_J.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241508" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="db55b835-481b-0aa5-3d85-baebc4cf6ecb" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Metal_J.SKEL_HUM_M_ARM_Headwear_Metal_J_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="db55b835-481b-0aa5-3d85-baebc4cf6ecb" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Metal_J.SKEL_HUM_M_ARM_Headwear_Metal_J_Mesh_LOD1.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="db55b835-481b-0aa5-3d85-baebc4cf6ecb" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Metal_J.SKEL_HUM_M_ARM_Headwear_Metal_J_Mesh_LOD2.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.10186605 1.968903 0.20969692" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.10162052 1.4885294 -0.1456412" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="73f1626f-d3f6-0b99-b438-b6fde26034f7" />
+					<attribute id="MaterialType" type="uint8" value="22" />
+					<attribute id="Name" type="LSString" value="SKEL_HUM_M_ARM_Headwear_Leather_C" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Headwear" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Skeleton/Resources/SKEL_HUM_M_ARM_Headwear_Leather_C.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Skeleton/Resources/SKEL_HUM_M_ARM_Headwear_Leather_C.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209027" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="89b063ff-7bf3-44a8-7e7d-41b29d0dd469" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Leather_C.SKEL_HUM_M_ARM_Magic_Light_A_Fur_Headwear_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="4b08cda4-d400-8c60-2b16-6fedbe38e9a0" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Leather_C.SKEL_HUM_M_ARM_Headwear_Leather_C_Mesh.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="89b063ff-7bf3-44a8-7e7d-41b29d0dd469" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Leather_C.SKEL_HUM_M_ARM_Magic_Light_A_Fur_Headwear_Mesh_LOD1.2" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="4b08cda4-d400-8c60-2b16-6fedbe38e9a0" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Leather_C.SKEL_HUM_M_ARM_Headwear_Leather_C_Mesh_LOD1.3" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="89b063ff-7bf3-44a8-7e7d-41b29d0dd469" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Leather_C.SKEL_HUM_M_ARM_Magic_Light_A_Fur_Headwear_Mesh_LOD2.4" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="4b08cda4-d400-8c60-2b16-6fedbe38e9a0" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Leather_C.SKEL_HUM_M_ARM_Headwear_Leather_C_Mesh_LOD2.5" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="3" />
+							<attribute id="MaterialID" type="FixedString" value="89b063ff-7bf3-44a8-7e7d-41b29d0dd469" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Leather_C.SKEL_HUM_M_ARM_Magic_Light_A_Fur_Headwear_Mesh_LOD3.6" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="3" />
+							<attribute id="MaterialID" type="FixedString" value="4b08cda4-d400-8c60-2b16-6fedbe38e9a0" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Leather_C.SKEL_HUM_M_ARM_Headwear_Leather_C_Mesh_LOD3.7" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="0f82feac-e658-3e15-c394-bb4972b5231e" />
+					<attribute id="BoundsMax" type="fvec3" value="0.07864821 1.8995556 0.081153564" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.07840315 1.6669707 -0.1187421" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="94332aa9-cc74-8e03-8288-0bd1be07ab1b" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="SKEL_HUM_M_NKD_Head_Blood" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="644dee57-cf43-42b2-2be6-e289c00e7a9f" />
+					<attribute id="SkeletonSlot" type="FixedString" value="1" />
+					<attribute id="Slot" type="FixedString" value="Head" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Anims/_Creatures/Skeleton/_Male/Resources/SKEL_HUM_M_NKD_Head_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Anims/_Creatures/Skeleton/_Male/Resources/SKEL_HUM_M_NKD_Head_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209006" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="5f7b5166-c7d2-3a46-d887-f770734fb239" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="89ac654f-8b0b-8f1f-0d00-55f8257bceb5" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_NKD_Head_A.SKEL_HUM_M_NKD_Head_A_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="89ac654f-8b0b-8f1f-0d00-55f8257bceb5" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_NKD_Head_A.SKEL_HUM_M_NKD_Head_A_Mesh_LOD1.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="89ac654f-8b0b-8f1f-0d00-55f8257bceb5" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_NKD_Head_A.SKEL_HUM_M_NKD_Head_A_Mesh_LOD2.2" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="3" />
+							<attribute id="MaterialID" type="FixedString" value="89ac654f-8b0b-8f1f-0d00-55f8257bceb5" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_NKD_Head_A.SKEL_HUM_M_NKD_Head_A_Mesh_LOD3.3" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="4" />
+							<attribute id="MaterialID" type="FixedString" value="89ac654f-8b0b-8f1f-0d00-55f8257bceb5" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_NKD_Head_A.SKEL_HUM_M_NKD_Head_A_Mesh_LOD4.4" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="5" />
+							<attribute id="MaterialID" type="FixedString" value="89ac654f-8b0b-8f1f-0d00-55f8257bceb5" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_NKD_Head_A.SKEL_HUM_M_NKD_Head_A_Mesh_LOD5.5" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="0f82feac-e658-3e15-c394-bb4972b5231e" />
+					<attribute id="BoundsMax" type="fvec3" value="0.074995585 1.9213562 0.0645716" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.074995585 1.6957316 -0.13439919" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="bcb16e4d-5518-1809-2bbc-9caaba138d9f" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="SKEL_HUM_M_NKD_Head_A_Oathbreaker" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="644dee57-cf43-42b2-2be6-e289c00e7a9f" />
+					<attribute id="SkeletonSlot" type="FixedString" value="1" />
+					<attribute id="Slot" type="FixedString" value="Head" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Anims/_Creatures/Skeleton/Resources/SKEL_HUM_M_NKD_Head_A_Oathbreaker.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Anims/_Creatures/Skeleton/Resources/SKEL_HUM_M_NKD_Head_A_Oathbreaker.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209014" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="5f7b5166-c7d2-3a46-d887-f770734fb239" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="40b8b2d5-e350-c04a-be79-f02d518dff0f" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_NKD_Head_A_Oathbreaker.SKEL_HUM_M_NKD_Head_A_Oathbreaker_Mesh.0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.112511106 1.9810429 0.13202219" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.108460575 1.6337408 -0.12811637" />
+					<attribute id="Center" type="fvec3" value="0.0020252652 1.8073919 0.0019529089" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="dab6f9df-36d8-30fa-c57c-a1b4136a0544" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="22" />
+					<attribute id="Name" type="LSString" value="SKEL_HUM_M_ARM_Headwear_Bandit_Mask" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.24347448" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Headwear" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Skeleton/Resources/SKEL_HUM_M_ARM_Headwear_Bandit_Mask.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Skeleton/Resources/SKEL_HUM_M_ARM_Headwear_Bandit_Mask.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241508" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="7dec5f78-13fc-0f68-b728-b55ccefb9f29" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Bandit_Mask.SKEL_HUM_M_ARM_Headwear_Bandit_Mask_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="1f12c137-fd8d-07cb-534c-fc20f2c09271" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Bandit_Mask.SKEL_HUM_M_CLT_Headwear_C_Mesh.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="7dec5f78-13fc-0f68-b728-b55ccefb9f29" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Bandit_Mask.SKEL_HUM_M_ARM_Headwear_Bandit_Mask_Mesh_LOD1.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="1f12c137-fd8d-07cb-534c-fc20f2c09271" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Bandit_Mask.SKEL_HUM_M_CLT_Headwear_C_Mesh_LOD1.3" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="7dec5f78-13fc-0f68-b728-b55ccefb9f29" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Bandit_Mask.SKEL_HUM_M_ARM_Headwear_Bandit_Mask_Mesh_LOD2.4" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="1f12c137-fd8d-07cb-534c-fc20f2c09271" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Bandit_Mask.SKEL_HUM_M_CLT_Headwear_C_Mesh_LOD2.5" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="3" />
+							<attribute id="MaterialID" type="FixedString" value="7dec5f78-13fc-0f68-b728-b55ccefb9f29" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Bandit_Mask.SKEL_HUM_M_ARM_Headwear_Bandit_Mask_Mesh_LOD3.6" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="3" />
+							<attribute id="MaterialID" type="FixedString" value="1f12c137-fd8d-07cb-534c-fc20f2c09271" />
+							<attribute id="ObjectID" type="FixedString" value="SKEL_HUM_M_ARM_Headwear_Bandit_Mask.SKEL_HUM_M_CLT_Headwear_C_Mesh_LOD3.7" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

@@ -1,0 +1,61 @@
+game.configs.WheelGate = Config{
+    params={
+        Type = {
+            type = EParamType.String,
+            help = [[            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[Interactable]]
+        },
+        SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when lever is enabled]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_On]]
+        },
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the lever start on?]],
+            required = false,
+            default = true
+        },
+        SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when lever is disabled]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_Off]]
+        },
+        DC = {
+            type = EParamType.String,
+            help = [[Perception check DC.]],
+            required = false,
+            default = [[HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.Lever2St,
+            SoundOff = params.SoundOff,
+            SoundOn = params.SoundOn,
+            StartEnabled = params.StartEnabled,
+            Type = params.Type,
+            DC = params.DC,
+            Immediate = true,
+        },
+    },
+    inputs={
+        UseBlockedFromStory=ExtSocket{description=[[The lever's use was blocked from story (because it was not enabled)]],{SocketRef{[[root.logic.inputs.UseBlockedFromStory]]}}},
+        Disable=ExtSocket{description=[[Disable the lever]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+        Enable=ExtSocket{description=[[Enable the lever]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+        ExternalFlip=ExtSocket{description=[[A scripted flip of the lever]],{SocketRef{[[root.logic.inputs.ForceActivate]]}}},
+    },
+    outputs={
+        Off=ExtSocket{description=[[Off desc]],{SocketRef{[[root.logic.outputs.Activated1]]}}},
+        On=ExtSocket{description=[[On desc]],{SocketRef{[[root.logic.outputs.Activated2]]}}},
+        UsedWhileDisabled=ExtSocket{description=[[Lever used while deactivated]],{SocketRef{[[root.logic.outputs.ActivateAttemptFailed]]}}},
+    }
+}

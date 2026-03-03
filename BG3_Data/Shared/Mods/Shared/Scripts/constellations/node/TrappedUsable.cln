@@ -1,0 +1,960 @@
+game.states.TrappedUsable = State{
+    function()
+
+        modules = {"shared.items"}
+
+        params.DC = {
+            type = EParamType.String,
+            default="HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f",
+            help=[[Perception check DC.]]
+        }
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            required=false,
+            default=6.0,
+            help=[[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]]
+        }
+
+        params.OneShot = {
+            type = EParamType.Bool,
+            default = true,
+            help = "The trap activates only the first time on use (e.g. explodes chest), rather than every time (e.g. a chest with spikes that come out)"
+        }
+
+        params.Skill = {
+            type = EParamType.String,
+            default="Perception",
+            help=[[The skill checked.]]
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_Off",
+            help = "Sound when trap is turned off"
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_On",
+            help = "Sound when trap is turned on"
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Does the trap start enabled? (will it trigger when using the item?)]],
+        }
+
+        params.StartUseEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Does the item's use start enabled? (should triggering item's use actions be blocked until the EnableObject socket is triggered?)]],
+        }
+
+        params.Type = {
+            type = EParamType.String,
+            default="Interactable",
+            help=[[
+            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]]
+        }
+
+        params.VFXOff = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = "VFX while the trap is disabled."
+        }
+
+        params.VFXOffBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = "Bone on which the the VFX is played."
+        }
+
+        params.VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while the trap is enabled and has been spotted.]],
+            required = false,
+            default = [[VFX_Script_Trap_Overlay_Red_01_a7361f25-e942-e071-7ce3-7a8182f4e0ef]]
+        }
+
+        params.VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the the VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        }
+
+        params.Key = {
+            type = EParamType.String,
+            default="STORYLOCK",
+            help=[[Key used when locking the item]]
+        }
+
+        params.DestroyOnDisarm = {
+            type=EParamType.Bool,
+            default = false,
+            help = "Does the item break on Disarm?"
+        }
+
+        outputs.Disable = {internal = true}
+        outputs.Enable = {internal = true}
+        inputs.DisableObject = {help = "Disable the object, so that interactions trigger not the trap, but the ActivateAttemptFailed socket."}
+        inputs.EnableObject = {help = "Enable the object, so that interactions can trigger the trap (if the trap is active)."}
+        outputs.DisableObject = { internal = true}
+        outputs.EnableObject = { internal = true}
+
+        inputs.TryActivate = {help = "Try to set off the trap."}
+
+        outputs.Activate = {help = [[The trap has activated]]}
+
+        outputs.UseAttempt = {help = "A character attempted to use the item (may be successful or not)"}
+        outputs.UseFinishedSuccessfully = {help = "A character successfully finished using this item (will trigger only after closing in case of a container)"}
+        outputs.UseFailed = {help = "A character failed to use this item (e.g. because it was locked)"}
+
+        inputs.Reveal = {help = [[Reveals the container]]}
+        outputs.Reveal = {internal = true}
+
+        inputs.DisarmFailed = {internal = true}
+        outputs.DisarmFailed = {help = "Disarm attempt failed"}
+
+        inputs.Disarm = {help = "Disarm this trap."}
+        outputs.Disarm = {internal = true}
+        inputs.Disarmed = {internal = true}
+        outputs.Disarmed = {help = [[The trap was disarmed]]}
+
+        inputs.Lock = {help = "Lock the item using params.Key as key"}
+        inputs.Unlock = {help = "Unlock the item"}
+
+        outputs.TryActivate = {internal = true}
+        inputs.Activate = {internal = true}
+
+        inputs.Disabled = {internal = true}
+        inputs.Enabled = {internal = true}
+
+        outputs.Disabled = {help = "Item was disabled"}
+        outputs.Enabled = {help = "Item was enabldes"}
+
+        outputs.Destroyed = {help = "Item was destroyed"}
+
+        inputs.UseBlockedFromStory = {help = [[Item use was blocked from story (because it was not enabled)]]}
+        outputs.UseBlockedFromStory = {internal = true}
+
+        outputs.ActivateAttemptFailed = {help = [[Lever was used while disabled]]}
+        inputs.ActivateAttemptFailed = {internal = true}
+
+        inputs.Revealed = {internal = true}
+        outputs.Revealed = {help = "Object was revealed"}
+
+        nodes.PerceptionDisarmOnOff = Proxy{
+            game.states.PerceptionDisarmOnOff,
+            params = {StartEnabled = params.StartEnabled,
+                      DC = params.DC,
+                      MinDistance = params.MinDistance,
+                      Skill = params.Skill,
+                      Type = params.Type,
+                      VFXOn= params.VFXOn,
+                      VFXOff = params.VFXOff,
+                      VFXOnBone = params.VFXOnBone,
+                      VFXOffBone = params.VFXOffBone,
+                      IsTrap = true,
+                      SoundOn = params.SoundOn,
+                      SoundOff = params.SoundOff,
+                      DestroyOnDisarm = params.DestroyOnDisarm},
+            inputs = {TryActivate = {outputs.TryActivate},
+                      Reveal = {outputs.Reveal},
+                      Disarm = {outputs.Disarm},
+                      Enable = {outputs.Enable},
+                      Disable = {outputs.Disable}},
+            outputs = {Activate = {inputs.Activate},
+                       DisarmFailed = {inputs.DisarmFailed},
+                       Disarmed = {inputs.Disarmed},
+                       Disabled = {inputs.Disabled},
+                       Enabled = {inputs.Enabled},
+                       ActivateAttemptFailed = {inputs.ActivateAttemptFailed},
+                       Revealed = {outputs.Revealed}}
+        }
+
+        nodes.StoryInteractionFilter = Proxy{
+            game.states.StoryInteractionFilter,
+            params = {StartUseEnabled = params.StartUseEnabled},
+            inputs = {EnableStoryItemUse = {outputs.EnableObject},
+                      DisableStoryItemUse = {outputs.DisableObject},
+                      UseBlockedFromStory = {outputs.UseBlockedFromStory}},
+            outputs = {UseBlockedFromStory = {inputs.ActivateAttemptFailed}}
+        }
+
+        socketEvents.DisableObject = function(ev)
+            TriggerOutput(outputs.DisableObject, ev.Object, ev.Param)
+        end
+
+        socketEvents.EnableObject = function(ev)
+            TriggerOutput(outputs.EnableObject, ev.Object, ev.Param)
+        end
+
+        socketEvents.Activate = function(ev)
+            TriggerOutput(outputs.Activate, ev.Object, ev.Param)
+            if params.OneShot then
+                TriggerOutput(outputs.Disable, ev.Object, ev.Param)
+            else
+                TriggerOutput(outputs.Reveal, ev.Object, false)
+            end
+        end
+
+        socketEvents.Disabled = function(ev)
+            if me.Blackboard.GetFact("Cnst.Disarm.IsTrap") == 1 and
+               me.Blackboard.GetFact("Cnst.Disarm.WasDisarmed") == 0 then
+                SetTrapArmed(me, false)
+            end
+            TriggerOutput(outputs.Disabled, ev.Object, ev.Param)
+        end
+
+        socketEvents.Enabled = function(ev)
+            if me.Blackboard.GetFact("Cnst.Disarm.IsTrap") == 1 and
+               me.Blackboard.GetFact("Cnst.Disarm.WasDisarmed") == 0 then
+                SetTrapArmed(me, true)
+            end
+            TriggerOutput(outputs.Enabled, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disarm = function(ev)
+            TriggerOutput(outputs.Disarm, ev.Object, ev.Param)
+        end
+
+        socketEvents.DisarmFailed = function(ev)
+            TriggerOutput(outputs.DisarmFailed, ev.Object, ev.Param)
+        end
+
+        socketEvents.Reveal = function(ev)
+            TriggerOutput(outputs.Reveal, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disarmed = function(ev)
+            TriggerOutput(outputs.Disarmed, ev.Object, ev.Param)
+        end
+
+        socketEvents.UseBlockedFromStory = function(ev)
+            TriggerOutput(outputs.UseBlockedFromStory, ev.Object, ev.Param)
+        end
+
+        socketEvents.ActivateAttemptFailed = function(ev)
+            TriggerOutput(outputs.ActivateAttemptFailed, ev.Object, ev.Param)
+        end
+
+        socketEvents.Lock = function(ev)
+            if not mod.items.SafeIsDestroyed(me) then
+                Lock(me, params.Key)
+            end
+        end
+
+        socketEvents.TryActivate = function(ev)
+            TriggerOutput(outputs.TryActivate, ev.Object, ev.Param)
+        end
+
+        socketEvents.Unlock = function(ev)
+            if not mod.items.SafeIsDestroyed(me) then
+                Unlock(me)
+            end
+        end
+
+        events.ArmedTrapUsed = function(ev)
+            TriggerOutput(outputs.TryActivate, ev.User.EntityRef)
+        end
+
+        events.UseFinished = function(ev)
+            TriggerOutput(outputs.UseAttempt, ev.User.EntityRef)
+            if me.Blackboard.GetFact("On") == 1 then
+                if ev.Success then
+                    TriggerOutput(outputs.UseFinishedSuccessfully, ev.User.EntityRef)
+                else
+                    TriggerOutput(outputs.UseFailed, ev.User.EntityRef)
+                end
+            end
+        end
+
+        socketEvents.Revealed = function(ev)
+            TriggerOutput(outputs.Revealed, ev.Object, ev.Param)
+        end
+
+        events.Destroyed = function(ev)
+            if ev.Entity == me then
+                if ev.Destroyer ~= nil then
+                    TriggerOutput(outputs.Destroyed, ev.Destroyer.EntityRef, ev.DestroyerOwner.EntityRef)
+                else
+                    TriggerOutput(outputs.Destroyed, nil, nil)
+                end
+            end
+        end
+
+    end
+
+}
+
+
+game.states.TrappedUsable_Explode = State{
+    function()
+
+        modules = {"shared.items"}
+
+        params.DC = {
+            type = EParamType.String,
+            default="HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f",
+            help=[[Perception check DC.]]
+        }
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            required=false,
+            default=6.0,
+            help=[[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]]
+        }
+
+        params.OneShot = {
+            type = EParamType.Bool,
+            default = true,
+            help = "The trap activates only the first time on use (e.g. explodes chest), rather than every time (e.g. a chest with spikes that come out)"
+        }
+
+        params.Skill = {
+            type = EParamType.String,
+            default="Perception",
+            help=[[The skill checked.]]
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_Off",
+            help = "Sound when trap is turned off"
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_On",
+            help = "Sound when trap is turned on"
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Does the trap start enabled? (will it trigger when using the item?)]],
+        }
+
+        params.StartUseEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Does the item's use start enabled? (should triggering item's use actions be blocked until the EnableObject socket is triggered?)]],
+        }
+
+        params.Type = {
+            type = EParamType.String,
+            default="Interactable",
+            help=[[
+            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]]
+        }
+
+        params.VFXOff = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = "VFX while the trap is disabled."
+        }
+
+        params.VFXOffBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = "Bone on which the the VFX is played."
+        }
+
+        params.VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while the trap is enabled and has been spotted.]],
+            required = false,
+            default = [[VFX_Script_Trap_Overlay_Red_01_a7361f25-e942-e071-7ce3-7a8182f4e0ef]]
+        }
+
+        params.VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the the VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        }
+
+        params.Key = {
+            type = EParamType.String,
+            default="STORYLOCK",
+            help=[[Key used when locking the item]]
+        }
+
+        params.DestroyProjectileSpell = {
+            type = EParamType.String,
+            help = [[The projectile (if any) that explodes when the trap is set off]],
+            default_value_provider = [[spell_projectile]],
+            required = false
+        }
+
+        params.DestroyType = {
+            type = EParamType.String,
+            help = [[When the trap goes off, use this death type. If not set, don't destroy on explosion]],
+            required = false,
+            default_value_provider = [[deathtype]]
+        }
+
+        
+        params.DestroyOnDisarm = {
+            type=EParamType.Bool,
+            default = false,
+            help = "Does the item break on Disarm?"
+        }
+
+
+        outputs.EnableObject = {internal = true}
+        outputs.DisableObject = {internal = true}
+        inputs.DisableObject = {help = "Disable the object, so that interactions trigger not the trap, but the ActivateAttemptFailed socket."}
+        inputs.EnableObject = {help = "Enable the object, so that interactions can trigger the trap (if the trap is active)."}
+        outputs.Activate = {help = [[The trap has activated]]}
+
+        outputs.UseAttempt = {help = "A character attempted to use the item (may be successful or not)"}
+        outputs.UseFinishedSuccessfully = {help = "A character successfully finished using this item (will trigger only after closing in case of a container)"}
+        outputs.UseFailed = {help = "A character failed to use this item (e.g. because it was locked)"}
+
+        inputs.UseAttempt = {internal = true}
+        inputs.UseFinishedSuccessfully = {internal = true}
+        inputs.UseFailed = {internal = true}
+        inputs.UpdateScriptedExplosionSpell = {internal = true}
+
+        inputs.Reveal = {help = [[Reveals the container]]}
+        outputs.Reveal = {internal = true}
+
+        inputs.DisarmFailed = {internal = true}
+
+        inputs.Disarm = {help = "Disarm this trap."}
+        outputs.Disarm = {internal = true}
+        inputs.Disarmed = {internal = true}
+        outputs.Disarmed = {help = [[The trap was disarmed]]}
+
+        inputs.Lock = {help = "Lock the item using params.Key as key"}
+        inputs.Unlock = {help = "Unlock the item"}
+
+        outputs.Lock = {internal = true}
+        outputs.Unlock = {internal = true}
+
+        outputs.TryActivate = {internal = true}
+        inputs.Activate = {internal = true}
+
+        inputs.UseBlockedFromStory = {help = [[Item use was blocked (because it was not enabled)]]}
+        outputs.UseBlockedFromStory = {internal = true}
+
+        outputs.ActivateAttemptFailed = {help = [[Lever was used while disabled]]}
+        inputs.ActivateAttemptFailed = {internal = true}
+
+        inputs.Destroyed = {internal = true}
+        outputs.Destroyed = {help = "Item was destroyed"}
+
+        nodes.TrappedUsable = Proxy{
+            game.states.TrappedUsable,
+            params = {StartEnabled = params.StartEnabled,
+                      DC = params.DC,
+                      MinDistance = params.MinDistance,
+                      Skill = params.Skill,
+                      Type = params.Type,
+                      VFXOn= params.VFXOn,
+                      VFXOff = params.VFXOff,
+                      VFXOnBone = params.VFXOnBone,
+                      VFXOffBone = params.VFXOffBone,
+                      IsTrap = true,
+                      Key = params.Key,
+                      SoundOn = params.SoundOn,
+                      SoundOff = params.SoundOff,
+                      OneShot = params.OneShot,
+                      DestroyOnDisarm = params.DestroyOnDisarm},
+            inputs = {EnableObject = {outputs.EnableObject},
+                      DisableObject = {outputs.DisableObject},
+                      TryActivate = {outputs.TryActivate},
+                      Reveal = {outputs.Reveal},
+                      Disarm = {outputs.Disarm},
+                      Lock = {outputs.Lock},
+                      Unlock = {outputs.Unlock}},
+            outputs = {Activate = {inputs.Activate},
+                       DisarmFailed = {inputs.DisarmFailed},
+                       Disarmed = {inputs.Disarmed,inputs.UpdateScriptedExplosionSpell},
+                       UseAttempt = {inputs.UseAttempt},
+                       UseFinishedSuccessfully = {inputs.UseFinishedSuccessfully},
+                       UseFailed = {inputs.UseFailed},
+                       ActivateAttemptFailed = {inputs.ActivateAttemptFailed},
+                       Revealed = {inputs.UpdateScriptedExplosionSpell},
+                       Disabled = {inputs.UpdateScriptedExplosionSpell},
+                       Enabled = {inputs.UpdateScriptedExplosionSpell},
+                       Destroyed = {inputs.Destroyed}}
+        }
+
+        nodes.StoryInteractionFilter = Proxy{
+            game.states.StoryInteractionFilter,
+            params = {StartUseEnabled = params.StartUseEnabled},
+            inputs = {EnableStoryItemUse = {outputs.EnableObject},
+                      DisableStoryItemUse = {outputs.DisableObject},
+                      UseBlockedFromStory = {outputs.UseBlockedFromStory}},
+            outputs = {UseBlockedFromStory = {inputs.ActivateAttemptFailed}}
+        }
+
+        nodes.Explode = Proxy{
+            game.states.Explode,
+            params = {
+                TargetEntity = "me",
+                Projectile = params.DestroyProjectileSpell,
+                DestroyType = params.DestroyType
+            },
+            inputs = {Explode = {outputs.Activate}}
+        }
+
+        self.OnInit = function(ev)
+            helpers.UpdateScriptedExplosionSpell()
+        end
+
+        self.OnEditorChanges = function(ev)
+            helpers.UpdateScriptedExplosionSpell()
+        end
+
+        helpers.UpdateScriptedExplosionSpell = function()
+            if (me.Blackboard.GetFact("On") == 1 or
+                (me.Blackboard.GetFact("On") == nil and
+                 params.StartEnabled)) and
+               ((params.Type == "None" and
+                 me.Blackboard.GetFact("Cnst.Perception.Discovered") == nil) or
+                me.Blackboard.GetFact("Cnst.Perception.Discovered") == 1) then
+                SetScriptedExplosionSpell(me, params.DestroyProjectileSpell)
+            else
+               SetScriptedExplosionSpell(me, "")
+            end
+        end
+
+        socketEvents.DisableObject = function(ev)
+            TriggerOutput(outputs.DisableObject, ev.Object, ev.Param)
+        end
+
+        
+        socketEvents.Destroyed = function(ev)
+            TriggerOutput(outputs.Destroyed, ev.Object, ev.Param)
+        end
+
+        socketEvents.EnableObject = function(ev)
+            TriggerOutput(outputs.EnableObject, ev.Object, ev.Param)
+        end
+
+        socketEvents.Reveal = function(ev)
+            TriggerOutput(outputs.Reveal, ev.Object, ev.Param)
+        end
+
+        socketEvents.UpdateScriptedExplosionSpell = function(ev)
+            helpers.UpdateScriptedExplosionSpell()
+        end
+
+        socketEvents.Activate = function(ev)
+            TriggerOutput(outputs.Activate, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disarm = function(ev)
+            TriggerOutput(outputs.Disarm, ev.Object, ev.Param)
+        end
+
+        socketEvents.DisarmFailed = function(ev)
+            TriggerOutput(outputs.TryActivate, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disarmed = function(ev)
+            TriggerOutput(outputs.Disarmed, ev.Object, ev.Param)
+        end
+
+        socketEvents.UseBlockedFromStory = function(ev)
+            TriggerOutput(outputs.UseBlockedFromStory, ev.Object, ev.Param)
+        end
+
+        socketEvents.ActivateAttemptFailed = function(ev)
+            TriggerOutput(outputs.ActivateAttemptFailed, ev.Object, ev.Param)
+        end
+
+        socketEvents.Lock = function(ev)
+            TriggerOutput(outputs.Lock, ev.Object, ev.Param)
+        end
+
+        socketEvents.Unlock = function(ev)
+            TriggerOutput(outputs.Unlock, ev.Object, ev.Param)
+        end
+
+        socketEvents.UseAttempt = function(ev)
+            TriggerOutput(outputs.UseAttempt, ev.Object, ev.Param)
+        end
+
+        socketEvents.UseFinishedSuccessfully = function(ev)
+            TriggerOutput(outputs.UseFinishedSuccessfully, ev.Object, ev.Param)
+        end
+
+        socketEvents.UseFailed = function(ev)
+            TriggerOutput(outputs.UseFailed, ev.Object, ev.Param)
+        end
+
+    end
+
+}
+
+
+game.states.TrappedUsable_CastSpell = State{
+    function()
+
+        modules = {"shared.items"}
+
+        params.DC = {
+            type = EParamType.String,
+            default="HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f",
+            help=[[Perception check DC.]]
+        }
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            required=false,
+            default=6.0,
+            help=[[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]]
+        }
+
+        params.OneShot = {
+            type = EParamType.Bool,
+            default = true,
+            help = "The trap activates only the first time on use (e.g. explodes chest), rather than every time (e.g. a chest with spikes that come out)"
+        }
+
+        params.Skill = {
+            type = EParamType.String,
+            default="Perception",
+            help=[[The skill checked.]]
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_Off",
+            help = "Sound when trap is turned off"
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_On",
+            help = "Sound when trap is turned on"
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Does the trap start enabled? (will it trigger when using the item?)]],
+        }
+
+        params.StartUseEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Does the item's use start enabled? (should triggering item's use actions be blocked until the EnableObject socket is triggered?)]],
+        }
+
+        params.Type = {
+            type = EParamType.String,
+            default="Interactable",
+            help=[[
+            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]]
+        }
+
+        params.VFXOff = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = "VFX while the trap is disabled."
+        }
+
+        params.VFXOffBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = "Bone on which the the VFX is played."
+        }
+
+        params.VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while the trap is enabled and has been spotted.]],
+            required = false,
+            default = [[VFX_Script_Trap_Overlay_Red_01_a7361f25-e942-e071-7ce3-7a8182f4e0ef]]
+        }
+
+        params.VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the the VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        }
+
+        params.Key = {
+            type = EParamType.String,
+            default="STORYLOCK",
+            help=[[Key used when locking the item]]
+        }
+
+        params.Caster = {
+            type = EParamType.String,
+            help = [[The entity that will cast the spell.
+                     Can be 'me' to set to the entity to which the config is attached.]],
+            default = "me",
+            required = false
+        }
+
+        params.ResponsibleCaster = {
+            type = EParamType.String,
+            help = [[The entity marked as responsible for casting the spell.
+                     If empty, uses the object parameter of the Cast socket event.
+                     Can be 'me' to set to the entity to which the config is attached.]],
+            default = "",
+            required = false
+        }
+
+        params.TargetEntity = {
+            type = EParamType.String,
+            help = [[Target of the spell.
+                    If empty, the spell will be cast on the person using the object.
+                    Can be 'me' to set to the entity to which the config is attached.]],
+            default = "",
+            required = false
+        }
+
+        params.TargetEntity2 = {
+            type = EParamType.String,
+            help = "Second target of the spell.",
+            default = "",
+            required = false
+        }
+
+        params.CastAtPosition = {
+            type = EParamType.Bool,
+            help = "If true, cast at TargetEntity's position instead of target itself",
+            default = true
+        }
+
+        params.Spell = {
+            type = EParamType.String,
+            help = [[The the spell to cast]],
+            required = true
+        }
+
+        params.CastVFX = {type = EParamType.String,
+            help = [[VFX played on the caster when spell is cast.]],
+            required=false,
+            default = ""
+        }
+
+        
+        params.DestroyOnDisarm = {
+            type=EParamType.Bool,
+            default = false,
+            help = "Does the item break on Disarm?"
+        }
+
+
+        outputs.EnableObject = {internal = true}
+        outputs.DisableObject = {internal = true}
+        inputs.DisableObject = {help = "Disable the object, so that interactions trigger not the trap, but the ActivateAttemptFailed socket."}
+        inputs.EnableObject = {help = "Enable the object, so that interactions can trigger the trap (if the trap is active)."}
+        outputs.Activate = {help = [[The trap has activated]]}
+
+        outputs.UseAttempt = {help = "A character attempted to use the item (may be successful or not)"}
+        outputs.UseFinishedSuccessfully = {help = "A character successfully finished using this item (will trigger only after closing in case of a container)"}
+        outputs.UseFailed = {help = "A character failed to use this item (e.g. because it was locked)"}
+
+        inputs.UseAttempt = {internal = true}
+        inputs.UseFinishedSuccessfully = {internal = true}
+        inputs.UseFailed = {internal = true}
+
+        inputs.Reveal = {help = [[Reveals the container]]}
+        outputs.Reveal = {internal = true}
+
+        inputs.DisarmFailed = {internal = true}
+
+        inputs.Disarm = {help = "Disarm this trap."}
+        outputs.Disarm = {internal = true}
+        inputs.Disarmed = {internal = true}
+        outputs.Disarmed = {help = [[The trap was disarmed]]}
+
+        inputs.Lock = {help = "Lock the item using params.Key as key"}
+        inputs.Unlock = {help = "Unlock the item"}
+
+        outputs.Lock = {internal = true}
+        outputs.Unlock = {internal = true}
+
+        outputs.TryActivate = {internal = true}
+        inputs.Activate = {internal = true}
+
+        inputs.UpdateScriptedExplosionSpell = {internal = true}
+
+        inputs.UseBlockedFromStory = {help = [[Item use was blocked from story (because it was not enabled)]]}
+        outputs.UseBlockedFromStory = {internal = true}
+
+        outputs.ActivateAttemptFailed = {help = [[Lever was used while disabled]]}
+        inputs.ActivateAttemptFailed = {internal = true}
+
+        inputs.Destroyed = {internal = true}
+        outputs.Destroyed = {help = "Item was destroyed"}
+
+        nodes.TrappedUsable = Proxy{
+            game.states.TrappedUsable,
+            params = {StartEnabled = params.StartEnabled,
+                      DC = params.DC,
+                      MinDistance = params.MinDistance,
+                      Skill = params.Skill,
+                      Type = params.Type,
+                      VFXOn= params.VFXOn,
+                      VFXOff = params.VFXOff,
+                      VFXOnBone = params.VFXOnBone,
+                      VFXOffBone = params.VFXOffBone,
+                      IsTrap = true,
+                      Key = params.Key,
+                      SoundOn = params.SoundOn,
+                      SoundOff = params.SoundOff,
+                      OneShot = params.OneShot,
+                      DestroyOnDisarm = params.DestroyOnDisarm},
+            inputs = {EnableObject = {outputs.EnableObject},
+                      DisableObject = {outputs.DisableObject},
+                      TryActivate = {outputs.TryActivate},
+                      Reveal = {outputs.Reveal},
+                      Disarm = {outputs.Disarm},
+                      Lock = {outputs.Lock},
+                      Unlock = {outputs.Unlock}},
+            outputs = {Activate = {inputs.Activate},
+                       DisarmFailed = {inputs.DisarmFailed},
+                       Disarmed = {inputs.Disarmed,inputs.UpdateScriptedExplosionSpell},
+                       UseAttempt = {inputs.UseAttempt},
+                       UseFinishedSuccessfully = {inputs.UseFinishedSuccessfully},
+                       UseFailed = {inputs.UseFailed},
+                       ActivateAttemptFailed = {inputs.ActivateAttemptFailed},
+                       Revealed = {inputs.UpdateScriptedExplosionSpell},
+                       Disabled = {inputs.UpdateScriptedExplosionSpell},
+                       Enabled = {inputs.UpdateScriptedExplosionSpell},
+                       Destroyed = {inputs.Destroyed}}
+        }
+
+        nodes.StoryInteractionFilter = Proxy{
+            game.states.StoryInteractionFilter,
+            params = {StartUseEnabled = params.StartUseEnabled},
+            inputs = {EnableStoryItemUse = {outputs.EnableObject},
+                      DisableStoryItemUse = {outputs.DisableObject},
+                      UseBlockedFromStory = {outputs.UseBlockedFromStory}},
+            outputs = {UseBlockedFromStory = {inputs.ActivateAttemptFailed}}
+        }
+
+        nodes.SpellCast = Proxy{
+            game.states.SpellCast,
+            params = {
+                Caster = params.Caster,
+                ResponsibleCaster = params.Caster,
+                TargetEntity = params.TargetEntity,
+                TargetEntity2 = params.TargetEntity2,
+                CastAtPosition = params.CastAtPosition,
+                Spell = params.Spell,
+                VFX = params.CastVFX
+            },
+            inputs = {Cast = {outputs.Activate}}
+        }
+
+        
+        self.OnInit = function(ev)
+            helpers.UpdateScriptedExplosionSpell()
+        end
+
+        self.OnEditorChanges = function(ev)
+            helpers.UpdateScriptedExplosionSpell()
+        end
+
+        helpers.UpdateScriptedExplosionSpell = function()
+            if (me.Blackboard.GetFact("On") == 1 or
+                (me.Blackboard.GetFact("On") == nil and
+                 params.StartEnabled)) and
+               ((params.Type == "None" and
+                 me.Blackboard.GetFact("Cnst.Perception.Discovered") == nil) or
+                me.Blackboard.GetFact("Cnst.Perception.Discovered") == 1) then
+                SetScriptedExplosionSpell(me, params.Spell)
+            else
+               SetScriptedExplosionSpell(me, "")
+            end
+        end
+
+        socketEvents.DisableObject = function(ev)
+            TriggerOutput(outputs.DisableObject, ev.Object, ev.Param)
+        end
+
+        socketEvents.EnableObject = function(ev)
+            TriggerOutput(outputs.EnableObject, ev.Object, ev.Param)
+        end
+
+        socketEvents.Destroyed = function(ev)
+            TriggerOutput(outputs.Destroyed, ev.Object, ev.Param)
+        end
+
+        socketEvents.Reveal = function(ev)
+            TriggerOutput(outputs.Reveal, ev.Object, ev.Param)
+        end
+
+        socketEvents.Activate = function(ev)
+            TriggerOutput(outputs.Activate, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disarm = function(ev)
+            TriggerOutput(outputs.Disarm, ev.Object, ev.Param)
+        end
+
+        socketEvents.DisarmFailed = function(ev)
+            TriggerOutput(outputs.TryActivate, ev.Object, ev.Param)
+        end
+
+        socketEvents.UpdateScriptedExplosionSpell = function(ev)
+            helpers.UpdateScriptedExplosionSpell()
+        end
+
+        socketEvents.Disarmed = function(ev)
+            TriggerOutput(outputs.Disarmed, ev.Object, ev.Param)
+        end
+
+        socketEvents.UseBlockedFromStory = function(ev)
+            TriggerOutput(outputs.UseBlockedFromStory, ev.Object, ev.Param)
+        end
+
+        socketEvents.ActivateAttemptFailed = function(ev)
+            TriggerOutput(outputs.ActivateAttemptFailed, ev.Object, ev.Param)
+        end
+
+        socketEvents.Lock = function(ev)
+            TriggerOutput(outputs.Lock, ev.Object, ev.Param)
+        end
+
+        socketEvents.Unlock = function(ev)
+            TriggerOutput(outputs.Unlock, ev.Object, ev.Param)
+        end
+
+        socketEvents.UseAttempt = function(ev)
+            TriggerOutput(outputs.UseAttempt, ev.Object, ev.Param)
+        end
+
+        socketEvents.UseFinishedSuccessfully = function(ev)
+            TriggerOutput(outputs.UseFinishedSuccessfully, ev.Object, ev.Param)
+        end
+
+        socketEvents.UseFailed = function(ev)
+            TriggerOutput(outputs.UseFailed, ev.Object, ev.Param)
+        end
+    end
+
+}

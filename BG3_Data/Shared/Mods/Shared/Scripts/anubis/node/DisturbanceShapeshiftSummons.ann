@@ -1,0 +1,437 @@
+game.actions.generics.Follow = Action
+{
+    function()
+        try
+            -- will only stop when this disturbance finishes -> only use for secondaries
+            FollowOwnerOrLeader()
+        catch e if ls.CheckType(e, error.MissingEntity) then
+            -- leader no longer exists, e.g. summon got despawned -> just stop
+        end
+    end,
+
+    OnEnter = function()
+        local critter = me.Blackboard.GetFact("Criminal1")
+        local currentFollow = me.Character.FollowCharacter
+        if currentFollow ~= nil then
+            me.Blackboard.SetFact("FollowCriminal_OldFollow", currentFollow)
+        else
+            me.Blackboard.ClearFact("FollowCriminal_OldFollow")
+        end
+        SetFollowCharacter(me.Character, critter.Character)
+    end,
+
+    OnLeave = function()
+        local oldFollow = me.Blackboard.GetFact("FollowCriminal_OldFollow")
+        if oldFollow == nil then
+            SetFollowCharacter(me.Character, nil)
+        else
+            SetFollowCharacter(me.Character, oldFollow.Character)
+        end
+    end
+}
+
+
+game.actions.generics.FollowComment = Action
+{
+    function(state)
+        local critter = me.Blackboard.GetFact("Criminal1")
+        local AD = Dialog(me.Blackboard.GetFact("ArrestDialog"))
+        local isLead = state.CrimesHumanoid.IsLead()
+        local playDialogue = isLead
+
+        local loopCount = 1
+        local maxLoopCount = math.random(8, 10)
+        while loopCount <= maxLoopCount do
+            if IsInDangerousSurfaceFor(me) then
+                FleeFromDangerousSurface()
+            end
+            if CanSee(me, critter) then
+                local distance = GetDistanceTo(me, critter)
+                if (distance < 2.0) or (distance > 4.0) then
+                    try
+                        MoveInRange(critter, 2, 5.0, MovementSpeed.Run)
+                    catch e if ls.CheckType(e, error.MovementFailed) then
+                        -- yeah well
+                    end
+                end
+
+                distance = GetDistanceTo(me, critter)
+                if distance < 8.0 then
+                    --[[ Returns a result indicating whether or not it started, but we don't care.
+                         The critter has no lines, so it won't fail even though it can't speak
+                    ]]
+                    if playDialogue then
+                        StartAutomatedDialogRateLimited(AD, 10.0, 20.0, false, me, critter)
+                    end
+                    if not isLead then
+                        playDialogue = math.random() < 0.2
+                    end
+                end
+                LookAtEntity(critter, 3.0)
+            else
+                local dX = math.random()*2.0 - 1.0
+                local dZ = math.random()*2.0 - 1.0
+                local offset = ls.math.Vector3(dX, 0, dZ)
+                local randomLookAt = me.Position + offset
+                SteerTo(randomLookAt)
+            end
+            Sleep(4.0 + math.random())
+            loopCount = loopCount + 1
+        end
+    end
+}
+
+game.actions.generics.FollowCommentThrow = Action
+{
+    function(state)
+        local critter = me.Blackboard.GetFact("Criminal1")
+        local AD = Dialog(me.Blackboard.GetFact("ArrestDialog"))
+
+        local loopCount = 1
+        local maxLoopCount = math.random(8, 10)
+        while loopCount <= maxLoopCount do
+            if IsInDangerousSurfaceFor(me) then
+                FleeFromDangerousSurface()
+            end
+            if CanSee(me, critter) then
+                local distance = GetDistanceTo(me, critter)
+                if (distance > 1.0) and
+                   (math.random() < 0.2) then
+                    try
+                        MoveInRange(critter, 0.5, 0.9, MovementSpeed.Run)
+                    catch e if ls.CheckType(e, error.MovementFailed) then
+                        -- yeah well
+                    end
+                    LookAtEntity(critter, 3.0)
+                elseif (distance < 2.0) or (distance > 5.0) then
+                    try
+                        MoveInRange(critter, 2.0, 5.0, MovementSpeed.Run)
+                    catch e if ls.CheckType(e, error.MovementFailed) then
+                        -- yeah well
+                    end
+                end
+
+                distance = GetDistanceTo(me, critter)
+                local throwing = false
+                if (distance <= 1.0) then
+                    local throwPos = FindValidPosition(me.Position + me.ForwardDirection * 5, 1.0, critter, false)
+                    if throwPos and CanSee(me, throwPos) then
+                        UseSpell("Throw_Throw", throwPos, critter, nil, nil, true, true, true, true)
+                        throwing = true
+                    end
+                end
+                if not throwing and (distance < 8.0) then
+                    --[[ Returns a result indicating whether or not it started, but we don't care.
+                         The critter has no lines, so it won't fail even though it can't speak
+                    ]]
+                    if AD ~= nil then
+                        if (math.random() < 0.2) then
+                            StartAutomatedDialogRateLimited(AD, 10.0, 20.0, false, me, critter)
+                        end
+                    end
+
+                    if (distance < 2.0) and
+                       (math.random() < 0.2) then
+                        Attack(critter, false, false)
+                    end
+                end
+                LookAtEntity(critter, 3.0)
+            else
+                local dX = math.random()*2.0 - 1.0
+                local dZ = math.random()*2.0 - 1.0
+                local offset = ls.math.Vector3(dX, 0, dZ)
+                local randomLookAt = me.Position + offset
+                SteerTo(randomLookAt)
+            end
+            Sleep(4.0 + math.random())
+            loopCount = loopCount + 1
+        end
+    end
+}
+
+
+game.actions.generics.GoblinKidThrowStonesAtSummon = Action
+{
+    function(state)
+        local critter = me.Blackboard.GetFact("Criminal1")
+        local AD = Dialog(me.Blackboard.GetFact("ArrestDialog"))
+        local isLead = state.CrimesHumanoid.IsLead()
+        local playDialogue = isLead
+
+        local loopCount = 1
+        local maxLoopCount = math.random(4, 8)
+        while (loopCount <= maxLoopCount) do
+            if IsInDangerousSurfaceFor(me) then
+                FleeFromDangerousSurface()
+            end
+            if CanSee(me, critter) then
+                try
+                    MoveInRange(critter, 0.5, 8.0, MovementSpeed.Run)
+                catch e if ls.CheckType(e, error.MovementFailed) then
+                    -- nothing
+                end
+                LookAtEntity(critter, 3.0)
+                if AD ~= nil then
+                    if playDialogue then
+                        StartAutomatedDialogRateLimited(AD, 10.0, 20.0, false, me, critter)
+                    end
+                    -- avoid all secondary investigators start playing their dialgues at the same time
+                    if not isLead then
+                        playDialogue = math.random() < 0.2
+                    end
+                end
+                UseSpell("Projectile_GEB_GoblinKid_ThrowRocks", critter, nil, nil, nil, true, true, true, true)
+                Sleep(2.0)
+                LookAtEntity(critter, 3.0)
+            else
+                local dX = math.random()*2.0 - 1.0
+                local dZ = math.random()*2.0 - 1.0
+                local offset = ls.math.Vector3(dX, 0, dZ)
+                local randomLookAt = me.Position + offset
+                SteerTo(randomLookAt)
+            end
+            Sleep(2.0 + math.random() * 3)
+            loopCount = loopCount + 1
+        end
+        local finishAD = Dialog("GEB_AD_GoblinKidCritterGiveUp_60401196-453e-0d76-da90-1f89b27d56ae")
+        try
+            StartAutomatedDialog(finishAD, true, me)
+        catch e if ls.CheckType(e, error.AutomatedDialogStartFailed) then
+            -- nothing
+        end
+end
+}
+
+game.actions.generics.HerdAnimal = Action
+{
+    function(state)
+        local animal = me.Blackboard.GetFact("Criminal1")
+        local AD = Dialog(me.Blackboard.GetFact("ArrestDialog"))
+        local initialAnimalPos = animal.Position
+        local myInitialPos = me.Position
+        local isLead = state.CrimesHumanoid.IsLead()
+        local playDialogue = isLead
+
+        SetUnicastEntityEvent(me, "CRIME_SetUnsheath")
+
+        while (GetDistanceTo(animal, initialAnimalPos) < 20.0) or
+              (GetDistanceTo(animal, myInitialPos) < 20.0) do
+
+            while IsInDangerousSurfaceFor(me) do
+                FleeFromDangerousSurface()
+            end
+
+            local moveSpeed
+            --[[ Ensure the lead can catch up with the target even when they keep running away,
+                 so that you can't kite everyone away forever (when the lead finishes the
+                 confrontation, so do the secondary investigators)]]--
+            if isLead then
+                moveSpeed = MovementSpeed.Sprint
+            else
+                moveSpeed = MovementSpeed.Run
+            end
+            if (AD ~= nil) then
+                if playDialogue then
+                    StartAutomatedDialogRateLimited(AD, 20.0, 20.0, false, me, animal)
+                end
+                -- avoid all secondary investigators start playing their dialgues at the same time
+                if not isLead then
+                    playDialogue = math.random() < 0.2
+                end
+            end
+
+            local currentDistance = GetDistanceTo(me, animal)
+            if (currentDistance < 5.0) or
+               (currentDistance > 7.0) then
+                local targetVector = me.Position - animal.Position
+                local targetArea = animal.Position + (targetVector / math.sqrt(targetVector * targetVector)) * 6.0
+                local targetPos = FindValidPosition(targetArea, 2.0, me, true)
+                if targetPos ~= nil then
+                    local result = MoveInRange(animal, 5.0, 7.0, moveSpeed, nil, false, false)
+                    if (result == error.MovementError.Blocked) and
+                       (GetDistanceTo(me, animal) < 5.0) then
+                        DebugText(me, "I'm blocked moving out of range, trying to flee!")
+                        result = FleeFrom(RelationType.Party, 10.0, false)
+                        if (result ~= error.MovementError.None) and
+                        (GetDistanceTo(me, animal) < 5.0) then
+                            DebugText(me, "Unable to flee either")
+                        end
+                    end
+                end
+            end
+
+            LookAtEntity(animal, 0.2 * math.random())
+
+            local maxSideMoveCount = math.random(2, 4)
+            local sideMoveCount = 1
+            local currentAnimalPos = animal.Position
+            while (sideMoveCount < maxSideMoveCount) and
+                  (GetDistanceTo(me, animal) >= 5.0) and
+                  (GetDistanceTo(me, animal) <= 7.0) do
+                Sleep(math.random() * 0.1 + 0.1)
+                local newAnimalPos = animal.Position
+                if (currentAnimalPos == newAnimalPos) then
+                    local direction = me.RightDirection * ((math.random() < 0.5) and -1.0 or 1.0)
+                    local newPos = me.Position + direction * (math.random() + 0.2)
+                    if AD ~= nil then
+                        if playDialogue then
+                            StartAutomatedDialogRateLimited(AD, 15.0, 20.0, false, me, animal)
+                        end
+                        if not isLead then
+                            playDialogue = math.random() < 0.3
+                        end
+                    end
+                    MoveTo(newPos, MovementSpeed.Stroll, false, false, 0.1, 0.5, false, PathClimbingMode.StaticOnly, PathDroppingMode.Disabled)
+                    SteerTo(animal, false, 5)
+                    LookAtEntity(animal, 3.0)
+                end
+                currentAnimalPos = newAnimalPos
+                sideMoveCount = sideMoveCount + 1
+            end
+        end
+    end
+}
+
+game.actions.generics.HerdAndOccasionallyAttack = Action
+{
+    function(state)
+        local animal = me.Blackboard.GetFact("Criminal1")
+        local AD = Dialog(me.Blackboard.GetFact("ArrestDialog"))
+        local initialAnimalPos = animal.Position
+        local myInitialPos = me.Position
+        local isLead = state.CrimesHumanoid.IsLead()
+        local playDialogue = isLead
+        local loopCount = 1
+        local isFamiliarCompanionOrWildshapedPlayer =
+        IsTagged(animal, Tag("FIND_FAMILIAR_8713fda9-1855-42ef-8c54-a1e2d5a49194")) or
+        IsTagged(animal, Tag("PLAYABLE_25bf5042-5bf6-4360-8df8-ab107ccb0d37")) or
+
+        SetUnicastEntityEvent(me, "CRIME_SetUnsheath")
+
+        while (GetDistanceTo(animal, initialAnimalPos) < 20.0) or
+              (GetDistanceTo(animal, myInitialPos) < 20.0) do
+
+            while IsInDangerousSurfaceFor(me) do
+                FleeFromDangerousSurface()
+            end
+
+            local moveSpeed
+            --[[ Ensure the lead can catch up with the target even when they keep running away,
+                 so that you can't kite everyone away forever (when the lead finishes the
+                 confrontation, so do the secondary investigators)]]--
+            if isLead then
+                moveSpeed = MovementSpeed.Sprint
+            else
+                moveSpeed = MovementSpeed.Run
+            end
+            if (AD ~= nil) then
+                if playDialogue then
+                    StartAutomatedDialogRateLimited(AD, 20.0, 20.0, false, me, animal)
+                end
+                -- avoid all secondary investigators start playing their dialgues at the same time
+                if not isLead then
+                    playDialogue = math.random() < 0.2
+                end
+            end
+
+            -- don't attack familiars/companions, because we went out of our way to ensure
+            -- players can walk with them everywhere (even in BG city)
+            if not isFamiliarCompanionOrWildshapedPlayer and
+               playDialogue then
+                if loopCount == 3 then
+                    local success = true
+                    try
+                        Attack(animal, false, false)
+                    catch e if ls.CheckType(e, error.AttackFailed) then
+                        success = false
+                    end
+                    if success then
+                        loopCount = 1
+                    end
+                else
+                    loopCount = loopCount + 1
+                end
+            end
+
+            local currentDistance = GetDistanceTo(me, animal)
+            if (currentDistance < 5.0) or
+               (currentDistance > 7.0) then
+                local targetVector = me.Position - animal.Position
+                local targetArea = animal.Position + (targetVector / math.sqrt(targetVector * targetVector)) * 6.0
+                local targetPos = FindValidPosition(targetArea, 2.0, me, true)
+                if targetPos ~= nil then
+                    DebugText(me, "Found valid position: [1]", targetPos)
+                    -- The found valid position falls in this range. Don't specify it directly
+                    -- so the flood can also pick another position if finds one. It's just to
+                    -- make sure that there is _a_ valid position in this range
+                    local result = MoveInRange(animal, 5.0, 7.0, moveSpeed, nil, false, false)
+                    if (result == error.MovementError.Blocked) and
+                       (GetDistanceTo(me, animal) < 5.0) then
+                        DebugText(me, "I'm blocked moving out of range, trying to flee!")
+                        result = FleeFrom(RelationType.Party, 10.0, false)
+                        if (result ~= error.MovementError.None) and
+                        (GetDistanceTo(me, animal) < 5.0) then
+                            DebugText(me, "Unable to flee either")
+                        end
+                    end
+                end
+            end
+
+            LookAtEntity(animal, 0.2 * math.random())
+
+            local maxSideMoveCount = math.random(2, 4)
+            local sideMoveCount = 1
+            local currentAnimalPos = animal.Position
+            while (sideMoveCount < maxSideMoveCount) and
+                  (GetDistanceTo(me, animal) >= 5.0) and
+                  (GetDistanceTo(me, animal) <= 7.0) do
+                Sleep(math.random() * 0.1 + 0.1)
+                local newAnimalPos = animal.Position
+                if (currentAnimalPos == newAnimalPos) then
+                    local direction = me.RightDirection * ((math.random() < 0.5) and -1.0 or 1.0)
+                    local newPos = me.Position + direction * (math.random() + 0.2)
+                    if AD ~= nil then
+                        if playDialogue then
+                            StartAutomatedDialogRateLimited(AD, 15.0, 20.0, false, me, animal)
+                        end
+                        if not isLead then
+                            playDialogue = math.random() < 0.3
+                        end
+                    end
+                    MoveTo(newPos, MovementSpeed.Stroll, false, false, 0.1, 0.5, false, PathClimbingMode.StaticOnly, PathDroppingMode.Disabled)
+                    SteerTo(animal, false, 5)
+                    LookAtEntity(animal, 3.0)
+                end
+                currentAnimalPos = newAnimalPos
+                sideMoveCount = sideMoveCount + 1
+            end
+        end
+    end
+}
+
+game.actions.generics.KeepGuardedDistance = Action
+{
+    function(state)
+        local animal = me.Blackboard.GetFact("Criminal1")
+        local AD = Dialog(me.Blackboard.GetFact("ArrestDialog"))
+        local isLead = state.CrimesHumanoid.IsLead()
+        local playDialogue = isLead
+
+        SetUnicastEntityEvent(me, "CRIME_SetUnsheath")
+
+        while GetDistanceTo(animal, me) <= 7.5 do
+            while IsInDangerousSurfaceFor(me) do
+                FleeFromDangerousSurface()
+            end
+            FleeFrom(RelationType.All, 5.0, false)
+            SteerTo(animal)
+            if not isLead then
+                playDialogue = math.random() < 0.2
+            end
+            if (AD ~= nil) and playDialogue then
+                StartAutomatedDialogRateLimited(AD, 15.0, 20.0, false, me, animal)
+            end
+            LookAtEntity(animal, 1.0 + math.random() * 2.0)
+        end
+    end
+}

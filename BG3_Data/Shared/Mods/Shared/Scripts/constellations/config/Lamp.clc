@@ -1,0 +1,75 @@
+game.configs.Lamp = Config{
+    params={
+        LightEffect = {
+            type = EParamType.String,
+            help = [[VFX while item is lit.]],
+            required = false,
+            default = [[VFX_LightSources_GEN_Torch_A_01_0aee588d-ba2a-aa3b-a048-5fbc03779371]]
+        },
+        StartLit = {
+            type = EParamType.Bool,
+            help = [[Does the item start lit?]],
+            required = false,
+            default = true
+        },
+        GameplayLightRadius = {
+            type = EParamType.Number,
+            help = [[Radius of gameplay light]],
+            required = false,
+            default = 5
+        },
+        GameplayLightSharpness = {
+            type = EParamType.Number,
+            help = [[Sharpness of gameplay light]],
+            required = false,
+            default = 0.1
+        },
+        LightEffectBone = {
+            type = EParamType.String,
+            help = [[Bone on which the VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        GameplayLightOffsetFallback = {
+            type = EParamType.Vector3,
+            help = [[Places the gameplay light at this position if the provided bone is not valid for the entity.]],
+            required = false,
+            default = Vector3(0, 0, 0)
+        },
+        GameplayLight = {
+            type = EParamType.Bool,
+            help = [[Does the item cast a gameplay light, or is purely decorative?]],
+            required = false,
+            default = false
+        },
+        GameplayLightPointLightVerticalLimit = {
+            type = EParamType.Number,
+            help = [[Vertical limit of a point light that does not check line-of-sight]],
+            required = false,
+            default = 2.5
+        }
+    },
+    root=StateRef{
+        game.roots.DefaultTrap,
+        logic = StateRef {
+            game.states.Lamp,
+            GameplayLight = params.GameplayLight,
+            GameplayLightRadius = params.GameplayLightRadius,
+            GameplayLightSharpness = params.GameplayLightSharpness,
+            GameplayLightOffsetFallback = params.GameplayLightOffsetFallback,
+            LightEffect = params.LightEffect,
+            LightEffectBone = params.LightEffectBone,
+            StartLit = params.StartLit,
+            GameplayLightPointLightVerticalLimit = params.GameplayLightPointLightVerticalLimit,
+        },
+    },
+    inputs={
+        TurnOff=ExtSocket{description=[[Turns the light off]],{SocketRef{[[root.logic.inputs.TurnOff]]}}},
+        ChangeVFX=ExtSocket{description=[[Changes VFX used for the light. Expects a string parameter.]],{SocketRef{[[root.logic.inputs.ChangeVFX]]}}},
+        TurnOn=ExtSocket{description=[[Turns the light on]],{SocketRef{[[root.logic.inputs.TurnOn]]}}},
+    },
+    outputs={
+        On=ExtSocket{description=[[Light turned on]],{SocketRef{[[root.logic.outputs.On]]}}},
+        Off=ExtSocket{description=[[Light turned off]],{SocketRef{[[root.logic.outputs.Off]]}}},
+    }
+}

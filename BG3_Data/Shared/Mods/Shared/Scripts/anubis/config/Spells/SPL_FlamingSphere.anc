@@ -1,0 +1,13 @@
+game.configs.SPL_FlamingSphere = Config{
+    params={
+    },
+    root=StateRef{game.roots.DefaultCharacter,
+        genericBehaviours = StateRef{game.states.CrimesHumanoid,
+            InvestigateAD = [[]],
+        },
+        idle = StateRef{game.states.SPL_FlamingSphere},
+        combat = StateRef{game.states.DefaultCombat,
+            FallbackAD = [[]],
+        },
+    }
+}

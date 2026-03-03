@@ -1,0 +1,81 @@
+game.states.SPL_FlamingSphere = State { function ()
+
+    description = [[The Flaming Sphere is a 'summon' that leaves a trail of ash as it moves.]]
+
+    --[[Documentation:
+        StartTimer http://codedocs/gus/Stable/namespacels_1_1anubis_1_1game.html#aa0c5197afc570cbffb2b420195aa7122
+        IsInSurface http://codedocs/gus/Stable/namespacels_1_1anubis_1_1game.html#a3a91d3383475a94a1728ab3706f9230e
+        CreateSurface http://codedocs/gus/Stable/namespacels_1_1anubis_1_1game.html#a79f819ce30f587045e69f9e2fe34c7a6
+        CreatePuddleAt http://codedocs/gus/Stable/namespacels_1_1anubis_1_1game.html#a3fc8c7edb1961912e37ff763eb4c8a23
+        ]]
+
+    local flamingSphereTimerStarted = false
+
+    -----------------------------------------
+    -- Local functions
+    helpers.StartFlamingSphereTimer = function()
+        if me.Active and not flamingSphereTimerStarted and (not me.IsInCombat or me.IsInActiveTeamTurn) then
+            flamingSphereTimerStarted = true
+            StartRealtimeTimer(me, "SPL_FlamingSphere_CheckSurface", 0.1, 0)                         -- tweak timer duration
+        end
+    end
+
+    helpers.StopFlamingSphereTimer = function()
+        flamingSphereTimerStarted = false
+        StopTimer(me, "SPL_FlamingSphere_CheckSurface")
+    end
+
+    -----------------------------------------
+    -- Nodes
+    nodes.FlamingSphere = Action {
+        function()
+            Sleep(1)
+        end
+    }
+
+    -----------------------------------------
+    -- Events
+
+    -- Start timer
+    events.Activated = function()
+        helpers.StartFlamingSphereTimer()
+    end
+
+    events.TurnStarted = function()
+        helpers.StartFlamingSphereTimer()
+    end 
+    
+    events.LeftCombat = function(e)
+        if e.Entity == me then
+            helpers.StartFlamingSphereTimer()
+        end
+    end
+
+    -- Stop timer
+    events.Deactivated = function()
+        helpers.StopFlamingSphereTimer()
+    end
+
+    events.TurnEnded = function()
+        helpers.StopFlamingSphereTimer()
+    end
+
+    -- Create surface
+    events.TimerFinished = function(ev)
+        flamingSphereTimerStarted = false
+        if me.Active and (ev.TimerName == "SPL_FlamingSphere_CheckSurface") then
+            if HasActiveStatus(me, 'FLAMING_SPHERE_AURA') then
+                if not IsInSurface(me, SurfaceType.ASH, 0.3) and not IsInSurface(me, SurfaceType.FIRE, 0.3) then    -- tweak radius check
+                    CreatePuddleAt(me, SurfaceType.FIRE, 6, 10, 1, 2, 0.2, 2.0, me.Character.Owner)    -- tweak cells
+                end
+            else
+                if not IsInSurface(me, SurfaceType.ASH, 0.3) then                                       -- tweak radius check
+                    CreatePuddleAt(me, SurfaceType.ASH, 6, 10, 1, 2, 0.2, 2.0, me.Character.Owner)    -- tweak cells
+                end
+            end
+            helpers.StartFlamingSphereTimer()
+        end
+    end
+
+end
+}

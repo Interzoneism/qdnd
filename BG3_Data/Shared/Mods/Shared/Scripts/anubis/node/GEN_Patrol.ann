@@ -1,0 +1,65 @@
+
+game.states.GEN_Patrol = State{
+    function ()
+
+        params.patrolActions = {type=EParamType.State, required = false, default=nil,
+            help = [[Optional slot for characters to do something while in patrol.
+                This state has higher priority than patrolling and is switched to as soon as its IsSelectable == true]]}
+        params.patrolSpline = {type=EParamType.String, required = true,
+            help = [[Spline to be patrolled]]}
+        params.patrolSpeed = {type=EParamType.String, required = false, default = "Walk",
+            help = [[Speed at which to patrol: Stroll, Walk, Run, or Sprint]]}
+        params.patrolReverse = {type=EParamType.Bool, required = false, default = false,
+            help = [[Whether or not to patrol the spline in reverse]]}
+        params.startSplineIndex = {type=EParamType.Int, required = false, default = -1,
+            help = [[Start spline point index or -1 for nearest]]}
+        params.patrolActionsIsSmallInterrupt = {type=EParamType.Bool, required = false, default = true,
+            help = [[Whether the caret should continue spline movement in background if character deactivates during PatrolActions.
+            		 Almost always safe to leave it to default true value]]}
+
+        local patrolSpline = Spline(params.patrolSpline)
+        local targetSplineIndex = params.startSplineIndex
+
+        local counter = 0
+
+        events.SplineControlPointReached = function(e)
+            targetSplineIndex = e.NewIndex
+        end
+
+        nodes = ImmediateSelector{
+        }
+
+        nodes.PatrolActions = Proxy{
+            params.patrolActions,
+
+            OnEnter = function()
+                if params.patrolActionsIsSmallInterrupt then
+                    ShortPatrolInterrupt()
+                end
+            end
+        }
+
+        nodes.Patrol = Action{
+            function()
+                DoPatrol(patrolSpline, params.patrolReverse, MovementSpeed[params.patrolSpeed], targetSplineIndex)
+
+                -- Example code for pausing occasionally but keep patrolling if we are deactivated
+                -- counter = counter + 1
+                -- if counter < 100 then
+                --     DoPatrol(patrolSpline, params.patrolReverse, MovementSpeed[params.patrolSpeed])
+                -- elseif counter == 100 then
+                --     DebugText(me,"ShortPatrolInterrupt")
+                --     ShortPatrolInterrupt()
+                -- elseif counter > 200 then
+                --     DebugText(me,"DoPatrol")
+                --     counter = 0
+                -- end
+
+            end,
+
+            Valid = function()
+                return patrolSpline ~= nil
+            end
+        }
+    end
+}

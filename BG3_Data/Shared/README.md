@@ -1,0 +1,1 @@
+This "Shared" folder is data directly unpacked from Baldurs Gate 3 and contains most important non-media data.

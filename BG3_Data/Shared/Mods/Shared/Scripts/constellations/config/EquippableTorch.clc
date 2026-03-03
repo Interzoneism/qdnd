@@ -1,0 +1,75 @@
+game.configs.EquippableTorch = Config{
+    params={
+        GameplayLightSharpness = {
+            type = EParamType.Number,
+            help = [[Sharpness of gameplay light]],
+            required = false,
+            default = 0.1
+        },
+        StartLit = {
+            type = EParamType.Bool,
+            help = [[Does the item start lit?]],
+            required = false,
+            default = false
+        },
+        LightOnSound = {
+            type = EParamType.String,
+            help = [[Sound played when this light is turned on.]],
+            required = false,
+            default = [[DEC_Interactive_Lightsources_Torch_Small_On]]
+        },
+        LightOffSound = {
+            type = EParamType.String,
+            help = [[Sound played when this light is turned off.]],
+            required = false,
+            default = [[DEC_Interactive_Lightsources_Torch_Small_Off]]
+        },
+        GameplayLightRadius = {
+            type = EParamType.Number,
+            help = [[Radius of gameplay light]],
+            required = false,
+            default = 5.0
+        },
+        GameplayLight = {
+            type = EParamType.Bool,
+            help = [[Does the item cast a gameplay light, or is purely decorative?]],
+            required = false,
+            default = false
+        },
+        PreviewEffect = {
+            type = EParamType.String,
+            help = [[Effect played on the editor to preview the ingame visual.]],
+            required = false,
+            default = [[VFX_LightSources_GEN_Torch_A_01_0aee588d-ba2a-aa3b-a048-5fbc03779371]]
+        },
+        PreviewEffectBone = {
+            type = EParamType.String,
+            help = "Bone where to play the preview effect.",
+            required = false,
+            default = "Dummy_FX_01"
+        },
+        GameplayLightPointLightVerticalLimit = {
+            type = EParamType.Number,
+            help = [[Vertical limit of a point light that does not check line-of-sight]],
+            required = false,
+            default = 2.5
+        }
+    },
+    root=StateRef{
+        game.roots.DefaultTrap,
+        logic = StateRef{
+            game.states.EquippableTorch,
+            GameplayLight = params.GameplayLight,
+            GameplayLightRadius = params.GameplayLightRadius,
+            GameplayLightSharpness = params.GameplayLightSharpness,
+            StartLit = params.StartLit,
+            LightOnSound = params.LightOnSound,
+            LightOffSound = params.LightOffSound,
+            PreviewEffect = params.PreviewEffect,
+            PreviewEffectBone = params.PreviewEffectBone,
+            GameplayLightPointLightVerticalLimit = params.GameplayLightPointLightVerticalLimit
+        },
+    },
+    inputs={ },
+    outputs={ }
+}

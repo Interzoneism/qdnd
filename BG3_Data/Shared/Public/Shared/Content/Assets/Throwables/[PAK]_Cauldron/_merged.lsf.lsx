@@ -1,0 +1,709 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="VirtualTextureBank">
+		<node id="VirtualTextureBank">
+			<children>
+				<node id="Resource">
+					<attribute id="GTexFileName" type="FixedString" value="76ef608a333ebc75032e7c74f3fb2cf4" />
+					<attribute id="ID" type="FixedString" value="f6cb5c47-56db-3789-0650-39694e22e9f4" />
+					<attribute id="Name" type="LSString" value="DEC_GEN_BoilingCauldron_A" />
+					<attribute id="Prefetch" type="bool" value="False" />
+					<attribute id="PrefetchMipLevel" type="int8" value="-1" />
+					<attribute id="ReferencedColorSpaces" type="uint32" value="6" />
+					<attribute id="VirtualTextureLayerConfig" type="uint32" value="3" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="PhysicsBank">
+		<node id="PhysicsBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="1021226f-e698-fc02-99b5-887b50854d03" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_GEN_BoilingCauldron_Broken_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Throwables/Cauldron/THR_BoilingCauldron_Broken_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Throwables/Cauldron/THR_BoilingCauldron_Broken_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855891" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="4653ab8a-41dc-9da2-0116-fcb4c1ca00ad" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_GEN_BoilingCauldron_Slime_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Throwables/Cauldron/THR_BoilingCauldron_Slime_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Throwables/Cauldron/THR_BoilingCauldron_Slime_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855891" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="78c7d88a-dc64-5d6f-4620-e192fe698fbd" />
+					<attribute id="Name" type="LSString" value="DEC_GEN_BoilingCauldron_Stew_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Throwables/Cauldron/DEC_GEN_BoilingCauldron_Stew_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Throwables/Cauldron/DEC_GEN_BoilingCauldron_Stew_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725656" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="e05ef459-e5b4-6d2e-329e-19f79adcc908" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="DEC_GEN_BoilingCauldron_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Throwables/Cauldron/THR_BoilingCauldron_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Throwables/Cauldron/THR_BoilingCauldron_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855891" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="MaterialBank">
+		<node id="MaterialBank">
+			<children>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+					<attribute id="MaterialType" type="uint8" value="4" />
+					<attribute id="Name" type="LSString" value="DEC_GEN_BoilingCauldron_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Base/Base_AlphaTest_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="f6cb5c47-56db-3789-0650-39694e22e9f4" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.5573377 0.92506737 0.5198281" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.5573377 0.000674 -0.545412" />
+					<attribute id="Center" type="fvec3" value="0 0.458574 -0.012791961" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="2c5881f1-bbbe-8b56-3e21-57a67cb6a70a" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="DEC_GEN_BoilingCauldron_Gruel_A_Bad_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.8861301" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/DEC_GEN_BoilingCauldron_Stew_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/DEC_GEN_BoilingCauldron_Stew_A.Dummy_DEC_GEN_BoilingCauldron_Stew_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855932" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="2236461a-a63d-a3b8-d73e-9232a8b25fb2" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Stew_A_mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Cauldron_A_mesh.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="2236461a-a63d-a3b8-d73e-9232a8b25fb2" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Stew_A_mesh_LOD1.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Cauldron_A_mesh_LOD1.3" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.27866885 0.46253368 0.259653" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.27866885 0.000337 -0.272967" />
+					<attribute id="Center" type="fvec3" value="0 0.229287 -0.0066570044" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="3a17a608-acf7-2e8b-3d54-84eb29c90c48" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="DEC_GEN_BoilingCauldron_Slime_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.44306502" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/DEC_GEN_BoilingCauldron_Slime_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/DEC_GEN_BoilingCauldron_Slime_A.Dummy_THR_BoilingCauldron_Slime.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855932" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Slime_A.THR_BoilingCauldron_Slime_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Slime_A.THR_BoilingCauldron_Slime_Mesh_LOD1.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.3016511 0.42889488 0.24466011" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.24949911 -0.007194843 -0.28096724" />
+					<attribute id="Center" type="fvec3" value="0.023372553 0.20912062 -0.0172216" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="3d9bfaec-b2b1-ccac-2397-4e7ad262c6a7" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="DEC_GEN_BoilingCauldron_Broken_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.43456727" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/DEC_GEN_BoilingCauldron_Broken_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/DEC_GEN_BoilingCauldron_Broken_A.Dummy_THR_BoilingCauldron_Broken_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855932" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Broken_A.THR_BoilingCauldron_Broken_A_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Broken_A.THR_BoilingCauldron_Broken_A_Mesh_LOD1.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.5573377 0.92506737 0.5198281" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.5573377 0.000674 -0.545412" />
+					<attribute id="Center" type="fvec3" value="0 0.458574 -0.012791961" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="547bc111-dc11-384a-d760-3485839d137c" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="DEC_GEN_BoilingCauldron_Gruel_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.8861301" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/DEC_GEN_BoilingCauldron_Stew_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/DEC_GEN_BoilingCauldron_Stew_A.Dummy_DEC_GEN_BoilingCauldron_Stew_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855932" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="5190700f-7e2a-35aa-0fa8-cf7b48989e28" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Stew_A_mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Cauldron_A_mesh.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="5190700f-7e2a-35aa-0fa8-cf7b48989e28" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Stew_A_mesh_LOD1.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Cauldron_A_mesh_LOD1.3" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.54024994 0.916474 0.5198281" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.54024994 0.000674 -0.545412" />
+					<attribute id="Center" type="fvec3" value="0 0.458574 -0.012791961" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="7f7b3737-bcf1-0556-b237-7955924484e7" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="INTERACT_DEC_GEN_BoilingCauldron_Gruel_A_Boiling_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.8861301" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/INTERACT_DEC_GEN_BoilingCauldron_Stew_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/INTERACT_DEC_GEN_BoilingCauldron_Stew_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855925" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_LandingPoint" />
+							<children>
+								<node id="MapValue">
+									<attribute id="Position" type="fvec3" value="-0.68 0 0" />
+									<attribute id="Rotation" type="mat3x3" value="-0.00 -0.00 -1.00 &#xD;&#xA; 0.00  1.00 -0.00 &#xD;&#xA; 1.00  0.00 -0.00 &#xD;&#xA;" />
+								</node>
+							</children>
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="147a0d9b-0bf8-c354-50ab-731c0130e2bd" />
+							<attribute id="ObjectID" type="FixedString" value="INTERACT_DEC_GEN_BoilingCauldron_Stew_A.INTERACT_DEC_GEN_BoilingCauldron_Stew_A_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="INTERACT_DEC_GEN_BoilingCauldron_Stew_A.INTERACT_DEC_GEN_BoilingCauldron_Cauldron_A_Mesh.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.27866885 0.46253368 0.25991404" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.27866885 0.000337 -0.2762486" />
+					<attribute id="Center" type="fvec3" value="0 0.23143534 -0.008167282" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="810c9b0f-1471-7e04-1efb-ebada1d38bfb" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="MaterialType" type="uint8" value="4" />
+					<attribute id="Name" type="LSString" value="DEC_GEN_BoilingCauldron_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.45047793" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/DEC_GEN_BoilingCauldron_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/DEC_GEN_BoilingCauldron_A.Dummy_DEC_GEN_BoilingCauldron_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725656" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_A.DEC_GEN_BoilingCauldron_A_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_A.water.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_A.water_LOD1.2" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_A.DEC_GEN_BoilingCauldron_A_Mesh_LOD1.3" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.5573377 0.92506737 0.5198281" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.5573377 0.000674 -0.545412" />
+					<attribute id="Center" type="fvec3" value="0 0.458574 -0.012791961" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="898cc22f-8c46-29e5-b989-cbeab658e43f" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="DEC_GEN_BoilingCauldron_Stew_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.8861301" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/DEC_GEN_BoilingCauldron_Stew_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/DEC_GEN_BoilingCauldron_Stew_A.Dummy_DEC_GEN_BoilingCauldron_Stew_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855932" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="6d974936-4b4f-0000-683a-bbc37ea78b82" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Stew_A_mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Cauldron_A_mesh.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="6d974936-4b4f-0000-683a-bbc37ea78b82" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Stew_A_mesh_LOD1.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Cauldron_A_mesh_LOD1.3" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.5573377 0.92506737 0.5198281" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.5573377 0.000674 -0.545412" />
+					<attribute id="Center" type="fvec3" value="0 0.458574 -0.012791961" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="c2268034-3554-d50c-05f2-529e77b0da10" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="DEC_GEN_BoilingCauldron_Gruel_A_Bad_A_Boiling_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.8861301" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/DEC_GEN_BoilingCauldron_Stew_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/DEC_GEN_BoilingCauldron_Stew_A.Dummy_DEC_GEN_BoilingCauldron_Stew_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855932" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Attachments">
+							<attribute id="Name" type="FixedString" value="Dummy_DEC_GEN_BoilingCauldron_Stew_A" />
+							<attribute id="UUID" type="FixedString" value="c16ea33c-354f-3547-7c2a-22e9c9774fde" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="a2fb2d3e-607c-bc0b-ab29-e9ffa1a9b129" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Stew_A_mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Cauldron_A_mesh.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="a2fb2d3e-607c-bc0b-ab29-e9ffa1a9b129" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Stew_A_mesh_LOD1.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Cauldron_A_mesh_LOD1.3" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.5573377 0.92506737 0.5198281" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.5573377 0.000674 -0.545412" />
+					<attribute id="Center" type="fvec3" value="0 0.458574 -0.012791961" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="dda9e1ad-de52-10b8-e471-7e62c33dfea5" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="DEC_GEN_BoilingCauldron_Stew_A_Boiling_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.8861301" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/DEC_GEN_BoilingCauldron_Stew_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/DEC_GEN_BoilingCauldron_Stew_A.Dummy_DEC_GEN_BoilingCauldron_Stew_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855932" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Attachments">
+							<attribute id="Name" type="FixedString" value="Dummy_DEC_GEN_BoilingCauldron_Stew_A" />
+							<attribute id="UUID" type="FixedString" value="a831a98d-3799-07be-97a3-57e4ef3a10f3" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="09f53044-0cf4-6506-b209-2e2415275c45" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Stew_A_mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Cauldron_A_mesh.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="09f53044-0cf4-6506-b209-2e2415275c45" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Stew_A_mesh_LOD1.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Cauldron_A_mesh_LOD1.3" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.588868 0.85087216 0.48932022" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.4953778 -0.014389686 -0.5582066" />
+					<attribute id="Center" type="fvec3" value="0.046745107 0.41824123 -0.0344432" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="df653eda-752d-65d6-8f52-eb6b28a2b9de" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="DEC_GEN_BoilingCauldron_Broken_Large_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.86913455" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/DEC_GEN_BoilingCauldron_Broken_Large_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/DEC_GEN_BoilingCauldron_Broken_Large_A.Dummy_THR_BoilingCauldron_Broken_Large_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855944" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Broken_Large_A.THR_BoilingCauldron_Broken_Large_A_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.5573377 0.92506737 0.5198281" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.5573377 0.000674 -0.545412" />
+					<attribute id="Center" type="fvec3" value="0 0.458574 -0.012791961" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="efa42f99-7f1f-2983-7cf1-43445a5eb041" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="DEC_GEN_BoilingCauldron_Gruel_A_Boiling_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.8861301" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/DEC_GEN_BoilingCauldron_Stew_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Throwables/Cauldron/Resources/DEC_GEN_BoilingCauldron_Stew_A.Dummy_DEC_GEN_BoilingCauldron_Stew_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855932" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Attachments">
+							<attribute id="Name" type="FixedString" value="Dummy_DEC_GEN_BoilingCauldron_Stew_A" />
+							<attribute id="UUID" type="FixedString" value="b4d42920-35fd-f73e-d5de-6b5b518a0be6" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="147a0d9b-0bf8-c354-50ab-731c0130e2bd" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Stew_A_mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Cauldron_A_mesh.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="147a0d9b-0bf8-c354-50ab-731c0130e2bd" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Stew_A_mesh_LOD1.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="ac82f723-8fa5-5de5-2667-8a143394726f" />
+							<attribute id="ObjectID" type="FixedString" value="DEC_GEN_BoilingCauldron_Stew_A.DEC_GEN_BoilingCauldron_Cauldron_A_mesh_LOD1.3" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

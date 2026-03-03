@@ -1,0 +1,16 @@
+game.configs.GEN_StandAtTrigger = Config{
+    params={
+        trigger = {
+            type = EParamType.String,
+            help = [[        The trigger at which the character stands.
+    ]],
+            required = true,
+        },
+    },
+    root=StateRef{game.roots.DefaultCharacter,
+        idle = StateRef{game.states.GLO_StandAtTrigger,
+            trigger = params.trigger,
+        },
+        genericBehaviours = StateRef{game.states.CrimesHumanoid},
+    }
+}

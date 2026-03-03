@@ -1,0 +1,36 @@
+game.states.FallingStalactite =  State{function ()
+
+    description = [[Falling stalactite.]]
+    
+    inputs.Drop = {help = [[Object needs to begin falling and then explode.]]}
+    inputs.TookDamage = {internal = true}
+    outputs.Dropped =  {help = [[Object has dropped.]]}
+
+    self.OnInit = function()
+        SetGravity(me,false)
+    end
+    
+    nodes.DamageTrigger = Proxy {
+        game.states.DamageTrigger,
+        outputs = {TookDamage = {inputs.TookDamage}}
+    }
+
+    nodes.Drop = Proxy {
+        game.states.Drop,
+        params = {DestroyType = "FALLING",
+        DestroyProjectileSpell = "Projectile_Stalactite_Explosion"},
+        inputs = {Drop = {outputs.Dropped}},
+        outputs = {Dropped = {inputs.Drop}}
+    }
+
+    socketEvents.TookDamage = function(ev)
+        TriggerOutput(outputs.Dropped, ev.Object)
+    end
+
+    socketEvents.Drop = function(ev)
+        TriggerOutput(outputs.Dropped, ev.Object)
+    end
+    
+end
+}
+    

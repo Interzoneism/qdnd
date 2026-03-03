@@ -1,0 +1,38 @@
+game.configs.StatusTrigger = Config{
+    params={
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the trigger start enabled?]],
+            required = false,
+            default = true
+        },
+        Status = {
+            type = EParamType.String,
+            help = [[Status to apply]],
+            required = true,
+        },
+        EntityFilter = {
+            type = EParamType.String,
+            help = [[Types of Entities to check for. Options:
+            All - check for any kind of entities in the trigger
+            Characters - only check for characters in the trigger
+            LivingCharacters - only check for living characters in the trigger, and character will leave when it dies in the trigger
+            PartyMembers - only check for party members,
+            LivingPartyMembers - only check for living party members,
+            Items - only check for items in the trigger]],
+            required = false,
+            default = [[All]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+    logic = StateRef{game.states.StatusTrigger,
+            StartEnabled = params.StartEnabled,
+            Status = params.Status,
+            EntityFilter = params.EntityFilter,
+        },
+    },
+    inputs={
+        Disable=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+        Enable=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+    }
+}

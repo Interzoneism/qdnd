@@ -1,0 +1,339 @@
+game.states.SightDetector = State{
+    function()
+
+        modules = {"shared.items", "shared.util"}
+
+        params.OnlyDetectParty = {
+            type = EParamType.Bool,
+            default = false,
+            help=[[Whether the detector only detects party members (players, summons and followers).]]
+        }
+
+        params.DetectorEntity = {
+            type = EParamType.String,
+            default = "me",
+            help = "Object that functions as the detecting entity. Supports 'me'. Detector entity needs to be an item that has a sight range defined in its stats!"
+        }
+
+        params.DetectClosestOnly = {
+            type = EParamType.Bool,
+            default = false,
+            help=[[Whether the detector only transmits the DetectedCharacter socket output for the closest detected character.]]
+        }
+
+        params.DC = {
+            type = EParamType.String,
+            default="HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f",
+            help=[[Perception check DC.]]
+        }
+
+        params.MinSkillCheckDistance = {
+            type = EParamType.Number,
+            required=false,
+            default=6.0,
+            help=[[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]]
+        }
+
+        params.DetectionDistance = {
+            type = EParamType.Number,
+            required=false,
+            default=6.0,
+            help=[[Maximum distance at which the target characters will be detected.]]
+        }
+
+        params.OneShot = {
+            type = EParamType.Bool,
+            default = false,
+            help =[[Does the detector disable itself after the first successful use?]]
+        }
+
+        params.Skill = {
+            type = EParamType.String,
+            default="Perception",
+            help=[[The skill checked for discovering the detector if the 'Type' is not 'None'.]]
+        }
+
+        params.VFXOn = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = "VFX while item is on."
+        }
+
+
+        params.VFXOnBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = "Bone on which the the VFX is played."
+        }
+
+        params.VFXOff = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = "VFX while item is off."
+        }
+
+
+        params.VFXOffBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = "Bone on which the the VFX is played."
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_On",
+            help = "Sound when trap is turned on"
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_Off",
+            help = "Sound when trap is turned off"
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = [[Does the detector start enabled? (enabled = pressing it will trigger the 'Pressed' output; disabled = pressing it will the the CantUseAD, if any).]]
+        }
+
+        params.Type = {
+            type = EParamType.String,
+            default="Interactable",
+            help=[[
+            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]]
+        }
+        
+        local detectedCharacters = {}
+
+        inputs.Enable = {help = "Enable detector"}
+        inputs.Disable = {help = "Disable detector"}
+
+        outputs.Enable = {internal = true}
+        outputs.Disable = {internal = true}
+
+        inputs.Reveal = {help = [[Reveals the detector]]}
+        outputs.Reveal = {internal = true}
+
+        outputs.TryActivateInt = {internal = true}
+
+        inputs.ActivateAttemptFailedInt = {internal = true}
+        
+        inputs.ActivatedInt = {internal = true}
+        outputs.ActivatedInt = {internal = true}
+        
+        outputs.AnyDetected = {help = [[The detector is detecting target characters.]]}
+        outputs.NoneDetected = {help = [[The detector is not detecting any target characters.]]}
+        outputs.DetectedCharacter = {help = [[Triggers when a character gets detected. Transmits the detected character entity as the Object parameter.]]}
+        outputs.UndetectedCharacter = {help = [[Triggers when a character is no longer detected. Transmits the detected character entity as the Object parameter.]]}
+
+        nodes.PerceptionDisarmOnOff = Proxy{
+            game.states.PerceptionDisarmOnOff,
+            params = {StartEnabled = params.StartEnabled,
+                      DC = params.DC,
+                      MinDistance = params.MinSkillCheckDistance,
+                      Skill = params.Skill,
+                      Type = params.Type,
+                      VFXOn= params.VFXOn,
+                      VFXOff = params.VFXOff,
+                      VFXOnBone = params.VFXOnBone,
+                      VFXOffBone = params.VFXOffBone,
+                      IsTrap = true,
+                      SoundOn = params.SoundOn,
+                      SoundOff = params.SoundOff,
+                      DestroyOnDisarm = false},
+            inputs = {Enable = {outputs.Enable},
+                      Disable = {outputs.Disable},
+                      Reveal = {outputs.Reveal},
+                      TryActivate = {outputs.TryActivateInt}},
+            outputs = {ActivateAttemptFailed = {inputs.ActivateAttemptFailedInt},
+                       Activate = {inputs.ActivatedInt}}
+        }
+
+
+
+        socketEvents.Enable = function(ev)
+            if me.Blackboard.GetFact("Cnst.Detector.TimerRunning") ~= nil then
+                return
+            end
+
+            TriggerOutput(outputs.Enable, ev.Object, ev.Param)
+            DebugText(me,"Detector enabled")
+            
+            if (params.DetectionDistance > 0.0001) then
+                StartRealtimeTimer(me.Blackboard.GetFact("DetectorEntity"), "Cnst.Detector.CheckSight", 0.5, -1)
+                me.Blackboard.SetFact("Cnst.Detector.TimerRunning", 1)
+            end
+        end
+
+        socketEvents.Disable = function(ev)
+            if me.Blackboard.GetFact("Cnst.Detector.TimerRunning") == nil then
+                return
+            end
+
+            TriggerOutput(outputs.Disable, ev.Object, ev.Param)
+            DebugText(me,"Detector disabled")
+
+            for character,value in pairs(detectedCharacters) do
+                if character ~= nil and value ~= 0 and character.UUID ~= nil then
+                    TriggerOutput(outputs.UndetectedCharacter, character.EntityRef, nil)
+                    DebugText(character,"No longer detected by [1] (detector disabled)",me.Name)
+                end
+            end
+            
+            detectedCharacters = {}
+            mod.util.ClearTableOnBlackboard(me, "Cnst.Detector.DetectedCharacters")
+
+            StopTimer(me, "Cnst.Detector.CheckSight")
+            me.Blackboard.ClearFact("Cnst.Detector.TimerRunning")
+        end
+
+        socketEvents.ActivatedInt = function(ev)
+            TriggerOutput(outputs.ActivatedInt, ev.Object, ev.Param)
+        end
+
+        socketEvents.ActivateAttemptFailedInt = function(ev)
+            TriggerOutput(outputs.ActivateAttemptFailed, ev.Object, ev.Param)
+        end
+
+        socketEvents.Reveal = function(ev)
+            TriggerOutput(outputs.Reveal, ev.Object, ev.Param)
+        end
+
+
+
+        helpers.Init = function()
+            if params.DetectorEntity == "me" then
+                me.Blackboard.SetFact("DetectorEntity", me)
+            else
+                me.Blackboard.SetFact("DetectorEntity", FindEntity(params.DetectorEntity))
+            end
+
+            if params.DetectionDistance > 0.0001 then
+                StartRealtimeTimer(me, "Cnst.Detector.CheckSight", 0.5, -1)
+                me.Blackboard.SetFact("Cnst.Detector.TimerRunning", 1)
+            end
+        end
+
+        self.OnEditorChanges = function()
+            StopTimer(me, "Cnst.Detector.CheckSight")
+            me.Blackboard.ClearFact("Cnst.Detector.TimerRunning")
+            helpers.Init()
+        end
+
+        self.OnInit = function()
+            if me.Blackboard.GetFact("Cnst.Detector.TimerRunning") == nil then
+                helpers.Init()
+            end
+        end
+
+        events.LevelLoaded = function(e)
+            if params.DetectorEntity == "me" then
+                me.Blackboard.SetFact("DetectorEntity", me)
+            else
+                me.Blackboard.SetFact("DetectorEntity", FindEntity(params.DetectorEntity))
+            end
+        end
+
+        self.OnLoaded = function()
+            detectedCharacters = mod.util.LoadTableFromBlackboard(
+                me,
+                "Cnst.Detector.DetectedCharacters",
+                function(val) return (val == 0) and false or true end)
+        end
+
+        events.TimerFinished  = function(e)
+            if e.TimerName == "Cnst.Detector.CheckSight" then
+                local entity = me.Blackboard.GetFact("DetectorEntity") or me
+                local closestDetectedCharacter = nil
+                local closestDetectedCharacterDistance = nil
+                local characterEntity = nil
+                local detecting = 0
+                local distance = 0.0
+                local nowDetecting = {}
+                local actives = {}
+
+                if params.OnlyDetectParty then
+                    actives = GetPartyMembers()
+
+                    for i,char in pairs(actives) do
+                        if GetDistanceTo(me,char) > params.DetectionDistance then
+                            table.remove(actives,i)
+                        end
+                    end
+                else
+                    actives = GetActiveCharacters(entity, params.DetectionDistance)
+                end
+
+                for _,char in pairs(actives) do
+                    if not char.Character.IsDead and CanSee(entity, char) and not HasActiveStatusWithGroup(char, "SG_Invisible") then --TODO: get CanSee functionality?
+                        detecting = 1
+                        
+                        if params.DetectClosestOnly then
+                            --Check closest detected character before sending entity event (after loop)
+                            distance = GetDistanceTo(char,entity)
+
+                            if closestDetectedCharacter == nil or distance < closestDetectedCharacterDistance then
+                                closestDetectedCharacter = char
+                                closestDetectedCharacterDistance = distance
+                            end
+                        else
+                            --Send DetectedCharacter output socket for every detected character
+                            nowDetecting[char.UUID.String] = 1
+                        end
+                    end
+                end
+
+                --Send DetectedCharacter output socket for closest character only
+                if closestDetectedCharacter ~= nil then
+                    nowDetecting[closestDetectedCharacter.UUID.String] = 1
+                    --DebugText(closestDetectedCharacter,"Closest to [1]",me.Name)
+                end
+
+                for characterString,value in pairs(nowDetecting) do
+                    if characterString ~= nil then
+                        characterEntity = FindEntity(characterString)
+
+                        if characterEntity ~= nil and detectedCharacters[characterString] ~= 1 then
+                            detectedCharacters[characterString] = 1
+                            mod.util.SetTableMapEntryOnBlackboard(me, "Cnst.Detector.DetectedCharacters", characterString, 1)
+                            TriggerOutput(outputs.DetectedCharacter, characterEntity.EntityRef, nil)
+                            DebugText(characterEntity,"Detected by [1]",me.Name)
+                        end
+                    end
+                end
+
+                for characterString,value in pairs(detectedCharacters) do
+                    if characterString ~= nil  and value == 1 then
+                        characterEntity = FindEntity(characterString)
+
+                        if characterEntity ~= nil and nowDetecting[characterString] ~= 1 then
+                            mod.util.RemoveTableMapEntryOnBlackboard(me, "Cnst.Detector.DetectedCharacters", characterString)
+                            TriggerOutput(outputs.UndetectedCharacter, characterEntity.EntityRef, nil)
+                            DebugText(characterEntity,"No longer detected by [1]",me.Name)
+                            detectedCharacters[characterString] = nil
+                        end
+                    end
+                end
+
+                if me.Blackboard.GetFact("Detecting") ~= detecting or me.Blackboard.GetFact("Detecting") == nil then
+                    me.Blackboard.SetFact("Detecting",detecting)
+                    if detecting == 1 then                
+                        DebugText(entity,"Someone detected")
+                        TriggerOutput(outputs.AnyDetected, nil, nil)
+                    else
+                        DebugText(entity,"No one detected")
+                        TriggerOutput(outputs.NoneDetected, nil, nil)
+                    end
+                end
+            end
+        end
+    
+    end
+}

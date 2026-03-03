@@ -1,0 +1,32 @@
+game.configs.Helper_PlayVFX = Config{
+    params={
+        VFX = {
+            type = EParamType.String,
+            help = [[VFX to play.]],
+            required = true,
+        },
+        TargetEntity = {
+            type = EParamType.String,
+            help = [[Entity on which to play the VFX.]],
+            required = false,
+            default = [[me]]
+        },
+        VFXBone = {
+            type = EParamType.String,
+            help = [[Bone on which to play the VFX.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.PlayVFX,
+            VFX = params.VFX,
+            VFXTarget = params.TargetEntity,
+            VFXBone = params.VFXBone,
+        },
+    },
+    inputs={
+        PlayVFX=ExtSocket{description=[[Play the VFX]],{SocketRef{[[root.logic.inputs.PlayVFX]]}}},
+        StopVFX=ExtSocket{description=[[Stop the VFX (if it was a looping one)]],{SocketRef{[[root.logic.inputs.StopVFX]]}}},
+    }
+}

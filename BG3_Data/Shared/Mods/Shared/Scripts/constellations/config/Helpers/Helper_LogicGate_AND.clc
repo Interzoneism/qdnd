@@ -1,0 +1,32 @@
+game.configs.Helper_LogicGate_AND = Config{
+    params={
+        StartOn2 = {
+            type = EParamType.Bool,
+            help = [[Does the second object start on?]],
+            required = false,
+            default = false
+        },
+        StartOn1 = {
+            type = EParamType.Bool,
+            help = [[Does the first object start on?]],
+            required = false,
+            default = false
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.LogicGate_AND,
+            StartOn2 = params.StartOn2,
+            StartOn1 = params.StartOn1,
+        },
+    },
+    inputs={
+        A_True=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.On1]]}}},
+        B_True=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.On2]]}}},
+        A_False=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Off1]]}}},
+        B_False=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Off2]]}}},
+    },
+    outputs={
+        On=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.On]]}}},
+        Off=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Off]]}}},
+    }
+}

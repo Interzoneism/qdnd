@@ -1,0 +1,18 @@
+
+game.configs.WeightTrigger = Config{
+    params = {
+        WeightLimit = {type = EParamType.Number, default = 50.0, help = [[
+                        Object's weight limit]]
+                    },
+        TargetEntity = {type = EParamType.String, default = "me", help = "Object on which the weight is checked."},
+    },
+    root = StateRef{game.roots.DefaultTrap,
+                    logic = StateRef{game.states.WeightTrigger,
+                                     WeightLimit = params.WeightLimit}
+                    },
+    outputs = {
+        Overweight = ExtSocket{description=[[Object went over weight]], {SocketRef{[[root.logic.outputs.Overweight]]}}},
+        Underweight = ExtSocket{description=[[Object went under weight]], {SocketRef{[[root.logic.outputs.Underweight]]}}},
+        WeightChanged = ExtSocket{description=[[Weight changed]], {SocketRef{[[root.logic.outputs.WeightChanged]]}}}
+    },
+}

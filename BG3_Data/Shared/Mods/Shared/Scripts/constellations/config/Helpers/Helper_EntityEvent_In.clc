@@ -1,0 +1,16 @@
+game.configs.Helper_EntityEvent_In = Config{
+    params={
+        EventName = {
+            type = EParamType.String,
+            help = [[Event name to which this object reacts.]],
+            required = true,
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.Helper_EntityEvent_In,
+                         EventName = params.EventName},
+    },
+    outputs={
+        EventSent=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.EventSent]]}}},
+    }
+}

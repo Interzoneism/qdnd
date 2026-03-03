@@ -1,0 +1,57 @@
+game.states.DefaultPartyMember = State{function()
+    local CAMP_GLO_State_InCamp = Flag("CAMP_GLO_State_InCamp_161b7223-039d-4ebe-986f-1dcd9a66733f")
+
+    self.Valid = function()
+        return not GetFlag(CAMP_GLO_State_InCamp, me)
+    end
+
+    nodes.Follow = Action
+    {
+        function()
+            FollowOwnerOrLeader()
+        end,
+        Valid = function()
+            local toFollow = me.Character.Owner or me.Character.FollowCharacter
+            if toFollow == nil then
+                return false
+            end
+
+            local distance = GetDistanceTo(me, toFollow)
+
+            return
+                (distance < GetFollowDistance()) and
+                not HasActiveStatus(toFollow, "DYING") and
+                not toFollow.IsInCombat and
+                IsGameLevel() and
+                not me.IsInTurnBasedMode and
+                not toFollow.IsInTurnBasedMode and
+                not IsInDialog(toFollow, true, true) and
+                not HasAppliedStatus(me, "PERFORM_NEGATIVE") and
+                not HasAppliedStatus(me, "PERFORM_POSITIVE")
+
+        end
+    }
+
+    nodes.FTBFallback = Action {
+        function()
+            SetTurnActionsCompleted(me, true)
+            Sleep(0.5)  
+        end,
+        Valid = function()
+            return me.IsInTurnBasedMode and me.Character.HasLostControl
+        end,
+        OnLeave = function()
+            SetTurnActionsCompleted(me, false)
+        end
+    }
+
+    nodes.PauseFollow = Action
+    {
+        function()
+            -- No WaitForInterrupt() since we want the Follow action's condition to be
+            -- regularly re-evaluated (and the owner stopping with sneaking won't
+            -- trigger an interrupt for us)
+            Sleep(0.2)
+        end
+    }
+end}

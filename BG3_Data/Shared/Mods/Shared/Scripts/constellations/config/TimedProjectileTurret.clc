@@ -1,0 +1,162 @@
+game.configs.TimedProjectileTurret = Config{
+    params={
+        BeamEffect = {
+            type = EParamType.String,
+            help = [[Beam effect to connect to the target.]],
+            required = false,
+        },
+        BeamEffectBone = {
+            type = EParamType.String,
+            help = [[Bone where the beam connects.]],
+            required = false,
+        },
+        DC = {
+            type = EParamType.String,
+            help = [[The skill check DC.]],
+            required = false,
+            default = [[HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f]]
+        },
+        Delay = {
+            type = EParamType.Number,
+            help = [[Delay before first shot. Affects immediate shots as well.]],
+            required = false,
+            default = 0
+        },
+        DestroyOnDisarm = {
+            type = EParamType.Bool,
+            help = [[Does the item break on Disarm?]],
+            required = false,
+            default = true
+        },
+        Immediate = {
+            type = EParamType.Bool,
+            help = [[Does the mine shoot the zone spell immediately when enabled instead of first going through a period?]],
+            required = false,
+            default = false
+        },
+        MinDistance = {
+            type = EParamType.Number,
+            help = [[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]],
+            required = false,
+            default = 6
+        },
+        Offset = {
+            type = EParamType.Vector3,
+            help = [[Offset from which the projectile will fire (world coordinates by default, set OffsetIsLocal to true for local coordinates).]],
+            required = false,
+            default = math.Vector3(0, 0, 0)
+        },
+        OffsetIsLocal = {
+            type = EParamType.Bool,
+            help = [[Interpret the Offset as relative to the forward direction of the turret]],
+            required = false,
+            default = false
+        },
+        Period = {
+            type = EParamType.Number,
+            help = [[Delay between shots]],
+            required = true,
+        },
+        Rotation = {
+            type = EParamType.Vector3,
+            help = [[Rotation relative to forward direction in which the projectile will fire.]],
+            required = false,
+            default = math.Vector3(0, 0, 0)
+        },
+        Skill = {
+            type = EParamType.String,
+            help = [[The skill checked for discovering the container and/or its trapped nature if the 'Type' is not 'None'.]],
+            required = false,
+            default = [[Perception]]
+        },
+        SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when turret is disabled]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_Off]]
+        },
+        SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when turret is enabled]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_On]]
+        },
+        Spell = {
+            type = EParamType.String,
+            help = [[Projectile Spell]],
+            required = true,
+            default_value_provider = [[spell_projectile]],
+        },
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the turret start enabled (shooting)?]],
+            required = false,
+            default = true
+        },
+        Type = {
+            type = EParamType.String,
+            help = [[            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[Interactable]]
+        },
+        VFX = {
+            type = EParamType.String,
+            help = [[VFX played when the projectile spell fires]],
+            required = false,
+        },
+        VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while the turret is enabled/shooting.]],
+            required = false,
+            default = [[]]
+        },
+        VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the the VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.TimedProjectileTurret,
+            DC = params.DC,
+            Delay = params.Delay,
+            DestroyOnDisarm = params.DestroyOnDisarm,
+            Immediate = params.Immediate,
+            MinDistance = params.MinDistance,
+            Offset = params.Offset,
+            OffsetIsLocal = params.OffsetIsLocal,
+            Period = params.Period,
+            Rotation = params.Rotation,
+            Skill = params.Skill,
+            SoundOff = params.SoundOff,
+            SoundOn = params.SoundOn,
+            Spell = params.Spell,
+            StartEnabled = params.StartEnabled,
+            Type = params.Type,
+            VFX = params.VFX,
+            VFXOn = params.VFXOn,
+            VFXOnBone = params.VFXOnBone,
+            BeamEffectBone = params.BeamEffectBone,
+            BeamEffect = params.BeamEffect,
+        },
+    },
+    inputs={
+        Disable=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+        SetTarget=ExtSocket{description=[[Set the override target of the spell using an output socket's Object parameter.]],{SocketRef{[[root.logic.inputs.SetTarget]]}}},
+        Enable=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+        ClearTarget=ExtSocket{description=[[Clears the override target of the spell.]],{SocketRef{[[root.logic.inputs.ClearTarget]]}}},
+    },
+    outputs={
+        DisarmFailed=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.DisarmFailed]]}}},
+        Enabled=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Enabled]]}}},
+        Disarmed=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Disarmed]]}}},
+        Disabled=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Disabled]]}}},
+    }
+}

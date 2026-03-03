@@ -1,0 +1,89 @@
+
+game.states.GLO_DominatedCharacter = State{
+function()
+    modules = {"shared.util"}
+
+    description = [[Dominated character behaviour: instead of using PROC_Follow use custom anubis behaviour for characters following others after under the influence of a status from SG_Dominated.]]
+
+    --------------------------------------------------------------
+    -- Local params
+    local charToFollow
+    local originalCharToFollow
+    local wanderAnchor
+    --------------------------------------------------------------
+
+    helpers.GetSourceOfDominationStatus = function()
+        local dominatedStatuses = GetActiveStatusesWithGroup(me, "SG_Dominated") 
+        local source
+
+        if #dominatedStatuses > 0 then
+            source = GetStatusSource(me, dominatedStatuses[#dominatedStatuses]) -- Get last status applied
+            if not source then
+                DebugLogCritical("NULL source for dominated status. Dominated statuses always need a source.")
+            end
+        end
+
+        return source
+    end
+
+    --------------------------------------------------------------
+    -- Nodes
+    nodes.Action_Follow = Action{
+        OnEnter = function()
+            originalCharToFollow = me.Character.FollowCharacter
+
+            charToFollow = helpers.GetSourceOfDominationStatus()
+        end,
+        function()
+            if charToFollow and (me.Character.FollowCharacter ~= charToFollow) then
+                SetFollowCharacter(me.Character, charToFollow.Character)
+            end
+            try
+                FollowOwnerOrLeader()
+            catch e if ls.CheckType(e, error.MissingEntity) then
+                DebugText(me, "Error: missing owner or leader")
+                Sleep(3.0)
+            end
+        end,
+        OnLeave = function()
+            -- Clear character to follow
+            charToFollow = nil
+            if originalCharToFollow ~= nil then 
+                SetFollowCharacter(me.Character, originalCharToFollow.Character)
+            end
+        end,
+        Valid = function()
+            return HasActiveStatusWithGroup(me, "SG_Dominated")
+        end
+    }
+
+    -- Small wander action
+    nodes.Action_Fallback = Action{
+        OnEnter = function()
+            wanderAnchor = me.Position
+        end,
+        function()
+            try
+                Wander(10.0, 3.0, MovementSpeed.Walk, wanderAnchor)
+            catch e if ls.CheckType(e, error.MovementFailed) then
+                DebugText("Error: wander failed")
+                Sleep(3.0)
+            end
+            mod.util.SleepRandom(6.0, 12.0)
+        end
+    }
+    --------------------------------------------------------------
+
+    events.StatusApplied = function(e)
+        if charToFollow ~= helpers.GetSourceOfDominationStatus() then
+            Interrupt() -- Reevaluate if after applying a new status the source changed.
+        end
+    end
+
+    events.StatusRemoved = function(e)
+        if charToFollow ~= helpers.GetSourceOfDominationStatus() then
+            Interrupt() -- Reevaluate if after removing a new status the source changed.
+        end
+    end
+end
+}

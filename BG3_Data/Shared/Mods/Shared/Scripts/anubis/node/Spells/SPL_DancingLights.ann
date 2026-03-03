@@ -1,0 +1,18 @@
+game.states.SPL_DancingLights = State{
+    function ()
+
+    description = [[Dancing Spell helper object]]
+
+    events.Destroyed = function(ev)
+        if ev.Entity == me then
+            --enabl
+        end
+    end
+
+    nodes.Idling = Action{
+        function()
+            WaitForInterrupt()
+        end
+    }
+end
+}

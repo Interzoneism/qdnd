@@ -1,0 +1,342 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="VirtualTextureBank">
+		<node id="VirtualTextureBank">
+			<children>
+				<node id="Resource">
+					<attribute id="GTexFileName" type="FixedString" value="9f0d6a81a6fb0f26bec8fbf3afad5308" />
+					<attribute id="ID" type="FixedString" value="5b0b2a8f-f46f-2e95-9cdc-d256820a7a63" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_GTY_Microscope_A" />
+					<attribute id="Prefetch" type="bool" value="False" />
+					<attribute id="PrefetchMipLevel" type="int8" value="-1" />
+					<attribute id="ReferencedColorSpaces" type="uint32" value="6" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="VirtualTextureLayerConfig" type="uint32" value="3" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115200960758167" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="PhysicsBank">
+		<node id="PhysicsBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="ce8dd796-6a0e-6a87-0d39-1c96d7c114dc" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_GTY_Microscope_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Tools/Githyanki/TOOL_GTY_Microscope_A/TOOL_GTY_Microscope_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Tools/Githyanki/TOOL_GTY_Microscope_A/TOOL_GTY_Microscope_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115200960758167" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="MaterialBank">
+		<node id="MaterialBank">
+			<children>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="311c64ec-4884-c5ed-c5d9-233b69df135d" />
+					<attribute id="MaterialType" type="uint8" value="4" />
+					<attribute id="Name" type="LSString" value="TOOL_GTY_Microscope_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Base/Base_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="5b0b2a8f-f46f-2e95-9cdc-d256820a7a63" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="41164661-bb4b-8c65-19bd-5fe436c524fa" />
+					<attribute id="MaterialType" type="uint8" value="27" />
+					<attribute id="Name" type="LSString" value="TOOL_GTY_Microscope_A_Glass_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Base/Base_Glass_Simple.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="3" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="GlassFresnel" />
+							<attribute id="Value" type="float" value="7" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="961d330f-9ca7-4b95-8eeb-d36c573e16a2" />
+							<attribute id="ParameterName" type="FixedString" value="normalmap" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="9ae74346-e810-dadd-460b-7664486e7eca" />
+							<attribute id="ParameterName" type="FixedString" value="basecolor" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="51941fbe-4a89-2967-15b6-6836e5f7bf41" />
+							<attribute id="ParameterName" type="FixedString" value="physicalmap" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="1 1 1" />
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="ColorMultiplier" />
+							<attribute id="Value" type="fvec3" value="0.98282623 0.9743002 0.9743002" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="TextureBank">
+		<node id="TextureBank">
+			<children>
+				<node id="Resource">
+					<attribute id="Depth" type="int32" value="1" />
+					<attribute id="Height" type="int32" value="1024" />
+					<attribute id="ID" type="FixedString" value="51941fbe-4a89-2967-15b6-6836e5f7bf41" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_GTY_Microscope_A_Glass_A_PM" />
+					<attribute id="SRGB" type="bool" value="False" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Tools/Githyanki/TOOL_GTY_Microscope_A/Resources/TOOL_GTY_Microscope_A_Glass_A_PM.DDS" />
+					<attribute id="Streaming" type="bool" value="True" />
+					<attribute id="Template" type="FixedString" value="TOOL_GTY_Microscope_A_Glass_A_PM" />
+					<attribute id="Type" type="int32" value="1" />
+					<attribute id="Width" type="int32" value="1024" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115200960758167" />
+				</node>
+				<node id="Resource">
+					<attribute id="Depth" type="int32" value="1" />
+					<attribute id="Height" type="int32" value="1024" />
+					<attribute id="ID" type="FixedString" value="9ae74346-e810-dadd-460b-7664486e7eca" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="TOOL_GTY_Microscope_A_Glass_A_BMA" />
+					<attribute id="SRGB" type="bool" value="True" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Tools/Githyanki/TOOL_GTY_Microscope_A/Resources/TOOL_GTY_Microscope_A_Glass_A_BMA.DDS" />
+					<attribute id="Streaming" type="bool" value="True" />
+					<attribute id="Template" type="FixedString" value="TOOL_GTY_Microscope_A_Glass_A_BMA" />
+					<attribute id="Type" type="int32" value="1" />
+					<attribute id="Width" type="int32" value="1024" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115200960758167" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="b6cd0080-69b7-be49-d5f1-806b9551db2d" />
+					<attribute id="BoundsMax" type="fvec3" value="0.3310456 0.8240949 0.3075096" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.3094353 0.019160494 -0.3075096" />
+					<attribute id="Center" type="fvec3" value="0.010805145 0.4216277 0" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="223fd53a-7687-c885-c0f9-c0da0c9d07fd" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="CINE_TOOL_GTY_Microscope_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.59924614" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="4017eb54-64a9-0e40-e7fa-d8b4046f159f" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Tools/Githyanki/TOOL_GTY_Microscope_A/Resources/CINE_TOOL_GTY_Microscope_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Tools/Githyanki/TOOL_GTY_Microscope_A/Resources/CINE_TOOL_GTY_Microscope_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725656" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="311c64ec-4884-c5ed-c5d9-233b69df135d" />
+							<attribute id="ObjectID" type="FixedString" value="CINE_TOOL_GTY_Microscope_A.CINE_TOOL_GTY_Microscope_A_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="41164661-bb4b-8c65-19bd-5fe436c524fa" />
+							<attribute id="ObjectID" type="FixedString" value="CINE_TOOL_GTY_Microscope_A.CINE_TOOL_GTY_Microscope_A_Glass_Mesh.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="63bde9ed-e8c7-a4a5-48a7-13f921093217" />
+							<attribute id="ObjectID" type="FixedString" value="CINE_TOOL_GTY_Microscope_A.CINE_TOOL_GTY_Microscope_A_TADPOLE_A_Body_Mesh.2" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="de7e3c95-a947-f524-6f72-ccff3eaf1c06" />
+							<attribute id="ObjectID" type="FixedString" value="CINE_TOOL_GTY_Microscope_A.CINE_TOOL_GTY_Microscope_A_TADPOLE_A_Eyes_Mesh.3" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="311c64ec-4884-c5ed-c5d9-233b69df135d" />
+							<attribute id="ObjectID" type="FixedString" value="CINE_TOOL_GTY_Microscope_A.CINE_TOOL_GTY_Microscope_A_Mesh_LOD1.4" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="41164661-bb4b-8c65-19bd-5fe436c524fa" />
+							<attribute id="ObjectID" type="FixedString" value="CINE_TOOL_GTY_Microscope_A.CINE_TOOL_GTY_Microscope_A_Glass_Mesh_LOD1.5" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="63bde9ed-e8c7-a4a5-48a7-13f921093217" />
+							<attribute id="ObjectID" type="FixedString" value="CINE_TOOL_GTY_Microscope_A.CINE_TOOL_GTY_Microscope_A_TADPOLE_A_Body_Mesh_LOD1.6" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="de7e3c95-a947-f524-6f72-ccff3eaf1c06" />
+							<attribute id="ObjectID" type="FixedString" value="CINE_TOOL_GTY_Microscope_A.CINE_TOOL_GTY_Microscope_A_TADPOLE_A_Eyes_Mesh_LOD1.7" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.33126426 0.8240949 0.3075096" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.3094353 0.019160494 -0.3075096" />
+					<attribute id="Center" type="fvec3" value="0.010914475 0.4216277 0" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="37d54820-f588-fd07-fa76-78b80a6c070c" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="TOOL_GTY_Microscope_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.59930456" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Tools/Githyanki/TOOL_GTY_Microscope_A/Resources/TOOL_GTY_Microscope_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Tools/Githyanki/TOOL_GTY_Microscope_A/Resources/TOOL_GTY_Microscope_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725656" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="311c64ec-4884-c5ed-c5d9-233b69df135d" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_GTY_Microscope_A.TOOL_GTY_Microscope_A_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="41164661-bb4b-8c65-19bd-5fe436c524fa" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_GTY_Microscope_A.TOOL_GTY_Microscope_A_Glass_Mesh.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="de7e3c95-a947-f524-6f72-ccff3eaf1c06" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_GTY_Microscope_A.TOOL_GTY_Microscope_A_Tadpole_Mesh.2" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="311c64ec-4884-c5ed-c5d9-233b69df135d" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_GTY_Microscope_A.TOOL_GTY_Microscope_A_Mesh_LOD1.3" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="41164661-bb4b-8c65-19bd-5fe436c524fa" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_GTY_Microscope_A.TOOL_GTY_Microscope_A_Glass_Mesh_LOD1.4" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="de7e3c95-a947-f524-6f72-ccff3eaf1c06" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_GTY_Microscope_A.TOOL_GTY_Microscope_A_Tadpole_Mesh_LOD1.5" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="311c64ec-4884-c5ed-c5d9-233b69df135d" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_GTY_Microscope_A.TOOL_GTY_Microscope_A_Mesh_LOD2.6" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="41164661-bb4b-8c65-19bd-5fe436c524fa" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_GTY_Microscope_A.TOOL_GTY_Microscope_A_Glass_Mesh_LOD2.7" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="de7e3c95-a947-f524-6f72-ccff3eaf1c06" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_GTY_Microscope_A.TOOL_GTY_Microscope_A_Tadpole_Mesh_LOD2.8" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="3" />
+							<attribute id="MaterialID" type="FixedString" value="311c64ec-4884-c5ed-c5d9-233b69df135d" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_GTY_Microscope_A.TOOL_GTY_Microscope_A_Mesh_LOD3.9" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="3" />
+							<attribute id="MaterialID" type="FixedString" value="41164661-bb4b-8c65-19bd-5fe436c524fa" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_GTY_Microscope_A.TOOL_GTY_Microscope_A_Glass_Mesh_LOD3.10" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="3" />
+							<attribute id="MaterialID" type="FixedString" value="de7e3c95-a947-f524-6f72-ccff3eaf1c06" />
+							<attribute id="ObjectID" type="FixedString" value="TOOL_GTY_Microscope_A.TOOL_GTY_Microscope_A_Tadpole_Mesh_LOD3.11" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

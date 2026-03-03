@@ -1,0 +1,116 @@
+game.configs.SpikeTrap = Config{
+    params={
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Is the trap armed from game start?]],
+            required = false,
+            default = true
+        },
+        DestroyOnDisarm = {
+            type = EParamType.Bool,
+            help = [[Does the spike trap break on Disarm?]],
+            required = false,
+            default = true
+        },
+        VFXOff = {
+            type = EParamType.String,
+            help = [[VFX while spikes are disabled and have been spotted.]],
+            required = false,
+            default = [[]]
+        },
+        Projectile = {
+            type = EParamType.String,
+            help = [[Projectile Spell used to do the damage.]],
+            required = false,
+            default = [[Projectile_SpikeTrap_Trap]]
+        },
+        DC = {
+            type = EParamType.String,
+            help = [[Perception check DC.]],
+            required = false,
+            default = [[HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f]]
+        },
+        Skill = {
+            type = EParamType.String,
+            help = [[The skill checked for perception.]],
+            required = false,
+            default = [[Perception]]
+        },
+        Type = {
+            type = EParamType.String,
+            help = [[            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[Invisible]]
+        },
+        SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when spike trap is disabled]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_Off]]
+        },
+        VFXOffBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOff' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when spike trap is enabled]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_On]]
+        },
+        WeightLimit = {
+            type = EParamType.Number,
+            help = [[Weight that sets off the trap (in grams).]],
+            required = false,
+            default = 50000
+        },
+        MinDistance = {
+            type = EParamType.Number,
+            help = [[Minimum distance that players are required to be in for the perception skill check. A distance of 0 disables the check.]],
+            required = false,
+            default = 6
+        },
+        VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the enabled-VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while spikes are enabled and have been spotted.]],
+            required = false,
+            default = [[VFX_Script_Trap_Overlay_Red_01_a7361f25-e942-e071-7ce3-7a8182f4e0ef]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.SpikeTrap,
+            DC = params.DC,
+            DestroyOnDisarm = params.DestroyOnDisarm,
+            MinDistance = params.MinDistance,
+            Projectile = params.Projectile,
+            Skill = params.Skill,
+            SoundOff = params.SoundOff,
+            SoundOn = params.SoundOn,
+            StartEnabled = params.StartEnabled,
+            Type = params.Type,
+            VFXOff = params.VFXOff,
+            VFXOffBone = params.VFXOffBone,
+            VFXOn = params.VFXOn,
+            VFXOnBone = params.VFXOnBone,
+            WeightLimit = params.WeightLimit,
+        },
+    },
+    inputs={
+        Enable=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+        Disable=ExtSocket{description=[[]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+    }
+}

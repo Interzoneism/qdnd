@@ -1,0 +1,2171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="AnimationBlueprintBank">
+		<node id="AnimationBlueprintBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="2b95057d-32a6-3a46-9920-01ac814c478d" />
+					<attribute id="Name" type="LSString" value="EYE_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="SourceFile" type="LSString" value="Editor/Mods/Shared/Assets/Blueprints/Characters_Creatures_NoIK.lsabp" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725667" />
+					<children>
+						<node id="Params">
+							<children>
+								<node id="Object">
+									<attribute id="MapKey" type="guid" value="7ef6eab2-bfca-4c97-a4ac-32774d45c217" />
+									<children>
+										<node id="Param">
+											<attribute id="Type" type="FixedString" value="Bool" />
+											<attribute id="Value" type="bool" value="True" />
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="SkeletonBank">
+		<node id="SkeletonBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="DynamicPhysicsResourceID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="ID" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="IKRigResourceID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="Name" type="LSString" value="EYE_Base" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RagdollResourceID" type="FixedString" value="61c7047f-8829-3d40-baa4-797c5b83844d" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_Base.GR2" />
+					<attribute id="SpringResourceID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_Base.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+					<children>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Root_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="eye_upper_m" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_HeadFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_StatusFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="eye_lower_l" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="eye_lower_m" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="eye_upper_l" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_WingFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_HitImpactFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="eye_l" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_TentacleFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_NeckFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_FollowPhysics" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_BodyFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Playerlight" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="eye_upper_r" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="eye_lower_r" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_ChestFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+									<attribute id="SoundObjectIndex" type="uint8" value="3" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_MouthFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+									<attribute id="SoundObjectIndex" type="uint8" value="4" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Blinker_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_L_HandFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_CastFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_OverheadFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_R_HandFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_EyeFX_01" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Root" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Custom_Anim" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="eye_r" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_Playerlight" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_Light_NPC" />
+							<attribute id="Transform" type="mat4x4" value=" 1.00  0.00  0.00 -0.00 &#xD;&#xA; 0.00  1.00  0.00  0.75 &#xD;&#xA; 0.00  0.00  1.00 -0.80 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_Playerlight" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_Light_Player" />
+							<attribute id="Transform" type="mat4x4" value=" 1.00  0.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00  0.00 &#xD;&#xA; 0.00  0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Root_M" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_HeadFX" />
+							<attribute id="Transform" type="mat4x4" value=" 1.00  0.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00  0.00 &#xD;&#xA; 0.00  0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Root_M" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_CombatLookAt" />
+							<attribute id="Transform" type="mat4x4" value=" 1.00  0.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00  0.00 &#xD;&#xA; 0.00  0.00  1.00 -0.30 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_Root" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_DIAG_Camera" />
+							<attribute id="Transform" type="mat4x4" value=" 1.00  0.00  0.00 -0.51 &#xD;&#xA; 0.00  1.00  0.00  0.60 &#xD;&#xA; 0.00  0.00  1.00  0.19 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_Root" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_COMBAT_Camera" />
+							<attribute id="Transform" type="mat4x4" value=" 1.00  0.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00  0.00 &#xD;&#xA; 0.00  0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="PhysicsBank">
+		<node id="PhysicsBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="2a7abf98-0670-7963-1364-d38168785afa" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="Eye_Scrying_Rig_A_Death_Phys" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/Eye_Scrying_Rig_A_Death_Phys.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/Eye_Scrying_Rig_A_Death_Phys" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115200960757861" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="5919701a-75f1-f6ab-2dcc-474cfe3b486a" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="Eye_Scrying_Rig_A_Picking_Phys" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/Eye_Scrying_Rig_A_Picking_Phys.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/Eye_Scrying_Rig_A_Picking_Phys" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855910" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="61c7047f-8829-3d40-baa4-797c5b83844d" />
+					<attribute id="Name" type="LSString" value="EYE_Ragdoll" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_Ragdoll.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_Ragdoll" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403208706" />
+					<children>
+						<node id="ObjectTemplates">
+							<attribute id="UUID" type="FixedString" value="61c7047f-8829-3d40-baa4-797c5b83844d" />
+							<children>
+								<node id="PhysicsCapsule">
+									<attribute id="Height" type="float" value="1" />
+									<attribute id="Kinematic" type="bool" value="True" />
+									<attribute id="Mass" type="float" value="0" />
+									<attribute id="Radius" type="float" value="0.5" />
+									<attribute id="UUID" type="FixedString" value="fb525311-b558-4056-3827-a9c2e4cfeb7f" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="6e4fb1c7-5180-9eca-4bcd-1fe815c5fc74" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="Eye_Shadowquake_A_Picking_Phys" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/Eye_Shadowquake_A_Picking_Phys.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/Eye_Shadowquake_A_Picking_Phys" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725559" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="8674b151-994e-7b39-e1a9-4e4df5afcbad" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="Eye_Shadowquake_A_Death_Phys" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/Eye_Shadowquake_A_Death_Phys.bin" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/Eye_Shadowquake_A_Death_Phys" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725559" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationSetBank">
+		<node id="AnimationSetBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="f1c9dc48-8692-8668-e1ee-e4e4c2fad46e" />
+					<attribute id="Name" type="LSString" value="EYE_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144959613005988140" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets">
+											<children>
+												<node id="Object">
+													<attribute id="FallBackSubSet" type="FixedString" value="" />
+													<attribute id="MapKey" type="FixedString" value="" />
+													<children>
+														<node id="Animation">
+															<children>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9673b8ca-3a41-e0ea-d645-aa3e412bc711" />
+																	<attribute id="MapKey" type="FixedString" value="414bbf02-2918-4f01-83fb-1ddc7a588d88" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f2036e65-09d5-6408-d505-7efd4e54d3a8" />
+																	<attribute id="MapKey" type="FixedString" value="cf27f269-3d43-4bfa-b370-e48d27ab2d0e" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5a580e7d-e6a2-048e-de97-f99cec968f69" />
+																	<attribute id="MapKey" type="FixedString" value="ca62839e-b440-43b7-9235-3424a45ffb88" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="b88e43c6-105e-0fe9-7113-4954c21ee449" />
+																	<attribute id="MapKey" type="FixedString" value="5001386e-fe1f-4546-b27c-6afac88eeb0b" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5c301070-caeb-35a9-3aad-854306b4f414" />
+																	<attribute id="MapKey" type="FixedString" value="cc5b0caf-3ed1-4711-a50d-11dc3f1fdc6a" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f2036e65-09d5-6408-d505-7efd4e54d3a8" />
+																	<attribute id="MapKey" type="FixedString" value="187e51d5-edd6-431f-84fe-eff84ecf1750" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="d982126e-2f41-d9d9-8fa0-2d22c739495e" />
+																	<attribute id="MapKey" type="FixedString" value="5b5a6d62-4405-4f20-8868-a3b10c5160a6" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9673b8ca-3a41-e0ea-d645-aa3e412bc711" />
+																	<attribute id="MapKey" type="FixedString" value="9313094a-bae2-454f-9701-f920d0e8e98d" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="4459cd9f-3415-109b-214e-c91ef7857fb9" />
+																	<attribute id="MapKey" type="FixedString" value="af84b904-33ad-49fb-8693-8e62917ffe19" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5c301070-caeb-35a9-3aad-854306b4f414" />
+																	<attribute id="MapKey" type="FixedString" value="7bb52cd4-0b1c-4926-9165-fa92b75876a3" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="71da5825-ccb3-11a5-ef8c-66cdfe00bcd4" />
+																	<attribute id="MapKey" type="FixedString" value="b18fe171-d5ff-4ec9-87d3-5ad5493e841e" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5c301070-caeb-35a9-3aad-854306b4f414" />
+																	<attribute id="MapKey" type="FixedString" value="42aaefdc-cf9b-4249-b159-285041851f69" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="a513f463-599d-7112-f3f1-2c9c9f367ac9" />
+																	<attribute id="MapKey" type="FixedString" value="881e6512-732b-48d1-9606-e235bcf97e50" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f2036e65-09d5-6408-d505-7efd4e54d3a8" />
+																	<attribute id="MapKey" type="FixedString" value="9214185e-c1ae-4e4b-838d-977b8588bd7a" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="ffffe54d-d5fc-d084-9075-d1f872330928" />
+																	<attribute id="MapKey" type="FixedString" value="cfc94799-5178-495f-98f4-7f6f726fab02" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="68ea77ba-8902-62b2-90a5-de66977541b4" />
+																	<attribute id="MapKey" type="FixedString" value="9acc8342-26ac-48ac-b569-18c07296456b" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="cf3e9181-b918-3dd3-85ac-63212cd385c5" />
+																	<attribute id="MapKey" type="FixedString" value="510ff37e-0618-40e4-8ce0-236e3dc9c291" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9673b8ca-3a41-e0ea-d645-aa3e412bc711" />
+																	<attribute id="MapKey" type="FixedString" value="3ff87abf-1ea1-4c32-aadf-c822d74c7dc0" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9673b8ca-3a41-e0ea-d645-aa3e412bc711" />
+																	<attribute id="MapKey" type="FixedString" value="03496c4a-49e0-4132-b585-3e5ecd1ad8e5" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f2036e65-09d5-6408-d505-7efd4e54d3a8" />
+																	<attribute id="MapKey" type="FixedString" value="6f188c33-cc0e-4515-804e-8c6cf5e97f26" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="3be70223-6586-e511-5806-3d6f5cb09252" />
+																	<attribute id="MapKey" type="FixedString" value="e22702f5-04d5-41a1-97ac-9b9f6b317d98" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5c301070-caeb-35a9-3aad-854306b4f414" />
+																	<attribute id="MapKey" type="FixedString" value="0c5dcc83-fa78-41da-b6a5-440b5ea30936" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="023383d5-b60e-d9f3-2220-d22d27f98647" />
+																	<attribute id="MapKey" type="FixedString" value="14294166-95db-46c1-b22a-2b780c2c2790" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9673b8ca-3a41-e0ea-d645-aa3e412bc711" />
+																	<attribute id="MapKey" type="FixedString" value="554a18f7-952e-494a-b301-7702a85d4bc9" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c7ec3478-48f4-7e42-f166-30d985ad3476" />
+																	<attribute id="MapKey" type="FixedString" value="db0c8bad-7936-408c-9b8c-0378c96e2713" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="66d1510a-f791-0b36-59b7-3426117fcd81" />
+																	<attribute id="MapKey" type="FixedString" value="1c364663-4698-4f11-a39a-85833e4d0d75" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f2036e65-09d5-6408-d505-7efd4e54d3a8" />
+																	<attribute id="MapKey" type="FixedString" value="0449ace0-eb64-4a23-942e-591130a0424c" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="0c6635a8-aa8b-8b01-60bd-7fcfb2f16432" />
+																	<attribute id="MapKey" type="FixedString" value="f0495ceb-43de-43af-9160-0d5038c688e7" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5c301070-caeb-35a9-3aad-854306b4f414" />
+																	<attribute id="MapKey" type="FixedString" value="808fdfab-2e6c-472e-b3c4-19ce4a719d9d" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5d25a0c8-e3ee-8626-9df6-3720ebfee07f" />
+																	<attribute id="MapKey" type="FixedString" value="5f127742-79d4-4590-839f-6eb5ae45930d" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="4459cd9f-3415-109b-214e-c91ef7857fb9" />
+																	<attribute id="MapKey" type="FixedString" value="8dccb0f6-24e3-44b7-a60b-1f217b7db523" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="64dd6a33-7c0c-9268-5354-92a15bebfddc" />
+																	<attribute id="MapKey" type="FixedString" value="2b81c18b-9698-4262-a623-932c2bb1296d" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c7ec3478-48f4-7e42-f166-30d985ad3476" />
+																	<attribute id="MapKey" type="FixedString" value="99115bc1-ee80-4060-b74e-7a0583a13345" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="b15c1d59-63db-a81f-c623-5a4ce7f54a5d" />
+																	<attribute id="MapKey" type="FixedString" value="e9ad50df-e7f1-43a0-b782-4c08f92b0f5a" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f2036e65-09d5-6408-d505-7efd4e54d3a8" />
+																	<attribute id="MapKey" type="FixedString" value="27ec0fe8-6400-4429-b378-465c487ffbf7" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c7ec3478-48f4-7e42-f166-30d985ad3476" />
+																	<attribute id="MapKey" type="FixedString" value="079e0116-ea7f-4a9d-9aee-7ac7fd9211cf" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="aeb1ff6f-e69e-b373-189b-29f513454f30" />
+																	<attribute id="MapKey" type="FixedString" value="9e02c309-46c1-43ef-b47c-ad6983058c19" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5c301070-caeb-35a9-3aad-854306b4f414" />
+																	<attribute id="MapKey" type="FixedString" value="d8925ce4-d6d9-400c-92f5-ad772ef7f178" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="e49c6fff-e91d-93de-e82c-1599fbe94422" />
+																	<attribute id="MapKey" type="FixedString" value="0f04649b-f556-4b73-9e7b-7705e3bfa577" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="68f8d46a-5120-5b61-cffa-cf3a1cafbf3f" />
+																	<attribute id="MapKey" type="FixedString" value="50398f4e-dd82-4d6a-ad43-aedd578543d9" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="991e2dde-9685-6de9-1330-955def932074" />
+																	<attribute id="MapKey" type="FixedString" value="5941832a-1acb-4452-948c-c1b7caef7b5f" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="4cba5812-d5f8-8ae4-aed0-cba0383923f6" />
+																	<attribute id="MapKey" type="FixedString" value="5658922f-15c5-4729-b736-ca4456228628" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="4cba5812-d5f8-8ae4-aed0-cba0383923f6" />
+																	<attribute id="MapKey" type="FixedString" value="07e81afc-95c4-452b-ac68-5cbb74710cca" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5c301070-caeb-35a9-3aad-854306b4f414" />
+																	<attribute id="MapKey" type="FixedString" value="a9682ef9-5d9e-4ac0-8144-2c7fe6eb868c" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f2036e65-09d5-6408-d505-7efd4e54d3a8" />
+																	<attribute id="MapKey" type="FixedString" value="79261934-8627-4c47-947d-446ac04bca3d" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5d25a0c8-e3ee-8626-9df6-3720ebfee07f" />
+																	<attribute id="MapKey" type="FixedString" value="153449c8-7d4c-42e9-9f36-8fbae59a909b" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="023383d5-b60e-d9f3-2220-d22d27f98647" />
+																	<attribute id="MapKey" type="FixedString" value="721abca5-2d52-4317-82a3-2a2e970a7a16" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5c301070-caeb-35a9-3aad-854306b4f414" />
+																	<attribute id="MapKey" type="FixedString" value="22dfbbf4-f417-4c84-b39e-2039315961e6" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f8f7540a-b47e-1e40-cafd-d400a86a6277" />
+																	<attribute id="MapKey" type="FixedString" value="06a9866d-0206-4016-a7ee-f124a623d73c" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="023383d5-b60e-d9f3-2220-d22d27f98647" />
+																	<attribute id="MapKey" type="FixedString" value="e8a5c57f-855b-4227-acaa-11e8ce8d7d64" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="185bf4be-fa1a-e4d8-5d8c-7f02343c192a" />
+																	<attribute id="MapKey" type="FixedString" value="a508bef8-6767-4560-ac3a-6c04132c825e" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="71da5825-ccb3-11a5-ef8c-66cdfe00bcd4" />
+																	<attribute id="MapKey" type="FixedString" value="696e513e-9524-4c35-90e8-8b66f7b7bad9" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="66d1510a-f791-0b36-59b7-3426117fcd81" />
+																	<attribute id="MapKey" type="FixedString" value="b5d99946-0646-4bdd-88a0-9604872a0dd9" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f2036e65-09d5-6408-d505-7efd4e54d3a8" />
+																	<attribute id="MapKey" type="FixedString" value="e312459b-34d3-4612-8dee-fc41901caa04" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="97410713-a39d-138e-5e18-3b8e6fac574d" />
+																	<attribute id="MapKey" type="FixedString" value="0ea9c815-ea38-47a0-b074-388a71957e1d" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="a734fa9a-29f1-5462-7aff-ffaad539cd0a" />
+																	<attribute id="MapKey" type="FixedString" value="62bf8952-d098-4e5d-94aa-e54aabf37c2e" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="0196d23d-f0eb-7b1d-c5cd-cd853b960718" />
+																	<attribute id="MapKey" type="FixedString" value="821aed88-e17b-4b85-b37a-533f90fbba84" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="4cba5812-d5f8-8ae4-aed0-cba0383923f6" />
+																	<attribute id="MapKey" type="FixedString" value="5cff24c4-99d7-4205-9187-21eada3d1614" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="33a7aa4f-738f-1de1-e2e6-12bf38f0057d" />
+																	<attribute id="MapKey" type="FixedString" value="0036dd28-0484-47fd-87bd-efa6af2b9f85" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="68f8d46a-5120-5b61-cffa-cf3a1cafbf3f" />
+																	<attribute id="MapKey" type="FixedString" value="f4ac302b-1569-404f-bd52-1fe443e265df" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c7ec3478-48f4-7e42-f166-30d985ad3476" />
+																	<attribute id="MapKey" type="FixedString" value="a10ede4b-6b1f-46d3-b52f-2dde06d738d1" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5638ecea-dbae-63fb-1dd7-54b514651601" />
+																	<attribute id="MapKey" type="FixedString" value="4ae452d5-4a2e-471a-bc98-907c9ca6c523" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="4c26c56f-3305-3389-bbff-62ee958dc14c" />
+																	<attribute id="MapKey" type="FixedString" value="5e7e63e1-0e69-46e7-ade7-fe3dadcc9184" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9396080f-bb45-9bde-6c76-2bfef7e8742b" />
+																	<attribute id="MapKey" type="FixedString" value="c2da4fe4-0870-4c0a-b7af-3a51e9b8dc91" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f2036e65-09d5-6408-d505-7efd4e54d3a8" />
+																	<attribute id="MapKey" type="FixedString" value="395fc3ee-59ab-4114-9b91-ad536473acfd" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="0196d23d-f0eb-7b1d-c5cd-cd853b960718" />
+																	<attribute id="MapKey" type="FixedString" value="cf3f0e09-1a9e-430d-8be2-7a4c0c8a875e" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="1ef28d1b-f58f-82a9-a325-5c23a55164e3" />
+																	<attribute id="MapKey" type="FixedString" value="9c83a871-ff94-48c4-a546-ec9a1753c07f" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="64dd6a33-7c0c-9268-5354-92a15bebfddc" />
+																	<attribute id="MapKey" type="FixedString" value="925779e7-8bf6-4d56-8c4d-42c3bc01c60c" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="04cb7197-df0f-db45-1d1f-7b04d1dfec2b" />
+																	<attribute id="MapKey" type="FixedString" value="78eb825c-cf79-46c9-bb59-11a3df7b29f9" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="74b1f40d-38bf-7330-2008-1a63855162ad" />
+																	<attribute id="MapKey" type="FixedString" value="577bcf78-3d3d-4bc3-a064-fc59b2280153" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="4cba5812-d5f8-8ae4-aed0-cba0383923f6" />
+																	<attribute id="MapKey" type="FixedString" value="00800f03-ef99-4b9f-8511-6440ca697356" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f2036e65-09d5-6408-d505-7efd4e54d3a8" />
+																	<attribute id="MapKey" type="FixedString" value="a443a68d-5c8a-4ce2-8c41-0270fedcf946" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5d25a0c8-e3ee-8626-9df6-3720ebfee07f" />
+																	<attribute id="MapKey" type="FixedString" value="1781fdf4-f6d7-4d8c-b9d4-a7bea3a56e37" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="b4078e01-5f13-582e-b453-7d7b46d45cbb" />
+																	<attribute id="MapKey" type="FixedString" value="fd5e6365-f314-42e8-a39b-a041dc56b0e7" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="a5593d5c-1b27-1923-745d-a3963ba00813" />
+																	<attribute id="MapKey" type="FixedString" value="5df11e35-f081-44f7-bd6f-7049d0e533cd" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="8ab948f1-67a2-5c3e-2004-278eff3727f5" />
+																	<attribute id="MapKey" type="FixedString" value="c36a9627-a348-4cca-abcf-206b29c791b9" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f2036e65-09d5-6408-d505-7efd4e54d3a8" />
+																	<attribute id="MapKey" type="FixedString" value="a1d88cbd-58a1-40ba-b13e-6dd4d78d18ba" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9673b8ca-3a41-e0ea-d645-aa3e412bc711" />
+																	<attribute id="MapKey" type="FixedString" value="72a23116-61b9-4de1-ac61-620dcfeb3ae4" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="d44b77b4-f17a-277b-f978-7cdef475e285" />
+																	<attribute id="MapKey" type="FixedString" value="0532ad73-988e-4b70-bb96-434bb2532bad" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="a531c649-b8e2-ad45-e57f-f6406e77f235" />
+																	<attribute id="MapKey" type="FixedString" value="6e1041c4-7e59-45c4-8ad9-e47480b95020" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="4cba5812-d5f8-8ae4-aed0-cba0383923f6" />
+																	<attribute id="MapKey" type="FixedString" value="ab6fb758-3ff1-42c9-9716-3372d1701a95" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="64dd6a33-7c0c-9268-5354-92a15bebfddc" />
+																	<attribute id="MapKey" type="FixedString" value="6606c30b-be1c-4f17-ae6b-1a591c80b18c" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f2036e65-09d5-6408-d505-7efd4e54d3a8" />
+																	<attribute id="MapKey" type="FixedString" value="91dc33c9-0871-4529-ac01-a068f4cd51f3" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f2036e65-09d5-6408-d505-7efd4e54d3a8" />
+																	<attribute id="MapKey" type="FixedString" value="0e5e02b3-a4ca-4d5b-bb42-71b097887a18" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="68f8d46a-5120-5b61-cffa-cf3a1cafbf3f" />
+																	<attribute id="MapKey" type="FixedString" value="3b1ecad1-dd85-4073-8799-e353e2460691" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="b8080515-c587-ad5f-a130-a791af4d6516" />
+																	<attribute id="MapKey" type="FixedString" value="ff165c3d-2b23-4f79-a592-3b7799574494" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="4cba5812-d5f8-8ae4-aed0-cba0383923f6" />
+																	<attribute id="MapKey" type="FixedString" value="7def448c-ee51-48da-a683-e8f8992efb82" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9673b8ca-3a41-e0ea-d645-aa3e412bc711" />
+																	<attribute id="MapKey" type="FixedString" value="dd86aa43-8189-4d9f-9a5c-454b5fe4a197" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f2036e65-09d5-6408-d505-7efd4e54d3a8" />
+																	<attribute id="MapKey" type="FixedString" value="d326ed36-d633-4414-a1ff-68227e9d3c5c" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5d25a0c8-e3ee-8626-9df6-3720ebfee07f" />
+																	<attribute id="MapKey" type="FixedString" value="43869da1-1252-4531-aee3-7408321d2424" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9673b8ca-3a41-e0ea-d645-aa3e412bc711" />
+																	<attribute id="MapKey" type="FixedString" value="8b8bb757-21ce-4e02-a2f3-97d55cf2f90b" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9673b8ca-3a41-e0ea-d645-aa3e412bc711" />
+																	<attribute id="MapKey" type="FixedString" value="6f42f5f3-7a5a-4441-a02e-71b0450ac4b7" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="884d6b2c-c02e-3d07-7ebe-1fd23f72cc9e" />
+																	<attribute id="MapKey" type="FixedString" value="5dcdcc4c-3744-451f-b5cf-ed96664481cc" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f2036e65-09d5-6408-d505-7efd4e54d3a8" />
+																	<attribute id="MapKey" type="FixedString" value="8145f891-e1f3-4510-b166-d974ef1c3896" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5c301070-caeb-35a9-3aad-854306b4f414" />
+																	<attribute id="MapKey" type="FixedString" value="4c1b2e5c-2352-4128-a263-233e921a19c4" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="29e91f0a-9134-48ca-9da8-a43a14a320d1" />
+																	<attribute id="MapKey" type="FixedString" value="0f474b42-8612-42b3-994e-d5d4b2e62f9c" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="023383d5-b60e-d9f3-2220-d22d27f98647" />
+																	<attribute id="MapKey" type="FixedString" value="1c343e00-7e6c-4f53-b588-074a3cdb9c7d" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationBank">
+		<node id="AnimationBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4" />
+					<attribute id="ID" type="FixedString" value="0196d23d-f0eb-7b1d-c5cd-cd853b960718" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_LOCO_Run_F_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_LOCO_Run_F_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_LOCO_Run_F_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144537400540921856" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Vocal_Angry" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="13" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="3" />
+							<children>
+								<node id="Properties">
+									<attribute id="EVocalType" type="uint8" value="10" />
+									<attribute id="Resource" type="FixedString" value="" />
+									<attribute id="SoundObjectIndex" type="uint8" value="4" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.4666667" />
+					<attribute id="ID" type="FixedString" value="023383d5-b60e-d9f3-2220-d22d27f98647" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_CMBT_Skill_Dash_01_Recover" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Dash_01_Recover.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Dash_01_Recover.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.4" />
+					<attribute id="ID" type="FixedString" value="04cb7197-df0f-db45-1d1f-7b04d1dfec2b" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_YawL" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_YawL.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_YawL.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.6666667" />
+					<attribute id="ID" type="FixedString" value="0c6635a8-aa8b-8b01-60bd-7fcfb2f16432" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_Skill_Shout_CallForHelp_01_Loop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_Skill_Shout_CallForHelp_01_Loop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_Skill_Shout_CallForHelp_01_Loop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.6" />
+					<attribute id="ID" type="FixedString" value="185bf4be-fa1a-e4d8-5d8c-7f02343c192a" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_TakeOff" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_TakeOff.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_TakeOff.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.6333334" />
+					<attribute id="ID" type="FixedString" value="1ef28d1b-f58f-82a9-a325-5c23a55164e3" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_CMBT_Skill_Shout_HelpArrives_01_Recover" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Shout_HelpArrives_01_Recover.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Shout_HelpArrives_01_Recover.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.53333336" />
+					<attribute id="ID" type="FixedString" value="29e91f0a-9134-48ca-9da8-a43a14a320d1" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_Skill_Shout_CallForHelp_01_Recover" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_Skill_Shout_CallForHelp_01_Recover.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_Skill_Shout_CallForHelp_01_Recover.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.4" />
+					<attribute id="ID" type="FixedString" value="33a7aa4f-738f-1de1-e2e6-12bf38f0057d" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_YawLR" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_YawLR.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_YawLR.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.4" />
+					<attribute id="ID" type="FixedString" value="3be70223-6586-e511-5806-3d6f5cb09252" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_Loop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_Loop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_Loop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.4000001" />
+					<attribute id="ID" type="FixedString" value="4459cd9f-3415-109b-214e-c91ef7857fb9" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_Peace_01_Landing" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_Peace_01_Landing.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_Peace_01_Landing.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.1666667" />
+					<attribute id="ID" type="FixedString" value="4c26c56f-3305-3389-bbff-62ee958dc14c" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_SPL_Somatic_Cone_01_Cast" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_SPL_Somatic_Cone_01_Cast.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_SPL_Somatic_Cone_01_Cast.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144959613005988340" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="React" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="15" />
+							<attribute id="Time" type="float" value="0.65" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Cast" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="8" />
+							<attribute id="Time" type="float" value="0.85" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="6.933334" />
+					<attribute id="ID" type="FixedString" value="4cba5812-d5f8-8ae4-aed0-cba0383923f6" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_IDLE_Still_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_IDLE_Still_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_IDLE_Still_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.5333334" />
+					<attribute id="ID" type="FixedString" value="5a580e7d-e6a2-048e-de97-f99cec968f69" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_CMBT_Skill_Shout_HelpArrives_01_Attack" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Shout_HelpArrives_01_Attack.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Shout_HelpArrives_01_Attack.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="React" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="15" />
+							<attribute id="Time" type="float" value="0.04643991" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Cast" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="8" />
+							<attribute id="Time" type="float" value="0.24417235" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.6666667" />
+					<attribute id="ID" type="FixedString" value="5c301070-caeb-35a9-3aad-854306b4f414" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_CMBT_Skill_Shout_HelpArrives_01_Loop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Shout_HelpArrives_01_Loop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Shout_HelpArrives_01_Loop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.1666667" />
+					<attribute id="ID" type="FixedString" value="5d25a0c8-e3ee-8626-9df6-3720ebfee07f" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_REAC_Magic_External_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_REAC_Magic_External_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_REAC_Magic_External_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.13333334" />
+					<attribute id="ID" type="FixedString" value="64dd6a33-7c0c-9268-5354-92a15bebfddc" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_CMBT_Skill_Dash_01_Antic" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Dash_01_Antic.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Dash_01_Antic.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="React" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="15" />
+							<attribute id="Time" type="float" value="0.0584127" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4" />
+					<attribute id="ID" type="FixedString" value="66d1510a-f791-0b36-59b7-3426117fcd81" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_IDLE_Random_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_IDLE_Random_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_IDLE_Random_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Vocal" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="13" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="EVocalType" type="uint8" value="9" />
+									<attribute id="Resource" type="FixedString" value="" />
+									<attribute id="SoundObjectIndex" type="uint8" value="4" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.033333335" />
+					<attribute id="ID" type="FixedString" value="68ea77ba-8902-62b2-90a5-de66977541b4" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_CC_Portrait_Still_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CC_Portrait_Still_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CC_Portrait_Still_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209025" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.06666667" />
+					<attribute id="ID" type="FixedString" value="68f8d46a-5120-5b61-cffa-cf3a1cafbf3f" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_CMBT_Skill_Dash_01_Attack" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Dash_01_Attack.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Dash_01_Attack.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Cast" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="8" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.2666668" />
+					<attribute id="ID" type="FixedString" value="71da5825-ccb3-11a5-ef8c-66cdfe00bcd4" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_LOCO_Sprint_F_Combat_01_Start" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_LOCO_Sprint_F_Combat_01_Start.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_LOCO_Sprint_F_Combat_01_Start.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4" />
+					<attribute id="ID" type="FixedString" value="74b1f40d-38bf-7330-2008-1a63855162ad" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_LOCO_Stroll_F_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_LOCO_Stroll_F_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_LOCO_Stroll_F_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144537400540921856" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Vocal_Relaxed" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="13" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="3" />
+							<children>
+								<node id="Properties">
+									<attribute id="EVocalType" type="uint8" value="15" />
+									<attribute id="Resource" type="FixedString" value="" />
+									<attribute id="SoundObjectIndex" type="uint8" value="4" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.3333334" />
+					<attribute id="ID" type="FixedString" value="884d6b2c-c02e-3d07-7ebe-1fd23f72cc9e" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_REAC_Dodge_B_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_REAC_Dodge_B_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_REAC_Dodge_B_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4" />
+					<attribute id="ID" type="FixedString" value="8ab948f1-67a2-5c3e-2004-278eff3727f5" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_LOCO_Passive_F_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_LOCO_Passive_F_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_LOCO_Passive_F_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144537400540921856" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.3333334" />
+					<attribute id="ID" type="FixedString" value="9396080f-bb45-9bde-6c76-2bfef7e8742b" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_REAC_Hit_F_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_REAC_Hit_F_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_REAC_Hit_F_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.9666667" />
+					<attribute id="ID" type="FixedString" value="9673b8ca-3a41-e0ea-d645-aa3e412bc711" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_CMBT_Skill_Shout_HelpArrives_01_Prepare" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Shout_HelpArrives_01_Prepare.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Shout_HelpArrives_01_Prepare.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.6" />
+					<attribute id="ID" type="FixedString" value="97410713-a39d-138e-5e18-3b8e6fac574d" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_Skill_Shout_CallForHelp_01_Antic" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_Skill_Shout_CallForHelp_01_Antic.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_Skill_Shout_CallForHelp_01_Antic.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="React" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="15" />
+							<attribute id="Time" type="float" value="0.48399097" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="6.666667" />
+					<attribute id="ID" type="FixedString" value="991e2dde-9685-6de9-1330-955def932074" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_STAT_Shouting_Combat_01_Loop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_STAT_Shouting_Combat_01_Loop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_STAT_Shouting_Combat_01_Loop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.3333334" />
+					<attribute id="ID" type="FixedString" value="a513f463-599d-7112-f3f1-2c9c9f367ac9" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_REAC_Dodge_F_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_REAC_Dodge_F_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_REAC_Dodge_F_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.8000002" />
+					<attribute id="ID" type="FixedString" value="a531c649-b8e2-ad45-e57f-f6406e77f235" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_LOCO_Sprint_F_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_LOCO_Sprint_F_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_LOCO_Sprint_F_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.5" />
+					<attribute id="ID" type="FixedString" value="a5593d5c-1b27-1923-745d-a3963ba00813" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_Cast" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_Cast.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_Cast.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209024" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="React" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="15" />
+							<attribute id="Time" type="float" value="0.25687075" />
+							<attribute id="Track" type="uint8" value="3" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Cast" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="8" />
+							<attribute id="Time" type="float" value="0.3417687" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.3333334" />
+					<attribute id="ID" type="FixedString" value="a734fa9a-29f1-5462-7aff-ffaad539cd0a" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_STAT_Grappled_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_STAT_Grappled_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_STAT_Grappled_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209022" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="8.5" />
+					<attribute id="ID" type="FixedString" value="aeb1ff6f-e69e-b373-189b-29f513454f30" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_IDLE_Random_Peace_02" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_IDLE_Random_Peace_02.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_IDLE_Random_Peace_02.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Vocal" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="13" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="EVocalType" type="uint8" value="12" />
+									<attribute id="Resource" type="FixedString" value="" />
+									<attribute id="SoundObjectIndex" type="uint8" value="4" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.7666667" />
+					<attribute id="ID" type="FixedString" value="b15c1d59-63db-a81f-c623-5a4ce7f54a5d" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_SPL_Somatic_Cone_01_Recover" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_SPL_Somatic_Cone_01_Recover.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_SPL_Somatic_Cone_01_Recover.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144959613005988340" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.0333334" />
+					<attribute id="ID" type="FixedString" value="b4078e01-5f13-582e-b453-7d7b46d45cbb" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_CMBT_Skill_Dismiss_01_Attack" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_DIE_Generic_LifeTime_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_DIE_Generic_LifeTime_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="React" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="15" />
+							<attribute id="Time" type="float" value="0.19882087" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Cast" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="8" />
+							<attribute id="Time" type="float" value="0.4019955" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.4" />
+					<attribute id="ID" type="FixedString" value="b8080515-c587-ad5f-a130-a791af4d6516" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_PitchD" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_PitchD.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_PitchD.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.4" />
+					<attribute id="ID" type="FixedString" value="b88e43c6-105e-0fe9-7113-4954c21ee449" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_PitchU" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_PitchU.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Fly_01_PitchU.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.8000001" />
+					<attribute id="ID" type="FixedString" value="c7ec3478-48f4-7e42-f166-30d985ad3476" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_LOCO_Sprint_F_Combat_01_End" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_LOCO_Sprint_F_Combat_01_End.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_LOCO_Sprint_F_Combat_01_End.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144959613005988140" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.6333334" />
+					<attribute id="ID" type="FixedString" value="cf3e9181-b918-3dd3-85ac-63212cd385c5" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_UTIL_Spawn_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_UTIL_Spawn_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_UTIL_Spawn_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Overlay_01" />
+							<attribute id="Length" type="float" value="0.02" />
+							<attribute id="TextKeyType" type="uint8" value="2" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="3" />
+							<children>
+								<node id="Properties">
+									<attribute id="Bone" type="FixedString" value="Dummy_BodyFX" />
+									<attribute id="Effect" type="FixedString" value="VFX_Spells_Cast_Wizard_Summon_ArcaneEye_SpawnFX_Overlay_01" />
+									<attribute id="HardAttach" type="bool" value="True" />
+									<attribute id="InterruptLoopAtEnd" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Spawn_Effect_01" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="2" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="Bone" type="FixedString" value="Blinker_M" />
+									<attribute id="Effect" type="FixedString" value="VFX_Spells_Cast_Wizard_Summon_ArcaneEye_SpawnFX_01" />
+									<attribute id="HardAttach" type="bool" value="True" />
+									<attribute id="InterruptLoopAtEnd" type="bool" value="False" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Vocal" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="13" />
+							<attribute id="Time" type="float" value="0.84462583" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="EVocalType" type="uint8" value="8" />
+									<attribute id="Resource" type="FixedString" value="" />
+									<attribute id="SoundObjectIndex" type="uint8" value="4" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.766667" />
+					<attribute id="ID" type="FixedString" value="d44b77b4-f17a-277b-f978-7cdef475e285" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_LOCO_Walk_F_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_LOCO_Walk_F_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_LOCO_Walk_F_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144537400540921856" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Vocal_Relaxed" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="13" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="4" />
+							<children>
+								<node id="Properties">
+									<attribute id="EVocalType" type="uint8" value="15" />
+									<attribute id="Resource" type="FixedString" value="" />
+									<attribute id="SoundObjectIndex" type="uint8" value="4" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.9666667" />
+					<attribute id="ID" type="FixedString" value="d982126e-2f41-d9d9-8fa0-2d22c739495e" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_Skill_Shout_CallForHelp_01_Prepare" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_Skill_Shout_CallForHelp_01_Prepare.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_Skill_Shout_CallForHelp_01_Prepare.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.4666667" />
+					<attribute id="ID" type="FixedString" value="e49c6fff-e91d-93de-e82c-1599fbe94422" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_Skill_Shout_CallForHelp_01_Attack" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_Skill_Shout_CallForHelp_01_Attack.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_Skill_Shout_CallForHelp_01_Attack.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Cast" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="8" />
+							<attribute id="Time" type="float" value="0.07619048" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.0333334" />
+					<attribute id="ID" type="FixedString" value="f2036e65-09d5-6408-d505-7efd4e54d3a8" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_DIE_Generic_LifeTime_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_DIE_Generic_LifeTime_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_DIE_Generic_LifeTime_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Vocal" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="13" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties">
+									<attribute id="EVocalType" type="uint8" value="2" />
+									<attribute id="Resource" type="FixedString" value="" />
+									<attribute id="SoundObjectIndex" type="uint8" value="4" />
+								</node>
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="TriggerRagdoll" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="9" />
+							<attribute id="Time" type="float" value="0.9795919" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties">
+									<attribute id="AngularVelocityModifier" type="float" value="1" />
+									<attribute id="AnimationResourceID" type="FixedString" value="f2036e65-09d5-6408-d505-7efd4e54d3a8" />
+									<attribute id="DampingMultiplier" type="float" value="1" />
+									<attribute id="DurationHardLimit" type="float" value="8" />
+									<attribute id="DurationSoftLimit" type="float" value="5" />
+									<attribute id="HitImpulseThreshold" type="float" value="30" />
+									<attribute id="HoldLastFrame" type="bool" value="False" />
+									<attribute id="LinearVelocityModifier" type="float" value="1" />
+									<attribute id="LockLimits" type="bool" value="False" />
+									<attribute id="StiffnessMultiplier" type="float" value="1" />
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.6000001" />
+					<attribute id="ID" type="FixedString" value="f8f7540a-b47e-1e40-cafd-d400a86a6277" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_REAC_Hit_B_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_REAC_Hit_B_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_REAC_Hit_B_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.1" />
+					<attribute id="ID" type="FixedString" value="ffffe54d-d5fc-d084-9075-d1f872330928" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_Rig_DFLT_CMBT_Skill_Shout_HelpArrives_01_Antic" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Shout_HelpArrives_01_Antic.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/EYE_SCRYING_Rig/EYE_Scrying_Rig_DFLT_CMBT_Skill_Shout_HelpArrives_01_Antic.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209020" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="2b95057d-32a6-3a46-9920-01ac814c478d" />
+					<attribute id="BoundsMax" type="fvec3" value="0 0 0" />
+					<attribute id="BoundsMin" type="fvec3" value="0 0 0" />
+					<attribute id="Center" type="fvec3" value="0 0 0" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="28d1fea3-6468-b217-2076-497d1c86d852" />
+					<attribute id="Initialized" type="bool" value="False" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="EYE_Base" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="EMPTY_VISUAL_TEMPLATE" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855906" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="f1c9dc48-8692-8668-e1ee-e4e4c2fad46e" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="574ab62d-51c9-f2a4-8b23-7a494a9cb318" />
+						</node>
+						<node id="Base" />
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.26120904 0.26119986 0.2641919" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.26217258 -0.26119995 -0.26284114" />
+					<attribute id="Center" type="fvec3" value="-0.00048176944 -4.4703484E-08 0.00067538023" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="7efb200f-d2a4-6489-00e0-50c4321bfda3" />
+					<attribute id="Initialized" type="bool" value="True" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Proxy_EYE_Scrying_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="Radius" type="float" value="0.4540357" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="aa35e443-ae3f-8299-16ec-e1baf4b500e7" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/Resources/Proxy_EYE_Scrying_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Anims/_Creatures/Eye_Scrying/Resources/Proxy_EYE_Scrying_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241508" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="9e2966c7-b61c-4bc1-bef1-a79cb5fde067" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_EYE_Scrying_A.Proxy_Eye_Scrying_Pupil_A_Mesh.0" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="9e2966c7-b61c-4bc1-bef1-a79cb5fde067" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_EYE_Scrying_A.Proxy_Eye_Scrying_Blinker_A_Mesh.1" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="9e2966c7-b61c-4bc1-bef1-a79cb5fde067" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_EYE_Scrying_A.Proxy_Eye_Scrying_Pupil_A_Mesh_LOD1.2" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="9e2966c7-b61c-4bc1-bef1-a79cb5fde067" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_EYE_Scrying_A.Proxy_Eye_Scrying_Blinker_A_Mesh_LOD1.3" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="9e2966c7-b61c-4bc1-bef1-a79cb5fde067" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_EYE_Scrying_A.Proxy_Eye_Scrying_Pupil_A_Mesh_LOD2.4" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="9e2966c7-b61c-4bc1-bef1-a79cb5fde067" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_EYE_Scrying_A.Proxy_Eye_Scrying_Blinker_A_Mesh_LOD2.5" />
+							<attribute id="Physics" type="FixedString" value="" />
+							<attribute id="Slot" type="FixedString" value="" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.2817632 0.27984905 0.28410977" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.28175184 -0.28161523 -0.28521174" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="c4291e0b-b035-e3f2-9d03-a1abe62c95d6" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="EYE_Scrying_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Eye_Scrying/Resources/EYE_Scrying_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Eye_Scrying/Resources/EYE_Scrying_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403208907" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="95ef9855-1611-97fe-e575-e0378c844286" />
+							<attribute id="ObjectID" type="FixedString" value="EYE_Scrying_A.Eye_Scrying_Pupil_A_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="92b941dc-921d-27a1-5003-089dd532da71" />
+							<attribute id="ObjectID" type="FixedString" value="EYE_Scrying_A.Eye_Scrying_Shell_A_Mesh.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="484abcb1-3cdb-54a3-1da9-819ac71bab4d" />
+							<attribute id="ObjectID" type="FixedString" value="EYE_Scrying_A.Eye_Scrying_Blinker_A_Mesh.2" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="95ef9855-1611-97fe-e575-e0378c844286" />
+							<attribute id="ObjectID" type="FixedString" value="EYE_Scrying_A.Eye_Scrying_Pupil_A_Mesh_LOD1.3" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="92b941dc-921d-27a1-5003-089dd532da71" />
+							<attribute id="ObjectID" type="FixedString" value="EYE_Scrying_A.Eye_Scrying_Shell_A_Mesh_LOD1.4" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="484abcb1-3cdb-54a3-1da9-819ac71bab4d" />
+							<attribute id="ObjectID" type="FixedString" value="EYE_Scrying_A.Eye_Scrying_Blinker_A_Mesh_LOD1.5" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="95ef9855-1611-97fe-e575-e0378c844286" />
+							<attribute id="ObjectID" type="FixedString" value="EYE_Scrying_A.Eye_Scrying_Pupil_A_Mesh_LOD2.6" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="92b941dc-921d-27a1-5003-089dd532da71" />
+							<attribute id="ObjectID" type="FixedString" value="EYE_Scrying_A.Eye_Scrying_Shell_A_Mesh_LOD2.7" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="484abcb1-3cdb-54a3-1da9-819ac71bab4d" />
+							<attribute id="ObjectID" type="FixedString" value="EYE_Scrying_A.Eye_Scrying_Blinker_A_Mesh_LOD2.8" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="3" />
+							<attribute id="MaterialID" type="FixedString" value="95ef9855-1611-97fe-e575-e0378c844286" />
+							<attribute id="ObjectID" type="FixedString" value="EYE_Scrying_A.Eye_Scrying_Pupil_A_Mesh_LOD3.9" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="3" />
+							<attribute id="MaterialID" type="FixedString" value="92b941dc-921d-27a1-5003-089dd532da71" />
+							<attribute id="ObjectID" type="FixedString" value="EYE_Scrying_A.Eye_Scrying_Shell_A_Mesh_LOD3.10" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="3" />
+							<attribute id="MaterialID" type="FixedString" value="484abcb1-3cdb-54a3-1da9-819ac71bab4d" />
+							<attribute id="ObjectID" type="FixedString" value="EYE_Scrying_A.Eye_Scrying_Blinker_A_Mesh_LOD3.11" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="4" />
+							<attribute id="MaterialID" type="FixedString" value="95ef9855-1611-97fe-e575-e0378c844286" />
+							<attribute id="ObjectID" type="FixedString" value="EYE_Scrying_A.Eye_Scrying_Pupil_A_Mesh_LOD4.12" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="4" />
+							<attribute id="MaterialID" type="FixedString" value="92b941dc-921d-27a1-5003-089dd532da71" />
+							<attribute id="ObjectID" type="FixedString" value="EYE_Scrying_A.Eye_Scrying_Shell_A_Mesh_LOD4.13" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="4" />
+							<attribute id="MaterialID" type="FixedString" value="484abcb1-3cdb-54a3-1da9-819ac71bab4d" />
+							<attribute id="ObjectID" type="FixedString" value="EYE_Scrying_A.Eye_Scrying_Blinker_A_Mesh_LOD4.14" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

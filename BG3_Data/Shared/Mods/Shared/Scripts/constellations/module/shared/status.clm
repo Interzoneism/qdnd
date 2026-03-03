@@ -1,0 +1,33 @@
+local m = AnubisModule()
+
+m.AreAllEntitiesAlive = function(...)
+    local entities = {...}
+    
+    if type(entities[1]) == "table" then
+        entities = entities[1]
+    end
+
+    for _, v in ipairs(entities) do
+        if v.Character.IsDead then
+            return false
+        end
+    end
+    return true
+end
+
+m.AreAllEntitiesDead = function(...)
+    local entities = {...}
+    
+    if type(entities[1]) == "table" then
+        entities = entities[1]
+    end
+    
+    for _, v in ipairs(entities) do
+        if not v.Character.IsDead then
+            return false
+        end
+    end
+    return true
+end
+
+return m

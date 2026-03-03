@@ -1,0 +1,1714 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="AnimationBlueprintBank">
+		<node id="AnimationBlueprintBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="0d97a565-7162-587c-5752-5bda43e56fff" />
+					<attribute id="Name" type="LSString" value="VINE_Tentacle_Dark_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="2538ee46-da41-baaa-9c07-e7e720c6130f" />
+					<attribute id="SourceFile" type="LSString" value="Editor/Mods/Shared/Assets/Blueprints/Characters_Creatures_Tentacle.lsabp" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725668" />
+					<children>
+						<node id="Params">
+							<children>
+								<node id="Object">
+									<attribute id="MapKey" type="guid" value="7ef6eab2-bfca-4c97-a4ac-32774d45c217" />
+									<children>
+										<node id="Param">
+											<attribute id="Type" type="FixedString" value="Bool" />
+											<attribute id="Value" type="bool" value="True" />
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="IKRigBank">
+		<node id="IKRigBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="b525d670-689b-4700-a292-212d1d03427f" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="Dark_Vine_IKRig" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725056" />
+					<children>
+						<node id="BoneCategories">
+							<children>
+								<node id="Object">
+									<attribute id="MapKey" type="guid" value="67075838-303f-4494-99e3-3b29ca06fe79" />
+									<attribute id="MapValue" type="FixedString" value="Dummy_GrabTarget" />
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine7_L" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine12_R" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="VineTip11_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine10_R" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Dummy_StatusFX" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Vine_Base_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="True" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine9_R" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Vine16_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine9_L" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine11_L" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="VineTip6_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Custom_Anim" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Vine5_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="True" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Vine9_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="True" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Vine1_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="True" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Vine4_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="True" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine2_R" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine11_R" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Dummy_OverheadFX" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Dummy_GrabTarget" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="True" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine8_R" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="VineTip10_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine5_L" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="VineTip12_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Vine17_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="VineTip1_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="VineTip8_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine7_R" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Dummy_HeadFX" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Root" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine12_L" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine3_L" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine6_L" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Vine11_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="True" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Vine2_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="True" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Vine12_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="True" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="VineTip4_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Playerlight" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Dummy_CastFX" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Vine13_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="True" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Dummy_BodyFX" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Vine0_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="True" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Vine14_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="True" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine6_R" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine5_R" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine8_L" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="VineTip5_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Dummy_FollowPhysics" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="VineTip7_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Vine10_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="True" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="VineTip2_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Vine7_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="True" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="VineTip9_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine3_R" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Root_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine4_L" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Vine15_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="True" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine13_R_EndBone" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Dummy_ChestFX" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Vine3_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="True" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine1_R" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Dummy_HitImpactFX" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine4_R" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine2_L" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="VineTip12_M_EndBone" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="VineTip3_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine13_L_EndBone" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="VineTip0_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Vine6_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="True" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Vine8_M" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="True" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine10_L" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="BoneProperties">
+							<attribute id="MapKey" type="FixedString" value="Side_Vine1_L" />
+							<children>
+								<node id="MapValue">
+									<children>
+										<node id="IKBone">
+											<attribute id="DoF" type="int64" value="7" />
+											<attribute id="Enabled" type="bool" value="False" />
+											<attribute id="Weight" type="fvec3" value="1 1 1" />
+											<children>
+												<node id="Limits">
+													<attribute id="Axis" type="uint8" value="0" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Max" type="fvec3" value="20 20 20" />
+													<attribute id="Min" type="fvec3" value="-20 -20 -20" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="IKTasks">
+							<attribute id="Bone" type="FixedString" value="Dummy_GrabTarget" />
+							<attribute id="Name" type="FixedString" value="Hand Task" />
+							<children>
+								<node id="Solver">
+									<children>
+										<node id="IKTask">
+											<attribute id="IsParentTask" type="bool" value="False" />
+											<attribute id="IsPoleObject" type="bool" value="False" />
+											<attribute id="LookAt" type="bool" value="False" />
+											<attribute id="LookAtAxis" type="fvec3" value="0 0 1" />
+											<attribute id="LookAtLocalSpace" type="bool" value="True" />
+											<children>
+												<node id="IKBone">
+													<attribute id="IKBoneCachedName" type="FixedString" value="HandTask_L" />
+													<attribute id="IKBoneName" type="FixedString" value="67075838-303f-4494-99e3-3b29ca06fe79" />
+													<attribute id="IKBoneType" type="int32" value="1" />
+												</node>
+												<node id="Position">
+													<attribute id="Depth" type="int32" value="16" />
+													<attribute id="DoF" type="int64" value="7" />
+													<attribute id="Enabled" type="bool" value="True" />
+													<attribute id="Weight" type="float" value="50" />
+												</node>
+												<node id="Rotation">
+													<attribute id="Depth" type="int32" value="16" />
+													<attribute id="DoF" type="int64" value="7" />
+													<attribute id="Enabled" type="bool" value="False" />
+													<attribute id="Weight" type="float" value="30" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Solver">
+							<children>
+								<node id="IKSolver">
+									<children>
+										<node id="Solver">
+											<attribute id="Root" type="bool" value="False" />
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationBank">
+		<node id="AnimationBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="5.0000005" />
+					<attribute id="ID" type="FixedString" value="84bcffef-d8ea-baf5-9ff8-0b225fd23107" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="VINE_Tentacle_Dark_Rig_DFLT_IDLE_Still_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="7e1d425c-04b4-4c8a-815e-0f96bdcaf9de" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="5e346e69-2cd3-27e8-6e0c-c64edd672d3d" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Vine_Tentacle/VINE_Tentacle_Dark_Rig/VINE_Tentacle_Dark_Rig_DFLT_IDLE_Still_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Vine_Tentacle/VINE_Tentacle_Dark_Rig/VINE_Tentacle_Dark_Rig_DFLT_IDLE_Still_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115203108241811" />
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

@@ -1,0 +1,7 @@
+game.configs.NoGenerics = Config{
+    root = StateRef{game.roots.DefaultCharacter,
+        genericBehaviours = StateRef{game.states.NoGenerics},
+        idle = StateRef{game.states.Dummy}
+    }
+}
+

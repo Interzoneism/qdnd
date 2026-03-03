@@ -1,0 +1,57 @@
+game.states.PUZ_DruidRune = State{ function ()
+
+    params.activatedStatus = {type = EParamType.String, required=false, default=[[ITEM_PUZ_DRUID_RUNE_ACTIVATED]],
+        help=[[Status to apply on the rune when it's activated. This script does nothing if it's nil.]]
+    }
+
+    local isActivated = false
+
+    helpers.ActivateRune = function(source)
+        StartTimer(me, "PUZ_DruidRune_Deactivate", 18.0, 0)
+        ApplyStatus(me, params.activatedStatus, true, -1, source)
+        isActivated = true
+    end
+
+    helpers.DeactivateRune = function()
+        StopTimer(me, "PUZ_DruidRune_Deactivate")
+        RemoveStatus(me, params.activatedStatus)
+        isActivated = false
+    end
+
+    nodes.DruidRune = Action {
+        function()
+            WaitForInterrupt()
+        end
+    }
+
+    events.UseStarted = function(e)
+        if (e.Object == me) and (params.activatedStatus ~= nil) then
+            if not isActivated then
+                helpers.ActivateRune(e.User)
+            else
+                helpers.DeactivateRune()
+            end
+        end
+    end
+
+    events.TimerFinished = function(e)
+        if(e.TimerName == "PUZ_DruidRune_Deactivate") then
+            helpers.DeactivateRune()
+        end
+    end
+
+    events.EntityEvent = function(e)
+        if e.TargetEntity == me then
+            if e.Event == "PUZ_DruidRune_KeepActivated" then
+                StopTimer(me, "PUZ_DruidRune_Deactivate")
+                if (params.activatedStatus ~= nil) and (not HasActiveStatus(me, params.activatedStatus)) then
+                    ApplyStatus(me, params.activatedStatus, true, -1, nil)
+                    isActivated = true
+                end
+            elseif e.Event == "PUZ_DruidRune_Deactivate" then
+                helpers.DeactivateRune()
+            end
+        end
+    end
+end
+}

@@ -1,0 +1,37 @@
+game.configs.Patroller = Config{
+    params={
+        patrolSpeed = {
+            type = EParamType.String,
+            help = [[Speed at which to patrol: Stroll, Walk, Run, or Sprint]],
+            required = false,
+            default = [[Walk]]
+        },
+        patrolReverse = {
+            type = EParamType.Bool,
+            help = [[Whether or not to patrol the spline in reverse]],
+            required = false,
+            default = false
+        },
+        patrolSpline = {
+            type = EParamType.String,
+            help = [[Spline to be patrolled]],
+            required = true,
+        },
+        startSplineIndex = {
+            type = EParamType.Int,
+            help = [[Start spline point index or -1 for nearest]],
+            required = false,
+            default = -1
+        },
+    },
+    root=StateRef{game.roots.DefaultCharacter,
+        combatCowerState = StateRef{game.states.CombatCower},
+        genericBehaviours = StateRef{game.states.CrimesHumanoid},
+        idle = StateRef{game.states.GEN_Patrol,
+            patrolReverse = params.patrolReverse,
+            patrolSpeed = params.patrolSpeed,
+            patrolSpline = params.patrolSpline,
+            startSplineIndex = params.startSplineIndex,
+        },
+    }
+}

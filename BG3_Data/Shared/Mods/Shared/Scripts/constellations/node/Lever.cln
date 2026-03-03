@@ -1,0 +1,310 @@
+game.states.LeverTrigger = State{
+    function()
+
+        inputs.ForceActivate = {help = [[A scripted activation/use of the item]]}
+
+        outputs.Activated = {help = [[Output socket that's triggered when any of the activation conditions are triggered]]}
+
+        events.UseFinished = function(ev)
+            if ev.Success then
+                TriggerOutput(outputs.Activated, ev.User.EntityRef)
+            end
+        end
+
+        events.Damaged = function(ev)
+            TriggerOutput(outputs.Activated, ev.Source.EntityRef)
+        end
+
+        socketEvents.ForceActivate = function(ev)
+            TriggerOutput(outputs.Activated, ev.Object)
+        end
+
+    end
+}
+
+game.states.Lever2St = State{
+    function()
+
+        --dependencies = {EComponentList.AnimationState, EComponentList.Lever} -- not supported yet
+        -- Connects to a Lever component: stores a lever state, and the last person to interact with the object so, when animation
+        -- is done, it can forward that entity as its activator.
+
+
+        inputs.NextStateReached = {internal = true} -- [[Callback from Animation, when it's done]]
+        inputs.Activate = {internal = true}
+
+        inputs.ForceActivate = {help = [[A scripted flip of the lever]]}
+        outputs.ForceActivateInt = {internal = true}
+
+        inputs.ForceOff = {help = [[A scripted flip of the lever, turning it off if the lever is on]]}
+        inputs.ForceOn = {help = [[A scripted flip of the lever, turning it on if the lever is off]]}
+        outputs.GoToState = {internal = true}
+
+        inputs.Enable = {help = [[Turn lever on]]}
+        outputs.OnInt = {internal = true}
+
+        inputs.Disable = {help = [[Turn lever off]]}
+        outputs.OffInt = {internal = true}
+
+        outputs.TryActivateInt = {internal = true}
+        inputs.ActivatedInt = {internal = true}
+
+        outputs.ToNextState = {internal = true} -- [[Call to Animation to move to next state]]
+        outputs.Activated1 = {help = [[Lever entered state 1 (fully on one side)]]}
+        outputs.Activated2 = {help = [[Lever entered state 2 (fully on the other side)]]}
+
+        outputs.ActivateAttemptFailed = {help = [[Lever was used while disabled]]}
+        inputs.ActivateAttemptFailedInt = {internal = true}
+
+        inputs.UseBlockedFromStory = {help = [[Lever use was blocked from story (because it was not enabled)]]}
+        outputs.UseBlockedFromStoryInt = {internal = true}
+
+        inputs.Reveal = {help = "Reveal the lever"}
+        outputs.RevealInt = {internal = true}
+
+        params.StartEnabled = {type=EParamType.Bool, default = true, help = "Does the lever can be used from the start?"}
+
+        params.Type = {
+            type = EParamType.String,
+            default="Interactable",
+            help=[[
+            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]]
+        }
+
+        params.DC = {
+            type = EParamType.String,
+            default="HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f",
+            help=[[Perception check DC.]]
+        }
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            required=false,
+            default=6.0,
+            help=[[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]]
+        }
+
+        params.Skill = {
+            type = EParamType.String,
+            default="Perception",
+            help=[[The skill checked for perception.]]
+        }
+
+        params.VFXOff = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = [[VFX while lever is disabled and has been spotted.]]
+        }
+
+        params.VFXOffBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = [[Bone on which the 'VFXOff' VFX is played.]]
+        }
+
+        params.VFXOn = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = [[VFX while lever is enabled and has been spotted.]]
+        }
+
+        params.VFXOnBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = [[Bone on which the enabled-VFX is played.]]
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_Off",
+            help = "Sound when lever is disabled"
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_On",
+            help = "Sound when lever is enabled"
+        }
+
+        params.Immediate = {
+            type = EParamType.Bool,
+            default = false,
+            help = "Don't wait for animation to output trigger"
+        }
+
+        self.OnInit = function()
+            if me.Blackboard.GetFact("Cnst.Lever.Moving") == nil then
+                me.Blackboard.SetFact("Cnst.Lever.Moving", 0)
+            end
+        end
+
+        self.OnLoaded = function()
+            -- If the lever was moving when we saved, we have to flush the result
+            -- since animation states are not saved/restored
+            if me.Blackboard.GetFact("Cnst.Lever.Moving") == 1 then
+                helpers.NextStateReached(nil)
+            end
+        end
+
+        helpers.NextStateReached= function(currentState)
+            local wantedState = me.Blackboard.GetFact("Cnst.AnimationState.WantedState")
+            me.Blackboard.SetFact("Cnst.Lever.Moving", 0)
+            if currentState == wantedState then -- Only allow interaction of the lever if wanted state is reached
+                SetCanInteract(me, true)
+            end
+            local activator = me.Blackboard.GetFact("Cnst.Lever.Activator")
+            -- Can be nil if movement event was sent from code to set the initial state
+            activator = activator and activator.EntityRef or nil
+
+            if not params.Immediate then
+                if currentState == 0 then
+                    TriggerOutput(outputs.Activated1, activator)
+                elseif currentState == 2 then
+                    TriggerOutput(outputs.Activated2, activator)
+                end
+            elseif currentState ~= wantedState then -- queued lever states causes the Immediate lever to send an early Activated event
+                if wantedState == 0 then -- lever will be turned off soon
+                    TriggerOutput(outputs.Activated1, activator)
+                elseif wantedState == 2 then -- lever will be turned on soon
+                    TriggerOutput(outputs.Activated2, activator)
+                end
+            end
+        end
+
+
+        socketEvents.NextStateReached = function(ev)
+            if me.Blackboard.GetFact("Cnst.Lever.Moving") == 1 then
+                local currentState = ev.Param -- currentState in blackboard can be outdated, retrieve from event instead
+                helpers.NextStateReached(currentState)
+            end
+        end
+
+        socketEvents.Activate = function(ev)
+            if me.Blackboard.GetFact("Cnst.Lever.Moving") == 0 then
+                me.Blackboard.SetFact("Cnst.Lever.Moving", 1)
+                SetCanInteract(me, false)
+
+                me.Blackboard.SetFact("Cnst.Lever.Activator", Entity(ev.Object))
+
+                TriggerOutput(outputs.TryActivateInt, ev.Object, ev.Param)
+            end
+        end
+
+        socketEvents.ActivatedInt = function(ev)
+            if params.Immediate then
+                local currentState = me.Blackboard.GetFact("Cnst.AnimationState.CurrentState")
+                if currentState == 0 then
+                    TriggerOutput(outputs.Activated1, ev.Object, ev.Param)
+                elseif currentState == 2 then
+                    TriggerOutput(outputs.Activated2, ev.Object, ev.Param)
+                end
+            end
+            if params.Type == "Trapped" then
+                TriggerOutput(outputs.RevealInt, ev.Object, ev.Param)
+            end
+            TriggerOutput(outputs.ToNextState, ev.Object, ev.Param)
+        end
+
+        socketEvents.ActivateAttemptFailedInt = function(ev)
+            SetCanInteract(me, true)
+            me.Blackboard.SetFact("Cnst.Lever.Moving", 0)
+            StartAutomatedDialogImmediate(Dialog("GLO_AD_MechanicalClunk_a96814b5-9d5b-cf71-b0c3-39d4aea3dfd6"), me)
+            TriggerOutput(outputs.ActivateAttemptFailed, ev.Object, ev.Param)
+        end
+
+        nodes.Triggernode = Proxy{
+            game.states.LeverTrigger,
+            outputs = {Activated = {inputs.Activate}},
+            inputs = {ForceActivate = {outputs.ForceActivateInt}}
+        }
+
+        nodes.AnimationState = Proxy{
+            game.states.AnimationStates,
+            params = {StateSequence = {0,4,2,5,0},
+                      DynamicStates = {4,5}},
+            inputs = {
+                        Activate = {outputs.ToNextState},
+                        GoToState = {outputs.GoToState}
+                    },
+            outputs = {NewState = {inputs.NextStateReached}},
+        }
+
+        nodes.StoryInteractionFilter = Proxy{
+            game.states.StoryInteractionFilter,
+            params = {StartUseEnabled = params.StartEnabled},
+            inputs = {EnableStoryItemUse = {outputs.OnInt},
+                      DisableStoryItemUse = {outputs.OffInt},
+                      UseBlockedFromStory = {outputs.UseBlockedFromStoryInt}},
+            outputs = {UseBlockedFromStory = {inputs.ActivateAttemptFailedInt}}
+        }
+
+        nodes.PerceptionDisarmOnOff = Proxy{
+            game.states.PerceptionDisarmOnOff,
+            params = {StartEnabled = params.StartEnabled,
+                      Type = params.Type,
+                      Skill = params.Skill,
+                      MinDistance = params.MinDistance,
+                      VFXOn= params.VFXOn,
+                      VFXOff = params.VFXOff,
+                      VFXOnBone = params.VFXOnBone,
+                      VFXOffBone = params.VFXOffBone,
+                      SoundOn = params.SoundOn,
+                      SoundOff = params.SoundOff,
+                      IsTrap = (params.Type == "Trapped"),
+                      DestroyOnDisarm = false},
+            inputs = {Enable = {outputs.OnInt},
+                      Disable = {outputs.OffInt},
+                      TryActivate = {outputs.TryActivateInt},
+                      Reveal = {outputs.RevealInt}},
+            outputs = {Activate = {inputs.ActivatedInt},
+                       ActivateAttemptFailed = {inputs.ActivateAttemptFailedInt}}
+                    }
+
+        socketEvents.ForceActivate = function(ev)
+            TriggerOutput(outputs.ForceActivateInt, ev.Object, ev.Param)
+        end
+
+        socketEvents.ForceOff = function(ev)
+            if me.Blackboard.GetFact("Cnst.AnimationState.CurrentState") ~= 0 then
+                if me.Blackboard.GetFact("Cnst.Lever.Moving") == 0 then
+                    me.Blackboard.SetFact("Cnst.Lever.Moving", 1)
+                    SetCanInteract(me, false)
+                end
+                TriggerOutput(outputs.GoToState, ev.Object, 0)
+            end
+        end
+
+        socketEvents.ForceOn = function(ev)
+            if me.Blackboard.GetFact("Cnst.AnimationState.CurrentState") ~= 2 then
+                if me.Blackboard.GetFact("Cnst.Lever.Moving") == 0 then
+                    me.Blackboard.SetFact("Cnst.Lever.Moving", 1)
+                    SetCanInteract(me, false)
+                end
+                TriggerOutput(outputs.GoToState, ev.Object, 2)
+            end
+        end
+
+        socketEvents.Reveal = function(ev)
+            TriggerOutput(outputs.RevealInt, ev.Object, ev.Param)
+        end
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.OnInt, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.OffInt, ev.Object, ev.Param)
+        end
+
+        socketEvents.UseBlockedFromStory = function(ev)
+            TriggerOutput(outputs.UseBlockedFromStoryInt, ev.Object, ev.Param)
+        end
+
+    end
+}

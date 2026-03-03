@@ -1,0 +1,348 @@
+game.roots.DefaultCharacter = State{function ()
+    description = [[Default script for characters]]
+
+    -- State data
+    -- this is the location that NPCs will walk to before resuming their idle script
+    local returnToIdlePos = nil
+    local returnToIdlePosForceUpdating = false
+    local returnToIdlePosFromDisturbance = false
+    local returnToIdlePosFromStoryOverride = false
+    local GLO_State_StopFollow = Flag("GLO_State_StopFollow_dc914da3-5e1b-443c-8724-8da8b2b1b6bb")
+    --TEMP this needs to be a bit more sofisticated
+    local movingOutOfDangerousSurface = false
+    local movingOutOfDangerousSurfaceInterruptable = true
+    local ignoreDangerousSurfacesTag = Tag("IGNORE_DANGEROUS_SURFACES_bbf62461-4af4-4631-807a-eb0bd988d9a6")
+
+    params.genericBehaviours = {type = EParamType.State, help=[[
+        Generic behaviour state for this object.
+    ]]}
+
+    params.combat = {type = EParamType.State, required=false, default=StateRef{game.states.DefaultCombat}, help=[[
+        State that will be executed when entity is in combat
+    ]]}
+
+    params.statusOverrides = {type = EParamType.State, default=StateRef{game.states.DefaultStatusOverrides}, help=[[
+        Actions that override the idle behaviour under specific conditions (e.g. when you have a certain status)
+    ]]
+    }
+
+    params.partyMember = {type = EParamType.State, default=StateRef{game.states.DefaultPartyMember}, help=[[
+        Action that override the idle behaviour while the character is in party (typically, following the leader)
+    ]]
+    }
+
+    params.idle = {type = EParamType.State, help=[[
+        Default behaviour that will be executed when not in combat or otherwise blocked (moving for items, generic behaviours and certain status for characters)
+    ]]}
+
+    params.combatCowerState = {type = EParamType.State, required=false, default=nil, help=[[
+        state to use when NPC encounter combat around them. Leave htis empty if you don't want the NPC to cower.
+    ]]}
+
+    self.OnException = function(e)
+        DebugLogCriticalException(e, "Unhandled Anubis exception caught in DefaultCharacter for " .. me.Name .. "\n")
+        return true
+    end
+
+    -- helpers
+    helpers.ShouldMoveOutSurfaces = function()
+        return not (IsTagged(me, ignoreDangerousSurfacesTag) or me.Character.IsAnubisMovingToDestination or me.Character.IsAnubisPatrolling)
+    end
+
+    -- events
+    events.EnteredCombat = function(e)
+        if e.Entity == me then
+            if not me.Character.IsPartyMember then
+                if not returnToIdlePos then
+                    returnToIdlePos = me.Position
+                    returnToIdlePosFromDisturbance = false
+                end
+            end
+            Interrupt()
+        end
+    end
+
+    events.DisturbanceReactionRequest = function(ev)
+        if ((ev.ReactionName ~= nil) and not string.match(ev.ReactionName, "[cC][rR][iI][mM][eE]_DoNothing.*")) then
+            if not returnToIdlePos then
+                returnToIdlePos = me.Position
+                returnToIdlePosFromDisturbance = true
+            end
+        end
+    end
+
+    events.DisturbanceInvestigationRequest = function(e)
+        if not returnToIdlePos then
+            returnToIdlePos = me.Position
+            returnToIdlePosFromDisturbance = true
+        end
+    end
+
+    events.LeftCombat = function(e)
+        if e.Entity == me and not returnToIdlePosFromStoryOverride then
+            if me.Character.IsPartyMember or
+               me.Character.IsDead
+               -- or IsInGameMasterMode()
+               then
+                returnToIdlePos = nil
+                returnToIdlePosFromDisturbance = false
+            end
+        end
+    end
+
+    events.EntityEvent = function(e)
+        if e.TargetEntity == me then
+            if (e.Event == "ClearPeaceReturn") or
+               (returnToIdlePosFromDisturbance and
+                (e.Event == "ClearCrimeReturn")) then
+                    returnToIdlePos = nil
+            elseif (e.Event == "SetPeaceReturnFromStory") then
+                if not returnToIdlePos then
+                    returnToIdlePos = me.Position
+                end
+                returnToIdlePosFromDisturbance = false
+                returnToIdlePosFromStoryOverride = true
+            elseif (e.Event == "ForceSetPeaceReturnFromStory") then
+                returnToIdlePos = me.Position
+                returnToIdlePosFromDisturbance = false
+                returnToIdlePosFromStoryOverride = true
+            elseif (e.Event == "SetPeaceReturnFromStoryThroughBlackboard") then
+                if not returnToIdlePos then
+                    returnToIdlePos = me.Blackboard.GetFact("CRIME_ReturnPos")
+                    me.Blackboard.ClearFact("CRIME_ReturnPos")
+
+                    returnToIdlePosFromDisturbance = false
+                    returnToIdlePosFromStoryOverride = true
+                end
+            elseif (e.Event == "GUS-298878-ReturnToIdlePosForceUpdateDeadCheck") and
+                   me.ForceUpdate then
+                    SetForceUpdate(me, false)
+            end
+        end
+    end
+
+    events.OnStageChanged = function(e)
+        if not e.OnStage then
+            returnToIdlePos = nil
+            returnToIdlePosFromDisturbance = false
+            returnToIdlePosFromStoryOverride = false
+        end
+    end
+
+    events.StoryOverride = function(e)
+        returnToIdlePos = nil
+        returnToIdlePosFromDisturbance = false
+        returnToIdlePosFromStoryOverride = false
+    end
+
+    events.LeftLevel = function(ev)
+        if returnToIdlePos ~= nil then
+            returnToIdlePos = nil
+        end
+        returnToIdlePosFromDisturbance = false
+        returnToIdlePosFromStoryOverride = false
+    end
+
+    events.Died = function()
+        returnToIdlePos = nil
+        returnToIdlePosFromDisturbance = false
+        returnToIdlePosFromStoryOverride = false
+    end
+
+    -- child nodes
+    nodes =  ImmediateSelector{
+        function(nodes)
+            return FindFirstSelectable(nodes)
+        end
+    }
+
+    -- NuWorldTester support
+    nodes.NuWorldTester = Proxy{
+        game.states.NuWorldTester
+    }
+
+    -- status overrides
+    nodes.StatusOverrides = Proxy{
+        params.statusOverrides
+    }
+
+    -- combat behaviour
+    nodes.Combat = Proxy{
+        params.combat
+    }
+
+    -- generic behaviours
+    nodes.GenericBehaviours = Proxy{
+        params.genericBehaviours
+    }
+
+    -- scene waiting, temporarily block idle behaviours
+    nodes.Waiting = Proxy{
+        game.states.Waiting
+    }
+
+    -- cowering around combat. TODO: put this higher than the waiting state?
+    nodes.Cower = Proxy{
+        params.combatCowerState
+    }
+
+    nodes.MoveTo = Proxy{
+        game.states.genMoveTo,
+        OnEnter = function()
+            returnToIdlePos = nil
+            returnToIdlePosFromDisturbance = false
+            returnToIdlePosFromStoryOverride = false
+        end
+    }
+
+    -- transitions between combat and peace behaviour
+    nodes.ReturnToIdlePos = Action{
+        Valid = function()
+            return not me.Character.IsPartyMember and returnToIdlePos ~= nil
+        end,
+        OnEnter = function()
+            if not returnToIdlePosForceUpdating then
+                SetForceUpdate(me, true)
+                returnToIdlePosForceUpdating = true
+            end
+        end,
+        OnLeave = function()
+            if returnToIdlePosForceUpdating then
+                SetForceUpdate(me, false)
+                returnToIdlePosForceUpdating = false
+            end
+        end,
+        OnInterrupt = function()
+            if returnToIdlePosForceUpdating and not me.AnubisActive and me.Character.IsDead then
+                --our anubis is inactive and no chance of us getting out of this by ourselves
+                --so disable our force update
+                SetForceUpdate(me, false)
+                returnToIdlePosForceUpdating = false
+            end
+        end,
+        function()
+            DebugText(me,"[Returning to original pos]")
+            if not returnToIdlePosForceUpdating then
+                -- after an interrupt and we got resurrected
+                -- we don't get a leave/enter for this
+                SetForceUpdate(me, true)
+                returnToIdlePosForceUpdating = true
+            end
+            if me.Character.CanMove then
+                try
+                    local validReturn = FindValidPosition(returnToIdlePos, 5.0, me)
+                    if validReturn ~= nil then
+                        MoveTo(validReturn, MovementSpeed.Walk, false, true)
+                    else
+                        SteerTo(returnToIdlePos)
+                    end
+                    -- in case the generic reaction triggered combat, don't walk back to the
+                    -- position where we were when combat started (in case we fled, that can
+                    -- be far away)
+                    returnToIdlePosFromDisturbance = false
+                    returnToIdlePosFromStoryOverride = false
+                    returnToIdlePos = nil
+                catch e if ls.CheckType(e, error.MovementFailed) then
+                    -- we ignore the exception here
+                end
+                -- in DOS2 we delayed this reaction a bit on interrupts
+                -- but since we don't have anything to fallback to here, we'll just sleep
+                if returnToIdlePos ~= nil then
+                    Sleep(1.0)
+                end
+            else
+                returnToIdlePosFromDisturbance = false
+                returnToIdlePosFromStoryOverride = false
+                returnToIdlePos = nil
+            end
+        end
+    }
+
+    nodes.PartyMember = Proxy{
+        params.partyMember,
+        Valid = function()
+            return me.Character.IsPartyMember and
+                   not GetFlag(GLO_State_StopFollow, me)
+        end
+    }
+
+    nodes.FollowerOfNPC = Action{
+        Valid = function()
+            if me.Character.IsPartyMember or
+               not me.Character.IsSummon then
+                return false
+            end
+            local toFollow = me.Character.Owner or me.Character.FollowCharacter
+            if toFollow == nil then
+                return false
+            end
+
+            local distance = GetDistanceTo(me, toFollow)
+
+            return
+                (distance < GetFollowDistance()) and
+                not HasActiveStatus(toFollow, "DYING") and
+                not toFollow.IsInCombat and
+                IsGameLevel()
+        end,
+
+        function()
+            FollowOwnerOrLeader()
+        end
+    }
+
+    nodes.MoveOutDangerousSurfaces = ImmediateSelector{
+        Valid = function(node)
+            return helpers.ShouldMoveOutSurfaces() and CheckAnyValid(node)
+        end
+    }
+
+    nodes.MoveOutDangerousSurfaces.FleeFromSurface = Action{
+        function()
+            movingOutOfDangerousSurface = true
+            try
+                FleeFromDangerousSurface()
+            catch e if ls.CheckType(e, error.MovementFailed) then
+                movingOutOfDangerousSurfaceInterruptable = false
+            end
+        end,
+        Valid = function()
+            return movingOutOfDangerousSurfaceInterruptable and IsInDangerousSurfaceFor(me)
+        end
+    }
+    nodes.MoveOutDangerousSurfaces.AvoidPingpong = Action{
+        function()
+            --wait at least 0.5 second to avoid exception spam from fleeing a surface
+            Sleep(0.5)
+            movingOutOfDangerousSurfaceInterruptable = true
+            --at this point we either continue waiting or the flee will take over again
+            Sleep(2.5 + 5.0*math.random())
+            movingOutOfDangerousSurface = false
+        end,
+        Valid = function()
+            return movingOutOfDangerousSurface
+        end,
+        OnInterrupt = function()
+            movingOutOfDangerousSurfaceInterruptable = true
+        end
+    }
+
+    -- this sucks, but our summons are using various configs
+    nodes.FTBFallback = Action {
+        function()
+            SetTurnActionsCompleted(me, true)
+            Sleep(0.5)
+        end,
+        Valid = function()
+            return me.IsInTurnBasedMode and me.IsCharacter and me.Character.IsPartyMember and me.Character.HasLostControl
+        end,
+        OnLeave = function()
+            SetTurnActionsCompleted(me, false)
+        end
+    }
+
+    -- idle behaviour, lowest priority
+    nodes.Idle = Proxy{
+        params.idle
+    }
+end}

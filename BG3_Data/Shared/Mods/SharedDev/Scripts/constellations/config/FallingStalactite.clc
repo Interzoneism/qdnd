@@ -1,0 +1,11 @@
+game.configs.FallingStalactite = Config{
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.FallingStalactite},
+    },
+    inputs={
+        Drop=ExtSocket{description=[[Object needs to begin falling and then explode.]],{SocketRef{[[root.logic.inputs.Drop]]}}},
+    },
+    outputs={
+        Dropped=ExtSocket{description=[[Object has dropped.]],{SocketRef{[[root.logic.outputs.Dropped]]}}},
+    }
+}

@@ -1,0 +1,22 @@
+game.configs.Escort = Config{
+    params={
+        Reverse = {
+            type = EParamType.Bool,
+            help = [[Whether or not to patrol the spline in reverse]],
+            required = false,
+            default = false
+        },
+        Spline = {
+            type = EParamType.String,
+            help = [[Spline to patrol]],
+            required = true,
+        },
+    },
+    root=StateRef{game.roots.DefaultCharacter,
+        genericBehaviours = StateRef{game.states.CrimesHumanoid},
+        idle = StateRef{game.states.GEN_Escort,
+            Reverse = params.Reverse,
+            Spline = params.Spline,
+        },
+    }
+}

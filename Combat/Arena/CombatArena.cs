@@ -27,8 +27,10 @@ using QDND.Data.Statuses;
 using QDND.Data.Passives;
 using QDND.Data.Interrupts;
 using QDND.Data.AI;
+using QDND.Data.Icons;
 using QDND.Tools.AutoBattler;
 using QDND.Combat.VFX;
+using QDND.Combat.UI.Base;
 using QDND.Combat.Arena.CustomFight;
 
 namespace QDND.Combat.Arena
@@ -957,6 +959,7 @@ namespace QDND.Combat.Arena
             _passiveRegistry = registries.PassiveRegistry;
             _interruptRegistry = registries.InterruptRegistry;
             _functorExecutor = registries.FunctorExecutor;
+            HudIcons.SetIconService(registries.IconService);
             _bg3AiRegistry = new BG3AIRegistry();
             var charRegistry = registries.CharRegistry;
 

@@ -1,0 +1,281 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="CharacterVisualBank">
+		<node id="CharacterVisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="BaseVisual" type="FixedString" value="0c42919c-f081-91b7-c62f-c842bf6fd33d" />
+					<attribute id="BodySetVisual" type="FixedString" value="2dd5e0a1-2b7f-78ae-bee3-8af2f41de544" />
+					<attribute id="ID" type="FixedString" value="500a8806-50a6-cd0e-024c-e37361f66441" />
+					<attribute id="Name" type="LSString" value="DRAGON_Red_Vista_Body_A" />
+					<attribute id="ShowEquipmentVisuals" type="bool" value="False" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+					<children>
+						<node id="MaterialOverrides">
+							<attribute id="MaterialResource" type="FixedString" value="" />
+							<children>
+								<node id="ColorPreset">
+									<attribute id="ForcePresetValues" type="bool" value="False" />
+									<attribute id="GroupName" type="FixedString" value="" />
+									<attribute id="MaterialPresetResource" type="FixedString" value="" />
+								</node>
+								<node id="MaterialPresets" />
+							</children>
+						</node>
+						<node id="RealMaterialOverrides" />
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="SkeletonBank">
+		<node id="SkeletonBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="DynamicPhysicsResourceID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="05b10e4d-f29b-0923-12c8-f83a156ac085" />
+					<attribute id="IKRigResourceID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="Name" type="LSString" value="DRAGON_Red_Vista_Base" />
+					<attribute id="PreviewAnimationResource" type="FixedString" value="" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="0ccdb580-ec72-00e8-174a-26a5096356d7" />
+					<attribute id="RagdollResourceID" type="FixedString" value="" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Dragons/DRAGON_Red_Vista_Base.GR2" />
+					<attribute id="SpringResourceID" type="FixedString" value="" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/Dragons/DRAGON_Red_Vista_Base.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+					<children>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_R_HandFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_MouthFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="4" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_L_HandFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="2" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_BodyFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="3" />
+								</node>
+							</children>
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Head_M" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_HeadFX" />
+							<attribute id="Transform" type="mat4x4" value=" 0.00 -0.00 -1.00  0.72 &#xD;&#xA;-0.00 -1.00 -0.00  0.26 &#xD;&#xA;-1.00  0.00 -0.00 -0.00 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Head_M" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_CombatLookAt" />
+							<attribute id="Transform" type="mat4x4" value=" 1.00  0.00  0.00  1.35 &#xD;&#xA; 0.00  1.00  0.00  0.21 &#xD;&#xA; 0.00  0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Head_M" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_CinematicLookAt" />
+							<attribute id="Transform" type="mat4x4" value="-0.00  1.00 -0.00  0.00 &#xD;&#xA;-1.00 -0.00  0.00  0.00 &#xD;&#xA; 0.00  0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_Playerlight" />
+							<attribute id="BoneConstraint" type="FixedString" value="Chest_M" />
+							<attribute id="ConstraintsPos" type="uint16" value="7" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_Light_NPC_1" />
+							<attribute id="Transform" type="mat4x4" value=" 1.00  0.00  0.00 -0.00 &#xD;&#xA; 0.00  0.13 -0.99  1.98 &#xD;&#xA; 0.00  0.99  0.13  0.43 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_Playerlight" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_Light_Player" />
+							<attribute id="Transform" type="mat4x4" value=" 1.00  0.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00  0.00 &#xD;&#xA; 0.00  0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_Root" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_DIAG_Camera" />
+							<attribute id="Transform" type="mat4x4" value=" 1.00  0.00  0.00 -1.97 &#xD;&#xA; 0.00  1.00  0.00  3.30 &#xD;&#xA; 0.00  0.00  1.00 -5.02 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_Root" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_COMBAT_Camera" />
+							<attribute id="Transform" type="mat4x4" value=" 1.00  0.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00  3.26 &#xD;&#xA; 0.00  0.00  1.00  0.84 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationSetBank">
+		<node id="AnimationSetBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="578d7724-db4b-6cf7-e44b-3d83458f1f93" />
+					<attribute id="Name" type="LSString" value="DRAGON_Red_Vista_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="FallBackAnimation" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets">
+											<children>
+												<node id="Object">
+													<attribute id="FallBackSubSet" type="FixedString" value="" />
+													<attribute id="MapKey" type="FixedString" value="" />
+													<children>
+														<node id="Animation" />
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="b190dc78-46a2-2496-ab23-c3a6b3bc6352" />
+					<attribute id="BoundsMax" type="fvec3" value="0 0 0" />
+					<attribute id="BoundsMin" type="fvec3" value="0 0 0" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="0c42919c-f081-91b7-c62f-c842bf6fd33d" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="DRAGON_Red_Vista_Base" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="05b10e4d-f29b-0923-12c8-f83a156ac085" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="EMPTY_VISUAL_TEMPLATE" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="578d7724-db4b-6cf7-e44b-3d83458f1f93" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="4f8d300d-58e7-ab8c-25c5-4446e93e144c" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="2dd4400a-11f8-15ab-8f84-057803c854ba" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="dcc373e1-2f6f-9596-7c5c-ea115ed48276" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="b4d698d0-bfda-2fda-e615-d180c0fc86f0" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="2d91cb23-ffd0-e657-4246-8677e83fad6f" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="c591444e-c517-6f98-dd02-21b3291d8a5b" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="7a474d49-0b32-e480-5fc1-8c3983995f24" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="17.091808 5.53236 14.535532" />
+					<attribute id="BoundsMin" type="fvec3" value="-17.091808 -0.84219784 -7.8168235" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="0ccdb580-ec72-00e8-174a-26a5096356d7" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Proxy_DRAGON_Red_A_Vista" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Characters/_Models/_Creatures/Dragons/Resources/Proxy_DRAGON_Red_A_Vista.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Characters/_Models/_Creatures/Dragons/Resources/Proxy_DRAGON_Red_A_Vista.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209013" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="9e2966c7-b61c-4bc1-bef1-a79cb5fde067" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_DRAGON_Red_A_Vista.Proxy_Dragon_Red_A_Vista_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="9e2966c7-b61c-4bc1-bef1-a79cb5fde067" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_DRAGON_Red_A_Vista.Proxy_Dragon_Red_A_Vista_Mesh_LOD1.1" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

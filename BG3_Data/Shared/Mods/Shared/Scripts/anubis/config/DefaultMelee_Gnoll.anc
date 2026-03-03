@@ -1,0 +1,9 @@
+game.configs.DefaultMelee_Gnoll = Config{
+    root=StateRef{game.roots.DefaultCharacter,
+        combat = StateRef{game.states.DefaultCombat,
+            FallbackMovementSpell = [[Shout_SuddenRush_Gnoll]],
+        },
+        genericBehaviours = StateRef{game.states.CrimesHumanoid},
+        idle = StateRef{game.states.Dummy},
+    }
+}

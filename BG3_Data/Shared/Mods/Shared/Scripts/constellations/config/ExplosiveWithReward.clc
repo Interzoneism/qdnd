@@ -1,0 +1,146 @@
+game.configs.ExplosiveWithReward = Config{
+    params={
+        VFXOff = {
+            type = EParamType.String,
+            help = [[VFX while mine is disabled and has been spotted.]],
+            required = false,
+            default = [[]]
+        },
+        AbsoluteValueThreshold = {
+            type = EParamType.Bool,
+            help = [[If true, treat the threshold as an absolute value rather than a medium value]],
+            required = false,
+            default = false
+        },
+        MinDistance = {
+            type = EParamType.Number,
+            help = [[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]],
+            required = false,
+            default = 6
+        },
+        VFXOffBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOff' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        Reward = {
+            type = EParamType.String,
+            help = [[Item that you get on disarming the trap.]],
+            required = true,
+        },
+        DamageThreshold = {
+            type = EParamType.Number,
+            help = [[            Minimum damage that needs to be done to the the mine for it to explode. 
+            Percentage, so on a 0.0-1.0 range unless AbsoluteValueTreshold is true]],
+            required = false,
+            default = 0
+        },
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the trap start on?]],
+            required = false,
+            default = true
+        },
+        VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the enabled-VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while explosive is enabled and has been spotted.]],
+            required = false,
+            default = [[]]
+        },
+        DamageTypes = {
+            type = EParamType.String,
+            help = [[Types of damage that affect the mine]],
+            required = false,
+            arrayRange=[[0..2147483647]],
+            default = {
+                [[FIRE]], 
+                [[LIGHTNING]], 
+                [[FORCE]], 
+                [[RADIANT]], 
+            }
+        },
+        Type = {
+            type = EParamType.String,
+            help = [[            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[Invisible]]
+        },
+        SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when mine is disabled]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_Off]]
+        },
+        DC = {
+            type = EParamType.String,
+            help = [[Perception check DC.]],
+            required = false,
+            default = [[HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f]]
+        },
+        ExcludeDamageTypes = {
+            type = EParamType.Bool,
+            help = [[Instead of trying to match the damage types, ignore them]],
+            required = false,
+            default = false
+        },
+        Skill = {
+            type = EParamType.String,
+            help = [[The skill checked.]],
+            required = false,
+            default = [[Perception]]
+        },
+        SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when mine is enabled]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_On]]
+        },
+        Projectile = {
+            type = EParamType.String,
+            help = [[The projectile that explodes]],
+            required = false,
+            default_value_provider = [[spell_projectile]],
+            default = [[Projectile_Fireball_Trap]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.ExplosiveWithReward,
+            AbsoluteValueThreshold = params.AbsoluteValueThreshold,
+            DamageThreshold = params.DamageThreshold,
+            DamageTypes = params.DamageTypes,
+            DC = params.DC,
+            ExcludeDamageTypes = params.ExcludeDamageTypes,
+            MinDistance = params.MinDistance,
+            Projectile = params.Projectile,
+            Reward = params.Reward,
+            Skill = params.Skill,
+            SoundOff = params.SoundOff,
+            SoundOn = params.SoundOn,
+            StartEnabled = params.StartEnabled,
+            Type = params.Type,
+            VFXOff = params.VFXOff,
+            VFXOffBone = params.VFXOffBone,
+            VFXOn = params.VFXOn,
+            VFXOnBone = params.VFXOnBone,
+        },
+    },
+    inputs={
+        Reveal=ExtSocket{description=[[Reveals the explosive. Pass a True boolean parameter to do this without an AD.]],{SocketRef{[[root.logic.inputs.Reveal]]}}},
+        Enable=ExtSocket{description=[[Turn explosive on.]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+        TryExplode=ExtSocket{description=[[Explodes the explosive, if it's armed.]],{SocketRef{[[root.logic.inputs.TryExplode]]}}},
+        Disable=ExtSocket{description=[[Disables the explosive.]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+    }
+}

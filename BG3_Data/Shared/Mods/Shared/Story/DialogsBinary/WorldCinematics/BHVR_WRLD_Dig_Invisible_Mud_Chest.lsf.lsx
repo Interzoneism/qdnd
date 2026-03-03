@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="6" revision="0" build="1" lslib_meta="v1,bswap_guids,lsf_keys_adjacency" />
+	<region id="dialog">
+		<node id="dialog">
+			<attribute id="IsBehaviour" type="bool" value="True" />
+			<attribute id="category" type="LSString" value="Generic NPC Dialog" />
+			<attribute id="UUID" type="FixedString" value="2e4e67a6-d6a0-9e01-27f8-ba97ffb0db8c" />
+			<attribute id="TimelineId" type="FixedString" value="1ae38f7f-9ec6-092c-b5ed-e4070dc4305c" />
+			<children>
+				<node id="DefaultAddressedSpeakers">
+					<children>
+						<node id="Object" key="MapKey">
+							<attribute id="MapKey" type="int32" value="0" />
+							<attribute id="MapValue" type="int32" value="-1" />
+						</node>
+						<node id="Object" key="MapKey">
+							<attribute id="MapKey" type="int32" value="1" />
+							<attribute id="MapValue" type="int32" value="-1" />
+						</node>
+						<node id="Object" key="MapKey">
+							<attribute id="MapKey" type="int32" value="2" />
+							<attribute id="MapValue" type="int32" value="-1" />
+						</node>
+					</children>
+				</node>
+				<node id="speakerlist">
+					<children>
+						<node id="speaker" key="index">
+							<attribute id="index" type="FixedString" value="0" />
+							<attribute id="list" type="LSString" value="69b61817-8458-47ac-8e78-5e855b0999ab" />
+							<attribute id="SpeakerMappingId" type="guid" value="3ee29b86-8da1-43f2-a197-6ab50d4fab5a" />
+						</node>
+						<node id="speaker" key="index">
+							<attribute id="index" type="FixedString" value="1" />
+							<attribute id="list" type="LSString" value="69b61817-8458-47ac-8e78-5e855b0999ab" />
+							<attribute id="SpeakerMappingId" type="guid" value="474d8f7a-5580-40a4-bbad-97177a2d0a0e" />
+						</node>
+						<node id="speaker" key="index">
+							<attribute id="index" type="FixedString" value="2" />
+							<attribute id="list" type="LSString" value="e0d1ff71-04a8-4340-ae64-9684d846eb83" />
+							<attribute id="SpeakerMappingId" type="guid" value="d0a6a915-3e27-4c28-97d5-17d42075adb7" />
+						</node>
+					</children>
+				</node>
+				<node id="nodes">
+					<children>
+						<node id="node" key="UUID">
+							<attribute id="constructor" type="FixedString" value="TagCinematic" />
+							<attribute id="UUID" type="FixedString" value="0c60e533-9a90-4d8a-a4f1-fd7f61ee4576" />
+							<attribute id="endnode" type="bool" value="True" />
+							<attribute id="Root" type="bool" value="True" />
+							<attribute id="ShowOnce" type="bool" value="True" />
+							<attribute id="speaker" type="int32" value="-1" />
+							<attribute id="BehaviourNodeType" type="uint8" value="1" />
+							<children>
+								<node id="children" />
+								<node id="GameData">
+									<children>
+										<node id="AiPersonalities" key="AiPersonality" />
+										<node id="MusicInstrumentSounds" />
+										<node id="OriginSound" />
+									</children>
+								</node>
+								<node id="Tags" />
+								<node id="setflags" />
+								<node id="checkflags" />
+							</children>
+						</node>
+						<node id="RootNodes">
+							<attribute id="RootNodes" type="FixedString" value="0c60e533-9a90-4d8a-a4f1-fd7f61ee4576" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

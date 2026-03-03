@@ -1,0 +1,32 @@
+EVENTS
+
+EVENT CharacterSetWetDev
+VARS
+	CHARACTER:_Character
+	LIST<STATUS>:_RemoveList
+	STATUS:_Result
+	INT:_Turns
+ON 
+	FetchCharacterApplyStatusData(_Character, WET)
+ACTIONS
+	Set(_Result,WET)
+	Set(_Turns,null)
+	ListClear(_RemoveList)
+	ListAdd(_RemoveList, GLO_PIXIECURSE)
+	IF "c1"
+		CharacterHasStatus(_Character, BURNING)
+	THEN
+		ListAdd(_RemoveList, BURNING)
+		Set(_Result, null)
+	ELIF "c1"
+		CharacterHasStatus(_Character, CHILLED)
+	THEN
+		ListAdd(_RemoveList, CHILLED)
+		Set(_Result,FROZEN)
+		Set(_Turns,1)
+	ELIF "c1"
+		CharacterHasStatus(_Character, FROZEN)
+	THEN
+		Set(_Result,null)
+	ENDIF
+	RETURN(_RemoveList,_Result,_Turns)

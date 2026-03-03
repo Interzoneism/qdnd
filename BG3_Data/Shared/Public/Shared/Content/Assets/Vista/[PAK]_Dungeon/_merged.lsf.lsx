@@ -1,0 +1,639 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="VirtualTextureBank">
+		<node id="VirtualTextureBank">
+			<children>
+				<node id="Resource">
+					<attribute id="GTexFileName" type="FixedString" value="502ea4d13062716349413b0a9ad96279" />
+					<attribute id="ID" type="FixedString" value="155ac25c-ed86-e79d-95a0-9f1da5f1b2d7" />
+					<attribute id="Name" type="LSString" value="Vista_Dungeon_SharTemple_A" />
+					<attribute id="Prefetch" type="bool" value="False" />
+					<attribute id="PrefetchMipLevel" type="int8" value="-1" />
+					<attribute id="ReferencedColorSpaces" type="uint32" value="6" />
+					<attribute id="VirtualTextureLayerConfig" type="uint32" value="3" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209018" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="MaterialBank">
+		<node id="MaterialBank">
+			<children>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="3515d150-91a4-8be5-d4c4-01886ca555f2" />
+					<attribute id="MaterialType" type="uint8" value="6" />
+					<attribute id="Name" type="LSString" value="Vista_Dungeon_SharTemple_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Base/Base_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="155ac25c-ed86-e79d-95a0-9f1da5f1b2d7" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="1.3762329 0 1.1838073" />
+					<attribute id="BoundsMin" type="fvec3" value="-1.3132074 -24 -1.1838073" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="06a5315c-ec7d-77c8-7260-5ad954241ff8" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Vista_Dungeon_SharTemple_Butress_Big_A_3W_24H_Middle_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Butress_Big_A_3W_24H_Middle_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Butress_Big_A_3W_24H_Middle_A.Dummy_Vista_Dungeon_SharTemple_Butress_Big_A_3W_24H_Middle_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209018" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="3515d150-91a4-8be5-d4c4-01886ca555f2" />
+							<attribute id="ObjectID" type="FixedString" value="Vista_Dungeon_SharTemple_Butress_Big_A_3W_24H_Middle_A.Vista_Dungeon_SharTemple_Butress_Big_A_3W_24H_Middle_A_Mesh.0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="2.6117 24 2.6158655" />
+					<attribute id="BoundsMin" type="fvec3" value="-2.6117 0 -2.6158655" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="1e5cf512-51c7-ab20-c1a5-1ab9eaa7aa80" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Vista_Dungeon_SharTemple_Pillar_B_24H_B" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Pillar_B_24H_B.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Pillar_B_24H_B.Dummy_Vista_Dungeon_SharTemple_Pillar_B_24H_B.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209018" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="3515d150-91a4-8be5-d4c4-01886ca555f2" />
+							<attribute id="ObjectID" type="FixedString" value="Vista_Dungeon_SharTemple_Pillar_B_24H_B.Vista_Dungeon_SharTemple_Pillar_B_24H_B_Mesh.0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="5.499785 5.5927134 1.1036469" />
+					<attribute id="BoundsMin" type="fvec3" value="-5.499785 0 -1.1036469" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="20303f08-6f6b-564f-0205-7a8987079199" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Vista_Dungeon_SharTemple_Arch_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Arch_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Arch_A.Dummy_Vista_Dungeon_SharTemple_Arch_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209018" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="3515d150-91a4-8be5-d4c4-01886ca555f2" />
+							<attribute id="ObjectID" type="FixedString" value="Vista_Dungeon_SharTemple_Arch_A.Vista_Dungeon_SharTemple_Arch_A_Mesh.0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="1.6587304 16.000004 1.6840409" />
+					<attribute id="BoundsMin" type="fvec3" value="-1.6587304 2.7207154E-06 -1.6840409" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="2ee288d0-9356-f866-7c38-0fd126a82ea4" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Vista_Dungeon_SharTemple_Pillar_D_16H_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Pillar_D_16H_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Pillar_D_16H_A.Dummy_Vista_Dungeon_SharTemple_Pillar_D_16H_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209018" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="3515d150-91a4-8be5-d4c4-01886ca555f2" />
+							<attribute id="ObjectID" type="FixedString" value="Vista_Dungeon_SharTemple_Pillar_D_16H_A.Vista_Dungeon_SharTemple_Pillar_D_16H_A_Mesh.0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="942.86536 -117.55849 -1073.7242" />
+					<attribute id="BoundsMin" type="fvec3" value="927.2261 -150.5654 -1095.1852" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="3ebf124c-4fd6-c926-eb94-6e1d050aa560" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Vista_MenuScreen_BhaalBridge_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Vista/Buildings/MenuScreen/Vista_MenuScreen_BhaalBridge_A/Resources/Vista_MenuScreen_BhaalBridge_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Vista/Buildings/MenuScreen/Vista_MenuScreen_BhaalBridge_A/Resources/Vista_MenuScreen_BhaalBridge_A.Dummy_Vista_MenuScreen_BhaalBridge_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209032" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="11360b00-428c-be54-fef3-a71988a3b1f2" />
+							<attribute id="ObjectID" type="FixedString" value="Vista_MenuScreen_BhaalBridge_A.Vista_MenuScreen_BhaalBridge_A_Trim_mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="2064b76b-9455-c848-363c-1b3f0a667f14" />
+							<attribute id="ObjectID" type="FixedString" value="Vista_MenuScreen_BhaalBridge_A.Vista_MenuScreen_BhaalBridge_A_Pillar_mesh.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="6b71cfe6-3bb7-7ebb-dd57-7b07bdce6e15" />
+							<attribute id="ObjectID" type="FixedString" value="Vista_MenuScreen_BhaalBridge_A.Vista_MenuScreen_BhaalBridge_A_mesh.2" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="1.3762329 0 1.1838073" />
+					<attribute id="BoundsMin" type="fvec3" value="-1.3132074 -8.000004 -1.1838073" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="49fd7a21-a8fb-e0c3-a984-a11a13b53de5" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Vista_Dungeon_SharTemple_Butress_Big_A_3W_8H_Middle_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Butress_Big_A_3W_8H_Middle_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Butress_Big_A_3W_8H_Middle_A.Dummy_Vista_Dungeon_SharTemple_Butress_Big_A_3W_8H_Middle_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209018" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="3515d150-91a4-8be5-d4c4-01886ca555f2" />
+							<attribute id="ObjectID" type="FixedString" value="Vista_Dungeon_SharTemple_Butress_Big_A_3W_8H_Middle_A.Vista_Dungeon_SharTemple_Butress_Big_A_3W_8H_Middle_A_Mesh.0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="1.1921923 8.085754 1.1587597" />
+					<attribute id="BoundsMin" type="fvec3" value="-1.1921923 0.085754775 -1.1587597" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="4ac2d4a8-f367-8221-ff55-b65741b9fc46" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Vista_Dungeon_SharTemple_Pillar_C_8H_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Pillar_C_8H_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Pillar_C_8H_A.Dummy_Vista_Dungeon_SharTemple_Pillar_C_8H_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209018" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="3515d150-91a4-8be5-d4c4-01886ca555f2" />
+							<attribute id="ObjectID" type="FixedString" value="Vista_Dungeon_SharTemple_Pillar_C_8H_A.Vista_Dungeon_SharTemple_Pillar_C_16H_A_Mesh.0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="1.6746179 4.085188 1.795265" />
+					<attribute id="BoundsMin" type="fvec3" value="-2.071306 2.4414062E-06 -2.0551322" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="63d7cf48-564b-781d-2abe-11a177e4fce7" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Vista_Dungeon_SharTemple_Pillar_D_Middle_Broken_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Pillar_D_Middle_Broken_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Pillar_D_Middle_Broken_A.Dummy_Vista_Dungeon_SharTemple_Pillar_D_Middle_Broken_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209018" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="3515d150-91a4-8be5-d4c4-01886ca555f2" />
+							<attribute id="ObjectID" type="FixedString" value="Vista_Dungeon_SharTemple_Pillar_D_Middle_Broken_A.Vista_Dungeon_SharTemple_Pillar_D_Middle_Broken_A_Mesh.0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="1.1921923 15.999998 1.1587597" />
+					<attribute id="BoundsMin" type="fvec3" value="-1.1921923 0 -1.1587597" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="70935dd7-ce76-a45e-6a17-9b49772ec4be" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Vista_Dungeon_SharTemple_Pillar_C_16H_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Pillar_C_16H_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Pillar_C_16H_A.Dummy_Vista_Dungeon_SharTemple_Pillar_C_16H_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209018" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="3515d150-91a4-8be5-d4c4-01886ca555f2" />
+							<attribute id="ObjectID" type="FixedString" value="Vista_Dungeon_SharTemple_Pillar_C_16H_A.Vista_Dungeon_SharTemple_Pillar_C_16H_A_Mesh.0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="1.9736328 1.0000068 2.0170875" />
+					<attribute id="BoundsMin" type="fvec3" value="-1.9736328 2.746582E-06 -2.0170877" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="809c9e05-7988-9a93-c00b-19cebfa975f5" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Vista_Dungeon_SharTemple_Pillar_D_Bottom_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Pillar_D_Bottom_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Pillar_D_Bottom_A.Dummy_Vista_Dungeon_SharTemple_Pillar_D_Bottom_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209018" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="3515d150-91a4-8be5-d4c4-01886ca555f2" />
+							<attribute id="ObjectID" type="FixedString" value="Vista_Dungeon_SharTemple_Pillar_D_Bottom_A.Vista_Dungeon_SharTemple_Pillar_D_Bottom_A_Mesh.0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="1.6587304 8.000003 1.6840409" />
+					<attribute id="BoundsMin" type="fvec3" value="-1.6587304 2.7207154E-06 -1.6840409" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="a5e5e012-3ff7-b828-1b4d-4614b257934a" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Vista_Dungeon_SharTemple_Pillar_D_8H_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Pillar_D_8H_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Pillar_D_8H_A.Dummy_Vista_Dungeon_SharTemple_Pillar_D_8H_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209018" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="3515d150-91a4-8be5-d4c4-01886ca555f2" />
+							<attribute id="ObjectID" type="FixedString" value="Vista_Dungeon_SharTemple_Pillar_D_8H_A.Vista_Dungeon_SharTemple_Pillar_D_8H_A_Mesh.0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="2.9600546 24 2.9600546" />
+					<attribute id="BoundsMin" type="fvec3" value="-2.9597335 0.06637817 -2.9600546" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="b4ef880e-d87f-2c08-36a9-a0824c296a08" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Vista_Dungeon_SharTemple_Pillar_B_24H_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Pillar_B_24H_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Pillar_B_24H_A.Dummy_Vista_Dungeon_SharTemple_Pillar_B_24H_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209018" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="3515d150-91a4-8be5-d4c4-01886ca555f2" />
+							<attribute id="ObjectID" type="FixedString" value="Vista_Dungeon_SharTemple_Pillar_B_24H_A.Vista_Dungeon_SharTemple_Pillar_B_24H_A_Mesh.0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="1.0323315 24 1.0394442" />
+					<attribute id="BoundsMin" type="fvec3" value="-1.0323315 -0.042373035 -1.0394442" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="cfae584e-56c9-2bce-e0b9-b4bd09716831" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Vista_Dungeon_SharTemple_Pillar_A_24H_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Pillar_A_24H_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Pillar_A_24H_A.Dummy_Vista_Dungeon_SharTemple_Pillar_A_24H_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209018" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="3515d150-91a4-8be5-d4c4-01886ca555f2" />
+							<attribute id="ObjectID" type="FixedString" value="Vista_Dungeon_SharTemple_Pillar_A_24H_A.Vista_Dungeon_SharTemple_Pillar_A_24H_A_Mesh.0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="12.365205 19.35946 1.2799398" />
+					<attribute id="BoundsMin" type="fvec3" value="0 -0.054704588 -1.2799398" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="e75b9c5e-19b3-b2ae-f553-b23efd0a1106" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Vista_Dungeon_SharTemple_Butress_Big_A_12W_20H_Top_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Butress_Big_A_12W_20H_Top_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Butress_Big_A_12W_20H_Top_A.Dummy_Vista_Dungeon_SharTemple_Butress_Big_A_12W_20H_Top_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209018" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="3515d150-91a4-8be5-d4c4-01886ca555f2" />
+							<attribute id="ObjectID" type="FixedString" value="Vista_Dungeon_SharTemple_Butress_Big_A_12W_20H_Top_A.Vista_Dungeon_SharTemple_Butress_Big_A_12W_20H_Top_A_Mesh.0" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="1.9595386 2.9087648 1.9693154" />
+					<attribute id="BoundsMin" type="fvec3" value="-1.9595386 2.7207154E-06 -1.9693154" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="ExcludeFromHLOD" type="bool" value="True" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="ff5ab94a-23e1-0ca0-ec1e-6b57f5eb025c" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Vista_Dungeon_SharTemple_Pillar_D_4H_Top_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Pillar_D_4H_Top_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Vista/Dungeon/Vista_Dungeon_SharTemple_ABC/Resources/Vista_Dungeon_SharTemple_Pillar_D_4H_Top_A.Dummy_Vista_Dungeon_SharTemple_Pillar_D_4H_Top_A.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209018" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="3515d150-91a4-8be5-d4c4-01886ca555f2" />
+							<attribute id="ObjectID" type="FixedString" value="Vista_Dungeon_SharTemple_Pillar_D_4H_Top_A.Vista_Dungeon_SharTemple_Pillar_D_4H_Top_A_Mesh.0" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

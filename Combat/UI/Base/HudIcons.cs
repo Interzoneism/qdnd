@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Godot;
 using QDND.Combat.Services;
+using QDND.Data.Icons;
 
 namespace QDND.Combat.UI.Base
 {
@@ -96,8 +97,28 @@ namespace QDND.Combat.UI.Base
             ["proficiency"] = "res://assets/Images/Icons General/Generic_Buff_Unfaded_Icon.png",
         };
 
+        private static IconService _iconService;
+
         private static Dictionary<string, string> _passiveIconIndex;
         private static bool _passiveIconIndexBuilt;
+
+        /// <summary>
+        /// Set the IconService for atlas-based icon resolution.
+        /// Called during CombatArena initialization.
+        /// </summary>
+        public static void SetIconService(IconService iconService)
+        {
+            _iconService = iconService;
+        }
+
+        /// <summary>
+        /// Try to get a Godot Texture2D from the BG3 icon atlas service.
+        /// Returns null if the icon is not in any atlas or the service is not initialized.
+        /// </summary>
+        public static Texture2D GetAtlasIcon(string iconName)
+        {
+            return _iconService?.GetIconTexture(iconName);
+        }
 
         // ── Equipment Slot Placeholders ────────────────────────────
 
@@ -212,8 +233,17 @@ namespace QDND.Combat.UI.Base
         /// </summary>
         public static Texture2D LoadTextureSafe(string path)
         {
-            if (string.IsNullOrWhiteSpace(path) ||
-                !path.StartsWith("res://", System.StringComparison.Ordinal))
+            if (string.IsNullOrWhiteSpace(path))
+                return null;
+
+            // Handle atlas-resolved icons
+            if (path.StartsWith("atlas://", StringComparison.Ordinal))
+            {
+                string iconName = path.Substring("atlas://".Length);
+                return GetAtlasIcon(iconName);
+            }
+
+            if (!path.StartsWith("res://", StringComparison.Ordinal))
                 return null;
 
             if (!ResourceLoader.Exists(path))
@@ -267,6 +297,14 @@ namespace QDND.Combat.UI.Base
                 return false;
 
             iconName = iconName.Trim();
+
+            // Try atlas-based resolution first (BG3 icon names like "Action_Dash", "Spell_Conjuration_MageArmor")
+            if (_iconService != null && _iconService.HasIcon(iconName))
+            {
+                resolvedPath = $"atlas://{iconName}";
+                return true;
+            }
+
             if (iconName.StartsWith("res://", StringComparison.Ordinal))
             {
                 if (ResourceLoader.Exists(iconName))

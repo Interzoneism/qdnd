@@ -1,0 +1,75 @@
+#INCLUDE Grenade
+
+INIT
+
+EXTERN FLOAT:%LifeTime=0
+EXTERN SPELL:%ProjectileSpell=Projectile_Grenade_Oil
+SPELL:%ExplosionProjectile=Projectile_VolatileItem_Explosion
+
+USING SHARED Grenade
+
+EVENTS
+
+EVENT GrenadeDestroy OVERRIDE
+VARS
+	ITEM:_ItemSource
+	CHARACTER:_CharacterSource
+	DAMAGE:_DamageType
+ON
+	OnDamage(_DamageType,_,_CharacterSource,_ItemSource)
+ACTIONS
+	IF "c1"
+		IsEqual(_DamageType, Fire)
+	THEN
+		IF "!c1"
+			ItemHasStatus(__Me,FROZEN)
+		THEN	
+			IF "!c1"
+				IsEqual(_CharacterSource, null)
+			THEN
+				ExplodeAt(__Me,%ExplosionProjectile,0,_CharacterSource)
+				CreateSurfaceAt(__Me, SurfaceFire, 1, 12, _CharacterSource)
+			ELIF "!c1"
+				IsEqual(_ItemSource, null)
+			THEN
+				ExplodeAt(__Me,%ExplosionProjectile,0,_ItemSource)
+				CreateSurfaceAt(__Me, SurfaceFire, 1, 12, _ItemSource)
+			ELSE
+				ExplodeAt(__Me,%ExplosionProjectile,0,__Me)
+				CreateSurfaceAt(__Me, SurfaceFire, 1, 12, __Me)
+			ENDIF
+			ItemDestroy(__Me)
+		ENDIF
+	ELIF "!c1&!c2"
+		IsEqual(__Me,_ItemSource)
+		IsEqual(_DamageType, None)
+	THEN
+		Set(%Caster, _CharacterSource)
+		Set(%CharacterSource, _CharacterSource)
+		CallFunction("Grenade_Explode")
+	ENDIF
+
+EVENT FetchSpellOnDamage OVERRIDE
+VARS
+	DAMAGE:_DamageType
+ON
+	FetchItemSpellOnDamage(_,_DamageType)
+ACTIONS
+	IF "c1"
+		IsEqual(_DamageType, Fire) 
+	THEN
+		IF "!c1"
+			ItemHasStatus(__Me, FROZEN)
+		THEN
+			RETURN(1, %ExplosionProjectile, 0)
+		ENDIF
+		RETURN(0, %ExplosionProjectile, 0)			
+	ELSE
+		IF "!c1"
+			IsEqual(%Exploded, 1)
+		THEN
+			RETURN(1, %ProjectileSpell, 0)
+		ENDIF
+		RETURN(0, %ProjectileSpell, 0)
+	ENDIF
+

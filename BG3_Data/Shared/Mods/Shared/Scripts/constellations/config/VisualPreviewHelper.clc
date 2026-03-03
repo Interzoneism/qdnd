@@ -1,0 +1,34 @@
+game.configs.VisualPreviewHelper = Config {
+    params = {
+        PreviewEffect = {
+            type = EParamType.String,
+            help = [[VFX shown in the preview for this item.]],
+            required = true
+        },
+        PreviewEffectBone = {
+            type = EParamType.String,
+            help = [[Bone on which the preview VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        StartActive = {
+            type = EParamType.Bool,
+            help = [[Whether the VFX is shown by default when the object is first loaded.]],
+            required = false,
+            default = true
+        }
+    },
+    root = StateRef {
+        game.roots.DefaultTrap,
+        logic = StateRef {
+            game.states.VisualPreviewHelper,
+            PreviewEffect = params.PreviewEffect,
+            PreviewEffectBone = params.PreviewEffectBone,
+            StartActive = params.StartActive
+        }
+    },
+    inputs={
+        Enable=ExtSocket{description=[[Sets the preview as active]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+        Disable=ExtSocket{description=[[Sets the preview as inactive]],{SocketRef{[[root.logic.inputs.Disable]]}}}
+    }
+}

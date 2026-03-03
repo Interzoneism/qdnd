@@ -1,0 +1,63 @@
+game.configs.Helper_TeleportSource = Config{
+    params={
+        Target = {
+            type = EParamType.String,
+            help = [[The target to which to teleport the source]],
+            required = true,
+        },
+        TeleportSummons = {
+            type = EParamType.Bool,
+            help = [[Teleport summons of the source or of teleported characters linked to the source]],
+            required = false,
+            default = true
+        },
+        LeaveCombat = {
+            type = EParamType.Bool,
+            help = [[Teleported characters should leave any combat they are currently in]],
+            required = false,
+            default = true
+        },
+        TeleportPartyFollowers = {
+            type = EParamType.Bool,
+            help = [[Teleport party followers of the source or of teleported characters linked to the source]],
+            required = false,
+            default = true
+        },
+        TeleportLinkedCharacters = {
+            type = EParamType.Bool,
+            help = [[Teleport player characters linked to the source]],
+            required = false,
+            default = true
+        },
+        SourceVFX = {
+            type = EParamType.String,
+            help = [[VFX to play at the source location when teleporting]],
+            required = false
+        },
+        TargetVFX = {
+            type = EParamType.String,
+            help = [[VFX to play at the target location when teleporting]],
+            required = false
+        },
+        Sound = {
+            type = EParamType.String,
+            help = [[Sound to play when teleporting]],
+            required = false,
+        }
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.TeleportSource,
+            LeaveCombat = params.LeaveCombat,
+            TeleportLinkedCharacters = params.TeleportLinkedCharacters,
+            TeleportPartyFollowers = params.TeleportPartyFollowers,
+            TeleportSummons = params.TeleportSummons,
+            Target = params.Target,
+            SourceVFX = params.SourceVFX,
+            TargetVFX = params.TargetVFX,
+            Sound = params.Sound
+        },
+    },
+    inputs={
+        Teleport=ExtSocket{description=[[Perform the teleport]],{SocketRef{[[root.logic.inputs.Teleport]]}}},
+    }
+}

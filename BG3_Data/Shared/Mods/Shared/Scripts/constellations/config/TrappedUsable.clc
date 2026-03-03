@@ -1,0 +1,136 @@
+game.configs.TrappedContainer = Config{
+    params={
+        DC = {
+            type = EParamType.String,
+            help = [[The skill check DC.]],
+            required = false,
+            default = [[HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f]]
+        },
+        DestroyOnDisarm = {
+            type = EParamType.Bool,
+            help = [[Does the item break on Disarm?]],
+            required = false,
+            default = false
+        },
+        Key = {
+            type = EParamType.String,
+            help = [[Key used when locking the item]],
+            required = false,
+            default = [[STORYLOCK]]
+        },
+        MinDistance = {
+            type = EParamType.Number,
+            help = [[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]],
+            required = false,
+            default = 6
+        },
+        OneShot = {
+            type = EParamType.Bool,
+            help = [[The trap activates only the first time on use (e.g. explodes chest), rather than every time (e.g. a chest with spikes that come out)]],
+            required = false,
+            default = true
+        },
+        Skill = {
+            type = EParamType.String,
+            help = [[The skill checked for discovering the container and/or its trapped nature if the 'Type' is not 'None'.]],
+            required = false,
+            default = [[Perception]]
+        },
+        SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when trap is turned off]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_Off]]
+        },
+        SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when trap is turned on]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_On]]
+        },
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the object start enabled? (will the trap trigger when using the item, or will the UsedWhileDisabled socket trigger instead)]],
+            required = false,
+            default = true
+        },
+        StartUseEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the item's use start enabled? (should triggering item's use actions be blocked until the EnableObject socket is triggered?)]],
+            required = false,
+            default = true
+        },
+        Type = {
+            type = EParamType.String,
+            help = [[            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[Trapped]]
+        },
+        VFXOff = {
+            type = EParamType.String,
+            help = [[VFX while the trap is disabled and has been spotted.]],
+            required = false,
+            default = [[]]
+        },
+        VFXOffBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOff' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while the trap is enabled and has been spotted.]],
+            required = false,
+            default = [[VFX_Script_Trap_Overlay_Red_01_a7361f25-e942-e071-7ce3-7a8182f4e0ef]]
+        },
+        VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOn' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.TrappedUsable,
+            DC = params.DC,
+            DestroyOnDisarm = params.DestroyOnDisarm,
+            Key = params.Key,
+            MinDistance = params.MinDistance,
+            OneShot = params.OneShot,
+            Skill = params.Skill,
+            SoundOff = params.SoundOff,
+            SoundOn = params.SoundOn,
+            StartEnabled = params.StartEnabled,
+            StartUseEnabled = params.StartUseEnabled,
+            Type = params.Type,
+            VFXOff = params.VFXOff,
+            VFXOffBone = params.VFXOffBone,
+            VFXOn = params.VFXOn,
+            VFXOnBone = params.VFXOnBone,
+        },
+    },
+    inputs={
+        Lock=ExtSocket{description=[[Lock the item using params.Key as key]],{SocketRef{[[root.logic.inputs.Lock]]}}},
+        Disarm=ExtSocket{description=[[Disarm the trap]],{SocketRef{[[root.logic.inputs.Disarm]]}}},
+        UseBlockedFromStory=ExtSocket{description=[[The item's use was blocked from story (because it was not enabled)]],{SocketRef{[[root.logic.inputs.UseBlockedFromStory]]}}},
+        Unlock=ExtSocket{description=[[Unlock the item]],{SocketRef{[[root.logic.inputs.Unlock]]}}},
+        Reveal=ExtSocket{description=[[Reveal the item, or its trapped state, depending on the Perception type]],{SocketRef{[[root.logic.inputs.Reveal]]}}},
+        EnableObject=ExtSocket{description=[[Enable the item (using it will trigger the trap if active, and the Pressed output)]],{SocketRef{[[root.logic.inputs.EnableObject]]}}},
+        DisableObject=ExtSocket{description=[[Disable the Object (using it will not trigger the trap or Pressed output)]],{SocketRef{[[root.logic.inputs.DisableObject]]}}},
+    },
+    outputs={
+        UsedWhileDisabled=ExtSocket{description=[[Item used while deactivated]],{SocketRef{[[root.logic.outputs.ActivateAttemptFailed]]}}},
+        UseFailed=ExtSocket{description=[[A character failed to use this item (e.g. because it was locked, or because they're blocked from using it based on their tags)]],{SocketRef{[[root.logic.outputs.UseFailed]]}}},
+        UseFinishedSuccessfully=ExtSocket{description=[[A character successfully finished using this item (will trigger only after closing in case of a container)]],{SocketRef{[[root.logic.outputs.UseFinishedSuccessfully]]}}},
+        Disarmed=ExtSocket{description=[[The trap was disarmed]],{SocketRef{[[root.logic.outputs.Disarmed]]}}},
+        Activate=ExtSocket{description=[[The trap has been triggered]],{SocketRef{[[root.logic.outputs.Activate]]}, SocketRef{[[root.logic.outputs.DisarmFailed]]}}},
+        Destroyed=ExtSocket{description=[[Item is destroyed]],{SocketRef{[[root.logic.outputs.Destroyed]]}}},
+    }
+}

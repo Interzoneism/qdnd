@@ -1,0 +1,88 @@
+game.configs.BurningItem = Config{
+    params={
+        LightOnSound = {
+            type = EParamType.String,
+            help = [[Sound played when this light is turned on.]],
+            required = false,
+            default = [[DEC_Interactive_Lightsources_Torch_Small_On]]
+        },
+        BurnEffect = {
+            type = EParamType.String,
+            help = [[VFX while item is burning.]],
+            required = false,
+            default = [[VFX_LightSources_GEN_Torch_A_01_0aee588d-ba2a-aa3b-a048-5fbc03779371]]
+        },
+        StartLit = {
+            type = EParamType.Bool,
+            help = [[Does the item start lit?]],
+            required = false,
+            default = true
+        },
+        GameplayLightPointLightVerticalLimit = {
+            type = EParamType.Number,
+            help = [[Vertical limit of a point light that does not check line-of-sight]],
+            required = false,
+            default = 2.5
+        },
+        BurnEffectBone = {
+            type = EParamType.String,
+            help = [[Bone on which the VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        GameplayLight = {
+            type = EParamType.Bool,
+            help = [[Does the item cast a gameplay light, or is purely decorative?]],
+            required = false,
+            default = false
+        },
+        GameplayLightOffsetFallback = {
+            type = EParamType.Vector3,
+            help = [[Places the gameplay light at this position if the provided bone is not valid for the entity.]],
+            required = false,
+            default = math.Vector3(0, 0, 0)
+        },
+        GameplayLightSharpness = {
+            type = EParamType.Number,
+            help = [[Sharpness of gameplay light]],
+            required = false,
+            default = 0.1
+        },
+        LightOffSound = {
+            type = EParamType.String,
+            help = [[Sound played when this light is turned off.]],
+            required = false,
+            default = [[DEC_Interactive_Lightsources_Torch_Small_Off]]
+        },
+        GameplayLightRadius = {
+            type = EParamType.Number,
+            help = [[Radius of gameplay light]],
+            required = false,
+            default = 5
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.BurningItem,
+            BurnEffect = params.BurnEffect,
+            BurnEffectBone = params.BurnEffectBone,
+            GameplayLight = params.GameplayLight,
+            GameplayLightOffsetFallback = params.GameplayLightOffsetFallback,
+            GameplayLightPointLightVerticalLimit = params.GameplayLightPointLightVerticalLimit,
+            GameplayLightRadius = params.GameplayLightRadius,
+            GameplayLightSharpness = params.GameplayLightSharpness,
+            LightOffSound = params.LightOffSound,
+            LightOnSound = params.LightOnSound,
+            StartLit = params.StartLit,
+        },
+    },
+    inputs={
+        TurnOn=ExtSocket{description=[[Turns burning item on]],{SocketRef{[[root.logic.inputs.TurnOn]]}}},
+        TurnOff=ExtSocket{description=[[Turns burning item off]],{SocketRef{[[root.logic.inputs.TurnOff]]}}},
+        Toggle=ExtSocket{description=[[Toggle burning item]],{SocketRef{[[root.logic.inputs.Toggle]]}}},
+        ChangeVFX=ExtSocket{description=[[Changes VFX used for the burning item. Expects a string parameter.]],{SocketRef{[[root.logic.inputs.ChangeVFX]]}}},
+    },
+    outputs={
+        Off=ExtSocket{description=[[Burning item turned off]],{SocketRef{[[root.logic.outputs.Off]]}}},
+        On=ExtSocket{description=[[Burning item turned on]],{SocketRef{[[root.logic.outputs.On]]}}},
+    }
+}

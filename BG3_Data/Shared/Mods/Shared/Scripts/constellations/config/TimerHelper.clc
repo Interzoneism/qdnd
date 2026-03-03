@@ -1,0 +1,47 @@
+game.configs.TimerHelper = Config{
+    params={
+        Repeats = {
+            type = EParamType.Int,
+            help = [[How many times does the timer repeat?]],
+            required = false,
+            default = 0
+        },
+        TickLength = {
+            type = EParamType.Number,
+            help = [[Delay between ticks]],
+            required = true,
+        },
+        Delay = {
+            type = EParamType.Number,
+            default = 0.0,
+            help = [[Delay before first shot. Affects immediate shots as well.]],
+        },
+        StartActive = {
+            type = EParamType.Bool,
+            help = [[Whether the object starts on]],
+            required = false,
+            default = false
+        },
+        TargetEntity = {
+            type = EParamType.String,
+            help = [[Object to which the timer is attached.]],
+            required = true,
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.Timer,
+            Repeats = params.Repeats,
+            StartActive = params.StartActive,
+            TickLength = params.TickLength,
+            Delay = params.Delay,
+            TargetEntity = params.TargetEntity,
+        },
+    },
+    inputs={
+        Stop=ExtSocket{description=[[Stop timer]],{SocketRef{[[root.logic.inputs.Stop]]}}},
+        Start=ExtSocket{description=[[Start timer]],{SocketRef{[[root.logic.inputs.Start]]}}},
+    },
+    outputs={
+        Tick=ExtSocket{description=[[Timer ticks]],{SocketRef{[[root.logic.outputs.Tick]]}}},
+    }
+}

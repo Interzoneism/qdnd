@@ -1,0 +1,26 @@
+
+local m = AnubisModule()
+
+m.ItemIsValid = function(item)
+    if item ~= nil and EntityExists(item) and item.IsItem then
+        return true
+    end
+    return false
+end
+
+m.SafeIsDestroyed = function(item)
+    if item ~= nil and
+        EntityExists(item) then
+        if (item.IsCharacter or item.IsTrigger) then
+            DebugLog("Anubis Module items: "..item.Name.. " in items.SafeIsDestroyed is not an item")
+            return false
+        else
+            return (not item.IsItem or --When an object is destroyed, it loses its Item component, and on reload ceases to exist at all (which is checked above)
+                    item.Item.IsDestroyed)
+        end
+    else
+        return true
+    end
+end
+
+return m

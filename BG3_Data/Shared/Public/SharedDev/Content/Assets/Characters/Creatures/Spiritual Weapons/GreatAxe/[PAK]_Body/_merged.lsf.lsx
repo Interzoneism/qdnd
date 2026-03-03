@@ -1,0 +1,2070 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="AnimationBlueprintBank">
+		<node id="AnimationBlueprintBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="231fdb37-7c98-dd45-8bb2-53a0ae6006eb" />
+					<attribute id="Name" type="LSString" value="SPRW_GreatAxe_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="f06ea22c-3d9e-be4a-9795-8521f54455a6" />
+					<attribute id="SourceFile" type="LSString" value="Editor/Mods/Shared/Assets/Blueprints/Characters_Creatures_NoIK.lsabp" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725668" />
+					<children>
+						<node id="Params" />
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="CharacterVisualBank">
+		<node id="CharacterVisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="BaseVisual" type="FixedString" value="aec60642-e09f-4825-e05b-b75da5ccc830" />
+					<attribute id="BodySetVisual" type="FixedString" value="c6a9ff29-2a1e-43f2-8361-b1e47b5f24ca" />
+					<attribute id="ID" type="FixedString" value="b90b4996-4be1-8587-c329-4e11d6bfacd1" />
+					<attribute id="Name" type="LSString" value="SPRW_GreatAxe_Body_A" />
+					<attribute id="ShowEquipmentVisuals" type="bool" value="False" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725668" />
+					<children>
+						<node id="MaterialOverrides">
+							<attribute id="MaterialResource" type="FixedString" value="" />
+							<children>
+								<node id="ColorPreset">
+									<attribute id="ForcePresetValues" type="bool" value="False" />
+									<attribute id="GroupName" type="FixedString" value="" />
+									<attribute id="MaterialPresetResource" type="FixedString" value="" />
+								</node>
+								<node id="MaterialPresets" />
+								<node id="ScalarParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="SphereMask_Radius" />
+									<attribute id="Value" type="float" value="0.6" />
+								</node>
+								<node id="ScalarParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="SphereMask_Intensity" />
+									<attribute id="Value" type="float" value="1.5" />
+								</node>
+								<node id="ScalarParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="FresnelScroll_Speed" />
+									<attribute id="Value" type="float" value="-0.5" />
+								</node>
+								<node id="ScalarParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="FresnelBorder_Power" />
+									<attribute id="Value" type="float" value="1" />
+								</node>
+								<node id="ScalarParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="FresnelBorder_Mult" />
+									<attribute id="Value" type="float" value="1" />
+								</node>
+								<node id="ScalarParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="OpacityMult" />
+									<attribute id="Value" type="float" value="5" />
+								</node>
+								<node id="ScalarParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="Fade_Distance" />
+									<attribute id="Value" type="float" value="1" />
+								</node>
+								<node id="ScalarParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="GradientMap_Contrast" />
+									<attribute id="Value" type="float" value="1" />
+								</node>
+								<node id="ScalarParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="EmissiveMult" />
+									<attribute id="Value" type="float" value="5" />
+								</node>
+								<node id="Vector3Parameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="BonePosition_Offset" />
+									<attribute id="Value" type="fvec3" value="0 1.1 0" />
+								</node>
+								<node id="Vector3Parameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="BonePosition" />
+									<attribute id="Value" type="fvec3" value="0 0 0" />
+								</node>
+								<node id="VectorParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="DynamicParameter" />
+									<attribute id="Value" type="fvec4" value="1 1 1 1" />
+								</node>
+								<node id="VectorParameters">
+									<attribute id="Color" type="bool" value="False" />
+									<attribute id="Custom" type="bool" value="True" />
+									<attribute id="Enabled" type="bool" value="False" />
+									<attribute id="Parameter" type="FixedString" value="Color" />
+									<attribute id="Value" type="fvec4" value="1 1 1 1" />
+								</node>
+							</children>
+						</node>
+						<node id="RealMaterialOverrides" />
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="SkeletonBank">
+		<node id="SkeletonBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="DynamicPhysicsResourceID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="ID" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="IKRigResourceID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Base" />
+					<attribute id="PreviewAnimationResource" type="FixedString" value="" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RagdollResourceID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Base.GR2" />
+					<attribute id="SpringResourceID" type="FixedString" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Base.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209015" />
+					<children>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_StatusFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_HeadFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Blade_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+									<attribute id="SoundObjectIndex" type="uint8" value="4" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_WingFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_ChestFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_R_Foot_01" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Handle6_M_Endjoint" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Handle5_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Handle4_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Handle3_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Handle2_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_BodyFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="40" />
+									<attribute id="SoundObjectIndex" type="uint8" value="3" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Handle1_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Root_M" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+									<attribute id="SoundObjectIndex" type="uint8" value="0" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_CastFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Custom_Anim" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_FollowPhysics" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_HitImpactFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Playerlight" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_OverheadFX" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Bones">
+							<attribute id="MapKey" type="FixedString" value="Dummy_Root" />
+							<children>
+								<node id="MapValue">
+									<attribute id="SoundObjectActivationRange" type="float" value="-1" />
+								</node>
+							</children>
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_Playerlight" />
+							<attribute id="BoneConstraint" type="FixedString" value="Root_M" />
+							<attribute id="ConstraintsPos" type="uint16" value="7" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_Light_NPC_1" />
+							<attribute id="Transform" type="mat4x4" value=" 1.00  0.00  0.00  0.00 &#xD;&#xA; 0.00  0.91 -0.42 -1.09 &#xD;&#xA; 0.00  0.42  0.91 -0.60 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_Playerlight" />
+							<attribute id="BoneConstraint" type="FixedString" value="Root_M" />
+							<attribute id="ConstraintsPos" type="uint16" value="7" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_Light_NPC_2" />
+							<attribute id="Transform" type="mat4x4" value=" 0.87  0.17 -0.47  0.50 &#xD;&#xA; 0.00 -0.94 -0.34 -1.29 &#xD;&#xA;-0.50  0.30 -0.81  0.60 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_Playerlight" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="7" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_Light_Player" />
+							<attribute id="Transform" type="mat4x4" value="-1.00  0.00 -0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00 -1.19 &#xD;&#xA; 0.00  0.00 -1.00  0.00 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_Playerlight" />
+							<attribute id="BoneConstraint" type="FixedString" value="Root_M" />
+							<attribute id="ConstraintsPos" type="uint16" value="7" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_Light_NPC_3" />
+							<attribute id="Transform" type="mat4x4" value=" 0.87 -0.17  0.47 -0.50 &#xD;&#xA; 0.00 -0.94 -0.34 -1.29 &#xD;&#xA; 0.50  0.30 -0.81  0.60 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_HeadFX" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_CombatLookAt" />
+							<attribute id="Transform" type="mat4x4" value="-0.00  0.00 -1.00  0.00 &#xD;&#xA; 1.00 -0.01 -0.00 -0.14 &#xD;&#xA;-0.01 -1.00 -0.00 -0.03 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_HeadFX" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_HeadFX" />
+							<attribute id="Transform" type="mat4x4" value=" 1.00 -0.00 -0.00  0.00 &#xD;&#xA; 0.00  1.00 -0.00 -0.14 &#xD;&#xA; 0.00  0.00  1.00  0.15 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_HeadFX" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_CinematicLookAt" />
+							<attribute id="Transform" type="mat4x4" value="-0.00  0.00 -1.00  0.00 &#xD;&#xA; 1.00 -0.01 -0.00 -0.14 &#xD;&#xA;-0.01 -1.00 -0.00  0.17 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Root_M" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_Light_Root" />
+							<attribute id="Transform" type="mat4x4" value="-0.00  0.00 -1.00  0.00 &#xD;&#xA;-1.00 -0.03  0.00 -0.71 &#xD;&#xA;-0.03  1.00  0.00 -0.00 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_Root" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_DIAG_Camera" />
+							<attribute id="Transform" type="mat4x4" value=" 1.00  0.00  0.00 -0.28 &#xD;&#xA; 0.00  1.00  0.00  1.06 &#xD;&#xA; 0.00  0.00  1.00  0.08 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+						<node id="Sockets">
+							<attribute id="Bone" type="FixedString" value="Dummy_Root" />
+							<attribute id="BoneConstraint" type="FixedString" value="" />
+							<attribute id="ConstraintsPos" type="uint16" value="0" />
+							<attribute id="ConstraintsRot" type="uint16" value="0" />
+							<attribute id="Name" type="FixedString" value="Socket_COMBAT_Camera" />
+							<attribute id="Transform" type="mat4x4" value=" 1.00  0.00  0.00  0.00 &#xD;&#xA; 0.00  1.00  0.00  0.90 &#xD;&#xA; 0.00  0.00  1.00  0.00 &#xD;&#xA; 0.00  0.00  0.00  1.00 &#xD;&#xA;" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationSetBank">
+		<node id="AnimationSetBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="9bfd4395-0770-a1f2-aeb2-996bf2aa1c8d" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Base" />
+					<attribute id="PreviewVisualResourceID" type="guid" value="00000000-0000-0000-0000-000000000000" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144959613005988540" />
+					<children>
+						<node id="AnimationSet">
+							<children>
+								<node id="AnimationBank">
+									<attribute id="ShortNameSetId" type="guid" value="00000000-0000-0000-0000-000000000000" />
+									<children>
+										<node id="AnimationSubSets">
+											<children>
+												<node id="Object">
+													<attribute id="FallBackSubSet" type="FixedString" value="" />
+													<attribute id="MapKey" type="FixedString" value="" />
+													<children>
+														<node id="Animation">
+															<children>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f07cf7d3-8ce4-28e9-431a-fb221454a91b" />
+																	<attribute id="MapKey" type="FixedString" value="b5cb923d-0c08-4c20-89a9-44b9bf98c6cb" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="99602e12-ca16-6954-3c47-899d16309a79" />
+																	<attribute id="MapKey" type="FixedString" value="0449ace0-eb64-4a23-942e-591130a0424c" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="45a347aa-1a5f-6d5b-d040-b5768feb1e93" />
+																	<attribute id="MapKey" type="FixedString" value="f8fe2e89-2313-48f7-963c-0907b6306fd1" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="8397fbe4-41a8-01b7-901b-e6aba3304743" />
+																	<attribute id="MapKey" type="FixedString" value="ac61dc44-d236-4d19-920c-31ab9dd5a993" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="ca882542-c13b-ba0e-ff2e-3ed37161f7d8" />
+																	<attribute id="MapKey" type="FixedString" value="8dccb0f6-24e3-44b7-a60b-1f217b7db523" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="031f214b-9cbd-d47c-df45-61040a8b4933" />
+																	<attribute id="MapKey" type="FixedString" value="a55420a8-13f4-4a95-a94a-45e14322064f" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9ccbc75c-8a67-7385-1350-ea03d5d82bbe" />
+																	<attribute id="MapKey" type="FixedString" value="6f957f78-322e-465f-b314-27299a98add7" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="52bbde9a-f9f3-420d-1ea9-9370f045bd23" />
+																	<attribute id="MapKey" type="FixedString" value="6495ac74-6183-41a4-8d3c-add157dd97a2" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="d6b73de6-5753-b8f4-eefe-b2467cb67247" />
+																	<attribute id="MapKey" type="FixedString" value="2b81c18b-9698-4262-a623-932c2bb1296d" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="a894129a-041d-5f2a-390a-6220c0c39b08" />
+																	<attribute id="MapKey" type="FixedString" value="9f2d32b9-529a-4b75-b3df-6e1ae1395280" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="99602e12-ca16-6954-3c47-899d16309a79" />
+																	<attribute id="MapKey" type="FixedString" value="27ec0fe8-6400-4429-b378-465c487ffbf7" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="e1533c3f-38a4-9bc4-2dbf-30e6fb3a4587" />
+																	<attribute id="MapKey" type="FixedString" value="50398f4e-dd82-4d6a-ad43-aedd578543d9" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="89e73fec-34b0-4e76-5eff-2cf39f91233c" />
+																	<attribute id="MapKey" type="FixedString" value="8ee67630-f1c7-441d-aaf6-fa4633c890da" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="99602e12-ca16-6954-3c47-899d16309a79" />
+																	<attribute id="MapKey" type="FixedString" value="79261934-8627-4c47-947d-446ac04bca3d" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9fd55bb5-c696-137b-e5af-73b5f8c94126" />
+																	<attribute id="MapKey" type="FixedString" value="ba86edb7-a943-4463-97c8-dd06064845cb" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="33e74028-e362-20b2-ee3a-d91b9efc0b6d" />
+																	<attribute id="MapKey" type="FixedString" value="510ff37e-0618-40e4-8ce0-236e3dc9c291" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f07cf7d3-8ce4-28e9-431a-fb221454a91b" />
+																	<attribute id="MapKey" type="FixedString" value="e8a5c57f-855b-4227-acaa-11e8ce8d7d64" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="e001fa39-3110-ddce-2b3c-ca03ee527abf" />
+																	<attribute id="MapKey" type="FixedString" value="b5d99946-0646-4bdd-88a0-9604872a0dd9" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="ddb46299-f8f6-3cea-57c2-89b897f068d4" />
+																	<attribute id="MapKey" type="FixedString" value="06a9866d-0206-4016-a7ee-f124a623d73c" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="99602e12-ca16-6954-3c47-899d16309a79" />
+																	<attribute id="MapKey" type="FixedString" value="e312459b-34d3-4612-8dee-fc41901caa04" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="21671e8c-095c-fbb2-21ad-170b9905e4ff" />
+																	<attribute id="MapKey" type="FixedString" value="a2e3711c-1115-4971-9dbf-b657f09e9d47" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="ccc111a9-e027-fb43-2f2a-db0119fd89a1" />
+																	<attribute id="MapKey" type="FixedString" value="0036dd28-0484-47fd-87bd-efa6af2b9f85" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="ebe3b62f-fca3-6e57-7b24-7cae4a0247f4" />
+																	<attribute id="MapKey" type="FixedString" value="f4ac302b-1569-404f-bd52-1fe443e265df" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="ad24d978-030d-ad7c-211a-4951bd4d8776" />
+																	<attribute id="MapKey" type="FixedString" value="e22702f5-04d5-41a1-97ac-9b9f6b317d98" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="3fbaaa05-d70a-ba58-aa52-655d51177a16" />
+																	<attribute id="MapKey" type="FixedString" value="c2da4fe4-0870-4c0a-b7af-3a51e9b8dc91" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="a894129a-041d-5f2a-390a-6220c0c39b08" />
+																	<attribute id="MapKey" type="FixedString" value="366693ee-d97f-4294-a4dd-a2145ddc4e6a" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="99602e12-ca16-6954-3c47-899d16309a79" />
+																	<attribute id="MapKey" type="FixedString" value="395fc3ee-59ab-4114-9b91-ad536473acfd" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="cea33945-7d12-7515-0628-3dcb6232238b" />
+																	<attribute id="MapKey" type="FixedString" value="a508bef8-6767-4560-ac3a-6c04132c825e" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="4233ce49-e6e1-01ed-4040-589b54f1d7d6" />
+																	<attribute id="MapKey" type="FixedString" value="925779e7-8bf6-4d56-8c4d-42c3bc01c60c" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="b7818264-2b52-b57f-2ed9-40ab3b9e6a7c" />
+																	<attribute id="MapKey" type="FixedString" value="15c8c8f4-b6a2-40bd-99b5-1360bdb0f74a" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="99602e12-ca16-6954-3c47-899d16309a79" />
+																	<attribute id="MapKey" type="FixedString" value="a443a68d-5c8a-4ce2-8c41-0270fedcf946" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9fd55bb5-c696-137b-e5af-73b5f8c94126" />
+																	<attribute id="MapKey" type="FixedString" value="b47955ba-760c-4e20-a1f0-db25ab1c54c3" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="42a44925-e176-57cd-ca8d-0a2c8c087eec" />
+																	<attribute id="MapKey" type="FixedString" value="9acc8342-26ac-48ac-b569-18c07296456b" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="2c3b8119-2bfc-5c9f-61ab-c57978dcce3a" />
+																	<attribute id="MapKey" type="FixedString" value="0b07883a-08b8-43b6-ac18-84dc9e84ff50" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="031f214b-9cbd-d47c-df45-61040a8b4933" />
+																	<attribute id="MapKey" type="FixedString" value="aac72f3d-a308-40cb-97d9-7fc8116e1456" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="031f214b-9cbd-d47c-df45-61040a8b4933" />
+																	<attribute id="MapKey" type="FixedString" value="a7323180-3349-4387-81f6-6eaac3f2a86f" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="99602e12-ca16-6954-3c47-899d16309a79" />
+																	<attribute id="MapKey" type="FixedString" value="a1d88cbd-58a1-40ba-b13e-6dd4d78d18ba" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="38638945-1c6d-e6e6-1c35-be0af7c757af" />
+																	<attribute id="MapKey" type="FixedString" value="78eb825c-cf79-46c9-bb59-11a3df7b29f9" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="031f214b-9cbd-d47c-df45-61040a8b4933" />
+																	<attribute id="MapKey" type="FixedString" value="8b71666d-a69a-4c54-ae41-20ce3fa0e003" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="a894129a-041d-5f2a-390a-6220c0c39b08" />
+																	<attribute id="MapKey" type="FixedString" value="6606c30b-be1c-4f17-ae6b-1a591c80b18c" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="031f214b-9cbd-d47c-df45-61040a8b4933" />
+																	<attribute id="MapKey" type="FixedString" value="b7af239e-87fe-4ef6-8e6c-f124350fab58" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="99602e12-ca16-6954-3c47-899d16309a79" />
+																	<attribute id="MapKey" type="FixedString" value="91dc33c9-0871-4529-ac01-a068f4cd51f3" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="7ecefee7-9d1d-d7b7-7de2-c77926710a48" />
+																	<attribute id="MapKey" type="FixedString" value="5df11e35-f081-44f7-bd6f-7049d0e533cd" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9b1f2207-fdae-e671-2f83-73da97225da2" />
+																	<attribute id="MapKey" type="FixedString" value="7def448c-ee51-48da-a683-e8f8992efb82" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="99602e12-ca16-6954-3c47-899d16309a79" />
+																	<attribute id="MapKey" type="FixedString" value="0e5e02b3-a4ca-4d5b-bb42-71b097887a18" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="e1d52c90-8e3b-e5a2-fadc-8b30d25e8395" />
+																	<attribute id="MapKey" type="FixedString" value="f49c1788-7819-481f-9b83-2344d708e682" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c8f46e4b-eb0e-b9dc-3e62-fa74aa2eda3a" />
+																	<attribute id="MapKey" type="FixedString" value="4ae452d5-4a2e-471a-bc98-907c9ca6c523" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="031f214b-9cbd-d47c-df45-61040a8b4933" />
+																	<attribute id="MapKey" type="FixedString" value="117941c9-1d06-46d2-8d77-941b13aaacf2" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="99602e12-ca16-6954-3c47-899d16309a79" />
+																	<attribute id="MapKey" type="FixedString" value="d326ed36-d633-4414-a1ff-68227e9d3c5c" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5eb7b779-1ac6-ddda-a552-400856729835" />
+																	<attribute id="MapKey" type="FixedString" value="5abe3725-c152-42de-98c8-0dbf872e1ff2" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="16a299e8-c451-d516-4354-c63002105b1a" />
+																	<attribute id="MapKey" type="FixedString" value="cf3f0e09-1a9e-430d-8be2-7a4c0c8a875e" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="51a053cb-5544-b618-412a-1b71ae319ca7" />
+																	<attribute id="MapKey" type="FixedString" value="b4960ceb-1b52-40e4-9253-5bc673d8ec21" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="59b820d3-8ef5-b131-2395-74d94eedea9a" />
+																	<attribute id="MapKey" type="FixedString" value="8b8bb757-21ce-4e02-a2f3-97d55cf2f90b" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="031f214b-9cbd-d47c-df45-61040a8b4933" />
+																	<attribute id="MapKey" type="FixedString" value="718dd26b-d222-4e81-940e-7f2092957b36" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="57e74430-2c21-ffb4-8890-2ea60b18e119" />
+																	<attribute id="MapKey" type="FixedString" value="07e81afc-95c4-452b-ac68-5cbb74710cca" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="778a6cef-f257-b27d-8038-4367ede20ed7" />
+																	<attribute id="MapKey" type="FixedString" value="5dcdcc4c-3744-451f-b5cf-ed96664481cc" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="ebe3b62f-fca3-6e57-7b24-7cae4a0247f4" />
+																	<attribute id="MapKey" type="FixedString" value="79323098-edb3-4993-ba50-9b5f705e9878" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="99602e12-ca16-6954-3c47-899d16309a79" />
+																	<attribute id="MapKey" type="FixedString" value="8145f891-e1f3-4510-b166-d974ef1c3896" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f4a485f6-be85-21fe-d581-40efe3d70863" />
+																	<attribute id="MapKey" type="FixedString" value="499dcaab-6c66-4f32-8e42-a4f9b6cf9f87" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9b87975d-85a2-f38d-5def-6ba71c1ef303" />
+																	<attribute id="MapKey" type="FixedString" value="ff165c3d-2b23-4f79-a592-3b7799574494" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c277a38f-36b4-0323-3b00-a10dbfc9dcfa" />
+																	<attribute id="MapKey" type="FixedString" value="1c343e00-7e6c-4f53-b588-074a3cdb9c7d" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c8f46e4b-eb0e-b9dc-3e62-fa74aa2eda3a" />
+																	<attribute id="MapKey" type="FixedString" value="c36a9627-a348-4cca-abcf-206b29c791b9" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="99602e12-ca16-6954-3c47-899d16309a79" />
+																	<attribute id="MapKey" type="FixedString" value="ac3b79de-641b-4f12-8e79-a2cc6e6a79e9" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="16a299e8-c451-d516-4354-c63002105b1a" />
+																	<attribute id="MapKey" type="FixedString" value="6e1041c4-7e59-45c4-8ad9-e47480b95020" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="5cadf6e3-771a-f54e-ff3a-8c132431bfd5" />
+																	<attribute id="MapKey" type="FixedString" value="821aed88-e17b-4b85-b37a-533f90fbba84" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="031f214b-9cbd-d47c-df45-61040a8b4933" />
+																	<attribute id="MapKey" type="FixedString" value="3c246fb9-66c9-48ab-b2e8-a04388bd29ac" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="99602e12-ca16-6954-3c47-899d16309a79" />
+																	<attribute id="MapKey" type="FixedString" value="cf27f269-3d43-4bfa-b370-e48d27ab2d0e" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="25beedaa-20d2-2cea-6b3e-545870bf1fb6" />
+																	<attribute id="MapKey" type="FixedString" value="e6af1757-da0b-4640-8ce5-ea559816d2b0" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="f07cf7d3-8ce4-28e9-431a-fb221454a91b" />
+																	<attribute id="MapKey" type="FixedString" value="6282d127-0c06-4365-9d53-6f32ef350127" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="99602e12-ca16-6954-3c47-899d16309a79" />
+																	<attribute id="MapKey" type="FixedString" value="187e51d5-edd6-431f-84fe-eff84ecf1750" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="59b820d3-8ef5-b131-2395-74d94eedea9a" />
+																	<attribute id="MapKey" type="FixedString" value="b6bebde2-ecff-4df6-9d24-cd9fabb9fe79" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="140d4760-2cc7-4fbf-fe6e-7203a62e3822" />
+																	<attribute id="MapKey" type="FixedString" value="af84b904-33ad-49fb-8693-8e62917ffe19" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="792fbc34-98f9-7c38-c2bd-82c1cd9b28f8" />
+																	<attribute id="MapKey" type="FixedString" value="63c0501c-14aa-467c-8980-45ed023ab15d" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="45a347aa-1a5f-6d5b-d040-b5768feb1e93" />
+																	<attribute id="MapKey" type="FixedString" value="7bb52cd4-0b1c-4926-9165-fa92b75876a3" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="031f214b-9cbd-d47c-df45-61040a8b4933" />
+																	<attribute id="MapKey" type="FixedString" value="577bcf78-3d3d-4bc3-a064-fc59b2280153" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="58391c7f-7869-ae23-0446-78d24e4286ea" />
+																	<attribute id="MapKey" type="FixedString" value="6dd3d472-9e11-47bf-8f7a-04e75ffe6c26" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="bc113b90-a63f-5aaf-eea3-f0a75f204b54" />
+																	<attribute id="MapKey" type="FixedString" value="d0de1b4a-5be9-4bd6-8422-25b5892866ea" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="356a7278-1e6c-3622-a915-42c48fb3f41d" />
+																	<attribute id="MapKey" type="FixedString" value="881e6512-732b-48d1-9606-e235bcf97e50" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="ebe3b62f-fca3-6e57-7b24-7cae4a0247f4" />
+																	<attribute id="MapKey" type="FixedString" value="479ee5da-2967-41e1-b7d1-a94e864a5f25" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="99602e12-ca16-6954-3c47-899d16309a79" />
+																	<attribute id="MapKey" type="FixedString" value="9214185e-c1ae-4e4b-838d-977b8588bd7a" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="ca494640-9e1a-fc00-8b54-8e13be2296c2" />
+																	<attribute id="MapKey" type="FixedString" value="5001386e-fe1f-4546-b27c-6afac88eeb0b" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c8f46e4b-eb0e-b9dc-3e62-fa74aa2eda3a" />
+																	<attribute id="MapKey" type="FixedString" value="851b5331-cdf5-4888-97e3-a9c45988eac4" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="7a86f919-ded2-f03c-565b-d76e36a12439" />
+																	<attribute id="MapKey" type="FixedString" value="8074af60-e984-4622-b824-aafc26f283e9" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="99602e12-ca16-6954-3c47-899d16309a79" />
+																	<attribute id="MapKey" type="FixedString" value="6f188c33-cc0e-4515-804e-8c6cf5e97f26" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="9fd55bb5-c696-137b-e5af-73b5f8c94126" />
+																	<attribute id="MapKey" type="FixedString" value="89c858e3-da44-45cd-9197-0fa1698f2ca1" />
+																</node>
+																<node id="Object">
+																	<attribute id="ID" type="FixedString" value="c6c5e13d-9acb-0106-9154-c4805e38c5bf" />
+																	<attribute id="MapKey" type="FixedString" value="0532ad73-988e-4b70-bb96-434bb2532bad" />
+																</node>
+															</children>
+														</node>
+													</children>
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="AnimationBank">
+		<node id="AnimationBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="8.466667" />
+					<attribute id="ID" type="FixedString" value="031f214b-9cbd-d47c-df45-61040a8b4933" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_LOCO_Stroll_F_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_LOCO_Stroll_F_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_LOCO_Stroll_F_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.5666667" />
+					<attribute id="ID" type="FixedString" value="140d4760-2cc7-4fbf-fe6e-7203a62e3822" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_Landing_Peace" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_Landing_Peace.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_Landing_Peace.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="3.966667" />
+					<attribute id="ID" type="FixedString" value="16a299e8-c451-d516-4354-c63002105b1a" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_LOCO_Sprint_F_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_LOCO_Sprint_F_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_LOCO_Sprint_F_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1" />
+					<attribute id="ID" type="FixedString" value="21671e8c-095c-fbb2-21ad-170b9905e4ff" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Falling" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Falling.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Falling.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.6333334" />
+					<attribute id="ID" type="FixedString" value="25beedaa-20d2-2cea-6b3e-545870bf1fb6" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Slash_01_Recover" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Slash_01_Recover.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Slash_01_Recover.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.6666667" />
+					<attribute id="ID" type="FixedString" value="2c3b8119-2bfc-5c9f-61ab-c57978dcce3a" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Cancel" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Cancel.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Cancel.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.2333333" />
+					<attribute id="ID" type="FixedString" value="33e74028-e362-20b2-ee3a-d91b9efc0b6d" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_UTIL_Spawn_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_UTIL_Spawn_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_UTIL_Spawn_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.86666673" />
+					<attribute id="ID" type="FixedString" value="356a7278-1e6c-3622-a915-42c48fb3f41d" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_REAC_Dodge_F_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_REAC_Dodge_F_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_REAC_Dodge_F_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.6666667" />
+					<attribute id="ID" type="FixedString" value="38638945-1c6d-e6e6-1c35-be0af7c757af" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_YawL" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_YawL.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_YawL.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1" />
+					<attribute id="ID" type="FixedString" value="3c9fe2f3-0e2f-4aab-24a1-de2d703e3072" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Loop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Loop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Loop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.7666667" />
+					<attribute id="ID" type="FixedString" value="3fbaaa05-d70a-ba58-aa52-655d51177a16" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_REAC_Hit_F_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_REAC_Hit_F_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_REAC_Hit_F_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.13333334" />
+					<attribute id="ID" type="FixedString" value="4233ce49-e6e1-01ed-4040-589b54f1d7d6" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Dash_01_Antic" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Dash_01_Antic.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Dash_01_Antic.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.033333335" />
+					<attribute id="ID" type="FixedString" value="42a44925-e176-57cd-ca8d-0a2c8c087eec" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CC_Portrait_Still_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CC_Portrait_Still_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CC_Portrait_Still_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209025" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.6666667" />
+					<attribute id="ID" type="FixedString" value="45a347aa-1a5f-6d5b-d040-b5768feb1e93" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Loop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Loop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Loop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.73333335" />
+					<attribute id="ID" type="FixedString" value="52bbde9a-f9f3-420d-1ea9-9370f045bd23" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_Combat_01_Recover" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_Combat_01_Recover.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_Combat_01_Recover.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="9.966667" />
+					<attribute id="ID" type="FixedString" value="57e74430-2c21-ffb4-8890-2ea60b18e119" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_IDLE_Still_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_IDLE_Still_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_IDLE_Still_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.966667" />
+					<attribute id="ID" type="FixedString" value="58391c7f-7869-ae23-0446-78d24e4286ea" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_IDLE_Random_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_IDLE_Random_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_IDLE_Random_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.3" />
+					<attribute id="ID" type="FixedString" value="59b820d3-8ef5-b131-2395-74d94eedea9a" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Prepare" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Prepare.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Prepare.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="5.166667" />
+					<attribute id="ID" type="FixedString" value="5cadf6e3-771a-f54e-ff3a-8c132431bfd5" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_LOCO_Run_F_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_LOCO_Run_F_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_LOCO_Run_F_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.5" />
+					<attribute id="ID" type="FixedString" value="5eb7b779-1ac6-ddda-a552-400856729835" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Cancel" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Cancel.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Cancel.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.7666667" />
+					<attribute id="ID" type="FixedString" value="778a6cef-f257-b27d-8038-4367ede20ed7" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_REAC_Dodge_B_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_REAC_Dodge_B_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_REAC_Dodge_B_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.86666673" />
+					<attribute id="ID" type="FixedString" value="792fbc34-98f9-7c38-c2bd-82c1cd9b28f8" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Slash_01_Attack" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Slash_01_Attack.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Slash_01_Attack.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="React" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="15" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Cast" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="8" />
+							<attribute id="Time" type="float" value="0.0827211" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.26666668" />
+					<attribute id="ID" type="FixedString" value="7a86f919-ded2-f03c-565b-d76e36a12439" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Victory_Start" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Victory_Start.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Victory_Start.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.53333336" />
+					<attribute id="ID" type="FixedString" value="7ecefee7-9d1d-d7b7-7de2-c77926710a48" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_Cast" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_Cast.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_Cast.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209031" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="React" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="15" />
+							<attribute id="Time" type="float" value="0.2800907" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Cast" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="8" />
+							<attribute id="Time" type="float" value="0.42158723" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.43333337" />
+					<attribute id="ID" type="FixedString" value="8397fbe4-41a8-01b7-901b-e6aba3304743" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Descend" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Descend.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Descend.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.5666667" />
+					<attribute id="ID" type="FixedString" value="89e73fec-34b0-4e76-5eff-2cf39f91233c" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Ascend" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Ascend.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Ascend.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.1333334" />
+					<attribute id="ID" type="FixedString" value="99602e12-ca16-6954-3c47-899d16309a79" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_DIE_Generic_LifeTime_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_DIE_Generic_LifeTime_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_DIE_Generic_LifeTime_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="8.3" />
+					<attribute id="ID" type="FixedString" value="9b1f2207-fdae-e671-2f83-73da97225da2" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_IDLE_Still_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_IDLE_Still_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_IDLE_Still_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.6666667" />
+					<attribute id="ID" type="FixedString" value="9b87975d-85a2-f38d-5def-6ba71c1ef303" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_PitchD" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_PitchD.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_PitchD.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.70000005" />
+					<attribute id="ID" type="FixedString" value="9ccbc75c-8a67-7385-1350-ea03d5d82bbe" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Slash_01_Antic" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Slash_01_Antic.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Slash_01_Antic.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.73333335" />
+					<attribute id="ID" type="FixedString" value="9fd55bb5-c696-137b-e5af-73b5f8c94126" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_Peace_01_Recover" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_Peace_01_Recover.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_Peace_01_Recover.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.5666667" />
+					<attribute id="ID" type="FixedString" value="a894129a-041d-5f2a-390a-6220c0c39b08" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Antic" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Antic.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Antic.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="React" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="15" />
+							<attribute id="Time" type="float" value="0.45351472" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.6666667" />
+					<attribute id="ID" type="FixedString" value="ad24d978-030d-ad7c-211a-4951bd4d8776" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_Loop" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_Loop.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_Loop.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.20000002" />
+					<attribute id="ID" type="FixedString" value="b620550d-053b-e27a-4b72-e184c533dd39" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Prepare" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Prepare.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Prepare.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.3" />
+					<attribute id="ID" type="FixedString" value="b7818264-2b52-b57f-2ed9-40ab3b9e6a7c" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Victory_End" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Victory_End.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Victory_End.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Sheathed_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="0" />
+							<attribute id="Time" type="float" value="0.21587302" />
+							<attribute id="Track" type="uint8" value="1" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.2" />
+					<attribute id="ID" type="FixedString" value="bc113b90-a63f-5aaf-eea3-f0a75f204b54" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_REAC_Magic_External_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_REAC_Magic_External_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_REAC_Magic_External_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.20000002" />
+					<attribute id="ID" type="FixedString" value="c277a38f-36b4-0323-3b00-a10dbfc9dcfa" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Dash_01_Recover" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Dash_01_Recover.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Dash_01_Recover.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="6.6333337" />
+					<attribute id="ID" type="FixedString" value="c6c5e13d-9acb-0106-9154-c4805e38c5bf" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_LOCO_Walk_F_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_LOCO_Walk_F_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_LOCO_Walk_F_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.6666667" />
+					<attribute id="ID" type="FixedString" value="c8f46e4b-eb0e-b9dc-3e62-fa74aa2eda3a" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_LOCO_Passive_F_Peace" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_LOCO_Passive_F_Peace.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_LOCO_Passive_F_Peace.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.6666667" />
+					<attribute id="ID" type="FixedString" value="ca494640-9e1a-fc00-8b54-8e13be2296c2" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_PitchU" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_PitchU.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_PitchU.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="1.5666667" />
+					<attribute id="ID" type="FixedString" value="ca882542-c13b-ba0e-ff2e-3ed37161f7d8" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_Combat_01_Landing" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_Combat_01_Landing.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_Combat_01_Landing.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="2.6666667" />
+					<attribute id="ID" type="FixedString" value="ccc111a9-e027-fb43-2f2a-db0119fd89a1" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_YawR" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_YawR.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_YawR.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.13333334" />
+					<attribute id="ID" type="FixedString" value="cea33945-7d12-7515-0628-3dcb6232238b" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_TakeOff" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_TakeOff.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Fly_01_TakeOff.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.3" />
+					<attribute id="ID" type="FixedString" value="d6b73de6-5753-b8f4-eefe-b2467cb67247" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Dash" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Dash.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Dash.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.9333334" />
+					<attribute id="ID" type="FixedString" value="ddb46299-f8f6-3cea-57c2-89b897f068d4" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_REAC_Hit_B_Combat_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_REAC_Hit_B_Combat_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_REAC_Hit_B_Combat_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="4.866667" />
+					<attribute id="ID" type="FixedString" value="e001fa39-3110-ddce-2b3c-ca03ee527abf" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_IDLE_Random_Peace_01" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_IDLE_Random_Peace_01.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_IDLE_Random_Peace_01.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.06666667" />
+					<attribute id="ID" type="FixedString" value="e1533c3f-38a4-9bc4-2dbf-30e6fb3a4587" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Dash_01_Attack" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Dash_01_Attack.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_Dash_01_Attack.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209029" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Cast" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="8" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="React" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="15" />
+							<attribute id="Time" type="float" value="0" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.40000004" />
+					<attribute id="ID" type="FixedString" value="e1d52c90-8e3b-e5a2-fadc-8b30d25e8395" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Cast" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Cast.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/Shared/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Skill_JumpFlight_01_Cast.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.004166667" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="React" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="15" />
+							<attribute id="Time" type="float" value="0.050430845" />
+							<attribute id="Track" type="uint8" value="1" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Cast" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="8" />
+							<attribute id="Time" type="float" value="0.2514286" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.9333334" />
+					<attribute id="ID" type="FixedString" value="ebe3b62f-fca3-6e57-7b24-7cae4a0247f4" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Attack" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Attack.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Attack.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Cast" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="8" />
+							<attribute id="Time" type="float" value="0.14657597" />
+							<attribute id="Track" type="uint8" value="0" />
+							<children>
+								<node id="Properties" />
+							</children>
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.5666667" />
+					<attribute id="ID" type="FixedString" value="f07cf7d3-8ce4-28e9-431a-fb221454a91b" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Recover" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Recover.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Melee_RHand_01_Recover.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+				</node>
+				<node id="Resource">
+					<attribute id="AdditiveLoopingAnimationID" type="FixedString" value="" />
+					<attribute id="AdditiveLoopingBlendTime" type="float" value="0" />
+					<attribute id="AdditiveLoopingStart" type="float" value="0" />
+					<attribute id="AnchorHand" type="uint8" value="0" />
+					<attribute id="Duration" type="float" value="0.70000005" />
+					<attribute id="ID" type="FixedString" value="f4a485f6-be85-21fe-d581-40efe3d70863" />
+					<attribute id="IsPoseBank" type="bool" value="False" />
+					<attribute id="LeftTransitionAnimation" type="FixedString" value="" />
+					<attribute id="Looping" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Rig_DFLT_CMBT_Initiative_End" />
+					<attribute id="Offset" type="float" value="0" />
+					<attribute id="PreviewVisualResource" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="RightTransitionAnimation" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Initiative_End.GR2" />
+					<attribute id="SupportingLeg" type="uint8" value="0" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/SPRW_Greataxe_Rig/SPRW_Greataxe_Rig_DFLT_CMBT_Initiative_End.Anim.0" />
+					<attribute id="TimeStep" type="float" value="0.016666668" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209005" />
+					<children>
+						<node id="Events">
+							<attribute id="ID" type="FixedString" value="Unsheathed_R" />
+							<attribute id="Length" type="float" value="0.1" />
+							<attribute id="TextKeyType" type="uint8" value="0" />
+							<attribute id="Time" type="float" value="0.4172336" />
+							<attribute id="Track" type="uint8" value="0" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="231fdb37-7c98-dd45-8bb2-53a0ae6006eb" />
+					<attribute id="BoundsMax" type="fvec3" value="0 0 0" />
+					<attribute id="BoundsMin" type="fvec3" value="0 0 0" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="aec60642-e09f-4825-e05b-b75da5ccc830" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe_Base" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="2439c8e7-1927-616f-581a-d63e12308b6a" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="EMPTY_VISUAL_TEMPLATE" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725668" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="9bfd4395-0770-a1f2-aeb2-996bf2aa1c8d" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="3e91ed4c-26b3-e5a2-cf36-12008db2c78b" />
+						</node>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="c2f7ab45-f9ba-6399-85fb-0ea56cda82a8" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.033855107 1.417429 0.16104452" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.033380244 0 -0.22536421" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="c6a9ff29-2a1e-43f2-8361-b1e47b5f24ca" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="SPRW_Greataxe" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Characters/_Models/_Creatures/SpiritualWeapons/Resources/SPRW_Greataxe.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Characters/_Models/_Creatures/SpiritualWeapons/Resources/SPRW_Greataxe.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725669" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="5f87c435-cdde-09e0-da3e-90b39295e684" />
+							<attribute id="ObjectID" type="FixedString" value="SPRW_Greataxe.SPRW_Greataxe_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="5f87c435-cdde-09e0-da3e-90b39295e684" />
+							<attribute id="ObjectID" type="FixedString" value="SPRW_Greataxe.SPRW_Greataxe_Mesh_LOD1.1" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.026257183 1.2548698 0.121665925" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.026257178 -0.00023061014 -0.18769121" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="cdb0e52d-856c-109e-548b-414307ec425b" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="Proxy_SPRW_Greataxe" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/Resources/Proxy_SPRW_Greataxe.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Characters/_Anims/_Creatures/SpiritualWeapons/Resources/Proxy_SPRW_Greataxe.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115205255725669" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="9e2966c7-b61c-4bc1-bef1-a79cb5fde067" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_SPRW_Greataxe.Proxy_SPRWPN_Greataxe_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="9e2966c7-b61c-4bc1-bef1-a79cb5fde067" />
+							<attribute id="ObjectID" type="FixedString" value="Proxy_SPRW_Greataxe.Proxy_SPRWPN_Greataxe_Mesh_LOD1.1" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

@@ -1,0 +1,127 @@
+game.states.Nightlight = State {
+    function()
+        params.DC = {
+            type = EParamType.String,
+            help = [[Difficulty class to gather this item (Nature Check). Must be provided as a DC GUID]],      
+            required = false,
+            default = [[Gather_Nightlight_007e3653-e338-4728-bfe0-ab53288f8532]]
+        }
+        
+        params.RewardTemplate = {
+            type = EParamType.String,
+            help = [[Reward added for the gatherer when this item is gathered.]],
+            required = true,
+        }
+
+        params.LightEffect = {
+            type = EParamType.String,
+            required = false,
+            default = "VFX_LightSources_Underdark_Mushroom_Nightlight_B_01_fa489d1e-5762-ed5e-4b19-0b01fdf4d5c1",
+            help = "VFX while item is lit."
+        }
+
+        params.LightEffectBone = {
+            type = EParamType.String,
+            required = false,
+            default = "",
+            help = "Bone on which the VFX is played."
+        }
+
+        params.GameplayLightOffsetFallback = {
+            type = EParamType.Vector3,
+            help = "Places the gameplay light at this position if the provided bone is not valid for the entity.",
+            required = false,
+            default = Vector3(0, 0, 0)
+        }
+
+        params.GameplayLight = {
+            type = EParamType.Bool,
+            required = false,
+            default = false,
+            help = "Does the item cast a gameplay light, or is purely decorative?"
+        }
+
+        params.GameplayLightRadius = {
+            type = EParamType.Number,
+            required = false,
+            default = 5.0,
+            help = "Radius of gameplay light"
+        }
+
+        params.GameplayLightSharpness = {
+            type = EParamType.Number,
+            required = false,
+            default = 0.1,
+            help = "Sharpness of gameplay light"
+        }
+
+        params.GameplayLightPointLightVerticalLimit = {
+            type = EParamType.Number,
+            required = false,
+            default = 2.5,
+            help = "Vertical limit of a point light that does not check line-of-sight"
+        }
+
+        inputs.Gather = {}
+
+        outputs.TurnOffInt = { internal = true }
+        outputs.GatherInt = { internal = true }
+
+        inputs.GatheredInt = { internal = true }
+        inputs.AttemptedInt = { internal = true }
+
+        outputs.Attempted = {}
+        outputs.Gathered = {}
+
+        nodes.Light = Proxy {
+            game.states.Light,
+            params = {
+                LightEffect = params.LightEffect,
+                LightEffectBone = params.LightEffectBone,
+                GameplayLight = params.GameplayLight,
+                GameplayLightRadius = params.GameplayLightRadius,
+                GamplayLightSharpness = params.GameplayLightSharpness,
+                GameplayLightOffsetFallback = params.GameplayLightOffsetFallback,
+                StartLit = true,
+                GameplayLightPointLightVerticalLimit = params.GameplayLightPointLightVerticalLimit
+            },
+            inputs = {
+                TurnOff = {outputs.TurnOffInt},
+            }
+        }
+
+        nodes.Gatherable = Proxy {
+            game.states.GLO_GatherableItem,
+            params = {
+                DC = params.DC,
+                RewardTemplate = params.RewardTemplate
+            },
+            inputs = {
+                Gather = { outputs.GatherInt }
+            },
+            outputs = {
+                Gathered = { inputs.GatheredInt },
+                Attempted = { inputs.AttemptedInt }
+            }
+        }
+
+        socketEvents.Gather = function(ev)
+            TriggerOutput(outputs.GatherInt, ev.Object, ev.Param)
+        end
+
+        events.UseStarted = function(ev)
+            TriggerOutput(outputs.GatherInt, ev.User.EntityRef, nil)
+        end
+
+        socketEvents.GatheredInt = function(ev)
+            TriggerOutput(outputs.Gathered, ev.Object, ev.Param)
+        end
+
+        socketEvents.AttemptedInt = function(ev)
+            TriggerOutput(outputs.TurnOffInt, ev.Object, ev.Param)
+            TriggerOutput(outputs.Attempted, ev.Object, ev.Param)
+        end
+
+    end
+    
+}

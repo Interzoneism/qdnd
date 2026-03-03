@@ -1,0 +1,88 @@
+game.states.CombatCower = State{function ()
+
+    params.combatInSightRange = { type = EParamType.Int, default = ExpressionRef{game.expressions.GLO_CombatInSightRange},
+       help= [[Expression that checks for nearby combats, use game.expressions.GLO_CombatInSightRange]]}
+
+    local GLO_State_Cowering = Flag("GLO_State_Cowering_cf16110e-3767-4585-8028-83cb9857adcd")
+    local GLO_State_NoCower = Flag("GLO_State_NoCower_8180293e-4d0d-4e9b-9dfc-b195d4c67ddb")
+
+    description = [[Our default combat cower state used by characters that are not involved in combat,
+                    but spot a combat around them]]
+
+    params.customCowerState = { type = EParamType.State, required = false, default = nil,
+        help= [[Custom state to use when NPC encounter combat around them. Leave this empty if there is no custom cower needed]]}
+
+    params.canFleeWhileCowering = { type = EParamType.Bool, required = false, default = false, -- maybe set to true after EA?
+        help = [[Should the character flee from everyone while cowering near combat]]}
+
+    self.CanEnter = function()
+        local character = me.Character
+        return character and params.combatInSightRange ~= 0 and (not character.IsPartyMember)
+    end
+
+    self.Valid = function()
+        local character = me.Character
+        return character and params.combatInSightRange ~= 0 and (not character.IsPartyMember) and not GetFlag(GLO_State_NoCower,me)
+    end
+
+    self.OnEnter = function()
+        EndRepose(me)
+        ApplyStatus(me, "ANIM_COWER")
+        SetFlag(GLO_State_Cowering, me)
+        DialogRequestStopRepeated(me)
+    end
+
+    self.OnLeave = function()
+        RemoveStatus(me, "ANIM_COWER")
+        ClearFlag(GLO_State_Cowering, me)
+    end
+
+    -- actions
+    nodes.CustomCower = Proxy{
+        params.customCowerState
+    }
+    nodes.Cower = Action {
+        function()
+            if params.canFleeWhileCowering then
+                try
+                    FleeFrom(RelationType.All, 5.0)
+                catch ex if ls.CheckType(ex, error.MovementFailed) then
+                    DebugText(me,"Failed FleeFrom All")
+                end
+                Sleep(1.0)
+            else
+                WaitForInterrupt()
+            end
+        end,
+    }
+end}
+
+game.states.CombatCowerFlee = State{function ()
+    local GLO_State_Cowering = Flag("GLO_State_Cowering_cf16110e-3767-4585-8028-83cb9857adcd")
+
+    description = [[Simplified combat cowering state that only supports fleeing, with the combat spotting outsourced to the parent state so we can use an expression ]]
+
+    self.OnEnter = function()
+        EndRepose(me)
+        SetFlag(GLO_State_Cowering, me)
+        DialogRequestStopRepeated(me)
+        ApplyStatus(me, "ANIM_COWER")
+    end
+
+    self.OnLeave = function()
+        RemoveStatus(me, "ANIM_COWER")
+        ClearFlag(GLO_State_Cowering, me)
+    end
+
+    -- actions
+    nodes.Cower = Action {
+        function()
+            try
+                FleeFrom(RelationType.All, 5.0)
+            catch ex if ls.CheckType(ex, error.MovementFailed) then
+                DebugText(me,"Failed FleeFrom All")
+            end
+            Sleep(1.0)
+        end,
+    }
+end}

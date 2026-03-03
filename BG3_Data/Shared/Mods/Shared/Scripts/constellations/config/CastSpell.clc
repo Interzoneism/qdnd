@@ -1,0 +1,68 @@
+game.configs.CastSpell = Config{
+    params={
+        ResponsibleCaster = {
+            type = EParamType.String,
+            help = [[The entity marked as responsible for casting the spell.
+                     If empty, uses the object parameter of the Cast socket event.
+                     Can be 'me' to set to the entity to which the config is attached.]],
+            required = false,
+            default = [[]]
+        },
+        Caster = {
+            type = EParamType.String,
+            help = [[The entity that will cast the spell. Currently only 'me' is supported)]],
+            required = false,
+            default = [[me]]
+        },
+        TargetEntity = {
+            type = EParamType.String,
+            help = [[Target of the spell.
+                    If empty, the spell will be cast on the object parameter of the Cast socket event
+                    (conventionally the character that triggered the trap).
+                    Can be 'me' to set to the entity to which the config is attached.]],
+            required = false,
+            default = [[me]]
+        },
+        CastAtPosition = {
+            type = EParamType.Bool,
+            help = [[If true, cast at TargetEntity's position instead of target itself]],
+            required = false,
+            default = true
+        },
+        VFX = {
+            type = EParamType.String,
+            help = [[VFX played when spell is cast.]],
+            required = false,
+            default = [[]]
+        },
+        Spell = {
+            type = EParamType.String,
+            help = [[The spell to cast]],
+            required = true,
+        },
+        TargetEntity2 = {
+            type = EParamType.String,
+            help = [[Second target of the spell.]],
+            required = false,
+            default = [[]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.SpellCast,
+            CastAtPosition = params.CastAtPosition,
+            Caster = params.Caster,
+            ResponsibleCaster = params.ResponsibleCaster,
+            Spell = params.Spell,
+            TargetEntity = params.TargetEntity,
+            TargetEntity2 = params.TargetEntity2,
+            VFX = params.VFX,
+        },
+    },
+    inputs={
+        Cast=ExtSocket{description=[[Trigger the spell cast]],{SocketRef{[[root.logic.inputs.Cast]]}}},
+    },
+    outputs={
+        FailedCast=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.FailedCast]]}}},
+        SuccessfulCast=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.SuccessfulCast]]}}},
+    }
+}

@@ -1,0 +1,23 @@
+game.configs.TrappedAreaIndicator = Config{
+    params={
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Is the object enabled by default]],
+            required = false,
+            default = true
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.TrappedAreaIndicator,
+            StartEnabled = params.StartEnabled,
+        },
+    },
+    inputs={
+        Off=ExtSocket{description=[[Mark the area as not trapped]],{SocketRef{[[root.logic.inputs.Off]]}}},
+        On=ExtSocket{description=[[Mark the area as trapped]],{SocketRef{[[root.logic.inputs.On]]}}},
+    },
+    outputs={
+        Enabled=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Enabled]]}}},
+        Disabled=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Disabled]]}}},
+    }
+}

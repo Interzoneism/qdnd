@@ -1,0 +1,1 @@
+This "Icons" folder is unpacked directly from the Baldurs Gate 3 resources. It contains Icons in various formats, with the .dds 64x64 icons being of most interest in this project.

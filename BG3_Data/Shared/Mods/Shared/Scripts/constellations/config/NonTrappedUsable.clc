@@ -1,0 +1,127 @@
+game.configs.NonTrappedUsable = Config{
+    params={
+        CantUseAD = {
+            type = EParamType.String,
+            help = [[PAD to play when a player uses the item while it's disabled. Nothing if empty.]],
+            required = false,
+            default = [[GLO_AD_CannotUseNow_057cb7cf-5aa4-1ed7-9639-65530939b2f9]]
+        },
+        DC = {
+            type = EParamType.String,
+            help = [[The skill check DC.]],
+            required = false,
+            default = [[HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f]]
+        },
+        Key = {
+            type = EParamType.String,
+            help = [[Key used when locking the item]],
+            required = false,
+            default = [[STORYLOCK]]
+        },
+        MinDistance = {
+            type = EParamType.Number,
+            help = [[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]],
+            required = false,
+            default = 6
+        },
+        OneShot = {
+            type = EParamType.Bool,
+            help = [[Does the item disable itself after the first successful use?]],
+            required = false,
+            default = false
+        },
+        Skill = {
+            type = EParamType.String,
+            help = [[The skill checked for discovering the item if the 'Type' is not 'None'.]],
+            required = false,
+            default = [[Perception]]
+        },
+        SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when item is disabled]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_Off]]
+        },
+        SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when item is enabled]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_On]]
+        },
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the item start enabled? (enabled = pressing it will trigger the 'Pressed' output; disabled = pressing it will the the CantUseAD, if any)]],
+            required = false,
+            default = true
+        },
+        Type = {
+            type = EParamType.String,
+            help = [[            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[Interactable]]
+        },
+        VFXOff = {
+            type = EParamType.String,
+            help = [[VFX while item is disabled and has been spotted.]],
+            required = false,
+            default = [[]]
+        },
+        VFXOffBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOff' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while item is enabled and has been spotted.]],
+            required = false,
+            default = [[]]
+        },
+        VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the enabled-VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.NonTrappedUsable,
+            CantUseAD = params.CantUseAD,
+            DC = params.DC,
+            Key = params.Key,
+            MinDistance = params.MinDistance,
+            OneShot = params.OneShot,
+            Skill = params.Skill,
+            SoundOff = params.SoundOff,
+            SoundOn = params.SoundOn,
+            StartEnabled = params.StartEnabled,
+            Type = params.Type,
+            VFXOff = params.VFXOff,
+            VFXOffBone = params.VFXOffBone,
+            VFXOn = params.VFXOn,
+            VFXOnBone = params.VFXOnBone,
+        },
+    },
+    inputs={
+        Lock=ExtSocket{description=[[Lock the item using params.Key as key]],{SocketRef{[[root.logic.inputs.Lock]]}}},
+        Enable=ExtSocket{description=[[Enable the item (using it will trigger the Pressed output)]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+        Unlock=ExtSocket{description=[[Unlock the item]],{SocketRef{[[root.logic.inputs.Unlock]]}}},
+        Reveal=ExtSocket{description=[[Reveal the item]],{SocketRef{[[root.logic.inputs.Reveal]]}}},
+        UseBlockedFromStory=ExtSocket{description=[[The lever's use was blocked from story (because it was not enabled)]],{SocketRef{[[root.logic.inputs.UseBlockedFromStory]]}}},
+        Disable=ExtSocket{description=[[Disable the item (using it will not trigger Pressed output, but UsedWhileDisabled)]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+    },
+    outputs={
+        UsedWhileDisabled=ExtSocket{description=[[Item used while deactivated]],{SocketRef{[[root.logic.outputs.ActivateAttemptFailed]]}}},
+        UseFinishedSuccessfully=ExtSocket{description=[[A character successfully finished using this item (will trigger only after closing in case of a container)]],{SocketRef{[[root.logic.outputs.UseFinishedSuccessfully]]}}},
+        Pressed=ExtSocket{description=[[A player attempted to use the item (may be successful or not). Not just for pressing things, name is for backward compatibility.]],{SocketRef{[[root.logic.outputs.Pressed]]}}},
+        UseFailed=ExtSocket{description=[[A character failed to use this item (e.g. because it was locked, or because they're blocked from using it based on their tags)]],{SocketRef{[[root.logic.outputs.UseFailed]]}}},
+        Destroyed=ExtSocket{description=[[Item is destroyed]],{SocketRef{[[root.logic.outputs.Destroyed]]}}},
+    }
+}

@@ -1,0 +1,266 @@
+game.states.Sit = State{function ()
+
+    params.seat = {type = EParamType.String, required=false, help=[[
+        Item to sit or lie on, if not set then sit on ground
+    ]]}
+    params.seatTrigger = {type = EParamType.String, required=false, help=[[
+        If set, will only sit or lie on item if it's inside this trigger
+    ]]}
+    params.sitAnimationOverride = {type = EParamType.String, required=false, help=[[
+        If set, play this animation while seated or lying down
+    ]]}
+    params.useSeatPositionAsFallBack = {type = EParamType.Bool, required=false, default=true, help=[[
+        When seat is destroyed/cleared after first use, return to its position/rotation instead of sitting or lying down
+    ]]}
+    params.sitOnGroundAsFallback = {type = EParamType.Bool, required=false, default=true, help=[[
+        When seat is destroyed, character will sit on ground as a fallback. Disable if the nonSitIdle proxy is desired.
+    ]]}
+    params.reactToDangerousSurface = {type = EParamType.Bool, required=false, default=true, help=[[
+        When the seat is in a dangerous surface, flee/don't sit or lie on it
+    ]]}
+    params.maxSeatDist = {type = EParamType.Number, required=false, default=4.0, help=[[
+        If the seat is further than this distance from its initial location, don't sit or lie on it
+        (and if already sat on it once, go to its original location instead)
+    ]]}
+    params.sitIdle = {type = EParamType.State, required = false, default = StateRef{game.states.SitDefaultIdle},
+        help = [[
+            Behaviour to perform while sitting or lying down. By default, does nothing.
+        ]]
+    }
+    params.nonSitIdle = {type = EParamType.State, required = false, default = StateRef{game.states.SitDefaultIdle},
+        help = [[
+            Behaviour to perform while idling because there is no chair or bed to use anymore, and
+            useSeatPositionAsFallBack is false, or useSeatPositionAsFallBack is true but that
+            position is currently in a dangerous surface, or useSeatPositionAsFallBack is true
+            and the chair or bed was not found/destroyed when the this script was initialised.
+            By default, does nothing. Also, sitOnGroundAsFallback must be false.
+        ]]
+    }
+
+    -- locals
+    local lookedUpSeat = false
+    local seat_Internal = nil
+    local seatStartPosition_Internal = nil
+    local seatStartRotation_Internal = nil
+    local usedSeat = false
+    local seatTrigger_Internal = nil
+    local sitAnimationOverride_Internal = nil
+
+    local sitting = false
+    local interruptSit = false
+    local stopSitting = false
+
+    self.OnInit = function()
+        if params.seat ~= nil then
+            seat_Internal = FindEntity(params.seat)
+            if seat_Internal ~= nil then
+                seatStartPosition_Internal = seat_Internal.Position
+                seatStartRotation_Internal = seat_Internal.Rotation
+            end
+        end
+        if params.seatTrigger ~= nil then
+            seatTrigger_Internal = FindEntity(params.seatTrigger)
+        end
+        if params.sitAnimationOverride ~= nil then
+            sitAnimationOverride_Internal = Animation(params.sitAnimationOverride)
+        end
+        if me.IsReposed then
+            usedSeat = true
+        end
+    end
+
+    self.CanEnter = function()
+        return true
+    end
+
+    self.Valid = function()
+        return not stopSitting
+    end
+
+    self.OnLeave = function()
+        stopSitting = false
+    end
+
+    nodes.SitFleeFromSurface = Action
+    {
+        function()
+            -- DebugText(me,"[Sit - Fleeing from dangerous surface]")
+            if me.IsReposed then
+                EndRepose(me)
+            end
+            FleeFromDangerousSurface()
+        end
+        ,
+        CanEnter = function()
+            return
+                (usedSeat == true) and
+                (params.reactToDangerousSurface == true) and
+                IsInDangerousSurfaceFor(me);
+        end
+    }
+
+    nodes.SitOnGround = Action
+    {
+        function()
+            --DebugText(me,"[Sit - Sitting On Ground]")
+            Sleep(1.0)
+            SitOnGround(me)
+            if sitAnimationOverride_Internal then
+                try
+                    PlayLoopingAnimation(nil, { sitAnimationOverride_Internal }, nil, false)
+                    WaitForInterrupt()
+                catch e if ls.CheckType(e, error.PlayAnimationFailed) then
+                    DebugText(me, "Animation Override Failed")
+                end
+            end
+        end
+        ,
+        CanEnter = function()
+            return seat_Internal == nil and params.sitOnGroundAsFallback
+        end
+
+    }
+
+    nodes.Sit = Action
+    {
+        function()
+            --DebugText(me,"[Sit - Sitting]")
+            local failedToUseSeat = false
+            try
+                UseItem(seat_Internal.Item)
+            catch e if ls.CheckType(e, error.UseItemFailed) then
+                failedToUseSeat = true
+            end
+            if not failedToUseSeat then
+                usedSeat = true
+                if sitAnimationOverride_Internal then
+                    try
+                        PlayLoopingAnimation(nil, { sitAnimationOverride_Internal }, nil, false)
+                        WaitForInterrupt()
+                    catch e if ls.CheckType(e, error.PlayAnimationFailed) then
+                        DebugText(me, "Animation Override Failed")
+                    end
+                end
+            else
+                Sleep(3.0)
+            end
+        end
+        ,
+        OnEnter = function()
+            sitting = true
+        end
+        ,
+        OnLeave = function()
+            if sitAnimationOverride_Internal then
+                StopAnimation(me)
+            end
+            sitting = false
+            interruptSit = false
+        end
+        ,
+        CanEnter = function()
+            return
+                (seat_Internal ~= nil) and
+                CanReposeOn(me, seat_Internal) and
+                (not params.reactToDangerousSurface or
+                 not IsInDangerousSurfaceFor(seat_Internal, me.Character)) and
+                (not usedSeat or
+                 (GetDistance2DTo(seat_Internal, seatStartPosition_Internal) < params.maxSeatDist)) and
+                not me.IsReposed and
+                ((seatTrigger_Internal == nil) or
+                 IsInTrigger(seat_Internal, seatTrigger_Internal.Trigger))
+        end
+        ,
+        Valid = function()
+            return
+                not interruptSit and
+                (seat_Internal ~= nil) and
+                (not params.reactToDangerousSurface or
+                 not IsInDangerousSurfaceFor(seat_Internal, me.Character))
+        end
+    }
+
+    nodes.FallbackToSeatStart = Action
+    {
+        function()
+            -- DebugText(me,"[Sit - Looking from seat position]")
+            try
+                MoveTo(seatStartPosition_Internal)
+            catch e if ls.CheckType(e, error.MovementFailed) then
+                -- That's okay
+            end
+            local lookTarget = seatStartPosition_Internal + seatStartRotation_Internal
+            SteerTo(lookTarget)
+            Sleep(2.0)
+        end
+        ,
+        CanEnter = function()
+            return
+                params.useSeatPositionAsFallBack and
+                usedSeat and
+                ((seat_Internal == nil) or
+                 (GetDistance2DTo(seat_Internal, seatStartPosition_Internal) >= params.maxSeatDist)) and
+                (not params.reactToDangerousSurface or
+                 not IsInDangerousSurfaceFor(seatStartPosition_Internal, me.Character))
+        end
+    }
+
+    nodes.SitIdle = Proxy{
+        params.sitIdle,
+        OnEnter = function()
+            sitting = true
+        end
+        ,
+        OnLeave = function()
+            sitting = false
+            interruptSit = false
+        end
+        ,
+        Valid = function()
+            return
+                not interruptSit and
+                me.IsReposed and
+                (not params.reactToDangerousSurface or
+                 not IsInDangerousSurfaceFor(me))
+        end
+    }
+
+    nodes.NonSitIdle = Proxy{
+        params.nonSitIdle
+    }
+
+    -- events
+
+    events.Destroyed = function(e)
+        if e.Entity == seat_Internal then
+            seat_Internal = nil
+        end
+    end
+
+    events.MovedBy = function(e)
+        if e.MovedEntity == seat_Internal then
+            interruptSit = sitting
+        end
+    end
+
+    events.EntityEvent = function(e)
+        if(e.TargetEntity == me) then
+            if e.Event == "GLO_Sit_ManualInterrupt" then
+                stopSitting = sitting
+            end
+        end
+    end
+
+end}
+
+-- default states
+
+game.states.SitDefaultIdle = State{function ()
+    nodes.Idle = Action
+    {
+        function()
+            --DebugText(me,"[Sit - idle]")
+            Sleep(1.0)
+        end
+    }
+end}

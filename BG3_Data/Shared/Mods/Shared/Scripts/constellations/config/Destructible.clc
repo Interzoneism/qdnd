@@ -1,0 +1,35 @@
+game.configs.Destructible = Config{
+    params={
+        GenerateTreasure = {
+            type = EParamType.Bool,
+            help = [[Generate treasure when the item gets destroyed]],
+            required = false,
+            default = true
+        },
+        DestroyVFX = {
+            type = EParamType.String,
+            help = [[Custom VFX to play on destruction]],
+            required = false,
+        },
+        DestroyType = {
+            type = EParamType.String,
+            help = [[When destroying the item, use this death type.]],
+            required = false,
+            default_value_provider = [[deathtype]],
+            default = [[NONE]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.Destructible,
+            DestroyType = params.DestroyType,
+            DestroyVFX = params.DestroyVFX,
+            GenerateTreasure = params.GenerateTreasure,
+        },
+    },
+    inputs={
+        Destroy=ExtSocket{description=[[Destroy item. ev.Object is assumed to be the Destroyer]],{SocketRef{[[root.logic.inputs.Destroy]]}}},
+    },
+    outputs={
+        Destroyed=ExtSocket{description=[[Object has been destroyed. ev.Object is the Destroyer, the parameter is the DestroyerOwner.]],{SocketRef{[[root.logic.outputs.Destroyed]]}}},
+    }
+}

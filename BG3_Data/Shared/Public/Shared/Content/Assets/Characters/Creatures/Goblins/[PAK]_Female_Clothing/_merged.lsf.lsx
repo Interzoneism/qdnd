@@ -1,0 +1,558 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="VirtualTextureBank">
+		<node id="VirtualTextureBank">
+			<children>
+				<node id="Resource">
+					<attribute id="GTexFileName" type="FixedString" value="734ed088950c71028bd8e1ab861ad7fe" />
+					<attribute id="ID" type="FixedString" value="09843903-c17a-1d2a-b50e-bf3e13f86741" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="GOB_F_ARM_Robe_Priest_A" />
+					<attribute id="Prefetch" type="bool" value="False" />
+					<attribute id="PrefetchMipLevel" type="int8" value="-1" />
+					<attribute id="ReferencedColorSpaces" type="uint32" value="6" />
+					<attribute id="SourceFile" type="LSString" value="" />
+					<attribute id="VirtualTextureLayerConfig" type="uint32" value="3" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115198813274313" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="MaterialBank">
+		<node id="MaterialBank">
+			<children>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="703c2075-41fe-3d02-98b8-b46a9b7a9f86" />
+					<attribute id="MaterialType" type="uint8" value="22" />
+					<attribute id="Name" type="LSString" value="GOB_F_ARM_Robe_Priest_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Characters/CHAR_BASE_AlphaTest_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.7" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Armor_Dirt_Sharpness" />
+							<attribute id="Value" type="float" value="0.7" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Armor_Blood_Sharpness" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="4" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Dirt_AO_Sharpness" />
+							<attribute id="Value" type="float" value="4" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="4" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Blood_AO_Sharpness" />
+							<attribute id="Value" type="float" value="4" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Dirt" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Blood" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="01 Texture Map" />
+							<attribute id="ID" type="FixedString" value="c32da610-0f66-403c-816a-dd0baec8ca53" />
+							<attribute id="ParameterName" type="FixedString" value="MSKColor" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="2765e270-52ce-6f45-eddf-d0451042b54c" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.15105805 0.29321614 0.4877652" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Cloth_Primary" />
+							<attribute id="Value" type="fvec3" value="0.15105805 0.29321614 0.4877652" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.17013837 0.04614884 0.04614884" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Cloth_Secondary" />
+							<attribute id="Value" type="fvec3" value="0.17013837 0.04614884 0.04614884" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.071761444 0.06190747 0.106156066" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Cloth_Tertiary" />
+							<attribute id="Value" type="fvec3" value="0.071761444 0.06190747 0.106156066" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="1 1 1" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Accent_Color" />
+							<attribute id="Value" type="fvec3" value="1 1 1" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.23882797 0.10363409 0.060031604" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Leather_Primary" />
+							<attribute id="Value" type="fvec3" value="0.23882797 0.10363409 0.060031604" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.15105805 0.034230202 0.02654868" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Leather_Secondary" />
+							<attribute id="Value" type="fvec3" value="0.15105805 0.034230202 0.02654868" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.12198571 0.060031604 0.051122047" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Leather_Tertiary" />
+							<attribute id="Value" type="fvec3" value="0.12198571 0.060031604 0.051122047" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="1 1 1" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Custom_1" />
+							<attribute id="Value" type="fvec3" value="1 1 1" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.7667436 0.7667436 0.7667436" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Metal_Primary" />
+							<attribute id="Value" type="fvec3" value="0.7667436 0.7667436 0.7667436" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.76862746 0.76862746 0.76862746" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Metal_Secondary" />
+							<attribute id="Value" type="fvec3" value="0.76862746 0.76862746 0.76862746" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.76862746 0.76862746 0.76862746" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Metal_Tertiary" />
+							<attribute id="Value" type="fvec3" value="0.76862746 0.76862746 0.76862746" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="1 1 1" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="02 Colour" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Custom_2" />
+							<attribute id="Value" type="fvec3" value="1 1 1" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.11764706 0.06666667 0.047058824" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="08Dirt&amp;Blood&amp;Sweat" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="DirtColor" />
+							<attribute id="Value" type="fvec3" value="0.11764706 0.06666667 0.047058824" />
+						</node>
+						<node id="Vector3Parameters">
+							<attribute id="BaseValue" type="fvec3" value="0.12941177 0.007843138 0.003921569" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="08Dirt&amp;Blood&amp;Sweat" />
+							<attribute id="IsColor" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="Blood_Color" />
+							<attribute id="Value" type="fvec3" value="0.12941177 0.007843138 0.003921569" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="09843903-c17a-1d2a-b50e-bf3e13f86741" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="TextureBank">
+		<node id="TextureBank">
+			<children>
+				<node id="Resource">
+					<attribute id="Depth" type="int32" value="1" />
+					<attribute id="Height" type="int32" value="2048" />
+					<attribute id="ID" type="FixedString" value="c32da610-0f66-403c-816a-dd0baec8ca53" />
+					<attribute id="Localized" type="bool" value="False" />
+					<attribute id="Name" type="LSString" value="GOB_F_ARM_Robe_Priest_A_MSKcloth" />
+					<attribute id="SRGB" type="bool" value="False" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Goblins/GOB_F_ARM_Priest_A/Resources/GOB_F_ARM_Robe_Priest_A_MSKcloth.DDS" />
+					<attribute id="Streaming" type="bool" value="True" />
+					<attribute id="Template" type="FixedString" value="GOB_F_ARM_Robe_Priest_A_MSKcloth" />
+					<attribute id="Type" type="int32" value="1" />
+					<attribute id="Width" type="int32" value="2048" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115188075855919" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.51682323 1.1076831 0.15706794" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.5819014 0.1277574 -0.18449977" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="9e4fca92-f4bd-1208-fe53-5f0129c13f32" />
+					<attribute id="MaterialType" type="uint8" value="22" />
+					<attribute id="Name" type="LSString" value="GOB_F_ARM_Robe_Priest_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Body" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Goblins/_Female/Resources/GOB_F_ARM_Robe_Priest_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/Shared/Assets/Characters/_Models/_Creatures/Goblins/_Female/Resources/GOB_F_ARM_Robe_Priest_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144537400540922056" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothParams">
+							<attribute id="AngularDrag" type="fvec3" value="0.0001 0.0001 0.0001" />
+							<attribute id="AngularInertia" type="fvec3" value="0.7 0.7 0.7" />
+							<attribute id="AnimDriveDampingForce" type="float" value="0" />
+							<attribute id="AnimDriveSpringForce" type="float" value="50" />
+							<attribute id="AnimInfluenceMultiplier" type="float" value="1" />
+							<attribute id="AtmosphericWindEnabled" type="bool" value="False" />
+							<attribute id="BendingStiffness" type="float" value="1" />
+							<attribute id="CentrifugalInertia" type="fvec3" value="0.5 0.5 0.5" />
+							<attribute id="ClothMainWindFrequency" type="float" value="0" />
+							<attribute id="ClothMainWindSpeed" type="float" value="0" />
+							<attribute id="ClothMainWindVariance" type="float" value="0" />
+							<attribute id="ClothMaxWindDirectionOffset" type="float" value="0" />
+							<attribute id="ClothWindDirectionOffsetFrequency" type="float" value="0" />
+							<attribute id="ClothWindSpeed" type="float" value="0" />
+							<attribute id="CollisionMassScale" type="float" value="1" />
+							<attribute id="CompressionLimit" type="float" value="0.8" />
+							<attribute id="Damping" type="fvec3" value="0.02 0.02 0.02" />
+							<attribute id="DragCoefficient" type="float" value="0.4" />
+							<attribute id="EnableCCD" type="bool" value="False" />
+							<attribute id="EnableVirtualParticles" type="bool" value="False" />
+							<attribute id="FluidDensity" type="float" value="0.1" />
+							<attribute id="Friction" type="float" value="0.1" />
+							<attribute id="FrontalWindSpeed" type="float" value="0" />
+							<attribute id="FrontalWindVariance" type="float" value="0" />
+							<attribute id="LiftCoefficient" type="float" value="0.01" />
+							<attribute id="LinearDrag" type="fvec3" value="0.0001 0.0001 0.0001" />
+							<attribute id="LinearInertia" type="fvec3" value="0.8 0.8 0.8" />
+							<attribute id="LinearStiffness" type="float" value="1" />
+							<attribute id="OverrideAtmosphericWind" type="bool" value="False" />
+							<attribute id="SelfCollisionDistance" type="float" value="0" />
+							<attribute id="SelfCollisionStiffness" type="float" value="0" />
+							<attribute id="SolverFrequency" type="float" value="30" />
+							<attribute id="StiffnessFrequency" type="float" value="200" />
+							<attribute id="StiffnessMultiplier" type="float" value="1" />
+							<attribute id="StretchLimit" type="float" value="1.2" />
+							<attribute id="TetherConstraintScale" type="float" value="1" />
+							<attribute id="TetherConstraintStiffness" type="float" value="1" />
+							<attribute id="UUID" type="FixedString" value="GOB_F_ARM_Robe_Priest_A.GOB_F_ARM_Robe_Priest_A_Cloth_Mesh.1" />
+						</node>
+						<node id="ClothParams">
+							<attribute id="AngularDrag" type="fvec3" value="0.0001 0.0001 0.0001" />
+							<attribute id="AngularInertia" type="fvec3" value="0.7 0.7 0.7" />
+							<attribute id="AnimDriveDampingForce" type="float" value="0" />
+							<attribute id="AnimDriveSpringForce" type="float" value="50" />
+							<attribute id="AnimInfluenceMultiplier" type="float" value="1" />
+							<attribute id="AtmosphericWindEnabled" type="bool" value="False" />
+							<attribute id="BendingStiffness" type="float" value="1" />
+							<attribute id="CentrifugalInertia" type="fvec3" value="0.5 0.5 0.5" />
+							<attribute id="ClothMainWindFrequency" type="float" value="0" />
+							<attribute id="ClothMainWindSpeed" type="float" value="0" />
+							<attribute id="ClothMainWindVariance" type="float" value="0" />
+							<attribute id="ClothMaxWindDirectionOffset" type="float" value="0" />
+							<attribute id="ClothWindDirectionOffsetFrequency" type="float" value="0" />
+							<attribute id="ClothWindSpeed" type="float" value="0" />
+							<attribute id="CollisionMassScale" type="float" value="1" />
+							<attribute id="CompressionLimit" type="float" value="0.8" />
+							<attribute id="Damping" type="fvec3" value="0.02 0.02 0.02" />
+							<attribute id="DragCoefficient" type="float" value="0.4" />
+							<attribute id="EnableCCD" type="bool" value="False" />
+							<attribute id="EnableVirtualParticles" type="bool" value="False" />
+							<attribute id="FluidDensity" type="float" value="0.1" />
+							<attribute id="Friction" type="float" value="0.1" />
+							<attribute id="FrontalWindSpeed" type="float" value="0" />
+							<attribute id="FrontalWindVariance" type="float" value="0" />
+							<attribute id="LiftCoefficient" type="float" value="0.01" />
+							<attribute id="LinearDrag" type="fvec3" value="0.0001 0.0001 0.0001" />
+							<attribute id="LinearInertia" type="fvec3" value="0.8 0.8 0.8" />
+							<attribute id="LinearStiffness" type="float" value="1" />
+							<attribute id="OverrideAtmosphericWind" type="bool" value="False" />
+							<attribute id="SelfCollisionDistance" type="float" value="0" />
+							<attribute id="SelfCollisionStiffness" type="float" value="0" />
+							<attribute id="SolverFrequency" type="float" value="30" />
+							<attribute id="StiffnessFrequency" type="float" value="200" />
+							<attribute id="StiffnessMultiplier" type="float" value="1" />
+							<attribute id="StretchLimit" type="float" value="1.2" />
+							<attribute id="TetherConstraintScale" type="float" value="1" />
+							<attribute id="TetherConstraintStiffness" type="float" value="1" />
+							<attribute id="UUID" type="FixedString" value="GOB_F_ARM_Robe_Priest_A.GOB_F_ARM_Robe_Priest_A_Cloth_Mesh_LOD1.3" />
+						</node>
+						<node id="ClothParams">
+							<attribute id="AngularDrag" type="fvec3" value="0.0001 0.0001 0.0001" />
+							<attribute id="AngularInertia" type="fvec3" value="0.7 0.7 0.7" />
+							<attribute id="AnimDriveDampingForce" type="float" value="0" />
+							<attribute id="AnimDriveSpringForce" type="float" value="50" />
+							<attribute id="AnimInfluenceMultiplier" type="float" value="1" />
+							<attribute id="AtmosphericWindEnabled" type="bool" value="False" />
+							<attribute id="BendingStiffness" type="float" value="1" />
+							<attribute id="CentrifugalInertia" type="fvec3" value="0.5 0.5 0.5" />
+							<attribute id="ClothMainWindFrequency" type="float" value="0" />
+							<attribute id="ClothMainWindSpeed" type="float" value="0" />
+							<attribute id="ClothMainWindVariance" type="float" value="0" />
+							<attribute id="ClothMaxWindDirectionOffset" type="float" value="0" />
+							<attribute id="ClothWindDirectionOffsetFrequency" type="float" value="0" />
+							<attribute id="ClothWindSpeed" type="float" value="0" />
+							<attribute id="CollisionMassScale" type="float" value="1" />
+							<attribute id="CompressionLimit" type="float" value="0.8" />
+							<attribute id="Damping" type="fvec3" value="0.02 0.02 0.02" />
+							<attribute id="DragCoefficient" type="float" value="0.4" />
+							<attribute id="EnableCCD" type="bool" value="False" />
+							<attribute id="EnableVirtualParticles" type="bool" value="False" />
+							<attribute id="FluidDensity" type="float" value="0.1" />
+							<attribute id="Friction" type="float" value="0.1" />
+							<attribute id="FrontalWindSpeed" type="float" value="0" />
+							<attribute id="FrontalWindVariance" type="float" value="0" />
+							<attribute id="LiftCoefficient" type="float" value="0.01" />
+							<attribute id="LinearDrag" type="fvec3" value="0.0001 0.0001 0.0001" />
+							<attribute id="LinearInertia" type="fvec3" value="0.8 0.8 0.8" />
+							<attribute id="LinearStiffness" type="float" value="1" />
+							<attribute id="OverrideAtmosphericWind" type="bool" value="False" />
+							<attribute id="SelfCollisionDistance" type="float" value="0" />
+							<attribute id="SelfCollisionStiffness" type="float" value="0" />
+							<attribute id="SolverFrequency" type="float" value="30" />
+							<attribute id="StiffnessFrequency" type="float" value="200" />
+							<attribute id="StiffnessMultiplier" type="float" value="1" />
+							<attribute id="StretchLimit" type="float" value="1.2" />
+							<attribute id="TetherConstraintScale" type="float" value="1" />
+							<attribute id="TetherConstraintStiffness" type="float" value="1" />
+							<attribute id="UUID" type="FixedString" value="GOB_F_ARM_Robe_Priest_A.GOB_F_ARM_Robe_Priest_A_Cloth_Mesh_LOD2.5" />
+						</node>
+						<node id="ClothParams">
+							<attribute id="AngularDrag" type="fvec3" value="0.0001 0.0001 0.0001" />
+							<attribute id="AngularInertia" type="fvec3" value="0.7 0.7 0.7" />
+							<attribute id="AnimDriveDampingForce" type="float" value="0" />
+							<attribute id="AnimDriveSpringForce" type="float" value="50" />
+							<attribute id="AnimInfluenceMultiplier" type="float" value="1" />
+							<attribute id="AtmosphericWindEnabled" type="bool" value="False" />
+							<attribute id="BendingStiffness" type="float" value="1" />
+							<attribute id="CentrifugalInertia" type="fvec3" value="0.5 0.5 0.5" />
+							<attribute id="ClothMainWindFrequency" type="float" value="0" />
+							<attribute id="ClothMainWindSpeed" type="float" value="0" />
+							<attribute id="ClothMainWindVariance" type="float" value="0" />
+							<attribute id="ClothMaxWindDirectionOffset" type="float" value="0" />
+							<attribute id="ClothWindDirectionOffsetFrequency" type="float" value="0" />
+							<attribute id="ClothWindSpeed" type="float" value="0" />
+							<attribute id="CollisionMassScale" type="float" value="1" />
+							<attribute id="CompressionLimit" type="float" value="0.8" />
+							<attribute id="Damping" type="fvec3" value="0.02 0.02 0.02" />
+							<attribute id="DragCoefficient" type="float" value="0.4" />
+							<attribute id="EnableCCD" type="bool" value="False" />
+							<attribute id="EnableVirtualParticles" type="bool" value="False" />
+							<attribute id="FluidDensity" type="float" value="0.1" />
+							<attribute id="Friction" type="float" value="0.1" />
+							<attribute id="FrontalWindSpeed" type="float" value="0" />
+							<attribute id="FrontalWindVariance" type="float" value="0" />
+							<attribute id="LiftCoefficient" type="float" value="0.01" />
+							<attribute id="LinearDrag" type="fvec3" value="0.0001 0.0001 0.0001" />
+							<attribute id="LinearInertia" type="fvec3" value="0.8 0.8 0.8" />
+							<attribute id="LinearStiffness" type="float" value="1" />
+							<attribute id="OverrideAtmosphericWind" type="bool" value="False" />
+							<attribute id="SelfCollisionDistance" type="float" value="0" />
+							<attribute id="SelfCollisionStiffness" type="float" value="0" />
+							<attribute id="SolverFrequency" type="float" value="30" />
+							<attribute id="StiffnessFrequency" type="float" value="200" />
+							<attribute id="StiffnessMultiplier" type="float" value="1" />
+							<attribute id="StretchLimit" type="float" value="1.2" />
+							<attribute id="TetherConstraintScale" type="float" value="1" />
+							<attribute id="TetherConstraintStiffness" type="float" value="1" />
+							<attribute id="UUID" type="FixedString" value="GOB_F_ARM_Robe_Priest_A.GOB_F_ARM_Robe_Priest_A_Cloth_Mesh_LOD3.7" />
+						</node>
+						<node id="ClothProxyMapping">
+							<children>
+								<node id="Object">
+									<attribute id="MapKey" type="FixedString" value="GOB_F_ARM_Robe_Priest_A.GOB_F_ARM_Robe_Priest_A_Cloth_Mesh.1" />
+									<children>
+										<node id="MapValue">
+											<children>
+												<node id="Object">
+													<attribute id="ClosestVertices" type="ScratchBuffer" value="eNp1WAl8V8UR/kYUvBFPEA2eCIIEEJFDQUOAEAFNCCQIIh5cKoIXKp49tDVAoIIinhCqtlaN9vA2YMEU693aegKWIGJLrYoHqLj9Zubt/71/wN/77bezs7Ozx9udnZ2t+BbbsJXp2xwqR3nBOD8YvYHfD1bakGAz8Vqlt1qr75K22Vau5wdKa/utpsXpDUm+La/fFL33ENJetiV9haSNUutwDepyWJfkMxPONWwfQsQZcJxplNIzc5x/oZHyjczr0A8n4zT8DI/gUeOsy6vN9ugaVuLPeBGPYyWexXAMxenoi5OoxftVyQ3s4+pM70rPyI3qI7hM/lyU03T8H8E1eK2PLcXYts5G7LjOxh2x0XpxVI63ihp8nsqJ3MYMHeVdcluudmUG65grHUIj1tsuCvYvt9gO+S73N30M2uJxzuZRW8l1nJ3vjZ3lezSXnQWyi4g0Yz6D9Vdx1Wbyr3RBd/TBAbITa/cTXZnLcSVX5Qpbpe7ohRP5DUAxdpPWshEHEg+S/U2yleEHeJ+yl8Hp6Sx1Qjccy68jjiel/BMMd5c9ZDfpJ33lZGljbfuQPonfySy1lH3kPbSUVsyn411MY2uV6YgO6MFP6bMMexoeLIfKXvz2ZNtT5ETpL72ZQngb76EXNanMpXgHE5mmUd/ZxhlneIi0Zeuj5HA5Ut5OJCcx74CDMI6SbaVAVKZAXoPWT8JruJR1bTAeBTKWEu1MopscL92JBUTldJU3MDmRn4w3TPP3hv43/R+tNMz/1yvxIXPlZiXrkvMSd8KHTfaG4gs8L39hegErEkw5ITyL50g9y/QcIq34GJ42Kta8YK1WJOh8r3PuHMymtq9sLk+z9XP4xugvDTfjS+7KLdjM0hfcmZvxP+N/hq+Zf41PMQJlqEA5PscX5DSXz/Fv/AebSH9i1EDKbMJ/iSEMxTAMQX+mfihBKU7BYBRR4mOobAtpzr3ah1ahP3dnH9b2YupNiQE4FbvKx9iIg6QFZXwWPlqfr889ztNXbEVu5nEtmq6V1q5MZMqkXM6QHWMIZVJidAnpEtvhJTKU+WByhojXljAfavJrELEkg8pxeZUcLE5Hjuoso0R5Ew3OSfXo//oGcQxlNrYoH8IqLGfdcqyC0/mc5fbvItZzNMuZ6kktxyCTiZw1aGCpActIqYZlCapMPaKGVXg+17be2imdcqKMY6pBOV5bb1wfieMqyjSw12XJGGLva2wua4z2US2z8a3KofP97zdgNfO1LK+29fM/6BpCWMa/35B3Xh5lHsLz1PA0fB18hes5E/3LQ2SQnMN0ljyD31PyEeJjyQjPknEyVgbKXzFOnsKT+AN+yhTCdcxDuEAukovlJVuxJ1j7J/wEf8QNuJb5dckKO66xWdyJu3EP7sBdbHEnbiPV2UbSUdoz72T0eTKZ+YVGT5BJMpHpApkiY+RltnoZ2tsruB+vUtO96CL34khSh9sYjsB9zLtY2/MNr5aZzM/1O0IewgyZYfRv8AAlH8Cvqamdtb3CJB82usCtqzyM6XKJXCrTZZq1mio6Lp/L9pid73CpkEoZzlSRw3zOsBwOM/6wpHRaHr9KiqWIn+aaKhJOFaniBKPmiKnmipzOWTajaixlrppLE75jsQygrjiSCut3pKhk1FlKGzBCTid1OvlF5IYwF/NQyJaqczFuIZ6BkbSYQykdwhDqPYdttadhpEMYZWtYg/n4FZbgVvpJC+hl3YrbWV6E0bIQHeRMkzmbLcfLbfSgFnCXLOA+uZ1pEesXob0cYzLjuV+nZlY1HW1cz9LcXHzd0hWL66b/ooKrOTyHVQkWGacqwSLTU2St4r+oSLQW5aG3SOn8HuehFouhODeDKUfnNY9UDeka49SwVktLmBZTap6VPfe2C2wFl5B7ayJzCu+YUt5Gqq2cd9jX/OvVyYnrikKmvvSg+pC6iydHz0tnuSc5iUrfh2ONPi6Dfh6PZW17udbow0z/AdD8bp7s4/h1pu5OxC70o46hJ3UU8RCeT5U81H0YHIz2/DriaLTF/ijAgeS0ZqkDcX8cgFbk7E26NT2XluhuffU0HGulsaZnPNQnGo8xGGvpTGjtmcy1to3hGMOW9H9aU2NLlloBRGAn9rOTjVzQjNS+xFbYHftQbi/mLSHkNiPdhtqbYz9K7mna9iBvT+yMXSihGMJo41cZjjLcjy1Go4XRLVCJXfkpvVviTxYzL+a9vxEHi/qGe0lPUm1tjuq90f4Y3Y2e2fEsa/6Z+Sab6Euo77GJfsUgpk+IG6mpB+W68s/of9P952dcz/4o7ufRPFUd+Om5OYG+rfrGvaF+aQ+uYk96rD3oG44zn+cz+jKf0qMZSB9mMD2T3kwhdJa7aGk7yh2kC2UuimS+zWUhz2QIi4w+m39gPECfvRn9crCvfW0W+8je0ofe8b70mHsZZ2/6vb1lkNF+u1xEDGGicaawFMJVcrlcyU85l+ESfMA75XreLDfYHfMEXmF+CS6g5349Lmb/N7LmVZankb7YxjMVNzKfiPPJu5D4c1yEqcSbmc6H2v/f4hcm+bsEp9Peu53fZi+rDfYauYoociX0nfG+Sb5Lf/8d+ubvM38b6q2/A/XcX7PaZXZvPm83ez2eIfUUBsqTHPNLvCHv58jHyCssvYyH8CBbPEheCNPFx/AwuZcZrfcO5y5XGF7OPNJuJdwauK2otVxthNsHp6PdqMmzOYsz1sM5NTkr5JKLczoda2nlldJ+a2lL5hlnaY6fj0uZajFAVLLQ8BakdMSFyf5x1N3keyniaO6w+ViIUaJYg4V2a2ito94Wo61ufpKPSvZkRF0Rb+u1Lulto7xzU4yaYy9xPKptlMyhbzobTqt8pUTa+4pYyZq5pBS9tjJPppKncm6Om0UdeWw5P0+PY5FEGV1tR+/Fa1XzfAywf1Bs+8Tv8aWZ21/vglrM4kyq+c3i34m9F5oW11wphTmdinNMw2x66NpyFnNfDR9bbKut1D7UJu+swkSDjttfYV9ZzUj6EiGMsBGONL9iBMd5BlMVeeXGL5e1lFxLHzcE1+D81XwlhrDC8EV6wyF8aJrXGwbDbw23aASJb72vzGqphs3Ju29Lzo79zTg34xzcxE/pc3EeS+ca/UvD8zCFHKcnQGUV1bZMoCWZkPAn8c0+mZIT+E0xHa7tJlJe0trXmZT/puE/DN/Cm/g73mIK4XVozT/9rhHHNtLa4gW8Q8XjAJofYnQ/OVX6Mh0m/eVwOYL5EcY/0vBow3Z88xfwpa90V+bdxOfua1KZ+DqF9p8qE9p9vMJExtFlUs4AKUrKheYXOWY9pWLTFrEwx99RbUR/cZcxVdh7sAK66yrg7+thzIfwOy0p9TeZEfCdWW4vdvd5fMd6BMD3qr8uXafr975mm2zUP8R6iPpLk1auf07Op3Isw/b63Sv2U+Cnyc9dtbVVq1kNt4rx1KjFytqBytypcb9W97+ecV/b1F+tMq9ypPnqnuspGsE8vxcfj46mOmMH8i2J0+7V+xi8X/UlUjsQvYuixK+OvTu/Kjm/PoYGe5+u5m24NsEsx1/BKZ2+fxWzL98YY2y0OFJEj0euz0Q+I9002lmXoFsGjUY2wjGYfYh8LQeoFXFapda7rHE09pyNncYI6jWGGuN1zgbjOO2xX691OkWPJXpkMhtf8kiRx4I8NuX2yiNUvtr+nvK3lb+Y/E3kr7NOGb/d5bPxdqezUfo0eh8jumnUui4TtY7x6my0eUZGsmk8OcYJ65LIYYwQrks4MVKnET+Pd2WjFo4xflWSxIJiVMojGNkok9em0RuNb+w4ehOjLh6XaLA9p+gv6+y72PHH39rxjVn6oy8+f3vuyE+rSXhLcn5a1tdSPyrfL3Kvxeno89QgejupP9PUb6lB6qvUJN6Cn/f07s76EvHGdwtWmVh75fjtkL0R4i1QuJ1Vb2rhs/Y82li1rttbWreuqaUty3HUxro1c8tWnVitaLvccuq8/CyopXIb5RYpa4XczuTbjayViBYgPdfpKf4/WA7zBA==" />
+													<attribute id="Name" type="FixedString" value="GOB_F_ARM_Robe_Priest_A.GOB_F_ARM_Robe_Priest_A_Mesh.0" />
+													<attribute id="NbClosestVertices" type="int32" value="3480" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+								<node id="Object">
+									<attribute id="MapKey" type="FixedString" value="GOB_F_ARM_Robe_Priest_A.GOB_F_ARM_Robe_Priest_A_Cloth_Mesh_LOD1.3" />
+									<children>
+										<node id="MapValue">
+											<children>
+												<node id="Object">
+													<attribute id="ClosestVertices" type="ScratchBuffer" value="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" />
+													<attribute id="Name" type="FixedString" value="GOB_F_ARM_Robe_Priest_A.GOB_F_ARM_Robe_Priest_A_Mesh_LOD1.2" />
+													<attribute id="NbClosestVertices" type="int32" value="2181" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+								<node id="Object">
+									<attribute id="MapKey" type="FixedString" value="GOB_F_ARM_Robe_Priest_A.GOB_F_ARM_Robe_Priest_A_Cloth_Mesh_LOD2.5" />
+									<children>
+										<node id="MapValue">
+											<children>
+												<node id="Object">
+													<attribute id="ClosestVertices" type="ScratchBuffer" value="eNptVglbE0kQLeWS9WB1x3UFP1aOibCiEiB4xPVaXF1jgOCRwATw+v9/ofe9V92TCTHzdXX169c93VU1Vanbpm1YHa2NdtdWoTtC+bsF/N5LborFmaS3bcfeS+7hIee85A52Ibqq2Trmktyzg1LnvI8TTnmgnSjr0ttR+nn8vemE7cjcjau4fjeOiXTK3To64UFkdvSuEHyHus7se25I973bepffj3ddhXU4y34Fox2MZoWsxFv/A/Ytm7V5u4l2yz4Lv4N+xV7ZPYxegfPS/jSDPg/8A9oD+ysyqd1Ho76GFU/AmwB7QsgHyb/BWENzfQ2cj9hlwtaxTwjjEXf52Jr2ycZsGhz2TeNMz7qwQJI/7ChqHfS9IT1JovtgtiBb6DuwYxeN9q3Zsm1HZB+yhVENttxEvxX9RU4I2zpVDfgyEI8o57jucgv8LWsAbQhZAntB6B089MANm4N9b9sSonMW/ZxOsi/Ziicp7NAyNO5wiFGmU/G9fHshnJwe9C76RSGL4IWQG/tcmOvX7ar1td/1Uief9gkhAyePdvPoyrQjrdONeqbdfBURnqiIeAGe73agO9Dm7gfepYfGWY/qd4iwlv0nb/wQ3gIWwjfpjK0Q3kh/bc/B87e4NX61c3bFruH8v9kxRjO4Sx/c7xj17Yt9te94uParcb/n0mckr2DtjNYc2wm4/+J5C+2FZi9F+Qv6U82clhbO4ttvw1tzMRLc//TcUkS8d0511nHKRmQWsHUGLcc411tyrcjl1VzRkvybKxI8qgvJHmZccux+cA9yLdctSD/SLOPjKEYROYewHPVrkldhvxD6YhzBG9/MkcGN0pmT39NpF3TaZcksyiVL9mgoP5yHtck/lqSPQvgi3eCLC3imYO9pfNWf8BAfk5y2cWD85qkTGY/cS3YZz0VolCFcRD8lLQT2kxhx9ST0KbUQJjXrcl5yArlkDGfcwpf0h5B+aZ8ifh33kYvWEYsPEYMvkaEeIhOR8whaCG8RIUmuIivuICs1oftXzAyza68Ru4zAN4iwUyP3RDucok/6ScWqHmPu5UP51P3uWX0bslbJSIwBfq0pWroxD/Q0ZqaqlfnKq49np2a8BeVje2aP1KgReWZPjbgzOeJME71LxzjLvD8POz5A/1HIuqTrKVaL8oTMQgtlDmG2cTwb+cqqd/EdBrl6P2bslGfOylQH27G2blSQVCXbwtpRd+nVfoDUVbO9yrtej1V+wPGa+Lnyv2I4/w+yvWen6o2KyrfpX5/j7llnbpZ1fLB/+seyF088/M9k8P9k9B9I9Z/DYDbV0NGKOVol3f4pL3WVebqxMlQrznCt+VntWCxrR9Xvo1nUs8nZHNuIGSaLlTG9PUXXz+LqbCydjZbhqKh635H/ARwc8Fk=" />
+													<attribute id="Name" type="FixedString" value="GOB_F_ARM_Robe_Priest_A.GOB_F_ARM_Robe_Priest_A_Mesh_LOD2.4" />
+													<attribute id="NbClosestVertices" type="int32" value="1329" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+								<node id="Object">
+									<attribute id="MapKey" type="FixedString" value="GOB_F_ARM_Robe_Priest_A.GOB_F_ARM_Robe_Priest_A_Cloth_Mesh_LOD3.7" />
+									<children>
+										<node id="MapValue">
+											<children>
+												<node id="Object">
+													<attribute id="ClosestVertices" type="ScratchBuffer" value="eNqNVG1b2kAQHEWEYismUihVi0mVWClgjPT//7Pr7OxdEnj6ofBkbm9uX2739q7AFhsUCPzZeM95QeYcwCVWnJf8V+QKjluMkWEveSXc8Cukt5KfskXnO6xarBjN7CvF2sfoRW8nZcRKvjz6hjE2sig03kvH4oYwwBmm+C3mDEOOU8mvYl+pP8RX3FH+Ln6KAVlbudM4xbX4L3jBDguypm3MAjPKO80uqDXhqvG/hC9RJ+02hAoNPpjTmDs0uVTGDef7ljE5hK20XHMsD6ZhfCFMzJCroN5G8jkzHURvbrvGT0a0KBa95MwjJvQ9mFaDnKeXoxZv/t3KeUfPYi0v7m3FL4RnPOGRcZ7lyWwfhVfCS9xyfMMnXFGqJb8TD1p9j/hE6x9Es7phJQ94wB99Icy54lIIxoUw4n5CyDDSvixj2+MIxiS+4axSxMsTnSZamWw+3apR/gmNT1hptSbvcT+URR59W3Z166eBI2C99iZ+gguO1xGtO27EJ5zgM/82m7CLTDZ+SA+Wu8kz4QPmrIJXwOpxOJJtn5nO3fsndcuSXTrnt5Rsfpb4BseZ+AUlx3QvBup163hjdhqtN25Vg6ztnCb2UdbWcxw7N4uauaqR9+oO5eV97prHDKKHvo5Ft53kvfPK4+nkOplacfqn1mkm/YQZOtss7q5v1d2XNRzT/S1bTO+SvTxJTkzHJ1y1stsm3Ebe3zp/i/zN6d90v91+a45z9MxTl2bRqpOPX93Tt7d7byvNuhcpZdq9DI7pxhl69//vKXcnWLf3ND85x3QK/65zV9Wylf8CW925Fw==" />
+													<attribute id="Name" type="FixedString" value="GOB_F_ARM_Robe_Priest_A.GOB_F_ARM_Robe_Priest_A_Mesh_LOD3.6" />
+													<attribute id="NbClosestVertices" type="int32" value="849" />
+												</node>
+											</children>
+										</node>
+									</children>
+								</node>
+							</children>
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="703c2075-41fe-3d02-98b8-b46a9b7a9f86" />
+							<attribute id="ObjectID" type="FixedString" value="GOB_F_ARM_Robe_Priest_A.GOB_F_ARM_Robe_Priest_A_Mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="9e2966c7-b61c-4bc1-bef1-a79cb5fde067" />
+							<attribute id="ObjectID" type="FixedString" value="GOB_F_ARM_Robe_Priest_A.GOB_F_ARM_Robe_Priest_A_Cloth_Mesh.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="703c2075-41fe-3d02-98b8-b46a9b7a9f86" />
+							<attribute id="ObjectID" type="FixedString" value="GOB_F_ARM_Robe_Priest_A.GOB_F_ARM_Robe_Priest_A_Mesh_LOD1.2" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="9e2966c7-b61c-4bc1-bef1-a79cb5fde067" />
+							<attribute id="ObjectID" type="FixedString" value="GOB_F_ARM_Robe_Priest_A.GOB_F_ARM_Robe_Priest_A_Cloth_Mesh_LOD1.3" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="703c2075-41fe-3d02-98b8-b46a9b7a9f86" />
+							<attribute id="ObjectID" type="FixedString" value="GOB_F_ARM_Robe_Priest_A.GOB_F_ARM_Robe_Priest_A_Mesh_LOD2.4" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="2" />
+							<attribute id="MaterialID" type="FixedString" value="9e2966c7-b61c-4bc1-bef1-a79cb5fde067" />
+							<attribute id="ObjectID" type="FixedString" value="GOB_F_ARM_Robe_Priest_A.GOB_F_ARM_Robe_Priest_A_Cloth_Mesh_LOD2.5" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="3" />
+							<attribute id="MaterialID" type="FixedString" value="703c2075-41fe-3d02-98b8-b46a9b7a9f86" />
+							<attribute id="ObjectID" type="FixedString" value="GOB_F_ARM_Robe_Priest_A.GOB_F_ARM_Robe_Priest_A_Mesh_LOD3.6" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="3" />
+							<attribute id="MaterialID" type="FixedString" value="9e2966c7-b61c-4bc1-bef1-a79cb5fde067" />
+							<attribute id="ObjectID" type="FixedString" value="GOB_F_ARM_Robe_Priest_A.GOB_F_ARM_Robe_Priest_A_Cloth_Mesh_LOD3.7" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

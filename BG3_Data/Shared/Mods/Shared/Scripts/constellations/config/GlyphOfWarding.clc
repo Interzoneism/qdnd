@@ -1,0 +1,15 @@
+game.configs.GlyphOfWarding = Config{
+    params={
+        Projectile = {
+            type = EParamType.String,
+            help = [[The projectile that explodes]],
+            required = false,
+            default = [[Projectile_Fireball_Trap]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.GlyphOfWarding,
+            Projectile = params.Projectile,
+        },
+    }
+}

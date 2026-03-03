@@ -1,0 +1,16 @@
+
+
+game.roots.DefaultTrap = State{function()
+    description = [[Basis for everything that does not require any base root logic.
+        Do not add logic in this root unless it can apply to all traps/triggers. ]]
+   
+    params.logic = {type = EParamType.State, help=[[
+        Component that contains trap logic
+    ]]}
+
+    nodes.logic = Proxy{
+        params.logic,
+    }
+
+end
+}

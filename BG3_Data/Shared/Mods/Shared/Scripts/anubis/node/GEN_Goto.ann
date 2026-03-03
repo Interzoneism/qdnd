@@ -1,0 +1,135 @@
+game.states.genMoveTo = State{function ()
+    -- Script-based go to
+    local genMoveToParameters = {}
+    local genMoveToForceupdating = false
+    local genMoveToForceupdate = false
+    local genMoveToTries = 0
+
+    self.Valid = function()
+        return (#genMoveToParameters > 0)
+    end
+
+    -- Functions
+    helpers.UpdateForceUpdate = function()
+        genMoveToForceupdate = false
+        if #genMoveToParameters > 0 then
+            for _,paramSet in ipairs(genMoveToParameters) do
+                genMoveToForceupdate = genMoveToForceupdate or paramSet.forceUpdate --If any of the remaining states want to continue force updating, keep force updating until you reach your destination.
+            end
+        end
+        if genMoveToForceupdating ~= genMoveToForceupdate then
+            SetForceUpdate(me, genMoveToForceupdate)
+            genMoveToForceupdating = genMoveToForceupdate
+        end
+    end
+
+    helpers.CleanupGoTo = function()
+        SetEntityEventToken(me, genMoveToParameters[1].waitToken, genMoveToParameters[1].arriveEvent)
+        table.remove(genMoveToParameters, 1)
+        helpers.UpdateForceUpdate()
+        genMoveToTries = 0
+    end
+
+    helpers.IntToBool = function(Int) -- This allows Osiris to submit 0 or 1 ints, but Anubis to use Bools.
+        if not Int then
+            return nil --If you get nil, return nil
+        end
+        if type(Int) ~= "number" and type(Int) ~= "boolean" then
+            DebugLog("Anubis Moveto parameter ForceUpdate is neither a boolean nor a number for "..me.Name..".")
+        end
+        return ((type(Int) == "number" and Int ~= 0) or (type(Int) == "boolean" and Int))
+    end
+
+    helpers.addMoveToDestinations = function(inputDestinationList, inputForceUpdate, inputMinDistance, inputMovementSpeed, inputArriveEvent, inputMaxDistance, inputLongPath, inputShouldArrive, inputWaitToken)
+
+        --- Define default values
+        inputForceUpdate = inputForceUpdate or false
+        inputMovementSpeed = inputMovementSpeed or MovementSpeed.Walk
+        inputMinDistance = inputMinDistance or 1.5
+        inputMaxDistance = inputMaxDistance or (inputMinDistance + 1.0)
+        inputArriveEvent = inputArriveEvent or ""
+        inputLongPath = inputLongPath or false
+        inputShouldArrive = inputShouldArrive or false
+        inputWaitToken = inputWaitToken or 0
+
+        if inputDestinationList then
+            for i, inputDestination in ipairs(inputDestinationList) do
+                if i == #inputDestinationList  then
+                    table.insert(genMoveToParameters, {destination = inputDestination,
+                                                    forceUpdate = inputForceUpdate,
+                                                    movementSpeed = inputMovementSpeed,
+                                                    minDistance = inputMinDistance,
+                                                    maxDistance = inputMaxDistance,
+                                                    arriveEvent = inputArriveEvent,
+                                                    longPath = inputLongPath,
+                                                    shouldArrive = inputShouldArrive,
+                                                    waitToken = inputWaitToken})
+                    genMoveToForceupdate = genMoveToForceupdate or inputForceUpdate
+                else
+                    table.insert(genMoveToParameters, {destination = inputDestination,
+                                                       forceUpdate = inputForceUpdate,
+                                                       movementSpeed = inputMovementSpeed,
+                                                       minDistance = inputMinDistance,
+                                                       maxDistance = inputMaxDistance,
+                                                       arriveEvent = "", --Throw event only on final arrival
+                                                       longPath = inputLongPath,
+                                                       shouldArrive = inputShouldArrive,
+                                                       waitToken = inputWaitToken})
+                end
+            end
+            helpers.UpdateForceUpdate()
+        end
+    end
+
+    events.EntityEvent = function(e)
+        if  e.TargetEntity ~= me then
+            return
+        end
+
+        if string.lower(e.Event) == "gen_anubismoveto" then
+            if e.Params[1] then
+                helpers.addMoveToDestinations({e.Params[1]}, helpers.IntToBool(e.Params[2]), e.Params[3], MovementSpeed[e.Params[4]], e.Params[5], e.Params[6], helpers.IntToBool(e.Params[7]), helpers.IntToBool(e.Params[8]), e.WaitToken)
+            else
+                DebugLog(me.Name.." is missing destination parameter for move to.")
+            end
+        elseif string.lower(e.Event) == "gen_anubismovetolist" then
+            if e.Params[1] then
+                helpers.addMoveToDestinations(e.Params[1], helpers.IntToBool(e.Params[2]), e.Params[3], MovementSpeed[e.Params[4]], e.Params[5], e.Params[6], helpers.IntToBool(e.Params[7]), helpers.IntToBool(e.Params[8]), e.WaitToken)
+            else
+                DebugLog(me.Name.." is missing destination parameter for move to.")
+            end
+        elseif string.lower(e.Event) == "gen_anubismovetocancel" and e.TargetEntity == me then
+            genMoveToParameters = {}
+            helpers.UpdateForceUpdate()
+            genMoveToTries = 0
+            --[[elseif string.lower(e.Event) == "gen_anubismovetocanceldialog" and e.TargetEntity == me then
+            SetEntityEventToken(me, e.WaitToken, "MoveToCancelled")
+            genMoveToParameters = {}
+            helpers.UpdateForceUpdate()]]
+        end
+    end
+
+    -- Anubis-based GoTo
+    nodes.AnubisGoTo = Action{
+        OnEnter = function()
+            helpers.UpdateForceUpdate()
+        end,
+        function()
+            genMoveToTries = genMoveToTries + 1
+            -- avoid getting stuck here forever; the caller can call this routine
+            -- again if moving to the target is still valid
+            if genMoveToTries > 10 then
+                helpers.CleanupGoTo()
+                return
+            end
+
+            try
+                MoveTo(genMoveToParameters[1].destination, genMoveToParameters[1].movementSpeed, genMoveToParameters[1].shouldArrive, genMoveToParameters[1].longPath, genMoveToParameters[1].minDistance, genMoveToParameters[1].maxDistance)
+                helpers.CleanupGoTo()
+            catch e if ls.CheckType(e, error.MovementFailed) then
+                Sleep(3.0)
+            end
+        end
+    }
+end
+}

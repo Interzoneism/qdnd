@@ -1,0 +1,18 @@
+game.configs.DefaultMonster = Config{
+    params={
+        CustomFallback = {
+            type = EParamType.String,
+            help = [[        Custom Action to override the Fallback behaviour
+    ]],
+            required = false,
+            default = [[FALLBACK]]
+        },
+    },
+    root=StateRef{game.roots.DefaultCharacter,
+        combat = StateRef{game.states.DefaultCombat,
+            CustomFallback = params.CustomFallback,
+        },
+        genericBehaviours = StateRef{game.states.CrimesHumanoid},
+        idle = StateRef{game.states.Dummy},
+    }
+}

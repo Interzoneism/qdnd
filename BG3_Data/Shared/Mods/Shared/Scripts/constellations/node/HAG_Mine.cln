@@ -1,0 +1,190 @@
+game.states.HAG_Mine = State{
+    function()
+
+        description = [[Hag mine. Like a mine, but turns off when under the effects of a status.]]
+        
+        params.DC = {
+            type = EParamType.String,
+            default="HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f",
+            help=[[Perception check DC.]]
+        }
+
+        params.WeightLimit = {
+            type = EParamType.Number,
+            help = [[Max Weight]],
+            default = 50.0,
+        }
+
+
+        params.Inverted = {
+            type = EParamType.Bool,
+            help = [[Inverts the mine logic - it explodes when weight is taken off it.]],
+            default = false
+        }
+
+        params.DamageTypes = {
+            type = EParamType.String,
+            arrayRange="0..",
+            help = [[Types of damage that affect the mine]],
+            default = {},
+        }
+
+        params.ExcludeDamageTypes = {
+            type = EParamType.Bool,
+            default = false,
+            help = "Instead of trying to match the damage types, ignore them"
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = "Does the trap start on?"
+        }
+
+        params.Projectile = {
+            type = EParamType.String,
+            default = "Projectile_Fireball_Trap",
+            help = [[The projectile that explodes]]
+        }
+
+
+        params.MinDistance = {
+            type = EParamType.Number,
+            required=false,
+            default=6,
+            help=[[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]]
+        }
+
+        params.Skill = {
+            type = EParamType.String,
+            default="Perception",
+            help=[[The skill checked.]]
+        }
+
+        params.Type = {
+            type = EParamType.String,
+            default="Interactable",
+            help=[[
+            Type of invisibility. Options:
+            None: No perception logic.
+            Invisible: Object is invisible until discovered
+            Interactable: Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped: Hides trapped state until discovered.
+            Highlight: Object is highlighted when noticed.
+            ]]
+        }
+
+        params.VFXOff = {type = EParamType.String,
+            required = false,
+            default = "",
+            help = [[VFX while mine is disabled and has been spotted.]]
+        }
+
+        params.VFXOffBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = [[Bone on which the 'VFXOff' VFX is played.]]
+        }
+
+        params.VFXOn = {type = EParamType.String,
+            required = false,
+            default = "VFX_Script_Trap_Overlay_Red_01_a7361f25-e942-e071-7ce3-7a8182f4e0ef",
+            help = [[VFX while mine is enabled and has been spotted.]]
+        }
+
+        params.VFXOnBone = {type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = [[Bone on which the enabled-VFX is played.]]
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_Off",
+            help = "Sound when mine is disabled"
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_On",
+            help = "Sound when mine is enabled"
+        }
+
+        
+        inputs.Enable = {}
+        inputs.Disable = {}
+
+
+        outputs.EnableInt = {internal = true}
+        outputs.DisableInt = {internal = true}
+        outputs.ExplodeInt = {internal = true}
+
+        outputs.RevealInt = {internal = true}
+
+        nodes.Mine = Proxy{
+            game.states.Mine,
+            params = {StartEnabled = params.StartEnabled,
+                        DC = params.DC,
+                        MinDistance = params.MinDistance,
+                        Skill = params.Skill,
+                        Type = params.Type,
+                        VFXOn= params.VFXOn,
+                        VFXOff = params.VFXOff,
+                        VFXOnBone = params.VFXOnBone,
+                        VFXOffBone = params.VFXOffBone,
+                        SoundOn = params.SoundOn,
+                        SoundOff = params.SoundOff,
+                        WeightLimit = params.WeightLimit,
+                        DamageTypes = params.DamageTypes,
+                        AbsoluteValueThreshold = true,
+                        DamageThreshold = 1.0,
+                        ExcludeDamageTypes = params.ExcludeDamageTypes,
+                        Inverted = params.Inverted,
+                        Projectile = params.Projectile},
+            inputs = {Enable = {outputs.EnableInt},
+                        Disable = {outputs.DisableInt},
+                        Reveal = {outputs.RevealInt}},
+        }
+
+        self.OnInit = function(ev)
+            if me.Blackboard.GetFact("Cnst.HAG.On") == nil then
+                if params.StartEnabled then
+                    me.Blackboard.SetFact("Cnst.HAG.On", 1)
+                else
+                    me.Blackboard.SetFact("Cnst.HAG.On", 0)
+                end
+            end
+        end
+
+        socketEvents.Enable = function(ev)
+            me.Blackboard.SetFact("Cnst.HAG.On", 1)
+            if not HasActiveStatus(me, "HAG_MASK_ILLUSION") then
+                TriggerOutput(outputs.EnableInt, ev.Object)
+            end
+        end
+
+        socketEvents.Disable = function(ev)
+            me.Blackboard.SetFact("Cnst.HAG.On", 0)
+            TriggerOutput(outputs.DisableInt, ev.Object)
+        end
+
+        events.StatusApplied = function(ev)
+            if ev.Status.StatusID == "HAG_MASK_ILLUSION" then
+                local causeEntity = ev.CauseEntity and ev.CauseEntity.EntityRef or nil
+                TriggerOutput(outputs.DisableInt, causeEntity)
+                TriggerOutput(outputs.RevealInt, causeEntity, true)
+            end
+        end
+
+        events.StatusRemoved = function(ev)
+            if ev.Status.StatusID == "HAG_MASK_ILLUSION" and
+               me.Blackboard.GetFact("Cnst.HAG.On") == 1 then
+                local causeEntity = ev.CauseEntity and ev.CauseEntity.EntityRef or nil
+                TriggerOutput(outputs.EnableInt, causeEntity)
+            end
+        end
+            
+    end
+
+
+}

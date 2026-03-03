@@ -1,0 +1,107 @@
+game.configs.TripWire = Config{
+    params={
+        VFXOff = {
+            type = EParamType.String,
+            help = [[VFX while mine is disabled and has been spotted.]],
+            required = false,
+            default = [[]]
+        },
+        MinDistance = {
+            type = EParamType.Number,
+            help = [[Minimum distance that players are required to be in for the skill check. A distance of 0 disables the check.]],
+            required = false,
+            default = 6
+        },
+        VFXOn = {
+            type = EParamType.String,
+            help = [[VFX while mine is enabled and has been spotted.]],
+            required = false,
+            default = [[VFX_Script_Trap_Overlay_Red_01_a7361f25-e942-e071-7ce3-7a8182f4e0ef]]
+        },
+        VFXOffBone = {
+            type = EParamType.String,
+            help = [[Bone on which the 'VFXOff' VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        Skill = {
+            type = EParamType.String,
+            help = [[The skill checked.]],
+            required = false,
+            default = [[Perception]]
+        },
+        Type = {
+            type = EParamType.String,
+            help = [[            Type of invisibility. Options:
+            None - No perception logic.
+            Invisible - Object is invisible until discovered
+            Interactable - Object is uninteractable (like scenery) until discovered. Also hides 'trapped' state, if object is trapped.
+            Trapped - Hides trapped state until discovered.
+            Highlight - Object is highlighted when noticed.
+            ]],
+            required = false,
+            default = [[Invisible]]
+        },
+        SoundOn = {
+            type = EParamType.String,
+            help = [[Sound when mine is enabled]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_On]]
+        },
+        DC = {
+            type = EParamType.String,
+            help = [[Perception check DC.]],
+            required = false,
+            default = [[HiddenPerception_Medium_cd1800ab-1b11-4c7a-9f50-fdeb8d35481f]]
+        },
+        VFXOnBone = {
+            type = EParamType.String,
+            help = [[Bone on which the enabled-VFX is played.]],
+            required = false,
+            default = [[Dummy_FX]]
+        },
+        SoundOff = {
+            type = EParamType.String,
+            help = [[Sound when mine is disabled]],
+            required = false,
+            default = [[PUZ_Trap_Mechanical_Off]]
+        },
+        StartEnabled = {
+            type = EParamType.Bool,
+            help = [[Does the tripwire start on?]],
+            required = false,
+            default = true
+        },
+        DestroyOnDisarm = {
+            type = EParamType.Bool,
+            help = [[Does the item break on Disarm?]],
+            required = false,
+            default = true
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.Tripwire,
+            DC = params.DC,
+            MinDistance = params.MinDistance,
+            Skill = params.Skill,
+            SoundOff = params.SoundOff,
+            SoundOn = params.SoundOn,
+            StartEnabled = params.StartEnabled,
+            Type = params.Type,
+            VFXOff = params.VFXOff,
+            VFXOffBone = params.VFXOffBone,
+            VFXOn = params.VFXOn,
+            VFXOnBone = params.VFXOnBone,
+            DestroyOnDisarm = params.DestroyOnDisarm,
+        },
+    },
+    inputs={
+        Disable=ExtSocket{description=[[Turn the tripwire 'off'.]],{SocketRef{[[root.logic.inputs.Disable]]}}},
+        Enable=ExtSocket{description=[[Turn the tripwire 'on'.]],{SocketRef{[[root.logic.inputs.Enable]]}}},
+        Trip=ExtSocket{description=[[Trigger the tripwire.]],{SocketRef{[[root.logic.inputs.Trip]]}}},
+        Reveal=ExtSocket{description=[[Reveals the tripwire. Use boolean True as parameter to do so without an AD.]],{SocketRef{[[root.logic.inputs.Reveal]]}}},
+    },
+    outputs={
+        Tripped=ExtSocket{description=[[Tripwire was tripped.]],{SocketRef{[[root.logic.outputs.Tripped]]}}},
+    }
+}

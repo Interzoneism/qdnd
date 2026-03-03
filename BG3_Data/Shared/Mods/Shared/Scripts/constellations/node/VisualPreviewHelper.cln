@@ -1,0 +1,78 @@
+game.states.VisualPreviewHelper = State{
+    function()
+        params.PreviewEffect = {
+            type = EParamType.String,
+            required = true,
+            help = "VFX shown in the preview for this item."
+        }
+
+        params.PreviewEffectBone = {
+            type = EParamType.String,
+            required = false,
+            default = "Dummy_FX",
+            help = "Bone on which the preview VFX is played."
+        }
+
+        params.StartActive = {
+            type = EParamType.Bool,
+            required = false,
+            default = true,
+            help = "Whether the VFX is shown by default when the object is first loaded."
+        }
+
+        inputs.Enable = {}
+        inputs.Disable = {}
+
+        local previewFXFact = "Cnst.VisualPreviewHelper.PreviewFX"
+        
+        -- This flag is used to distinguish when we first enter Editor mode (where we should respect the isEnabled state) 
+        -- vs. when using the right-click menu command "Create Preview Visuals"
+        local inEditor = false
+
+        -- This flag is used to store the current state of the preview - which can be manipulated by the embedding script
+        -- f.e. to reflect an ingame state.
+        local isEnabled = params.StartActive
+
+        helpers.SwitchPreviewVFX = function(on)
+            local previewFX = PlayingEffect(me.Blackboard.GetFact(previewFXFact))
+            if previewFX == nil and on then
+                local previewFXPrepared = params.PreviewEffect ~= "" and PrepareEffect(params.PreviewEffect) or nil
+                previewFX = previewFXPrepared and PlayEffectAt(previewFXPrepared, me, params.PreviewEffectBone) or nil
+        
+                if previewFX ~= nil then
+                    me.Blackboard.SetFact(previewFXFact, previewFX.Handle)
+                end
+            elseif previewFX ~= nil and not on then
+                StopEffect(previewFX)
+                me.Blackboard.ClearFact(previewFXFact)
+            end
+        end
+
+        events.GameRunningStarted = function(ev)
+            inEditor = false
+        end
+
+        self.OnEditorChanges = function(ev)
+            helpers.SwitchPreviewVFX(false)
+            helpers.SwitchPreviewVFX(isEnabled)
+            inEditor = true
+        end
+        
+        self.OnCreateEditorPreviewVisual = function(ev)
+            helpers.SwitchPreviewVFX(inEditor or isEnabled)
+            inEditor = true
+        end
+        
+        self.OnDestroyEditorPreviewVisual = function(ev)
+            helpers.SwitchPreviewVFX(false)
+        end
+
+        socketEvents.Enable = function(ev)
+            isEnabled = true
+        end
+
+        socketEvents.Disable = function(ev)
+            isEnabled = false
+        end
+    end
+}

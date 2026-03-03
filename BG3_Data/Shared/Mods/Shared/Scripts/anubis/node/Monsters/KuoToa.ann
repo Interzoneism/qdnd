@@ -1,0 +1,26 @@
+game.states.KuoToa = State { function ()
+    description = [[
+        Behaviour for the KuoToa. Simply wandering around and spawns water trail.
+    ]]
+
+    modules = { "shared.math" }
+
+    local basePosition
+
+    self.OnInit = function()
+        basePosition = me.Position
+    end
+
+    nodes.AcidTrailSpawn = Proxy{
+        game.states.SurfaceTrailSpawner,
+        params = {
+            SurfaceType = "WATER"
+        }
+    }
+
+    nodes.Default = Action{
+        function()
+            WaitForInterrupt()
+        end
+    }
+end}

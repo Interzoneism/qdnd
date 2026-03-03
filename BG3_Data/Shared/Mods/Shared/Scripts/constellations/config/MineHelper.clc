@@ -1,0 +1,25 @@
+game.configs.MineHelper = Config{
+    params={
+        TargetEntity = {
+            type = EParamType.String,
+            help = [[Object to whose damage you're reacting.]],
+            required = false,
+            default = [[me]]
+        },
+        Projectile = {
+            type = EParamType.String,
+            help = [[Projectile when mine explodes]],
+            required = false,
+            default = [[Projectile_Fireball_Trap]]
+        },
+    },
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.Explode,
+            Projectile = params.Projectile,
+            TargetEntity = params.TargetEntity,
+        },
+    },
+    inputs={
+        GoOff=ExtSocket{description=[[Trigger mine]],{SocketRef{[[root.logic.inputs.Explode]]}}},
+    }
+}

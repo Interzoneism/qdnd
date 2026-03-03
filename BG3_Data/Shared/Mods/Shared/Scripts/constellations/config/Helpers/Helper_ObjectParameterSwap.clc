@@ -1,0 +1,11 @@
+game.configs.Helper_ObjectParameterSwap = Config{
+    root=StateRef{game.roots.DefaultTrap,
+        logic = StateRef{game.states.Helper_ObjectParameterSwap},
+    },
+    inputs={
+        In=ExtSocket{description=[[In socket]],{SocketRef{[[root.logic.inputs.In]]}}},
+    },
+    outputs={
+        Out=ExtSocket{description=[[]],{SocketRef{[[root.logic.outputs.Out]]}}},
+    }
+}

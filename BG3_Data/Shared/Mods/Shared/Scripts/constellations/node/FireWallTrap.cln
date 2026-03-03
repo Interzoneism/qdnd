@@ -1,0 +1,220 @@
+game.states.FirewallTrap = State{
+    function()
+
+        params.DC = {
+            type = EParamType.String,
+            default="DC_Legacy_15_bddbb9b8-a242-4c3e-a2eb-3fd274c0c539",
+            help=[[Perception check DC.]]
+        }
+
+        params.StartEnabled = {
+            type = EParamType.Bool,
+            default = true,
+            help = "Does the trap start on?"
+        }
+
+        params.SoundOn = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_On",
+            help = "Sound when trap is turned on"
+        }
+
+        params.SoundOff = {
+            type = EParamType.String,
+            default = "PUZ_Trap_Mechanical_Off",
+            help = "Sound when trap is turned off"
+        }
+
+        params.DestroyOnDisarm = {
+            type=EParamType.Bool,
+            default = true,
+            help = "Does the item break on Disarm?"
+        }
+
+
+        description = [[Plays a fire VFX.]]
+
+        inputs.Enable = {help = "Turns this ring on"}
+        inputs.Disable = {help = "Turns this ring off"}
+        outputs.Enabled = {help = "Ring has turned on"}
+        outputs.Disabled = {help = "Ring has turned off"}
+        outputs.StopTimer = {internal = true}
+        inputs.Timer = {internal = true}
+
+        nodes.PerceptionDisarmOnOff = Proxy{
+            game.states.PerceptionDisarmOnOff,
+            params = {VFXOn = "VFX_Script_UND_KathericCity_FireTrap_Small_01_aae8a4f7-a16f-06d2-5ce2-3054f9de5596",
+                      VFXOff = "",
+                      Type = "Interactable",
+                      SoundOn = params.SoundOn,
+                      SoundOff = params.SoundOff,
+                      StartEnabled = params.StartEnabled,
+                      DestroyOnDisarm = params.DestroyOnDisarm},
+            inputs = {Enable = {outputs.Enabled},
+                      Reveal = {outputs.Enabled},
+                      Disable = {outputs.Disabled}},
+            outputs = {Disarmed = {inputs.Disable}}
+            }
+
+        nodes.Timer = Proxy{
+            game.states.Timer,
+            params = {StartActive = params.StartEnabled,
+                      TickLength = 6.0,
+                      Repeats = -1,
+                      TargetEntity = "me"},
+            outputs = {Tick = {inputs.Timer}},
+            inputs = {Start = {outputs.Enabled},
+                      Stop = {outputs.StopTimer}}
+        }
+
+        helpers.Init = function()
+            if me.Blackboard.GetFact("Cnst.FirewallTrap.Active") == nil then
+                if params.StartEnabled then
+                    me.Blackboard.SetFact("Cnst.FirewallTrap.Active", 1)
+                else
+                    me.Blackboard.SetFact("Cnst.FirewallTrap.Active", 0)
+                end
+                me.Blackboard.SetFact("Cnst.BUGFIX.GUS-286048", 1)
+            elseif me.Blackboard.GetFact("Cnst.BUGFIX.GUS-286048") == nil then
+                me.Blackboard.SetFact("Cnst.BUGFIX.GUS-286048", 1)
+                if me.Blackboard.GetFact("Cnst.FirewallTrap.Active") == 1 and
+                   me.Blackboard.GetFact("Cnst.Disarm.WasDisarmed") == 0 then
+                    TriggerOutput(outputs.Disabled, ev.Object, ev.Param)
+                end
+            end
+        end
+
+        self.OnEditorChanges = function()
+            helpers.Init()
+        end
+
+        self.OnInit = function()
+            if me.Blackboard.GetFact("Cnst.FirewallTrap.Active") ~= nil then
+                return
+            end
+
+            helpers.Init()
+        end
+
+        socketEvents.Enable = function(ev)
+            if me.Blackboard.GetFact("Cnst.FirewallTrap.Active") == 0 and
+               me.Blackboard.GetFact("Cnst.Disarm.WasDisarmed") == 0 then
+                me.Blackboard.SetFact("Cnst.FirewallTrap.Active", 1)
+                TriggerOutput(outputs.Enabled, ev.Object, ev.Param)
+            end
+        end
+
+        socketEvents.Timer = function(ev)
+            -- The "On" state from PerceptionDisarmOnOff
+            if me.Blackboard.GetFact("On") == 1 then
+                TriggerOutput(outputs.Disabled, ev.Object, ev.Param)
+            else
+                TriggerOutput(outputs.Enabled, ev.Object, ev.Param)
+            end
+        end
+
+        socketEvents.Disable = function(ev)
+            if me.Blackboard.GetFact("Cnst.FirewallTrap.Active") == 1 then
+                me.Blackboard.SetFact("Cnst.FirewallTrap.Active", 0)
+                TriggerOutput(outputs.StopTimer, ev.Object, ev.Param)
+                TriggerOutput(outputs.Disabled, ev.Object, ev.Param)
+            end
+        end
+
+    end
+}
+
+
+game.states.FirewallTrigger = State{
+    function()
+
+        description = [[Area in which characters and items get set on fire.]]
+
+        inputs.On1 = {}
+        inputs.On2 = {}
+        inputs.Off1 = {}
+        inputs.Off2 = {}
+
+        inputs.Enable = {internal = true}
+        inputs.Disable = {internal = true}
+
+        outputs.On1Int = {internal = true}
+        outputs.On2Int = {internal = true}
+        outputs.Off1Int = {internal = true}
+        outputs.Off2Int = {internal = true}
+
+
+        outputs.EnableStatusTrigger = {internal = true}
+        outputs.DisableStatusTrigger = {internal = true}
+
+        params.StartOn1 = {type = EParamType.Bool, default = false, help = [[Does the first object start on?]]}
+        params.StartOn2 = {type = EParamType.Bool, default = false, help = [[Does the second object start on?]]}
+
+        nodes.OrGate = Proxy{
+            game.states.LogicGate_OR,
+            params = {StartOn1 = params.StartOn1,
+                      StartOn2 = params.StartOn2},
+            inputs = {On1 = {outputs.On1Int},
+                      On2 = {outputs.On2Int},
+                      Off1 = {outputs.Off1Int},
+                      Off2 = {outputs.Off2Int}},
+            outputs = {On = {inputs.Enable},
+                       Off = {inputs.Disable}}
+        }
+
+        nodes.StatusTrigger = Proxy{
+            game.states.StatusTrigger,
+            params = {StartEnabled = false,
+                      Status = "BURNING_TRAPWALL"},
+            inputs = {Enable = {outputs.EnableStatusTrigger},
+                      Disable = {outputs.DisableStatusTrigger}}
+        }
+
+        socketEvents.On1 = function(ev)
+            TriggerOutput(outputs.On1Int, ev.Object, ev.Param)
+        end
+
+        socketEvents.On2 = function(ev)
+            TriggerOutput(outputs.On2Int, ev.Object, ev.Param)
+        end
+        socketEvents.Off1 = function(ev)
+            TriggerOutput(outputs.Off1Int, ev.Object, ev.Param)
+        end
+
+        socketEvents.Off2 = function(ev)
+            TriggerOutput(outputs.Off2Int, ev.Object, ev.Param)
+        end
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.EnableStatusTrigger, ev.Object, ev.Param)
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.DisableStatusTrigger, ev.Object, ev.Param)
+        end
+    end
+}
+
+
+game.states.FirewallConstellation = State{
+    function()
+
+        description = [[Area in which the character gets set on fire.]]
+
+        inputs.Enable = {help = "Turns this object on"}
+        inputs.Disable = {help = "Turns this object off"}
+
+        outputs.On = {}
+        outputs.Off = {}
+
+
+        socketEvents.Enable = function(ev)
+            TriggerOutput(outputs.On, ev.Object)
+        end
+
+        socketEvents.Disable = function(ev)
+            TriggerOutput(outputs.Off, ev.Object)
+        end
+
+    end
+}

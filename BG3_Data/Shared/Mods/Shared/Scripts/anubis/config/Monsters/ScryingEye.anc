@@ -1,0 +1,19 @@
+game.configs.ScryingEye = Config{
+    params={
+        patrolSpline = {
+            type = EParamType.String,
+            help = [[Spline to patrol]],
+            required = false,
+            default = nil,
+        },
+    },
+    root=StateRef{game.roots.DefaultCharacter,
+        genericBehaviours = StateRef{game.states.CrimesHumanoid},
+        idle = StateRef{game.states.GLO_ApplyStatus,
+            Status = [[LEVITATE]],
+            idle = StateRef{game.states.ScryingEye,
+                Route = params.patrolSpline
+            },
+        },
+    }
+}

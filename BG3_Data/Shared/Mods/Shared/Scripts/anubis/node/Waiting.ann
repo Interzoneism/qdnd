@@ -1,0 +1,62 @@
+-- State used for waiting for scenes or coordinating behaviours
+game.states.Waiting = State{function ()
+    -- State locals
+    local waitingFor = nil
+    local dialogToWaitFor = nil
+    local eventToWaitFor = nil
+    local dialogCurrent = nil
+
+    -- Helper functions
+    helpers.ClearWaitingInfo = function()
+        waitingFor = nil
+        eventToWaitFor = nil
+        dialogToWaitFor = nil
+    end
+
+    self.Valid = function()
+        return waitingFor ~= nil and (waitingFor ~= "DialogEnd"
+            or (dialogCurrent ~= nil and dialogCurrent == dialogToWaitFor))
+    end
+
+    -- events
+    events.EntityEvent = function(e)
+        --TODO: add type checks in here
+        if e.TargetEntity == me then
+            if e.Event == "WaitOnDialogEnd" then
+                waitingFor = "DialogEnd"
+                dialogToWaitFor = e.Params[1]
+            elseif e.Event == "WaitOnEvent" then
+                waitingFor = "Event"
+                eventToWaitFor = e.Params[1]
+            elseif e.Event == "StopWaitOnDialogEnd" and waitingFor == "DialogEnd" then
+                helpers.ClearWaitingInfo()
+            elseif e.Event == eventToWaitFor and waitingFor == "Event" then
+                helpers.ClearWaitingInfo()
+            end
+        end
+    end
+
+    events.DialogStarted = function(e)
+        dialogCurrent = e.Instance.DialogUUID
+    end
+
+    events.DialogEnded = function(e)
+        if waitingFor == "DialogEnd" and e.Instance.DialogUUID == dialogToWaitFor then
+            helpers.ClearWaitingInfo()
+        end
+        dialogCurrent = nil
+    end
+
+    self.OnEnter = function()
+        DebugText(me, "Entering [WAIT]")
+    end
+
+    self.OnLeave = function()
+        DebugText(me, "Leaving [WAIT]")
+    end
+
+    nodes.Waiting = function()
+        --DebugText(me, "[WAITING]")
+        WaitForInterrupt()
+    end
+end}

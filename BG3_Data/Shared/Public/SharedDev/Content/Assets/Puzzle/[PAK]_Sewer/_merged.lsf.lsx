@@ -1,0 +1,244 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<save>
+	<version major="4" minor="0" revision="9" build="0" lslib_meta="v1,bswap_guids,lsf_adjacency" />
+	<region id="VirtualTextureBank">
+		<node id="VirtualTextureBank">
+			<children>
+				<node id="Resource">
+					<attribute id="GTexFileName" type="FixedString" value="c2cadb9587a10cd6f355734ed01e704d" />
+					<attribute id="ID" type="FixedString" value="ec87a213-f547-b230-87a5-8d3e563458c4" />
+					<attribute id="Name" type="LSString" value="PUZ_Sewer_Gauge_A" />
+					<attribute id="Prefetch" type="bool" value="False" />
+					<attribute id="PrefetchMipLevel" type="int8" value="-1" />
+					<attribute id="ReferencedColorSpaces" type="uint32" value="6" />
+					<attribute id="VirtualTextureLayerConfig" type="uint32" value="3" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209032" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="PhysicsBank">
+		<node id="PhysicsBank">
+			<children>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="31455347-070e-f586-a64d-7d35851e7695" />
+					<attribute id="Name" type="LSString" value="PUZ_Sewer_Gauge_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Puzzle/Sewer/PUZ_Sewer_Gauge_ABC/PUZ_Sewer_Gauge_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Puzzle/Sewer/PUZ_Sewer_Gauge_ABC/PUZ_Sewer_Gauge_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209022" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="3d40edce-94a9-ddea-b1a5-4fa3bc35ae36" />
+					<attribute id="Name" type="LSString" value="PUZ_Sewer_Gauge_Pointer_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Puzzle/Sewer/PUZ_Sewer_Gauge_ABC/PUZ_Sewer_Gauge_Pointer_A.bin" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Puzzle/Sewer/PUZ_Sewer_Gauge_ABC/PUZ_Sewer_Gauge_Pointer_A" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209022" />
+				</node>
+				<node id="Resource">
+					<attribute id="ID" type="FixedString" value="45fab638-f742-3ee4-8b38-0d86a86307de" />
+					<attribute id="Name" type="LSString" value="PUZ_Sewer_Gauge_B" />
+					<attribute id="SourceFile" type="LSString" value="Public/SharedDev/Assets/Puzzle/Sewer/PUZ_Sewer_Gauge_ABC/PUZ_Sewer_Gauge_B.bin" />
+					<attribute id="Template" type="FixedString" value="Public/SharedDev/Assets/Puzzle/Sewer/PUZ_Sewer_Gauge_ABC/PUZ_Sewer_Gauge_B" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209022" />
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="MaterialBank">
+		<node id="MaterialBank">
+			<children>
+				<node id="Resource">
+					<attribute id="DiffusionProfileUUID" type="FixedString" value="" />
+					<attribute id="ID" type="FixedString" value="66f15b0f-5f61-fc8f-f544-f9f56679e15e" />
+					<attribute id="MaterialType" type="uint8" value="4" />
+					<attribute id="Name" type="LSString" value="PUZ_Sewer_Gauge_A" />
+					<attribute id="SourceFile" type="LSString" value="Public/Shared/Assets/Materials/Base/Base_VT.lsf" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209030" />
+					<children>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="False" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="SeeThroughEnabled" />
+							<attribute id="Value" type="float" value="0" />
+						</node>
+						<node id="ScalarParameters">
+							<attribute id="BaseValue" type="float" value="0.5" />
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ParameterName" type="FixedString" value="Reflectance" />
+							<attribute id="Value" type="float" value="0.5" />
+						</node>
+						<node id="Texture2DParameters">
+							<attribute id="Enabled" type="bool" value="False" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="" />
+							<attribute id="ID" type="FixedString" value="9dc5807b-3697-4b8f-ab0f-b9c5c1bd7010" />
+							<attribute id="IgnoreTexelDensity" type="bool" value="True" />
+							<attribute id="ParameterName" type="FixedString" value="" />
+						</node>
+						<node id="VirtualTextureParameters">
+							<attribute id="Enabled" type="bool" value="True" />
+							<attribute id="ExportAsPreset" type="bool" value="True" />
+							<attribute id="GroupName" type="FixedString" value="Texture Map" />
+							<attribute id="ID" type="FixedString" value="ec87a213-f547-b230-87a5-8d3e563458c4" />
+							<attribute id="Index" type="int32" value="0" />
+							<attribute id="ParameterName" type="FixedString" value="virtualtexture" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+	<region id="VisualBank">
+		<node id="VisualBank">
+			<children>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="c8fa12d1-a72c-54ff-63f1-3e502883a00d" />
+					<attribute id="BoundsMax" type="fvec3" value="1.1055013 1.8445588 1.3521304" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.57283527 -2.4094977 -1.0860237" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="1e79b92e-ef48-1948-cbc6-7231f9af2782" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="PUZ_Sewer_Gauge_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Puzzle/Sewer/PUZ_Sewer_Gauge_ABC/Resources/PUZ_Sewer_Gauge_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Puzzle/Sewer/PUZ_Sewer_Gauge_ABC/Resources/PUZ_Sewer_Gauge_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209032" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="66f15b0f-5f61-fc8f-f544-f9f56679e15e" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_Sewer_Gauge_A.PUZ_Sewer_Gauge_A_mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="66f15b0f-5f61-fc8f-f544-f9f56679e15e" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_Sewer_Gauge_A.PUZ_Sewer_Gauge_Pointer_A_mesh.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="66f15b0f-5f61-fc8f-f544-f9f56679e15e" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_Sewer_Gauge_A.PUZ_Sewer_Gauge_A_mesh_LOD1.2" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="66f15b0f-5f61-fc8f-f544-f9f56679e15e" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_Sewer_Gauge_A.PUZ_Sewer_Gauge_Pointer_A_mesh_LOD1.3" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="c8fa12d1-a72c-54ff-63f1-3e502883a00d" />
+					<attribute id="BoundsMax" type="fvec3" value="0.57285875 1.8445588 1.3521305" />
+					<attribute id="BoundsMin" type="fvec3" value="-1.1055013 -2.1939592 -0.8797944" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="48c0fbda-3bb9-9f5c-f796-ffdaadb83aba" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="PUZ_Sewer_Gauge_B" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Puzzle/Sewer/PUZ_Sewer_Gauge_ABC/Resources/PUZ_Sewer_Gauge_B.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Puzzle/Sewer/PUZ_Sewer_Gauge_ABC/Resources/PUZ_Sewer_Gauge_B.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209032" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="66f15b0f-5f61-fc8f-f544-f9f56679e15e" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_Sewer_Gauge_B.PUZ_Sewer_Gauge_B_mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="66f15b0f-5f61-fc8f-f544-f9f56679e15e" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_Sewer_Gauge_B.PUZ_Sewer_Gauge_Pointer_B_mesh.1" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="66f15b0f-5f61-fc8f-f544-f9f56679e15e" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_Sewer_Gauge_B.PUZ_Sewer_Gauge_B_mesh_LOD1.2" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="66f15b0f-5f61-fc8f-f544-f9f56679e15e" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_Sewer_Gauge_B.PUZ_Sewer_Gauge_Pointer_B_mesh_LOD1.3" />
+						</node>
+					</children>
+				</node>
+				<node id="Resource">
+					<attribute id="AttachBone" type="FixedString" value="" />
+					<attribute id="AttachmentSkeletonResource" type="FixedString" value="" />
+					<attribute id="BlueprintInstanceResourceID" type="FixedString" value="" />
+					<attribute id="BoundsMax" type="fvec3" value="0.028279273 0.3582839 -0.2012603" />
+					<attribute id="BoundsMin" type="fvec3" value="-0.028343754 -0.050158635 -0.21627845" />
+					<attribute id="ClothColliderResourceID" type="FixedString" value="" />
+					<attribute id="HairPresetResourceId" type="FixedString" value="" />
+					<attribute id="HairType" type="uint8" value="0" />
+					<attribute id="ID" type="FixedString" value="9bd64cba-3dde-7d9d-f3b3-a02ab1904927" />
+					<attribute id="MaterialType" type="uint8" value="0" />
+					<attribute id="Name" type="LSString" value="PUZ_Sewer_Gauge_Pointer_A" />
+					<attribute id="NeedsSkeletonRemap" type="bool" value="False" />
+					<attribute id="RemapperSlotId" type="FixedString" value="" />
+					<attribute id="ScalpMaterialId" type="FixedString" value="" />
+					<attribute id="SkeletonResource" type="FixedString" value="" />
+					<attribute id="SkeletonSlot" type="FixedString" value="" />
+					<attribute id="Slot" type="FixedString" value="Unassigned" />
+					<attribute id="SoftbodyResourceID" type="FixedString" value="" />
+					<attribute id="SourceFile" type="LSString" value="Generated/Public/SharedDev/Assets/Puzzle/Sewer/PUZ_Sewer_Gauge_ABC/Resources/PUZ_Sewer_Gauge_Pointer_A.GR2" />
+					<attribute id="SupportsVertexColorMask" type="bool" value="False" />
+					<attribute id="Template" type="FixedString" value="Generated/Public/SharedDev/Assets/Puzzle/Sewer/PUZ_Sewer_Gauge_ABC/Resources/PUZ_Sewer_Gauge_Pointer_A.Dummy_Root.0" />
+					<attribute id="_OriginalFileVersion_" type="int64" value="144115207403209023" />
+					<children>
+						<node id="AnimationWaterfall">
+							<attribute id="Object" type="FixedString" value="" />
+						</node>
+						<node id="Base" />
+						<node id="ClothProxyMapping" />
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="0" />
+							<attribute id="MaterialID" type="FixedString" value="66f15b0f-5f61-fc8f-f544-f9f56679e15e" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_Sewer_Gauge_Pointer_A.PUZ_Sewer_Gauge_Pointer_A_mesh.0" />
+						</node>
+						<node id="Objects">
+							<attribute id="LOD" type="uint8" value="1" />
+							<attribute id="MaterialID" type="FixedString" value="66f15b0f-5f61-fc8f-f544-f9f56679e15e" />
+							<attribute id="ObjectID" type="FixedString" value="PUZ_Sewer_Gauge_Pointer_A.PUZ_Sewer_Gauge_Pointer_A_mesh_LOD1.1" />
+						</node>
+					</children>
+				</node>
+			</children>
+		</node>
+	</region>
+</save>

@@ -1,0 +1,231 @@
+local m = AnubisModule()
+
+-- call engine's ls.anubis.game.deferred.Sleep with a random float duration
+-- in range [minSec, maxSec)
+m.action.SleepRandom = function(minSec, maxSec)
+    local sleepTime = math.random() * (maxSec - minSec) + minSec
+    Sleep(sleepTime) -- from ls.anubis.game.deferred
+end
+
+m.DebugTextLog = function(entity, formattedString)
+    DebugLog("[1]: [2]", entity.Name, formattedString)
+    DebugText(entity, formattedString)
+end
+
+m.RandomFrom = function(dict)
+    if #dict == 0 then
+        return nil
+    end
+
+    local keys = {}
+    for key, gob in pairs(dict) do
+        table.insert(keys, key)
+    end
+
+    local key = keys[math.random(1, #keys)]
+    return key, dict[key]
+end
+
+m.ContainsValue = function(aTable, value)
+    for _, v in pairs(aTable) do
+        if value == v then
+            return true
+        end
+    end
+    return false
+end
+
+m.GetFlagAny = function(flagList, entity)
+    for _, fl in pairs(flagList) do
+        if GetFlag(fl, entity) then
+            return true
+        end
+    end
+    return false
+end
+
+m.GetFlagAll = function(flagList, entity)
+    for _, fl in pairs(flagList) do
+        if not GetFlag(fl, entity) then
+            return false
+        end
+    end
+    return true
+end
+
+m.GetNearbyPlayer = function(source, distance)
+    local activeCharacters = GetActiveCharacters(source, distance)
+
+    for _,v in pairs(activeCharacters) do
+        if (v.Character.IsPlayer) then return v end
+    end
+
+    return nil
+end
+
+m.GetNearbyPartyMember = function(source, distance)
+    local activeCharacters = GetActiveCharacters(source, distance)
+
+    for _,v in pairs(activeCharacters) do
+        if (v.Character.IsPartyMember) then return v end
+    end
+
+    return nil
+end
+
+m.SetTableMapEntryOnBlackboard = function(entity, name, key, value)
+    local length = entity.Blackboard.GetFact(name .. "__Length")
+    local blackboardKeyVarName = name .. "__ItemWithKey__" .. tostring(key)
+    if length == nil then
+        length = 1
+        entity.Blackboard.SetFact(name .. "__IsArray", 0)
+        entity.Blackboard.SetFact(name .. "__Length", length)
+    else
+        local existingEntry = entity.Blackboard.GetFact(blackboardKeyVarName)
+        if existingEntry == nil then
+            length = length + 1
+            entity.Blackboard.SetFact(name .. "__Length", length)
+        else
+            me.Blackboard.ClearFact(blackboardKeyVarName)
+        end
+    end
+    entity.Blackboard.SetFact(name .. "__Key" .. tostring(length), key)
+    entity.Blackboard.SetFact(blackboardKeyVarName, value)
+end
+
+m.RemoveTableMapEntryOnBlackboard = function(entity, name, key)
+    local length = entity.Blackboard.GetFact(name .. "__Length")
+    if length == nil then
+        return
+    end
+
+    local blackboardKeyVarName = name .. "__ItemWithKey__" .. tostring(key)
+    entity.Blackboard.ClearFact(blackboardKeyVarName)
+    -- we will clean up the __ItemX and __Length values during loading in
+    -- LoadTableFromBlackboard (see comment there for the reason why)
+end
+
+m.SetTableArrayEntryOnBlackboard = function(entity, name, index, value)
+    local length = entity.Blackboard.GetFact(name .. "__Length")
+    if (length == nil) and
+       (index == 1) then
+        length = 1
+        entity.Blackboard.SetFact(name .. "__IsArray", 1)
+        entity.Blackboard.SetFact(name .. "__Length", length)
+    elseif (length == nil) or
+           (index > length) then
+        if index == length + 1 then
+            length = index
+        else
+            DebugLogCritical("Cannot skip entries when setting array elements on entity [1], array name [2], index [3], current length [4]", entity.UUID, name, index, length or 0)
+            return
+        end
+    end
+
+    entity.Blackboard.SetFact(name .. "__Length", length)
+    entity.Blackboard.SetFact(name .. "__Item" .. tostring(length), value)
+end
+
+m.LoadTableFromBlackboard = function(entity, name, mapfunction)
+    local lengthVarName = name .. "__Length"
+    local length = entity.Blackboard.GetFact(lengthVarName)
+    local isArray = entity.Blackboard.GetFact(name .. "__IsArray")
+    if (isArray == nil) or
+       (length == nil) then
+        return {}
+    end
+
+    local result = {}
+    if isArray == 1 then
+        for index = 1, length do
+            result[index] = entity.Blackboard.GetFact(name .. "__Item" .. tostring(index))
+        end
+    else
+        local removedValues = {}
+        for index = 1, length do
+            local keyName = name .. "__Key" .. tostring(index)
+            local key = entity.Blackboard.GetFact(keyName)
+            if key == nil then
+                DebugLogCritical("Nil key while loading key [1] for table [2] from blackboard for entity [3]", index, name, entity.UUID)
+            else
+                local value = entity.Blackboard.GetFact(name .. "__ItemWithKey__" .. tostring(key))
+                -- value == nil means that the item got removed from the table. We don't
+                -- remove the key at that time because it would require a linear search
+                -- through all key facts to figure out which one it was. So clean up up here
+                -- during loading (ideally we would do it before saving, but there's no callback
+                -- for that)
+                if value == nil then
+                    entity.Blackboard.ClearFact(keyName)
+                    removedValues[#removedValues + 1] = index
+                end
+                if mapfunction ~= nil then
+                    result[key] = mapfunction(value)
+                else
+                    result[key] = value
+                end
+            end
+        end
+
+        if #removedValues ~= 0 then
+            for index = #removedValues, 1, -1 do
+                if removedValues[index] ~= length then
+                    -- move last entry to current position (keys are unorderd)
+                    local thisKeyName =  name .. "__Key" .. tostring(removedValues[index])
+                    local lastKeyName =  name .. "__Key" .. tostring(length)
+                    local lastKey = entity.Blackboard.GetFact(lastKeyName)
+                    entity.Blackboard.SetFact(thisKeyName, lastKey)
+                    entity.Blackboard.ClearFact(lastKeyName)
+                end
+                length = length -1
+            end
+            entity.Blackboard.SetFact(lengthVarName, length)
+        end
+    end
+
+    return result
+end
+
+m.ClearTableOnBlackboard = function(entity, name)
+    local isArray = entity.Blackboard.GetFact(name .. "__IsArray")
+    local length = entity.Blackboard.GetFact(name .. "__Length")
+    entity.Blackboard.ClearFact(name .. "__IsArray")
+    entity.Blackboard.ClearFact(name .. "__Length")
+    if (isArray == nil) or
+       (length == nil) or
+       (length == 0) then
+        return
+    end
+
+    if isArray then
+        for index = 1, length do
+            entity.Blackboard.ClearFact(name .. "__Item" .. index)
+        end
+    else
+        for index = 1, length do
+            local oldKey = entity.Blackboard.GetFact(name .. "__Key" .. index)
+            if oldKey == nil then
+                DebugLogCritical("Encountered nil key with index [1] while trying to clear existing entries in map [2] for entity [3]", index, name, entity.UUID)
+            else
+                entity.Blackboard.ClearFact(name .. "__Key" .. index)
+                entity.Blackboard.ClearFact(name .. "__ItemWithKey__" .. oldKey)
+            end
+        end
+    end
+end
+
+-- Useful to handle items with stats that don't give them any hitpoints
+-- (will return nil for those)
+m.SafeGetHitPointsPercentage = function(entity)
+    if entity ~= nil and
+       EntityExists(entity) then
+        try
+            return entity.HitpointsPercentage
+        catch e if ls.CheckType(e, error.MissingComponent) then
+            return nil
+        end
+    else
+        return nil
+    end
+end
+
+return m

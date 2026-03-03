@@ -1,0 +1,36 @@
+game.states.GLO_StandGuard = State { function ()
+    --Basic script similar to GLO_StandAtTrigger or GLO_LoopAnimation
+    description = [[Character unsheats their weapon, stand on the provided point, look from it and loop the combat idle animation. Typically used on guards.]]
+
+    modules = { "shared.moveto" }
+
+    params.standGuardPoint = { type= EParamType.String, required = true, help = [[Will walk to and look from this entity before looping the combat idle animation.]] }
+
+    local point = Entity(params.standGuardPoint)
+    local combatLoopAnim = Animation([[CUST_Idle_Still_Combat_01_590ea7e8-ae43-4307-916b-b1133ef47dfa]])
+    local ignoreDangerousSurfacesTag = Tag("IGNORE_DANGEROUS_SURFACES_bbf62461-4af4-4631-807a-eb0bd988d9a6")
+
+    self.OnEnter = function()
+        SetWeaponUnsheathed(me, true)
+    end
+
+    nodes.StandGuard = Action {
+        function()
+            if not IsInDangerousSurfaceFor(point, me.Character) or IsTagged(me, ignoreDangerousSurfacesTag) then
+                if mod.moveto.MoveToPoint(point, MovementSpeed.Walk, me) then
+                    LookFrom(point)
+                    PlayAnimation(combatLoopAnim, false, true)
+                    WaitForInterrupt()
+                end
+            end
+            SteerTo(point)
+            Sleep(2.0)
+        end,
+        OnLeave = function()
+            StopAnimation(me)
+        end,
+        OnInterrupt = function()
+            StopAnimation(me)
+        end
+    }
+end}

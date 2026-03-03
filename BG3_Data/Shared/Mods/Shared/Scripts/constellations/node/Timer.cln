@@ -1,0 +1,232 @@
+game.states.Timer = State{
+    function()
+
+        description = "Generic timer that can be turned on and off."
+
+        params.StartActive = {type = EParamType.Bool, default = false, help = [[Does the object timer start running?]]}
+        params.TickLength = {type = EParamType.Number, default = 6.0, help = [[Timer step duration.]]}
+        params.Repeats = {type = EParamType.Int, default = 0.0, help = [[How often this timer repeats]]}
+        params.Delay = {type = EParamType.Number, default = 0.0, help = [[Delay added to extra tick]]}
+
+        params.TargetEntity = { type = EParamType.String, required = true, help = "Object to which the timer is attached."}
+
+        inputs.Start = {help = "Start Timer"}
+        inputs.Stop = {help = "Stop Timer"}
+
+        outputs.Tick = {help = "Timer Tick"}
+
+        self.OnInit = function()
+            if me.Blackboard.GetFact("TargetEntity") == nil then
+                if params.TargetEntity == "me" then
+                    me.Blackboard.SetFact("TargetEntity", me)
+                else
+                    me.Blackboard.SetFact("TargetEntity",FindEntity(params.TargetEntity))
+                end
+            end
+            RegisterForEvents(me.Blackboard.GetFact("TargetEntity"))
+            if params.Delay >= params.TickLength then
+                DebugLogCritical("WARNING: params.Delay is not smaller than params.TickLength for [1], TargetEntity [2]. Please fix this.", me.Name, me.Blackboard.GetFact("TargetEntity").Name)
+            end
+            if params.TickLength == 0 then
+                DebugLogCritical("WARNING: params.TickLength is 0 for [1], TargetEntity [2]. Please fix this.", me.Name, me.Blackboard.GetFact("TargetEntity").Name)
+            end
+
+            if me.Blackboard.GetFact("Cnst.Timer.TimerOn") == nil then
+                helpers.Init()
+            end
+        end
+
+        helpers.Init = function()
+
+            helpers.InitRepeats()
+
+            if params.StartActive then
+                helpers.StartTimer()
+            else
+                helpers.StopTimer()
+            end
+        end
+
+        helpers.InitRepeats = function()
+            if me.Blackboard.GetFact("RepeatsLeft") == nil then
+                if params.Repeats == 0 then
+                    me.Blackboard.SetFact("RepeatsLeft", 1)
+                else
+                    me.Blackboard.SetFact("RepeatsLeft", params.Repeats)
+                end
+            end
+        end
+
+        helpers.StartTimer = function()
+            if not helpers.IsInFTB() then
+                if me.Blackboard.GetFact("Cnst.Timer.TimerOn") ~= 1 then
+                    me.Blackboard.SetFact("Cnst.Timer.TimerOn", 1)
+                    StartTimer(me, "Cnst.Timer.GenTrapTimer", params.TickLength, params.Repeats)
+                else
+                    if me.Blackboard.GetFact("Cnst.Timer.DelayStarted") ~= nil then
+                        StopTimer(me, "Cnst.Timer.GenTrapDelayTimer")
+                        me.Blackboard.ClearFact("Cnst.Timer.DelayStarted")
+                    end
+                    StopTimer(me, "Cnst.Timer.GenTrapTimer")
+                    StartTimer(me, "Cnst.Timer.GenTrapTimer", params.TickLength, params.Repeats)
+                end
+            else
+                me.Blackboard.SetFact("Cnst.Timer.TimerOn", 1)
+                me.Blackboard.SetFact("Cnst.Timer.TimerStartBlockedByFTB", 1)
+            end
+        end
+
+        helpers.StopTimer = function()
+            me.Blackboard.ClearFact("Cnst.Timer.TimerStartBlockedByFTB")
+            if me.Blackboard.GetFact("Cnst.Timer.TimerOn") == 1 then
+                if me.Blackboard.GetFact("Cnst.Timer.DelayStarted") ~= nil then
+                    StopTimer(me, "Cnst.Timer.GenTrapDelayTimer")
+                    me.Blackboard.ClearFact("Cnst.Timer.DelayStarted")
+                end
+                StopTimer(me, "Cnst.Timer.GenTrapTimer")
+                me.Blackboard.SetFact("Cnst.Timer.TimerOn", 0)
+            elseif me.Blackboard.GetFact("Cnst.Timer.TimerOn") == nil then
+                me.Blackboard.SetFact("Cnst.Timer.TimerOn", 0)
+            end
+        end
+
+        helpers.ReduceRepeats = function()
+            helpers.InitRepeats()
+            local repeatsLeft = me.Blackboard.GetFact("RepeatsLeft")
+            if params.Repeats > 0 then
+                repeatsLeft = repeatsLeft - 1
+                me.Blackboard.SetFact("RepeatsLeft", repeatsLeft)
+            end
+            if repeatsLeft == 0 then
+                helpers.StopTimer()
+            end
+        end
+
+        -- Check if entity is in FTBM
+        helpers.IsInFTB = function()
+            local entity = me.Blackboard.GetFact("TargetEntity")
+            return IsInvolvedInFTB(entity)
+        end
+
+        helpers.FTBPauseTimer = function()
+            if me.Blackboard.GetFact("Cnst.Timer.TimerOn") == 1 and
+            me.Blackboard.GetFact("Cnst.Timer.TimerPaused") ~= 1 then
+                --DebugLog("[1] pausing timer", me.Blackboard.GetFact("TargetEntity").Name)
+                if me.Blackboard.GetFact("Cnst.Timer.DelayStarted") ~= nil then
+                    StopTimer(me, "Cnst.Timer.GenTrapDelayTimer")
+                    me.Blackboard.ClearFact("Cnst.Timer.DelayStarted")
+                end
+                PauseTimer(me, "Cnst.Timer.GenTrapTimer")
+                me.Blackboard.SetFact("Cnst.Timer.TimerPaused", 1)
+            end
+        end
+
+        helpers.FTBUnpauseTimer = function()
+            if me.Blackboard.GetFact("Cnst.Timer.TimerOn") == 1 then
+                --DebugLog("[1] unpausing timer", me.Blackboard.GetFact("TargetEntity").Name)
+                if me.Blackboard.GetFact("Cnst.Timer.TimerStartBlockedByFTB") == 1 then
+                    StartTimer(me, "Cnst.Timer.GenTrapTimer", params.TickLength, params.Repeats)
+                else
+                    UnpauseTimer(me, "Cnst.Timer.GenTrapTimer")
+                end
+            end
+            me.Blackboard.ClearFact("Cnst.Timer.TimerStartBlockedByFTB")
+            me.Blackboard.ClearFact("Cnst.Timer.TimerPaused")
+        end
+
+        helpers.FTBTickTimer = function()
+            --DebugLog("[1] TBTick", me.Blackboard.GetFact("TargetEntity").Name)
+            if me.Blackboard.GetFact("Cnst.Timer.TimerOn") == 1 then
+                if params.Delay > 0.0 then
+                    helpers.StartDelayTimer()
+                else
+                    helpers.Tick()
+                end
+            end
+        end
+
+        helpers.StartDelayTimer = function()
+            if me.Blackboard.GetFact("Cnst.Timer.DelayStarted") ~= nil then
+                StopTimer(me, "Cnst.Timer.GenTrapDelayTimer")
+                helpers.DelayedTick()
+            end
+            me.Blackboard.SetFact("Cnst.Timer.DelayStarted", 1)
+            StartRealtimeTimer(me, "Cnst.Timer.GenTrapDelayTimer", params.Delay, 0)
+        end
+
+        helpers.DelayedTick = function()
+            me.Blackboard.ClearFact("Cnst.Timer.DelayStarted")
+            helpers.Tick()
+        end
+
+        helpers.Tick = function()
+            helpers.ReduceRepeats()
+            TriggerOutput(outputs.Tick, nil)
+        end
+
+        self.OnEditorChanges = function()
+            local timerWasOn = me.Blackboard.GetFact("Cnst.Timer.TimerOn")
+
+            -- always stop/restart even if it was running already and needs to keep running
+            -- to handle changes to the ticklength/repeats parameters
+            StopTimer(me, "Cnst.Timer.GenTrapTimer")
+            StopTimer(me, "Cnst.Timer.GenTrapDelayTimer")
+            me.Blackboard.ClearFact("Cnst.Timer.DelayStarted")
+            me.Blackboard.SetFact("Cnst.Timer.TimerOn", params.StartActive and 1 or 0)
+            if params.StartActive and
+               timerWasOn then
+                StartTimer(me, "Cnst.Timer.GenTrapTimer", params.TickLength, params.Repeats)
+            end
+        end
+
+        forwardedEvents.EnteredForceTurnBased = function(ev, source)
+            if Entity(source) == me.Blackboard.GetFact("TargetEntity") then
+                helpers.FTBPauseTimer()
+            end
+        end
+
+        forwardedEvents.LeftForceTurnBased = function(ev, source)
+            if Entity(source) == me.Blackboard.GetFact("TargetEntity") then
+                if not helpers.IsInFTB() then
+                    helpers.FTBUnpauseTimer()
+                end
+            end
+        end
+
+        events.ForceTurnBasedPartyTurnEnded  = function(ev)
+            if me.Blackboard.GetFact("TargetEntity") == nil then
+            else
+                if IsInvolvedInFTB(me.Blackboard.GetFact("TargetEntity")) and
+                    ev.FTBZoneId == me.Blackboard.GetFact("TargetEntity").FTBZoneId then
+                    helpers.FTBTickTimer()
+                end
+            end
+        end
+
+        socketEvents.Start = function(ev)
+            me.Blackboard.SetFact("RepeatsLeft", params.Repeats)
+            helpers.StartTimer()
+        end
+
+        socketEvents.Stop = function(ev)
+            helpers.StopTimer()
+        end
+
+        events.TimerFinished = function(ev)
+            if ev.TimerName == "Cnst.Timer.GenTrapTimer" then
+                -- DebugLog("[1] Timer Tick", me.Blackboard.GetFact("TargetEntity").Name)
+                if params.Delay > 0.0 then
+                    helpers.StartDelayTimer()
+                else
+                    helpers.Tick()
+                end
+            end
+
+            if ev.TimerName == "Cnst.Timer.GenTrapDelayTimer" then
+                if me.Blackboard.GetFact("Cnst.Timer.TimerOn") == 1 then
+                    helpers.DelayedTick()
+                end
+            end
+        end
+    end
+}

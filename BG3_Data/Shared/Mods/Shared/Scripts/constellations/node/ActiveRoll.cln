@@ -1,0 +1,131 @@
+game.states.ActiveRoll = State{ function()
+
+    modules = {"shared.util"}
+
+    description = [[State that performs an activeroll against TargetEntity.]]
+    params.TargetEntity = { type = EParamType.String, default = "me", help = "Object that is the roll subject."}
+    params.SkillOrAbility = { type = EParamType.String, default = "Strength", help = "Ability or skill."}
+    params.DC = {
+        type = EParamType.String,
+        default="DC_Legacy_15_bddbb9b8-a242-4c3e-a2eb-3fd274c0c539",
+        help="The roll DC."
+    }
+    params.RollerAdvantage  = {type = EParamType.String, default = "None"
+        , help = [[Advantage type of the roller:
+        None,
+        Advantage,
+        Disadvantage
+    ]]}
+
+    inputs.PerformRoll = {help = "Perform the active roll."}
+    inputs.Disable  = {help = "Disable the active roll."}
+    inputs.ResetRoll  = {help = "Resets the roll for a specific entity."}
+
+    outputs.OnRollSuccess = {help = "Roller succeeded the roll"}
+    outputs.OnRollFailure = {help = "Roller failed the roll"}
+    outputs.OnRollCancelled = {help = "Roller failed the roll"}
+
+    --no need to serialize these
+    local advantageType
+    local skillOrAbility
+
+    --players that failed the roll so we don't repeat
+    local failedPlayers = {}
+
+    helpers.SetupRollParams = function()
+        advantageType = AdvantageType[params.RollerAdvantage]
+        if not advantageType then
+            DebugLogCritical("Unknown advantage type "..params.RollerAdvantage)
+            advantageType = AdvantageType.None
+        end
+        skillOrAbility = Ability[params.SkillOrAbility]
+        if skillOrAbility == nil then
+            skillOrAbility = Skill[params.SkillOrAbility]
+        end
+        if not skillOrAbility then
+            DebugLogCritical("Unknown skill or ability "..params.SkillOrAbility)
+        end
+    end
+
+    self.OnLoaded = function()
+        helpers.SetupRollParams()   -- this is also called for Editor changes
+        failedPlayers = mod.util.LoadTableFromBlackboard(
+            me,
+            "Cnst.ActiveRoll.FailedPlayers",
+            function(val) return (val == 0) and false or true end)
+    end
+
+    self.OnInit = function()
+        if not me.Blackboard.GetFact("On") then
+            me.Blackboard.SetFact("On", 1)
+        end
+    end
+
+    socketEvents.PerformRoll = function(ev)
+        if (me.Blackboard.GetFact("On") == 1) and (ev.Object ~= nil) then
+            local roller = Entity(ev.Object)
+            if roller == nil then
+                DebugLogCritical("Constellation ActiveRoll config on entity [1]_[2] triggered with nil roller. Aborting roll and failing, otherwise it would crash.", me.Name, me.UUID)
+                TriggerOutput(outputs.OnRollFailure, nil)
+                return
+            end
+
+            local rollSubject = (params.TargetEntity == "me") and me or FindEntity(params.TargetEntity)
+            if (rollSubject == nil) or
+               (not rollSubject.IsCharacter and not rollSubject.IsItem) then
+                DebugLogCritical("Constellation ActiveRoll config on entity [1]_[2] does not have a valid character or item as TargetEntity parameter. Aborting roll and triggering failure, otherwise it would crash.", me.Name, me.UUID)
+                TriggerOutput(outputs.OnRollFailure, roller.EntityRef)
+                return
+            end
+
+            if roller.IsCharacter and not failedPlayers[roller.UUID.String] then
+                me.Blackboard.SetFact("Cnst.ActiveRoll.Roller", roller)
+                RequestActiveRoll(roller.Character, rollSubject,
+                    skillOrAbility,
+                    DifficultyClass(params.DC),
+                    "Cnst.ActiveRoll",
+                    advantageType
+                )
+            elseif failedPlayers[roller.UUID.String] then
+                --trigger failure again?
+                TriggerOutput(outputs.OnRollFailure, roller.EntityRef)
+            end
+        end
+    end
+
+    socketEvents.Disable = function(ev)
+        me.Blackboard.SetFact("On", 0)
+    end
+
+    socketEvents.ResetRoll = function(ev)
+        local roller = Entity(ev.Object)
+        if roller and roller.IsCharacter then
+            local charUUID = roller.UUID.String
+            failedPlayers[charUUID] = false
+            mod.util.RemoveTableMapEntryOnBlackboard(me, "Cnst.ActiveRoll.FailedPlayers", charUUID)
+        end
+    end
+
+    events.RollResult = function(ev)
+        local rollSubject = (params.TargetEntity == "me") and me or FindEntity(params.TargetEntity)
+        local roller = me.Blackboard.GetFact("Cnst.ActiveRoll.Roller")
+        --just identify the roll by our roller/rollsubject
+        if roller and
+           ev.RollSubject == rollSubject and
+           ev.Roller == roller and
+           ev.Event == "Cnst.ActiveRoll"
+          then
+            me.Blackboard.ClearFact("Cnst.ActiveRoll.Roller")
+            if ev.Type == RollResultType.Success then
+                TriggerOutput(outputs.OnRollSuccess, roller.EntityRef)
+            elseif ev.Type == RollResultType.Failure then
+                local charUUID = roller.UUID.String
+                failedPlayers[charUUID] = true
+                mod.util.SetTableMapEntryOnBlackboard(me, "Cnst.ActiveRoll.FailedPlayers", charUUID, 1)
+                TriggerOutput(outputs.OnRollFailure, roller.EntityRef)
+            elseif ev.Type == RollResultType.Cancel then
+                TriggerOutput(outputs.OnRollCancelled, roller.EntityRef)
+            end
+        end
+    end
+end}

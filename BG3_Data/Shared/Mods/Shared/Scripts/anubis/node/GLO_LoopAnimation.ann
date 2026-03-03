@@ -1,0 +1,24 @@
+game.states.GLO_LoopAnimation = State{function ()
+
+    description = [[A very simple script to make a NPC loop an animation. Mostly useful on NPCs that are just standing somewhere before a cutscene starts.]]
+
+    params.loopingAnimation = { type = EParamType.String, required = true,
+        help = [[Required. The animation to loop until the state is interrupted.]]
+    }
+
+    local anim = Animation(params.loopingAnimation)
+
+    nodes.LoopAnimation = Action{
+        function()
+            PlayAnimation(anim, false, true)
+            WaitForInterrupt()
+        end,
+        OnLeave = function()
+            StopAnimation(me)
+        end,
+        OnInterrupt = function()
+            StopAnimation(me)
+        end
+    }
+end
+}

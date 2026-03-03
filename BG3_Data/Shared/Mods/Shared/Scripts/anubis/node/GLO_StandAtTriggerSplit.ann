@@ -1,0 +1,100 @@
+game.states.GLO_StandAtTriggerSplit = State{function ()
+
+    modules = { "shared.math", "shared.params", "shared.util" }
+
+    params.trigger = {type = EParamType.String, help=[[
+        The trigger at which the character stands.
+    ]]}
+
+    params.distance = {type = EParamType.Number, default = 0.5, help=[[
+        Maximum distance to target trigger
+    ]]}
+
+    params.speed = {type = EParamType.String, help=[[
+        Speed to use to move to the trigger
+    ]], required = false, default = "Walk"}
+
+    params.animation = {type = EParamType.String, default = "", help=[[
+        Animation to play at the trigger
+    ]]}
+
+    params.animations = {type = EParamType.String, default = nil, required = false, arrayRange="1..", help=[[
+        Animation to play at the trigger
+    ]]}
+
+    params.animationDelay = {type = EParamType.Number, arrayRange="2..2", default = {5.0, 15.0}, help = [[
+        Range for a delay between playing animations
+    ]]}
+
+    local trigger = Entity(params.trigger)
+    local ignoreDangerousSurfacesTag = Tag("IGNORE_DANGEROUS_SURFACES_bbf62461-4af4-4631-807a-eb0bd988d9a6")
+    local animation = Animation(params.animation)
+    local animations = {}
+    local animationTimeout = false
+    local timerStr = "Timer_GLO_StandAtTriggerSplit_AnimationDelay_"
+    local speed = nil
+
+    self.OnInit = function()
+        -- gen random string to avoid mishandling of TimerFinished
+        -- if this state is used more than once in a config
+        timerStr = timerStr .. tostring(mod.math.random(0.0, 100.0))
+        speed = MovementSpeed[params.speed]
+        if speed == nil then
+            DebugLogCritical("GLO_StandAtTriggerSplit: params.speed is malformed: [1]",
+                tostring(params.speed))
+            speed = MovementSpeed.Walk
+        end
+        if params.animations ~= nil then
+            animations = mod.params.ParamArrayToAnimationsList(params.animations)
+        end
+    end
+
+    nodes.LookAtDestination = Action{
+        CanEnter = function()
+            return IsInDangerousSurfaceFor(trigger, me.Character)
+                and not IsTagged(me, ignoreDangerousSurfacesTag)
+        end,
+        function()
+            SteerTo(trigger)
+            Sleep(2.0)
+        end
+    }
+
+    nodes.WalkToTrigger = Action{
+        CanEnter = function()
+            return GetDistanceTo(me, trigger) > params.distance
+        end,
+        function()
+            local moveResult = MoveTo(trigger, speed, false, false, 0.1, 1.0, false)
+            if moveResult ~= error.MovementError.None then
+                SteerTo(trigger)
+                Sleep(2.0)
+            end
+        end
+    }
+
+    nodes.StandAtTrigger = Action{function()
+        LookFrom(trigger)
+        if #animations > 0 then
+            if not animationTimeout then
+                try
+                    local _, anim = mod.util.RandomFrom(animations)
+                    PlayAnimation(anim, true)
+                    animationTimeout = true
+                    StartTimer(me, timerStr, math.random(params.animationDelay[1], params.animationDelay[2]), 0)
+                catch ex if ls.CheckType(ex, error.PlayAnimationFailed) then
+                    DebugText(me, "Failed PlayAnimation")
+                end
+            end
+        end
+        Sleep(1.0)
+    end}
+
+
+    events.TimerFinished = function(ev)
+        if ev.TimerName == timerStr then
+            animationTimeout = false
+        end
+    end
+end
+}
