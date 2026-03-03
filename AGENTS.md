@@ -127,4 +127,42 @@ Or trigger a one-shot re-index via the CLI if many files changed:
 ## Common Gotchas
 - Ring mesh orientation: `TorusMesh` is already ground-aligned in Godot. Do **not** rotate range/selection/target torus indicators by 90 degrees unless you have verified the mesh orientation in-scene. A forced X-axis 90 rotation will put rings on the wrong axis.
 - Test-host interop: In `dotnet test` (`testhost`/`vstest`) processes, direct Godot interop calls like `Godot.GD.Print/PrintErr` (and sometimes `Godot.FileAccess`/`DirAccess`) can crash the host. For parser/data paths exercised by unit tests, guard for testhost and fall back to `Console` + `System.IO`.
+- Phase references: Code comments reference "Phase A/B/C" from an earlier implementation plan. Phase C (surfaces spawned by effects, movement validation) is largely **incomplete** — stubs exist but the full pipeline does not execute. Don't assume phase labels represent current status.
+- Functor stubs: 10+ functor types in `FunctorExecutor.cs` are stubs that log warnings but do nothing: `SpawnSurface`, `Teleport`, `UseSpell`, `Resurrect`, `Counterspell`, `SummonInInventory`, `Explode`, `CreateZone`, `FireProjectile`, `Douse`. Check before assuming a functor works end-to-end.
+- ConditionEvaluator fail-open: Unknown BG3 condition functions return `true` with a warning. This means conditions may pass silently when they shouldn't. Always verify condition strings are actually evaluated if correctness matters.
+- Dual BG3StatusIntegration: `Combat/Statuses/BG3StatusIntegration.cs` handles runtime integration; `Data/Statuses/BG3StatusIntegration.cs` handles data-layer conversion. Different roles, same name, different namespaces.
+- EffectPipeline property injection: At ~3.3k lines with ~15 optional service dependencies. Follow the existing pattern of nullable property setters when adding services.
+- Reaction execution flags: Reactions set `SkipRangeValidation=true` and `IgnoreReactionBudgetCheck=true` during execution because eligibility is checked at prompt time, not execution time.
+- Exhaustion incomplete: Only Level 1 exhaustion is implemented (disadvantage on attacks/checks). Levels 2-6 are not tracked — no speed halving, no save disadvantage, no max HP reduction, no death.
+- ObscurementService not wired: `AddZone()`/`RemoveZone()` are TODOs — spell effects (Darkness, Fog Cloud) do not push zones into the obscurement service. Only surface-based obscurement works.
+- Barrier system: Referenced in `RulesEngine.cs` as "not yet implemented" (`targetBarrier: 0`). Damage pipeline has the absorption slot but no system feeds it.
 - Keep this section updated: when you discover a recurring engine/UI pitfall that can waste debugging time, add it here as a concise rule for future agents.
+
+## Codebase Quick Reference
+
+**Scale**: ~190k lines C#, 610 files, 1027 classes. Combat/ is ~99k lines, Data/ ~19k, Tests/ ~59k.
+
+**Data volumes**: 1467 BG3 spell entries, 1082 status entries, 418 passives, 54 interrupts → parsed at startup. 427 supplementary JSON actions. 12 D&D classes with 46+ subclasses, 11 races with subraces, 45+ feats.
+
+**Key subsystem sizes** (files → largest file):
+- `Combat/Services/` — 30 files → InventoryService (2.3k lines)
+- `Combat/Actions/Effects/` — 29 files → DealDamageEffect
+- `Combat/AI/` — 17 files → AIDecisionPipeline (3.7k lines)
+- `Combat/Rules/` — 14 files + 10 Boosts + 5 Functors + 3 Conditions → RulesEngine (1.5k lines), BoostEvaluator (1.2k lines), ConditionEvaluator (1.7k lines)
+- `Combat/Targeting/` — 12 modes + 9 visuals + 8 core files
+- `Combat/Statuses/` — 10 files → StatusSystem (1.6k lines)
+- `Combat/Reactions/` — 9 files → BG3ReactionIntegration
+
+**State machine**: 10 states (NotInCombat → CombatStart → TurnStart → PlayerDecision/AIDecision → ActionExecution → ReactionPrompt → TurnEnd → RoundEnd → CombatEnd → NotInCombat). 7 substates (None, TargetSelection, MultiTargetPicking, AoEPlacement, MovementPreview, ReactionPrompt, AnimationLock).
+
+**Character model**: `CharacterSheet` (properties) → `CharacterResolver` (computed stats: HP, AC, spell slots, multiclass merging) → `CharacterBuilder` (creation flow). Resolution order: Race → Background → Class → Feat → Multiclass spell merge.
+
+**Damage pipeline**: 5 stages in `DamagePipeline` — base → additive modifiers → percentage modifiers → resistance/vulnerability/immunity → reduction/absorption (temp HP).
+
+**Boost system**: 57 types across 4 tiers, evaluated by `BoostEvaluator`. Core: AC, Advantage, Disadvantage, Resistance, DamageBonus. Advanced: UnlockSpell, RollBonus, CriticalHit. Extended: SpellSaveDC, IncreaseMaxHP, Tag.
+
+**Conditions**: 16 D&D 5e conditions in `ConditionEffects.cs` (the sole authority). `ConditionEvaluator.cs` has 60+ BG3 condition functions for boost/passive/status evaluation.
+
+**Surfaces**: 34 definitions in SurfaceManager. Elemental (fire, water, ice, acid, lightning, steam). Hazards (grease, oil, web, entangle, spike growth, plant growth). Clouds (fog, darkness, stinking cloud, cloudkill). Interactions: freeze/electrify/ignite/melt/douse event transforms.
+
+**Reactions**: 13 registered (OA, Shield, Counterspell, Uncanny Dodge, Deflect Missiles, Hellish Rebuke, Cutting Words, Sentinel ×2, Mage Slayer, War Caster, Warding Flare, Defensive Duelist). 9 trigger types. AI: 5 policies (Always, Never, DamageThreshold, Random, PriorityTargets).
