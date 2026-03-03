@@ -24,7 +24,7 @@ namespace QDND.Tests.Unit
             Assert.Equal(4f, effect.Value); // radius
             Assert.Equal(3, effect.StatusDuration); // duration
             Assert.True(effect.Parameters.ContainsKey("surface_type"));
-            Assert.Equal("spikegrowth", effect.Parameters["surface_type"]);
+            Assert.Equal("spike_growth", effect.Parameters["surface_type"]);
         }
 
         [Fact]
@@ -109,7 +109,7 @@ namespace QDND.Tests.Unit
             Assert.Equal("spawn_surface", effect.Type);
             Assert.Equal(6f, effect.Value);
             Assert.Equal(3, effect.StatusDuration);
-            Assert.Equal("fogcloud", effect.Parameters["surface_type"]);
+            Assert.Equal("fog", effect.Parameters["surface_type"]);
         }
 
         [Fact]
@@ -126,7 +126,7 @@ namespace QDND.Tests.Unit
             Assert.Equal("spawn_surface", effect.Type);
             Assert.Equal(4f, effect.Value);
             Assert.Equal(3, effect.StatusDuration);
-            Assert.Equal("spikegrowth", effect.Parameters["surface_type"]);
+            Assert.Equal("spike_growth", effect.Parameters["surface_type"]);
         }
 
         [Fact]

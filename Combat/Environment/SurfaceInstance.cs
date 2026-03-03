@@ -28,6 +28,11 @@ namespace QDND.Combat.Environment
         public bool IsPermanent => Definition.DefaultDuration == 0 || RemainingDuration == 0;
         public bool IsDepleted => _blobs.Count == 0;
 
+        /// <summary>
+        /// Rounds since last growth step. Reset to 0 after each growth.
+        /// </summary>
+        public int RoundsSinceLastGrowth { get; set; }
+
         public SurfaceInstance(SurfaceDefinition definition)
         {
             Definition = definition;
@@ -144,6 +149,24 @@ namespace QDND.Combat.Environment
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Expand all blobs by the given radial amount.
+        /// </summary>
+        public void GrowBlobs(float radiusIncrease, float maxRadius = 0f)
+        {
+            if (radiusIncrease <= 0f || _blobs.Count == 0)
+                return;
+
+            foreach (var blob in _blobs)
+            {
+                float newRadius = blob.Radius + radiusIncrease;
+                if (maxRadius > 0f)
+                    newRadius = Mathf.Min(newRadius, maxRadius);
+                blob.Radius = newRadius;
+            }
+            RecalculateBounds();
         }
 
         public bool Tick()

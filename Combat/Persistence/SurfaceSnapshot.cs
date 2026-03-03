@@ -59,6 +59,11 @@ namespace QDND.Combat.Persistence
         /// </summary>
         public int RemainingDuration { get; set; }
 
+        /// <summary>
+        /// Rounds since last surface growth tick.
+        /// </summary>
+        public int RoundsSinceLastGrowth { get; set; }
+
         // --- Owner ---
 
         /// <summary>

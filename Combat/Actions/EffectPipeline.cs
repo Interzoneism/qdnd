@@ -277,6 +277,7 @@ namespace QDND.Combat.Actions
             RegisterEffect(new UseSpellEffect());
             RegisterEffect(new ExecuteWeaponFunctorsEffect());
             RegisterEffect(new SurfaceChangeEffect());
+            RegisterEffect(new SurfaceClearLayerEffect());
             RegisterEffect(new RemoveStatusByGroupEffect());
             RegisterEffect(new SwitchDeathTypeEffect());
             RegisterEffect(new SetAdvantageEffect());

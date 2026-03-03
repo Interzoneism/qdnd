@@ -24,6 +24,14 @@ namespace QDND.Combat.Environment
         Lightning,
         Blessed,
         Cursed,
+        Blood,
+        Grease,
+        Lava,
+        Web,
+        Mud,
+        Alcohol,
+        BlackPowder,
+        DeepWater,
         Custom
     }
 
@@ -138,6 +146,24 @@ namespace QDND.Combat.Environment
 
         public bool CanMerge { get; set; } = true;
         public bool CanBeSubtracted { get; set; } = true;
+
+        /// <summary>
+        /// Radius growth per interval in meters. 0 = no growth.
+        /// BG3 zone spells like Wall of Fire expand their surfaces in steps.
+        /// </summary>
+        public float GrowStep { get; set; }
+
+        /// <summary>
+        /// Growth interval in rounds.
+        /// When > 0, the surface expands by GrowStep meters every GrowInterval rounds.
+        /// </summary>
+        public int GrowInterval { get; set; }
+
+        /// <summary>
+        /// Maximum radius the surface can grow to. 0 = unlimited.
+        /// </summary>
+        public float GrowMaxRadius { get; set; }
+
         public bool IsLiquidVisual { get; set; } = true;
         public string ColorHex { get; set; } = "#808080";
         public float VisualOpacity { get; set; } = 0.55f;

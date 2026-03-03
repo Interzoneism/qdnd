@@ -20,8 +20,8 @@ namespace QDND.Data.Actions
             {
                 ["waterfrozen"] = "ice",
                 ["waterelectrified"] = "electrified_water",
-                ["bloodfrozen"] = "ice",
-                ["bloodelectrified"] = "electrified_water",
+                ["bloodfrozen"] = "blood_frozen",
+                ["bloodelectrified"] = "blood_electrified",
                 ["fogcloud"] = "fog",
                 ["darknesscloud"] = "darkness",
                 ["stinkingcloud"] = "stinking_cloud",
@@ -36,9 +36,12 @@ namespace QDND.Data.Actions
                 ["sporepinkcloud"] = "spores",
                 ["watercloudelectrified"] = "electrified_steam",
                 ["causticbrine"] = "acid",
-                ["alcohol"] = "oil",
-                ["mud"] = "entangle",
-                ["lava"] = "fire",
+                ["poisonfrozen"] = "poison_frozen",
+                ["poisonground"] = "ground_poison",
+                ["blackpowder"] = "black_powder",
+                ["deepwater"] = "deep_water",
+                ["potionhealingcloud"] = "potion_healing_cloud",
+                ["potionhealinggreatercloud"] = "potion_healing_greater_cloud",
                 ["cloud"] = "fog",
                 ["none"] = string.Empty
             };
@@ -687,7 +690,7 @@ namespace QDND.Data.Actions
                 };
 
                 // Group 1 = radius
-                if (float.TryParse(surfaceMatch.Groups[1].Value, out var radius))
+                if (float.TryParse(surfaceMatch.Groups[1].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var radius))
                 {
                     effect.Value = radius;
                 }
@@ -861,6 +864,23 @@ namespace QDND.Data.Actions
                     Parameters = new Dictionary<string, object>
                     {
                         { "surface_type", surfaceType }
+                    }
+                };
+            }
+
+            // SurfaceClearLayer(layer) — removes all surfaces on a layer (Ground or Cloud)
+            if (TryGetFunctorArguments(functor, "SurfaceClearLayer", out var clearLayerArgs) &&
+                clearLayerArgs.Count >= 1)
+            {
+                string layer = NormalizeFunctorToken(clearLayerArgs[0]);
+
+                return new EffectDefinition
+                {
+                    Type = "surface_clear_layer",
+                    Value = 3f, // Default clear radius
+                    Parameters = new Dictionary<string, object>
+                    {
+                        { "layer", layer }
                     }
                 };
             }

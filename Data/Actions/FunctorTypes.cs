@@ -28,6 +28,7 @@ namespace QDND.Data.Actions
         SwitchDeathType,
         ExecuteWeaponFunctors,
         SurfaceChange,
+        SurfaceClearLayer,
         Stabilize,
         Resurrect,
         RemoveStatusByGroup,
@@ -177,6 +178,13 @@ namespace QDND.Data.Actions
                 "SurfaceChange",
                 @"\(\s*(\w+)\s*,\s*(\d+\.?\d*)\s*,\s*(\d+)\s*\)",
                 "Changes surface type. Args: (surfaceType, radius, lifetime)",
+                true
+            ),
+            ["SurfaceClearLayer"] = new FunctorMetadata(
+                BG3FunctorType.SurfaceClearLayer,
+                "SurfaceClearLayer",
+                @"\(\s*(\w+)\s*\)",
+                "Clears all surfaces on a layer. Args: (layer)",
                 true
             ),
             ["Stabilize"] = new FunctorMetadata(

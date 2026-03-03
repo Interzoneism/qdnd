@@ -319,6 +319,47 @@ namespace QDND.Combat.Actions.Effects
     }
 
     /// <summary>
+    /// Handles "surface_clear_layer" effect type.
+    /// Removes all surfaces of a given layer within the effect area.
+    /// </summary>
+    public class SurfaceClearLayerEffect : Effect
+    {
+        public override string Type => "surface_clear_layer";
+
+        public override List<EffectResult> Execute(EffectDefinition definition, EffectContext context)
+        {
+            var results = new List<EffectResult>();
+            var sourceId = context?.Source?.Id ?? "unknown";
+
+            if (context?.Surfaces == null)
+            {
+                results.Add(EffectResult.Failed(Type, sourceId, null, "No surface manager available"));
+                return results;
+            }
+
+            definition.Parameters.TryGetValue("layer", out var layerObj);
+            string layerStr = layerObj?.ToString() ?? "cloud";
+            if (!Enum.TryParse<SurfaceLayer>(layerStr, true, out var layer))
+                layer = SurfaceLayer.Cloud;
+
+            float radius = definition.Value > 0f ? definition.Value : 3f;
+            var position = context.TargetPosition
+                ?? context.Source?.Position;
+            if (!position.HasValue)
+            {
+                results.Add(EffectResult.Failed(Type, sourceId, null, "No position available for surface clear layer"));
+                return results;
+            }
+
+            int affected = context.Surfaces.ClearSurfaceLayer(layer, position.Value, radius);
+
+            results.Add(EffectResult.Succeeded(Type, sourceId, null, affected,
+                $"Surface clear layer '{layer}': {affected} surface(s) affected"));
+            return results;
+        }
+    }
+
+    /// <summary>
     /// Fires the weapon's on-hit triggers (Divine Smite, Hex, etc.) on each target.
     /// </summary>
     public class ExecuteWeaponFunctorsEffect : Effect

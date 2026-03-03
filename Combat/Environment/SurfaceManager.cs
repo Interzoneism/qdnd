@@ -21,13 +21,19 @@ namespace QDND.Combat.Environment
                 {
                     ["water"] = "ice",
                     ["electrified_water"] = "ice",
-                    ["blood"] = "ice"
+                    ["blood"] = "blood_frozen",
+                    ["ground_poison"] = "poison_frozen",
+                    ["deep_water"] = "ice",
+                    ["mud"] = "ice",
+                    ["blood_electrified"] = "blood_frozen"
                 },
                 ["electrify"] = new(StringComparer.OrdinalIgnoreCase)
                 {
                     ["water"] = "electrified_water",
-                    ["blood"] = "electrified_water",
-                    ["steam"] = "electrified_steam"
+                    ["blood"] = "blood_electrified",
+                    ["steam"] = "electrified_steam",
+                    ["deep_water"] = "electrified_water",
+                    ["blood_electrified"] = "blood_electrified"
                 },
                 ["ignite"] = new(StringComparer.OrdinalIgnoreCase)
                 {
@@ -36,11 +42,30 @@ namespace QDND.Combat.Environment
                     ["web"] = "fire",
                     ["water"] = "steam",
                     ["electrified_water"] = "steam",
-                    ["acid"] = "fire"
+                    ["acid"] = "fire",
+                    ["ground_poison"] = "fire",
+                    ["blood"] = "fire",
+                    ["alcohol"] = "fire",
+                    ["black_powder"] = "fire",
+                    ["poison_frozen"] = "ground_poison"
                 },
                 ["melt"] = new(StringComparer.OrdinalIgnoreCase)
                 {
-                    ["ice"] = "water"
+                    ["ice"] = "water",
+                    ["blood_frozen"] = "blood"
+                },
+                ["vaporize"] = new(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["water"] = "steam",
+                    ["deep_water"] = "steam",
+                    ["electrified_water"] = "electrified_steam",
+                    ["blood"] = "steam",
+                    ["ice"] = "steam"
+                },
+                ["douse"] = new(StringComparer.OrdinalIgnoreCase)
+                {
+                    ["fire"] = "steam",
+                    ["lava"] = "stone_wall"
                 }
             };
         private static readonly Dictionary<string, string> SurfaceAliases =
@@ -48,8 +73,8 @@ namespace QDND.Combat.Environment
             {
                 ["waterfrozen"] = "ice",
                 ["waterelectrified"] = "electrified_water",
-                ["bloodfrozen"] = "ice",
-                ["bloodelectrified"] = "electrified_water",
+                ["bloodfrozen"] = "blood_frozen",
+                ["bloodelectrified"] = "blood_electrified",
                 ["fogcloud"] = "fog",
                 ["darknesscloud"] = "darkness",
                 ["stinkingcloud"] = "stinking_cloud",
@@ -64,11 +89,20 @@ namespace QDND.Combat.Environment
                 ["sporepinkcloud"] = "spores",
                 ["watercloudelectrified"] = "electrified_steam",
                 ["causticbrine"] = "acid",
-                ["alcohol"] = "oil",
-                ["mud"] = "entangle",
-                ["lava"] = "fire",
                 ["cloud"] = "fog",
-                ["none"] = string.Empty
+                ["none"] = string.Empty,
+                ["surfacegroundpoison"] = "ground_poison",
+                ["surfacelava"] = "lava",
+                ["surfacemud"] = "mud",
+                ["surfaceblackpowder"] = "black_powder",
+                ["surfacedeepwater"] = "deep_water",
+                ["surfacealcohol"] = "alcohol",
+                ["surfacepoisonfrozen"] = "poison_frozen",
+                ["surfacebloodfrozen"] = "blood_frozen",
+                ["surfacebloodelectrified"] = "blood_electrified",
+                ["potionhealingcloud"] = "potion_healing_cloud",
+                ["potionhealinggreatercloud"] = "potion_healing_greater_cloud",
+                ["poisonground"] = "ground_poison"
             };
 
         private readonly Dictionary<string, SurfaceDefinition> _definitions = new(StringComparer.OrdinalIgnoreCase);
@@ -331,6 +365,8 @@ namespace QDND.Combat.Environment
                 "extinguish" => "douse",
                 "destroywater" => "destroy_water",
                 "remove_water" => "destroy_water",
+                "vaporise" => "vaporize",
+                "vapourise" => "vaporize",
                 _ => eventId.Trim().ToLowerInvariant()
             };
         }
@@ -545,10 +581,162 @@ namespace QDND.Combat.Environment
                 }
             }
 
+            // Process surface growth
+            foreach (var surface in _activeSurfaces)
+            {
+                if (toRemove.Contains(surface))
+                    continue;
+
+                if (surface.Definition.GrowStep <= 0f || surface.Definition.GrowInterval <= 0)
+                    continue;
+
+                surface.RoundsSinceLastGrowth++;
+                if (surface.RoundsSinceLastGrowth >= surface.Definition.GrowInterval)
+                {
+                    surface.RoundsSinceLastGrowth = 0;
+                    surface.GrowBlobs(surface.Definition.GrowStep, surface.Definition.GrowMaxRadius);
+                    OnSurfaceGeometryChanged?.Invoke(surface);
+                    DispatchSurfaceGeometryChanged(surface);
+                }
+            }
+
             foreach (var surface in toRemove)
             {
                 RemoveSurface(surface);
             }
+        }
+
+        /// <summary>
+        /// Create a non-symmetrical puddle surface using multiple random blobs.
+        /// Used for spilled liquids from broken containers.
+        /// </summary>
+        /// <param name="surfaceId">The surface definition ID.</param>
+        /// <param name="origin">Center origin point.</param>
+        /// <param name="totalCells">Approximate number of 0.5m cells to cover.</param>
+        /// <param name="creatorId">ID of the creator (optional).</param>
+        /// <param name="duration">Override duration in rounds (optional).</param>
+        /// <returns>The created surface instance, or null if creation failed.</returns>
+        public SurfaceInstance CreatePuddle(string surfaceId, Vector3 origin, int totalCells, string creatorId = null, int? duration = null)
+        {
+            if (totalCells <= 0)
+                return null;
+
+            string resolvedSurfaceId = ResolveSurfaceId(surfaceId);
+            if (string.IsNullOrWhiteSpace(resolvedSurfaceId))
+                return null;
+
+            if (!_definitions.TryGetValue(resolvedSurfaceId, out var def))
+            {
+                Godot.GD.PushWarning($"Unknown surface type for puddle: {surfaceId}");
+                return null;
+            }
+
+            // Convert totalCells (0.5m each) to approximate area, then to blob count
+            // Each cell = 0.25 m², so totalCells cells ≈ totalCells * 0.25 m² total area
+            float totalArea = totalCells * 0.25f;
+
+            // Create 3-8 overlapping blobs of varying size to make an irregular shape
+            int blobCount = Math.Clamp(totalCells / 20 + 2, 3, 8);
+            float avgBlobRadius = Mathf.Sqrt(totalArea / (blobCount * Mathf.Pi));
+
+            int resolvedDuration = ResolveDuration(def, duration);
+            var instance = new SurfaceInstance(def)
+            {
+                CreatorId = creatorId,
+                RemainingDuration = resolvedDuration
+            };
+
+            for (int i = 0; i < blobCount; i++)
+            {
+                // Randomize blob positions around origin
+                float angle = (float)(_random.NextDouble() * Mathf.Tau);
+                float dist = (float)(_random.NextDouble() * avgBlobRadius * 1.5f);
+                float blobRadius = avgBlobRadius * (0.6f + (float)_random.NextDouble() * 0.8f);
+                blobRadius = Mathf.Max(0.25f, blobRadius);
+
+                var blobCenter = origin + new Vector3(
+                    Mathf.Cos(angle) * dist,
+                    0f,
+                    Mathf.Sin(angle) * dist
+                );
+
+                if (i == 0)
+                    instance.InitializeGeometry(blobCenter, blobRadius);
+                else
+                    instance.AddBlob(blobCenter, blobRadius);
+            }
+
+            // Check for merge with existing same-type surface
+            var mergeTarget = FindMergeTarget(instance);
+            if (mergeTarget != null)
+            {
+                mergeTarget.MergeGeometryFrom(instance);
+                RefreshDuration(mergeTarget, resolvedDuration);
+                OnSurfaceGeometryChanged?.Invoke(mergeTarget);
+                DispatchSurfaceGeometryChanged(mergeTarget);
+                ResolveContactInteractionsFor(mergeTarget);
+                return mergeTarget;
+            }
+
+            _activeSurfaces.Add(instance);
+            ResolveContactInteractionsFor(instance);
+
+            if (_activeSurfaces.Contains(instance))
+            {
+                OnSurfaceCreated?.Invoke(instance);
+                DispatchSurfaceCreated(instance, creatorId);
+            }
+
+            return instance;
+        }
+
+        /// <summary>
+        /// Remove all surfaces of a given layer within a radius.
+        /// Implements BG3's SurfaceClearLayer(layer) functor.
+        /// </summary>
+        /// <param name="layer">The layer to clear (Ground or Cloud).</param>
+        /// <param name="position">Center position.</param>
+        /// <param name="radius">Radius to clear within.</param>
+        /// <returns>Number of surfaces affected.</returns>
+        public int ClearSurfaceLayer(SurfaceLayer layer, Vector3 position, float radius)
+        {
+            if (radius <= 0f)
+                return 0;
+
+            var targets = _activeSurfaces
+                .Where(s => s.Definition.Layer == layer && s.IntersectsArea(position, radius))
+                .ToList();
+
+            int affected = 0;
+            foreach (var surface in targets)
+            {
+                if (!_activeSurfaces.Contains(surface))
+                    continue;
+
+                if (surface.Definition.CanBeSubtracted)
+                {
+                    if (surface.SubtractArea(position, radius))
+                    {
+                        affected++;
+                        if (surface.IsDepleted)
+                        {
+                            RemoveSurface(surface);
+                        }
+                        else
+                        {
+                            OnSurfaceGeometryChanged?.Invoke(surface);
+                            DispatchSurfaceGeometryChanged(surface);
+                        }
+                    }
+                }
+                else
+                {
+                    RemoveSurface(surface);
+                    affected++;
+                }
+            }
+
+            return affected;
         }
 
         /// <summary>
@@ -1081,7 +1269,8 @@ namespace QDND.Combat.Environment
                     PositionZ = surface.Position.Z,
                     Radius = surface.Radius,
                     OwnerCombatantId = surface.CreatorId ?? string.Empty,
-                    RemainingDuration = surface.RemainingDuration
+                    RemainingDuration = surface.RemainingDuration,
+                    RoundsSinceLastGrowth = surface.RoundsSinceLastGrowth
                 };
 
                 foreach (var blob in surface.Blobs)
@@ -1153,7 +1342,8 @@ namespace QDND.Combat.Environment
             var instance = new SurfaceInstance(def)
             {
                 CreatorId = snapshot.OwnerCombatantId,
-                RemainingDuration = ResolveDuration(def, snapshot.RemainingDuration)
+                RemainingDuration = ResolveDuration(def, snapshot.RemainingDuration),
+                RoundsSinceLastGrowth = snapshot.RoundsSinceLastGrowth
             };
 
             if (snapshot.Blobs != null && snapshot.Blobs.Count > 0)
@@ -1267,7 +1457,7 @@ namespace QDND.Combat.Environment
             void Add(SurfaceDefinition d) => RegisterSurface(d);
 
             var fire = Def("fire", "Fire", SurfaceType.Fire, SurfaceLayer.Ground, 3, "#FF6A00", 0.62f, liquid: false);
-            fire.DamagePerTrigger = 5; fire.DamageType = "fire";
+            fire.DamagePerTrigger = 5; fire.DamageType = "fire"; fire.AppliesStatusId = "burning";
             fire.Tags = new HashSet<string> { "fire", "elemental" };
             fire.Interactions = new Dictionary<string, string> { ["water"] = "steam", ["oil"] = "fire", ["grease"] = "fire", ["web"] = "fire", ["poison"] = "fire", ["ice"] = "water" };
             fire.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
@@ -1289,12 +1479,14 @@ namespace QDND.Combat.Environment
             };
             Add(water);
 
-            var blood = Def("blood", "Blood", SurfaceType.Custom, SurfaceLayer.Ground, 0, "#8B1F2D", 0.52f);
+            var blood = Def("blood", "Blood", SurfaceType.Blood, SurfaceLayer.Ground, 0, "#8B1F2D", 0.52f);
             blood.Tags = new HashSet<string> { "blood", "liquid" };
+            blood.Interactions = new Dictionary<string, string> { ["fire"] = "fire", ["lightning"] = "blood_electrified" };
             blood.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
             {
-                ["freeze"] = new SurfaceReaction { ResultSurfaceId = "ice" },
-                ["electrify"] = new SurfaceReaction { ResultSurfaceId = "electrified_water" }
+                ["freeze"] = new SurfaceReaction { ResultSurfaceId = "blood_frozen" },
+                ["electrify"] = new SurfaceReaction { ResultSurfaceId = "blood_electrified" },
+                ["ignite"] = new SurfaceReaction { ResultSurfaceId = "fire" }
             };
             Add(blood);
 
@@ -1466,6 +1658,102 @@ namespace QDND.Combat.Environment
             entangle.SaveDC = 12;
             entangle.Tags = new HashSet<string> { "nature", "difficult_terrain" };
             Add(entangle);
+
+            var lava = Def("lava", "Lava", SurfaceType.Lava, SurfaceLayer.Ground, 0, "#FF4500", 0.72f, liquid: false);
+            lava.DamagePerTrigger = 10; lava.DamageType = "fire"; lava.MovementCostMultiplier = 2f;
+            lava.Tags = new HashSet<string> { "fire", "elemental", "difficult_terrain" };
+            lava.Interactions = new Dictionary<string, string> { ["water"] = "stone_wall" };
+            lava.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["douse"] = new SurfaceReaction { ResultSurfaceId = "stone_wall" },
+                ["freeze"] = new SurfaceReaction { ResultSurfaceId = "stone_wall" }
+            };
+            Add(lava);
+
+            var groundPoison = Def("ground_poison", "Poison", SurfaceType.Poison, SurfaceLayer.Ground, 3, "#46AE39", 0.54f);
+            groundPoison.DamagePerTrigger = 3; groundPoison.DamageType = "poison"; groundPoison.AppliesStatusId = "poisoned";
+            groundPoison.Tags = new HashSet<string> { "poison", "liquid" };
+            groundPoison.Interactions = new Dictionary<string, string> { ["fire"] = "fire" };
+            groundPoison.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["ignite"] = new SurfaceReaction { ResultSurfaceId = "fire", ExplosionDamage = 5, ExplosionRadius = 2f, ExplosionDamageType = "fire" },
+                ["freeze"] = new SurfaceReaction { ResultSurfaceId = "poison_frozen" }
+            };
+            Add(groundPoison);
+
+            var poisonFrozen = Def("poison_frozen", "Frozen Poison", SurfaceType.Ice, SurfaceLayer.Ground, 5, "#6ECE82", 0.56f);
+            poisonFrozen.MovementCostMultiplier = 2f; poisonFrozen.AppliesStatusId = "prone";
+            poisonFrozen.SaveAbility = AbilityType.Dexterity; poisonFrozen.SaveDC = 10;
+            poisonFrozen.Tags = new HashSet<string> { "ice", "poison", "difficult_terrain", "slippery" };
+            poisonFrozen.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["melt"] = new SurfaceReaction { ResultSurfaceId = "ground_poison" },
+                ["ignite"] = new SurfaceReaction { ResultSurfaceId = "ground_poison" }
+            };
+            Add(poisonFrozen);
+
+            var bloodFrozen = Def("blood_frozen", "Frozen Blood", SurfaceType.Ice, SurfaceLayer.Ground, 5, "#5C1020", 0.56f);
+            bloodFrozen.MovementCostMultiplier = 2f; bloodFrozen.AppliesStatusId = "prone";
+            bloodFrozen.SaveAbility = AbilityType.Dexterity; bloodFrozen.SaveDC = 10;
+            bloodFrozen.Tags = new HashSet<string> { "ice", "blood", "difficult_terrain", "slippery" };
+            bloodFrozen.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["melt"] = new SurfaceReaction { ResultSurfaceId = "blood" }
+            };
+            Add(bloodFrozen);
+
+            var bloodElectrified = Def("blood_electrified", "Electrified Blood", SurfaceType.Lightning, SurfaceLayer.Ground, 2, "#A03050", 0.58f);
+            bloodElectrified.DamagePerTrigger = 4; bloodElectrified.DamageType = "lightning"; bloodElectrified.AppliesStatusId = "shocked";
+            bloodElectrified.Tags = new HashSet<string> { "lightning", "blood", "elemental" };
+            bloodElectrified.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["freeze"] = new SurfaceReaction { ResultSurfaceId = "blood_frozen" }
+            };
+            Add(bloodElectrified);
+
+            var alcoholSurface = Def("alcohol", "Alcohol", SurfaceType.Alcohol, SurfaceLayer.Ground, 0, "#CD853F", 0.5f);
+            alcoholSurface.MovementCostMultiplier = 1f;
+            alcoholSurface.Tags = new HashSet<string> { "alcohol", "flammable", "liquid" };
+            alcoholSurface.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["ignite"] = new SurfaceReaction { ResultSurfaceId = "fire", ExplosionDamage = 6, ExplosionRadius = 2.5f, ExplosionDamageType = "fire" }
+            };
+            Add(alcoholSurface);
+
+            var mud = Def("mud", "Mud", SurfaceType.Mud, SurfaceLayer.Ground, 0, "#6B4423", 0.56f);
+            mud.MovementCostMultiplier = 3f;
+            mud.Tags = new HashSet<string> { "mud", "difficult_terrain", "nature" };
+            mud.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["freeze"] = new SurfaceReaction { ResultSurfaceId = "ice" }
+            };
+            Add(mud);
+
+            var blackPowder = Def("black_powder", "Black Powder", SurfaceType.BlackPowder, SurfaceLayer.Ground, 0, "#2F2F2F", 0.55f, liquid: false);
+            blackPowder.Tags = new HashSet<string> { "explosive", "flammable" };
+            blackPowder.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["ignite"] = new SurfaceReaction { ResultSurfaceId = "fire", ExplosionDamage = 12, ExplosionRadius = 3f, ExplosionDamageType = "fire" }
+            };
+            Add(blackPowder);
+
+            var deepWater = Def("deep_water", "Deep Water", SurfaceType.DeepWater, SurfaceLayer.Ground, 0, "#1A5276", 0.65f);
+            deepWater.MovementCostMultiplier = 4f; deepWater.AppliesStatusId = "wet";
+            deepWater.Tags = new HashSet<string> { "water", "deep", "difficult_terrain" };
+            deepWater.EventReactions = new Dictionary<string, SurfaceReaction>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["freeze"] = new SurfaceReaction { ResultSurfaceId = "ice" },
+                ["electrify"] = new SurfaceReaction { ResultSurfaceId = "electrified_water" }
+            };
+            Add(deepWater);
+
+            var potionHealingCloud = Def("potion_healing_cloud", "Healing Vapors", SurfaceType.Custom, SurfaceLayer.Cloud, 1, "#FF6B8A", 0.36f, liquid: false);
+            potionHealingCloud.Tags = new HashSet<string> { "healing", "cloud", "magic" };
+            Add(potionHealingCloud);
+
+            var potionHealingGreaterCloud = Def("potion_healing_greater_cloud", "Greater Healing Vapors", SurfaceType.Custom, SurfaceLayer.Cloud, 1, "#FF4570", 0.38f, liquid: false);
+            potionHealingGreaterCloud.Tags = new HashSet<string> { "healing", "cloud", "magic" };
+            Add(potionHealingGreaterCloud);
 
             var daylight = Def("daylight", "Daylight", SurfaceType.Custom, SurfaceLayer.Cloud, 10, "#FFF0B2", 0.28f, liquid: false);
             daylight.Tags = new HashSet<string> { "light", "cloud", "magic" };
