@@ -169,6 +169,12 @@ namespace QDND.Combat.Statuses
         public List<string> GrantedActions { get; set; } = new();
 
         /// <summary>
+        /// Number of extra action charges granted to the bearer at the start of their turn.
+        /// Used by Haste-like effects that grant an additional action per turn.
+        /// </summary>
+        public int ExtraActionCharges { get; set; }
+
+        /// <summary>
         /// If set, overrides AI movement on the affected combatant's turn.
         /// Values: "flee_from_source", "approach_source"
         /// </summary>
@@ -192,6 +198,20 @@ namespace QDND.Combat.Statuses
         /// Default: true (matches most BG3 auras like Flaming Sphere).
         /// </summary>
         public bool AuraAffectsEnemiesOnly { get; set; } = true;
+
+        /// <summary>
+        /// If true, this aura's child status is applied at the START of each affected combatant's
+        /// turn rather than the end. Used by Spirit Guardians (BG3: damage at turn start).
+        /// Default: false (most auras process at turn end, e.g. Flaming Sphere).
+        /// </summary>
+        public bool AuraTurnStart { get; set; }
+
+        /// <summary>
+        /// If true, this status's tick effects fire at the START of the affected combatant's
+        /// turn instead of the end. Duration still decrements at turn end.
+        /// Used by Spirit Guardians child status (damage at turn start, not turn end).
+        /// </summary>
+        public bool TickAtTurnStart { get; set; }
 
         /// <summary>
         /// Check if this status has a specific status property flag.
@@ -225,6 +245,8 @@ namespace QDND.Combat.Statuses
         public float Value { get; set; }
         public float ValuePerStack { get; set; } // Additional value per stack
         public string Condition { get; set; }
+        /// <summary>Dice expression (e.g. "1d4") used when Type is Dice. Takes priority over Value.</summary>
+        public string DiceFormula { get; set; }
     }
 
     /// <summary>
@@ -373,6 +395,13 @@ namespace QDND.Combat.Statuses
                     Tags = new HashSet<string>(Definition.Tags)
                 };
 
+                // If the data definition includes a dice formula, override to Dice type
+                if (!string.IsNullOrEmpty(modDef.DiceFormula))
+                {
+                    mod.Type = ModifierType.Dice;
+                    mod.DiceFormula = modDef.DiceFormula;
+                }
+
                 // Status-specific mechanical conditions that are not expressible in flat data yet.
                 if (string.Equals(Definition.Id, "threatened", StringComparison.OrdinalIgnoreCase) &&
                     mod.Target == ModifierTarget.AttackRoll &&
@@ -488,6 +517,23 @@ namespace QDND.Combat.Statuses
                 var saveTag = $"save:{rawAbility.ToLowerInvariant()}";
                 return ctx =>
                     ctx?.Tags != null && ctx.Tags.Contains(saveTag);
+            }
+
+            // melee_twohanded_or_versatile: applies to melee attacks with a Two-Handed or Versatile weapon (GWM All In, BG3 rule)
+            if (condition.Equals("melee_twohanded_or_versatile", StringComparison.OrdinalIgnoreCase))
+            {
+                return ctx =>
+                    ctx?.Tags != null &&
+                    ctx.Tags.Contains("melee_attack") &&
+                    (ctx.Tags.Contains("weapon:two_handed") || ctx.Tags.Contains("weapon:versatile"));
+            }
+
+            // weapon_attack: applies to melee or ranged weapon attacks (Crusader's Mantle, etc.)
+            if (condition.Equals("weapon_attack", StringComparison.OrdinalIgnoreCase))
+            {
+                return ctx =>
+                    ctx?.Tags != null &&
+                    (ctx.Tags.Contains("melee_attack") || ctx.Tags.Contains("ranged_attack"));
             }
 
             return null;
@@ -1256,6 +1302,32 @@ namespace QDND.Combat.Statuses
         }
 
         /// <summary>
+        /// Process turn start for a combatant: fires tick effects for any status with
+        /// TickAtTurnStart = true (e.g. Spirit Guardians child). Duration is NOT decremented
+        /// here — that still happens in ProcessTurnEnd.
+        /// </summary>
+        public void ProcessTurnStart(string combatantId)
+        {
+            if (!_combatantStatuses.TryGetValue(combatantId, out var list))
+                return;
+
+            foreach (var instance in list.ToList())
+            {
+                if (!instance.Definition.TickAtTurnStart) continue;
+
+                try
+                {
+                    ProcessTickEffects(instance);
+                    OnStatusTick?.Invoke(instance);
+                }
+                catch (Exception ex)
+                {
+                    RuntimeSafety.LogError($"[StatusManager] Error processing turn-start tick for {instance.Definition.Id} on {combatantId}: {ex.Message}");
+                }
+            }
+        }
+
+        /// <summary>
         /// Process turn end for a combatant (tick turn-based statuses).
         /// Also processes saving throw repeats for statuses that allow them.
         /// </summary>
@@ -1329,9 +1401,14 @@ namespace QDND.Combat.Statuses
 
                     if (instance.Definition.DurationType == DurationType.Turns)
                     {
-                        // Process tick effects
-                        ProcessTickEffects(instance);
-                        OnStatusTick?.Invoke(instance);
+                        // Only fire tick effects here for non-turn-start-tick statuses.
+                        // Statuses with TickAtTurnStart = true already fired at turn start;
+                        // we still decrement their duration so they expire correctly.
+                        if (!instance.Definition.TickAtTurnStart)
+                        {
+                            ProcessTickEffects(instance);
+                            OnStatusTick?.Invoke(instance);
+                        }
 
                         if (!instance.Tick())
                         {

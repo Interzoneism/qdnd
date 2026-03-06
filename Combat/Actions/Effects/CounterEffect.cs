@@ -23,21 +23,51 @@ namespace QDND.Combat.Actions.Effects
             var results = new List<EffectResult>();
 
             // Check if there's a counterable ability cast
-            if (context.TriggerContext != null &&
-                context.TriggerContext.IsCancellable &&
-                (context.TriggerContext.TriggerType == QDND.Combat.Reactions.ReactionTriggerType.SpellCastNearby) &&
-                !string.IsNullOrEmpty(context.TriggerContext.ActionId))
+            if (context.TriggerContext == null ||
+                !context.TriggerContext.IsCancellable ||
+                context.TriggerContext.TriggerType != QDND.Combat.Reactions.ReactionTriggerType.SpellCastNearby ||
+                string.IsNullOrEmpty(context.TriggerContext.ActionId))
             {
-                context.TriggerContext.WasCancelled = true;
+                results.Add(EffectResult.Failed(Type, context.Source.Id, null,
+                    "No counterable ability"));
+                return results;
+            }
 
-                string msg = $"Countered {context.TriggerContext.ActionId}";
+            int targetSpellLevel = context.TriggerContext.TriggerSpellLevel;
+            int counterspellSlotLevel = context.TriggerContext.CounterspellSlotLevel;
+
+            if (targetSpellLevel <= counterspellSlotLevel)
+            {
+                // Auto-cancel: Counterspell slot level >= target spell level
+                context.TriggerContext.WasCancelled = true;
+                string msg = $"Countered {context.TriggerContext.ActionId} (auto, slot {counterspellSlotLevel} >= level {targetSpellLevel})";
                 results.Add(EffectResult.Succeeded(Type, context.Source.Id,
                     context.TriggerContext.TriggerSourceId, 0, msg));
             }
             else
             {
-                results.Add(EffectResult.Failed(Type, context.Source.Id, null,
-                    "No counterable ability"));
+                // Ability check required: DC = 10 + target spell level, use Intelligence modifier
+                int dc = 10 + targetSpellLevel;
+                int intMod = context.Source.GetAbilityModifier(AbilityType.Intelligence);
+                int roll = context.Rules.Dice.RollD20();
+                int total = roll + intMod;
+
+                context.TriggerContext.Data["counterspellAttempted"] = true;
+
+                if (total >= dc)
+                {
+                    context.TriggerContext.WasCancelled = true;
+                    string msg = $"Countered {context.TriggerContext.ActionId} (check {total} vs DC {dc})";
+                    results.Add(EffectResult.Succeeded(Type, context.Source.Id,
+                        context.TriggerContext.TriggerSourceId, 0, msg));
+                }
+                else
+                {
+                    context.TriggerContext.WasCancelled = false;
+                    string msg = $"Failed to counter {context.TriggerContext.ActionId} (check {total} vs DC {dc})";
+                    results.Add(EffectResult.Failed(Type, context.Source.Id,
+                        context.TriggerContext.TriggerSourceId, msg));
+                }
             }
 
             return results;

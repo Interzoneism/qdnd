@@ -350,11 +350,11 @@
       "isDispellable": true,
       "isConcentration": true,
       "tags": ["buff", "spell", "transmutation", "concentration"],
+      "extraActionCharges": 1,
       "modifiers": [
         { "target": "armorClass", "type": "flat", "value": 2 },
-        { "target": "movementSpeed", "type": "percentage", "value": 100 },
-        { "target": "savingThrow", "type": "advantage", "value": 1, "condition": "ability:dexterity" },
-        { "target": "actionPoints", "type": "flat", "value": 1 }
+        { "target": "movementSpeed", "type": "flat", "value": 9 },
+        { "target": "savingThrow", "type": "advantage", "value": 1, "condition": "ability:dexterity" }
       ],
       "triggerEffects": [
         { "triggerOn": "OnRemove", "effectType": "apply_status", "statusId": "lethargic", "triggerChance": 100, "parameters": { "duration": 1 } }

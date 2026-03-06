@@ -151,8 +151,9 @@ namespace QDND.Tests.Unit
                 IsCancellable = true
             };
 
-            // No spell slots available -> cannot trigger.
-            Assert.False(reactions.CanTrigger(reaction, trigger, reactor));
+            // No spell slots available -> CanTrigger is true (trigger type is valid),
+            // but UseReaction fails because resources are checked there.
+            Assert.True(reactions.CanTrigger(reaction, trigger, reactor));
             Assert.False(reactions.UseReaction(reactor, reaction, trigger));
             Assert.True(reactor.ActionBudget.HasReaction);
 
@@ -170,10 +171,10 @@ namespace QDND.Tests.Unit
             Assert.Equal(0, reactor.ActionResources.GetCurrent("SpellSlot", 3));
             Assert.False(reactor.ActionBudget.HasReaction);
 
-            // After turn reset reaction returns, but no spell slot remains so it still cannot trigger.
+            // After turn reset reaction returns, but no spell slot remains so UseReaction still fails.
             reactor.ActionBudget.ResetReactionForRound();
             Assert.True(reactor.ActionBudget.HasReaction);
-            Assert.False(reactions.CanTrigger(reaction, trigger, reactor));
+            Assert.False(reactions.UseReaction(reactor, reaction, trigger));
         }
     }
 }

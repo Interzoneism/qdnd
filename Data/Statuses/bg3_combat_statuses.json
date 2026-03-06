@@ -296,7 +296,7 @@
       "modifiers": [
         { "target": "skillCheck", "type": "disadvantage", "value": 1, "condition": "ability:strength" },
         { "target": "savingThrow", "type": "disadvantage", "value": 1, "condition": "ability:strength" },
-        { "target": "damageDealt", "type": "dice", "value": -4, "condition": "weapon_attack" }
+        { "target": "damageDealt", "type": "dice", "value": 0, "diceFormula": "-1d4", "condition": "weapon_attack" }
       ]
     },
     {

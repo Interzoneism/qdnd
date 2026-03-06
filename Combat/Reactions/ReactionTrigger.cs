@@ -99,6 +99,18 @@ namespace QDND.Combat.Reactions
         public bool WasCancelled { get; set; }
 
         /// <summary>
+        /// The effective spell level of the triggering spell (base level + upcast delta).
+        /// Set when a SpellCastNearby trigger is constructed in the action pipeline.
+        /// </summary>
+        public int TriggerSpellLevel { get; set; }
+
+        /// <summary>
+        /// The spell slot level used by the counterspeller.
+        /// Defaults to 3 (minimum Counterspell slot). Set by AI or player before reaction executes.
+        /// </summary>
+        public int CounterspellSlotLevel { get; set; } = 3;
+
+        /// <summary>
         /// Custom data for specific triggers.
         /// </summary>
         public System.Collections.Generic.Dictionary<string, object> Data { get; set; } = new();

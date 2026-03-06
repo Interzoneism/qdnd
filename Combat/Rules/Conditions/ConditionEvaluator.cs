@@ -402,7 +402,7 @@ namespace QDND.Combat.Rules.Conditions
             {
                 "Target" => _ctx.Target,
                 "Source" => _ctx.Source,
-                _ => _ctx.Source   // unqualified defaults to source
+                _ => _ctx.DefaultSubjectIsTarget ? _ctx.Target : _ctx.Source   // unqualified defaults to source, or target for TargetConditions
             };
 
             switch (fn.ToLowerInvariant())
@@ -482,14 +482,23 @@ namespace QDND.Combat.Rules.Conditions
                            ReferenceEquals(_ctx.Source, _ctx.Target);
 
                 case "character":
+                {
                     // Character() — is a real character (not a summon/object)
-                    return subject != null && subject.Faction != Faction.Neutral && string.IsNullOrEmpty(subject.OwnerId);
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    return who != null && who.Faction != Faction.Neutral && string.IsNullOrEmpty(who.OwnerId);
+                }
 
                 case "dead":
-                    return subject?.LifeState == CombatantLifeState.Dead;
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    return who?.LifeState == CombatantLifeState.Dead;
+                }
 
                 case "isalive":
-                    return subject?.LifeState == CombatantLifeState.Alive;
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    return who?.LifeState == CombatantLifeState.Alive;
+                }
 
                 // ── Distance checks ──
                 case "distancetotargetgreaterthan":
@@ -609,7 +618,7 @@ namespace QDND.Combat.Rules.Conditions
                 case "hastag":
                 {
                     string tag = StripQuotes(ArgString(args, 0));
-                    return subject?.Tags?.Contains(tag) ?? false;
+                    return subject?.Tags?.Any(t => t.Equals(tag, StringComparison.OrdinalIgnoreCase)) ?? false;
                 }
 
                 // ── New BG3 condition functions ──
@@ -728,12 +737,14 @@ namespace QDND.Combat.Rules.Conditions
 
                 case "player":
                 {
-                    return subject?.IsPlayerControlled ?? false;
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    return who?.IsPlayerControlled ?? false;
                 }
 
                 case "party":
                 {
-                    return subject?.IsPlayerControlled ?? false;
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    return who?.IsPlayerControlled ?? false;
                 }
 
                 case "item":

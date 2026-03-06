@@ -99,6 +99,12 @@ namespace QDND.Combat.Statuses
                 definition.Tags.Add("incapacitated");
             }
 
+            // Check for paralysis (HOLD_PERSON, HOLD_MONSTER: melee attacks auto-crit)
+            if (bg3Status.StatusGroups?.Contains("SG_Paralyzed") == true)
+            {
+                definition.Tags.Add("paralyzed");
+            }
+
             // Parse remove events
             if (!string.IsNullOrEmpty(bg3Status.RemoveEvents))
             {

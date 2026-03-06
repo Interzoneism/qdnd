@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using QDND.Combat.Entities;
+using QDND.Combat.Rules.Boosts;
+using QDND.Combat.Rules.Conditions;
 using QDND.Data.CharacterModel;
 using QDND.Combat.Environment;
 using QDND.Combat.Statuses;
@@ -51,6 +53,11 @@ namespace QDND.Combat.Targeting
         /// Optional status manager for sanctuary and other status-based targeting checks.
         /// </summary>
         public StatusManager Statuses { get; set; }
+
+        /// <summary>
+        /// Optional condition evaluator for BG3TargetConditions evaluation.
+        /// </summary>
+        public ConditionEvaluator ConditionEval { get; set; }
 
         /// <summary>
         /// Create a validator without LOS checking.
@@ -187,16 +194,22 @@ namespace QDND.Combat.Targeting
                     return TargetValidation.Invalid($"Target out of range ({distance:F1}/{action.Range + tolerance:F1})");
             }
 
-            // Sanctuary check: BG3 Sanctuary is a hard targeting block via CannotHarmCauseEntity.
-            // The protected creature cannot be targeted by hostile actions at all.
-            // Sanctuary is removed when the protected creature attacks (handled by passive system).
-            if (Statuses != null
-                && source.Id != target.Id
-                && source.Faction != target.Faction
-                && Statuses.HasStatus(target.Id, "sanctuary"))
+            // Targeting restriction checks (hostile-only, different entity)
+            if (source.Id != target.Id && source.Faction != target.Faction)
             {
-                return TargetValidation.Invalid("Target is protected by Sanctuary");
+                // CannotHarmCauseEntity: actor's boost prevents them from harming the entity that applied it
+                // (covers Charmed, Dominated, and similar mechanics)
+                if (!BoostEvaluator.CanHarm(source, target, Statuses))
+                    return TargetValidation.Invalid("Cannot target this entity");
+
+                // Sanctuary: target is protected by Sanctuary status (hard targeting block)
+                if (Statuses != null && Statuses.HasStatus(target.Id, "sanctuary"))
+                    return TargetValidation.Invalid("Target is protected by Sanctuary");
             }
+
+            // BG3TargetConditions: creature-type and feature gating (e.g. Tagged('HUMANOID'))
+            if (!PassesTargetCondition(action, source, target))
+                return TargetValidation.Invalid("Target condition not met");
 
             return TargetValidation.Valid(new List<Combatant> { target });
         }
@@ -219,6 +232,7 @@ namespace QDND.Combat.Targeting
                 .Where(c => IsTargetStateAllowed(action, c))
                 .Where(c => IsValidFaction(action.TargetFilter, source, c))
                 .Where(c => HasRequiredTags(action, c))
+                .Where(c => PassesTargetCondition(action, source, c))
                 .Where(c => !IsShoveAction(action) || IsValidShoveSize(source, c))
                 .Where(c => HasLineOfSight(source, c))
                 .Where(c => IsInAbilityRange(source, c, action.Range))
@@ -289,6 +303,18 @@ namespace QDND.Combat.Targeting
         {
             float distance = source.Position.DistanceTo(target.Position);
             return distance <= range;
+        }
+
+        /// <summary>
+        /// Evaluate BG3TargetConditions expression against a candidate target.
+        /// Returns true if no condition is set, if the evaluator is unavailable, or if the condition passes.
+        /// </summary>
+        private bool PassesTargetCondition(Actions.ActionDefinition action, Combatant source, Combatant target)
+        {
+            if (string.IsNullOrEmpty(action.BG3TargetConditions) || ConditionEval == null)
+                return true;
+            var ctx = ConditionContext.ForTargetCondition(source, target, Statuses);
+            return ConditionEval.Evaluate(action.BG3TargetConditions, ctx);
         }
 
         /// <summary>
@@ -375,6 +401,9 @@ namespace QDND.Combat.Targeting
 
                 bool hasRequiredTags = HasRequiredTags(action, combatant);
                 if (!hasRequiredTags)
+                    continue;
+
+                if (!PassesTargetCondition(action, source, combatant))
                     continue;
 
                 var pos = getPosition(combatant);

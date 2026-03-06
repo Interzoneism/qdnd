@@ -1406,6 +1406,9 @@ namespace QDND.Data
             if (faction == Faction.Player) tags.Add("player");
             if (faction == Faction.Hostile) tags.Add("enemy");
 
+            // All scenarios currently use standard D&D races which are humanoids
+            tags.Add("HUMANOID");
+
             bool subclassCaster = classDef?.Subclasses?.Any(sub =>
                 string.Equals(sub.Id, subclassId, StringComparison.OrdinalIgnoreCase)
                 && sub.SpellcasterModifier > 0) == true;

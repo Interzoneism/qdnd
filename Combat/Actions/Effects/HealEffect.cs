@@ -22,9 +22,49 @@ namespace QDND.Combat.Actions.Effects
         {
             var results = new List<EffectResult>();
 
+            // Resolve LevelMapValue tokens in the heal formula (e.g. "1d10+LevelMapValue(SecondWindHeal)")
+            string effectiveHealFormula = definition.DiceFormula;
+            if (!string.IsNullOrEmpty(effectiveHealFormula) &&
+                effectiveHealFormula.Contains("LevelMapValue", StringComparison.OrdinalIgnoreCase))
+            {
+                var lvlMatch = System.Text.RegularExpressions.Regex.Match(
+                    effectiveHealFormula,
+                    @"LevelMapValue\((\w+)\)",
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (lvlMatch.Success)
+                {
+                    string mapName = lvlMatch.Groups[1].Value;
+                    string mapClassName = QDND.Combat.Rules.LevelMapResolver.GetClassForMap(mapName);
+                    int classLevel = mapClassName != null
+                        ? (context.Source?.ResolvedCharacter?.Sheet?.GetClassLevel(mapClassName) ?? 1)
+                        : (context.Source?.ResolvedCharacter?.Sheet?.TotalLevel ?? 1);
+                    string resolved = QDND.Combat.Rules.LevelMapResolver.Resolve(mapName, classLevel);
+                    effectiveHealFormula = effectiveHealFormula.Replace(lvlMatch.Value, resolved);
+                }
+            }
+
             foreach (var target in context.Targets)
             {
-                int baseHealAmount = RollDice(definition, context, critDouble: false);
+                // Roll dice with the (possibly level-resolved) formula
+                int baseHealAmount;
+                if (!string.IsNullOrEmpty(effectiveHealFormula))
+                {
+                    var (hCount, hSides, hBonus) = ParseDice(effectiveHealFormula);
+                    if (hSides > 0)
+                    {
+                        baseHealAmount = hBonus;
+                        for (int i = 0; i < hCount; i++)
+                            baseHealAmount += context.Rng.Next(1, hSides + 1);
+                    }
+                    else
+                    {
+                        baseHealAmount = hBonus;
+                    }
+                }
+                else
+                {
+                    baseHealAmount = (int)definition.Value;
+                }
 
                 // Apply healing through rules engine for modifiers
                 var healQuery = new QueryInput

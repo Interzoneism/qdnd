@@ -367,9 +367,9 @@ namespace QDND.Combat.Reactions
             {
                 if (context.IsCancellable)
                 {
-                    context.WasCancelled = true;
-                    context.Data["counterspelled"] = true;
-                    context.Data["counterspellerLevel"] = 3; // Base level; higher-slot logic TBD
+                    int casterSlotLevel = context.Data.TryGetValue("counterspellSlotLevel", out var slv) && slv is int i ? i : 3;
+                    context.CounterspellSlotLevel = casterSlotLevel;
+                    context.Data["counterspellerLevel"] = casterSlotLevel;
                     context.Data["interruptId"] = "Interrupt_Counterspell";
                 }
             };

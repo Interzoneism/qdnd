@@ -445,6 +445,15 @@ namespace QDND.Combat.Rules
                 }
             }
 
+            // Target-side boost checks: Advantage(AttackTarget)
+            // Note: SourceAdvantageOnAttack (True Strike, Vow of Enmity) is checked in EffectPipeline
+            // where both attacker and StatusManager are available for SourceId cross-referencing.
+            if (input.Target != null)
+            {
+                if (BoostEvaluator.HasAdvantageAgainstTarget(input.Target))
+                    allAdvSources.Add("TargetBoost");
+            }
+
             // Condition-based advantage/disadvantage from active statuses (D&D 5e conditions)
             bool isMelee = input.Tags != null && (input.Tags.Contains("melee") || input.Tags.Contains("melee_attack"));
             if (input.Parameters.TryGetValue("sourceActiveStatuses", out var srcStatusObj) && srcStatusObj is IEnumerable<string> srcStatuses)
@@ -726,7 +735,9 @@ namespace QDND.Combat.Rules
             if (input.Parameters.TryGetValue("targetActiveStatuses", out var saveTargetStatusObj) && saveTargetStatusObj is IEnumerable<string> saveTargetStatuses)
             {
                 var saveTargetEffects = ConditionEffects.GetAggregateEffects(saveTargetStatuses);
-                // Auto-fail STR/DEX saves (Paralyzed, Petrified, Stunned, Unconscious)
+                // Auto-fail STR/DEX saves (Paralyzed, Petrified, Stunned, Unconscious).
+                // Note: boost-based auto-fail (AbilityFailedSavingThrow boost type) is handled in
+                // EffectPipeline.ShouldAutoFailSave() and is NOT duplicated here.
                 if (saveTargetEffects.AutoFailStrDexSaves && ability.HasValue)
                 {
                     if (ability.Value == AbilityType.Strength || ability.Value == AbilityType.Dexterity)
@@ -1171,6 +1182,41 @@ namespace QDND.Combat.Rules
             int targetTempHP = input.Target?.Resources.TemporaryHP ?? 0;
             int targetCurrentHP = input.Target?.Resources.CurrentHP ?? 100;
 
+            // Pre-roll Dice-type modifiers without mutating the originals
+            // (originals are shared refs from the status system and must stay as Dice for re-rolling)
+            int preRolledDiceBonus = 0;
+            for (int mi = allModifiers.Count - 1; mi >= 0; mi--)
+            {
+                var mod = allModifiers[mi];
+                if (mod.Type != ModifierType.Dice || string.IsNullOrEmpty(mod.DiceFormula))
+                    continue;
+
+                allModifiers.RemoveAt(mi);
+                var f = mod.DiceFormula.Trim();
+                bool neg = f.StartsWith("-");
+                if (neg) f = f.Substring(1);
+                var parts = f.ToLowerInvariant().Split('d');
+                if (parts.Length == 2
+                    && int.TryParse(parts[0], out int dc)
+                    && int.TryParse(parts[1], out int ds)
+                    && dc > 0 && ds > 0)
+                {
+                    int rolled = _dice.Roll(dc, ds);
+                    preRolledDiceBonus += neg ? -rolled : rolled;
+                }
+            }
+            if (preRolledDiceBonus != 0)
+            {
+                allModifiers.Add(new Modifier
+                {
+                    Name = "Dice Bonus (rolled)",
+                    Type = ModifierType.Flat,
+                    Target = ModifierTarget.DamageDealt,
+                    Value = preRolledDiceBonus,
+                    Source = "dice_preroll"
+                });
+            }
+
             // Execute damage pipeline
             var pipelineResult = DamagePipeline.Calculate(
                 baseDamage: baseDamage,
@@ -1428,10 +1474,13 @@ namespace QDND.Combat.Rules
             int boostACBonus = BoostEvaluator.GetACBonus(combatant);
             finalAC += boostACBonus;
 
-            // BG3 DAZED: BlockAbilityModifierFromAC(Dexterity) — remove the DEX contribution.
+            // BG3 DAZED/PARALYZED/STUNNED: BlockAbilityModifierFromAC(Dexterity) — remove the DEX contribution.
             // For armored combatants the contribution is clamped to [0, MaxDexBonus];
             // for unarmored it is also clamped to min 0 so only a positive modifier is removed.
-            if (BlockDexFromACCheck?.Invoke(combatant.Id) == true)
+            // Checked via both the legacy status flag and the boost system.
+            bool blockDexFromAC = (BlockDexFromACCheck?.Invoke(combatant.Id) == true)
+                || BoostEvaluator.IsAbilityModifierBlockedFromAC(combatant, AbilityType.Dexterity);
+            if (blockDexFromAC)
             {
                 int equippedMaxDex = combatant.EquippedArmor?.MaxDexBonus ?? int.MaxValue;
                 int dexMod = combatant.GetAbilityModifier(AbilityType.Dexterity);

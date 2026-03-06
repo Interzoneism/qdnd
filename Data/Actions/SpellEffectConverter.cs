@@ -139,6 +139,9 @@ namespace QDND.Data.Actions
             // ParseSingleEffect may be called directly by tests/tools; unwrap simple wrappers first.
             functor = UnwrapConditionals(functor);
 
+            // Strip leading colon artifacts left by double-colon typos in BG3 data (e.g., "IF(...)::DealDamage(...)").
+            functor = functor.TrimStart(':');
+
             // Guard against bracket-only artifacts from wrapper tokenization (e.g., "]").
             if (string.IsNullOrWhiteSpace(functor) ||
                 functor.All(c => c == '[' || c == ']' || char.IsWhiteSpace(c)))
@@ -165,12 +168,42 @@ namespace QDND.Data.Actions
                 // DealDamage(max(1,1d6+UnarmedMeleeAbilityModifier),Piercing,Magical)
                 if (dealDamageArgs.Count >= 2)
                 {
-                    string diceFormula = CleanDiceFormula(dealDamageArgs[0]);
+                    string rawDiceArg = dealDamageArgs[0];
+                    float? extractedMultiplier = null;
+
+                    // Extract trailing /N divisor before cleaning (e.g. "(8d6)/2", "3d6/2", "MainMeleeWeapon/2")
+                    var divisorMatch = System.Text.RegularExpressions.Regex.Match(rawDiceArg, @"^(.*)/\s*(\d+)$");
+                    if (divisorMatch.Success)
+                    {
+                        int divisor = int.Parse(divisorMatch.Groups[2].Value);
+                        if (divisor > 1)
+                            extractedMultiplier = 1.0f / divisor;
+                        rawDiceArg = divisorMatch.Groups[1].Value.Trim();
+                    }
+
+                    // Strip outer parentheses left by BG3 "(8d6)/2" format
+                    if (rawDiceArg.Length >= 2 && rawDiceArg[0] == '(' && rawDiceArg[^1] == ')')
+                        rawDiceArg = rawDiceArg[1..^1].Trim();
+
+                    // Second pass: handle inner-paren divisor format "(1d10/2)" where /N was inside the parens.
+                    // After stripping the outer parens above we now have "1d10/2" — extract the divisor.
+                    if (!extractedMultiplier.HasValue)
+                    {
+                        var innerDivisorMatch = System.Text.RegularExpressions.Regex.Match(rawDiceArg, @"^(.*)/\s*(\d+)$");
+                        if (innerDivisorMatch.Success &&
+                            int.TryParse(innerDivisorMatch.Groups[2].Value, out int innerDivisor) && innerDivisor > 1)
+                        {
+                            extractedMultiplier = 1.0f / innerDivisor;
+                            rawDiceArg = innerDivisorMatch.Groups[1].Value.Trim();
+                        }
+                    }
+
+                    string diceFormula = CleanDiceFormula(rawDiceArg);
                     string damageType = NormalizeFunctorToken(dealDamageArgs[1]).ToLowerInvariant();
 
                     if (!string.IsNullOrWhiteSpace(diceFormula) && !string.IsNullOrWhiteSpace(damageType))
                     {
-                        return new EffectDefinition
+                        var effect = new EffectDefinition
                         {
                             Type = "damage",
                             DiceFormula = diceFormula,
@@ -178,6 +211,9 @@ namespace QDND.Data.Actions
                             SaveTakesHalf = halfOnSave,
                             Condition = null // Will be set by caller if needed
                         };
+                        if (extractedMultiplier.HasValue)
+                            effect.Parameters["damageMultiplier"] = extractedMultiplier.Value;
+                        return effect;
                     }
                 }
             }
@@ -1076,7 +1112,7 @@ namespace QDND.Data.Actions
                     depth++;
                 else if (c == ')')
                     depth--;
-                else if (c == ';' && depth == 0)
+                else if ((c == ';' || c == ',') && depth == 0)
                 {
                     result.Add(formula.Substring(start, i - start));
                     start = i + 1;
@@ -1588,6 +1624,10 @@ namespace QDND.Data.Actions
                 RuntimeSafety.Log($"[SpellEffectConverter] Stripped divisor /{divMatch.Groups[2].Value} from formula: {formula}");
             }
 
+            // Strip outer parentheses (belt-and-suspenders for BG3 "(8d6)/2" format after divisor removal)
+            if (formula.Length >= 2 && formula[0] == '(' && formula[^1] == ')')
+                formula = formula[1..^1].Trim();
+
             // Handle max() function (e.g., "max(1, OffhandMeleeWeapon)")
             var maxMatch = Regex.Match(formula, @"max\s*\(\s*(\d+)\s*,\s*([^)]+)\s*\)", RegexOptions.IgnoreCase);
             if (maxMatch.Success)
@@ -1996,6 +2036,10 @@ namespace QDND.Data.Actions
         /// </summary>
         private static string ResolveLevelMapValue(string mapValues, int level)
         {
+            // Named map (no colon): delegate to LevelMapResolver which knows cantrip scaling, rage, etc.
+            if (!mapValues.Contains(':'))
+                return QDND.Combat.Rules.LevelMapResolver.Resolve(mapValues, level);
+
             var values = mapValues.Split(':');
             if (values.Length == 0)
                 return "0";

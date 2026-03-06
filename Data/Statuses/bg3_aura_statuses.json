@@ -32,6 +32,90 @@
         }
       ],
       "tags": ["fire", "flaming_sphere", "aura_child"]
+    },
+    {
+      "id": "spirit_guardians_radiant_aura",
+      "name": "Spirit Guardians",
+      "description": "Spiritual guardians surround the caster, slowing enemies and dealing 3d8 Radiant damage at the start of each turn.",
+      "isBuff": true,
+      "isConcentration": true,
+      "isDispellable": true,
+      "durationType": "turns",
+      "defaultDuration": 100,
+      "auraRadius": 3.0,
+      "auraStatusId": "spirit_guardians_radiant_child",
+      "auraAffectsEnemiesOnly": true,
+      "auraTurnStart": true,
+      "tags": ["buff", "aura", "concentration", "conjuration"]
+    },
+    {
+      "id": "spirit_guardians_radiant_child",
+      "name": "Hindered (Spirit Guardians)",
+      "description": "Slowed by spiritual guardians. Movement speed halved and takes 3d8 Radiant damage at the start of each turn (WIS save for half).",
+      "isBuff": false,
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "stacking": "refresh",
+      "tickAtTurnStart": true,
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "percentage",
+          "value": -50
+        }
+      ],
+      "tickEffects": [
+        {
+          "effectType": "damage",
+          "diceFormula": "3d8",
+          "damageType": "radiant",
+          "saveType": "wisdom",
+          "halfDamageOnSave": true
+        }
+      ],
+      "tags": ["debuff", "aura_child"]
+    },
+    {
+      "id": "spirit_guardians_necrotic_aura",
+      "name": "Spirit Guardians (Necrotic)",
+      "description": "Spiritual guardians surround the caster, slowing enemies and dealing 3d8 Necrotic damage at the start of each turn.",
+      "isBuff": true,
+      "isConcentration": true,
+      "isDispellable": true,
+      "durationType": "turns",
+      "defaultDuration": 100,
+      "auraRadius": 3.0,
+      "auraStatusId": "spirit_guardians_necrotic_child",
+      "auraAffectsEnemiesOnly": true,
+      "auraTurnStart": true,
+      "tags": ["buff", "aura", "concentration", "conjuration"]
+    },
+    {
+      "id": "spirit_guardians_necrotic_child",
+      "name": "Hindered (Spirit Guardians, Necrotic)",
+      "description": "Slowed by spiritual guardians. Movement speed halved and takes 3d8 Necrotic damage at the start of each turn (WIS save for half).",
+      "isBuff": false,
+      "durationType": "turns",
+      "defaultDuration": 1,
+      "stacking": "refresh",
+      "tickAtTurnStart": true,
+      "modifiers": [
+        {
+          "target": "movementSpeed",
+          "type": "percentage",
+          "value": -50
+        }
+      ],
+      "tickEffects": [
+        {
+          "effectType": "damage",
+          "diceFormula": "3d8",
+          "damageType": "necrotic",
+          "saveType": "wisdom",
+          "halfDamageOnSave": true
+        }
+      ],
+      "tags": ["debuff", "aura_child"]
     }
   ]
 }

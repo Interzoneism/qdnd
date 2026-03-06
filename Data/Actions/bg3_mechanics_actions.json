@@ -221,7 +221,7 @@
         {
           "type": "apply_status",
           "statusId": "hasted",
-          "statusDuration": 3
+          "statusDuration": 10
         }
       ],
       "tags": [
@@ -245,12 +245,12 @@
         "usesAction": true
       },
       "requiresConcentration": true,
-      "concentrationStatusId": "spirit_guardians",
+      "concentrationStatusId": "spirit_guardians_radiant_aura",
       "effects": [
         {
           "type": "apply_status",
-          "statusId": "spirit_guardians",
-          "statusDuration": 3
+          "statusId": "spirit_guardians_radiant_aura",
+          "statusDuration": 100
         }
       ],
       "tags": [
@@ -764,7 +764,7 @@
       "effects": [
         {
           "type": "heal",
-          "diceFormula": "1d10+5"
+          "diceFormula": "1d10+LevelMapValue(SecondWindHeal)"
         }
       ],
       "tags": [
@@ -909,8 +909,8 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "1d8+3",
-          "damageType": "physical",
+          "diceFormula": "MainMeleeWeapon",
+          "damageType": "MainMeleeWeaponDamageType",
           "condition": "on_hit"
         }
       ],
@@ -1433,14 +1433,14 @@
       "effects": [
         {
           "type": "damage",
-          "diceFormula": "1d6+2",
-          "damageType": "physical",
+          "diceFormula": "LevelMapValue(MartialArtsDie)",
+          "damageType": "bludgeoning",
           "condition": "on_hit"
         },
         {
           "type": "damage",
-          "diceFormula": "1d6+2",
-          "damageType": "physical",
+          "diceFormula": "LevelMapValue(MartialArtsDie)",
+          "damageType": "bludgeoning",
           "condition": "on_hit"
         }
       ],

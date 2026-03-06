@@ -34,9 +34,9 @@ namespace QDND.Data.Spells
             if (_upcastRules.TryGetValue(normalizedId, out var scaling))
                 return scaling;
 
-            // Strip BG3 type prefix (e.g., "projectile_magicmissile" -> "magicmissile")
+            // Strip BG3 type prefix (e.g., "Projectile_MagicMissile" -> "magic_missile")
             // BG3 IDs are like Projectile_MagicMissile, Zone_BurningHands, Target_CureWounds
-            string strippedId = NormalizeBG3SpellId(normalizedId);
+            string strippedId = NormalizeBG3SpellId(spellId);
             if (strippedId != normalizedId && _upcastRules.TryGetValue(strippedId, out scaling))
                 return scaling;
 
@@ -49,19 +49,22 @@ namespace QDND.Data.Spells
         /// "zone_burninghands" -> "burning_hands",
         /// "target_curewounds" -> "cure_wounds"
         /// </summary>
-        internal static string NormalizeBG3SpellId(string bg3Id)
+        public static string NormalizeBG3SpellId(string bg3Id)
         {
             if (string.IsNullOrEmpty(bg3Id))
                 return bg3Id;
 
-            // Strip known BG3 type prefixes
-            string[] prefixes = { "projectile_", "target_", "zone_", "shout_", "rush_", "teleportation_", "throw_", "wall_", "projectilestrike_" };
-            string stripped = bg3Id.ToLowerInvariant();
+            string[] prefixes = { "projectile_", "target_", "zone_", "shout_", "rush_",
+                                  "teleportation_", "throw_", "wall_", "projectilestrike_" };
+
+            string lowerInput = bg3Id.ToLowerInvariant();
+            string stripped = bg3Id;  // Keep original case for PascalCase → snake_case conversion
+
             foreach (var prefix in prefixes)
             {
-                if (stripped.StartsWith(prefix))
+                if (lowerInput.StartsWith(prefix))
                 {
-                    stripped = stripped.Substring(prefix.Length);
+                    stripped = bg3Id.Substring(prefix.Length);  // Original-case suffix
                     break;
                 }
             }
@@ -69,11 +72,12 @@ namespace QDND.Data.Spells
             // Strip level suffixes like "_2", "_3" (upcast variants)
             stripped = System.Text.RegularExpressions.Regex.Replace(stripped, @"_\d+$", "");
 
-            // Convert PascalCase/CamelCase remnants to snake_case
-            // Insert underscore before uppercase letter sequences
-            stripped = System.Text.RegularExpressions.Regex.Replace(stripped, @"([a-z])([A-Z])", "$1_$2").ToLowerInvariant();
+            // Handle consecutive-uppercase runs (e.g., "AoEBlast" → "Ao_EBlast") before standard split
+            stripped = System.Text.RegularExpressions.Regex.Replace(stripped, @"([A-Z]+)([A-Z][a-z])", "$1_$2");
+            // Standard PascalCase → snake_case BEFORE lowercasing so boundaries are detectable
+            stripped = System.Text.RegularExpressions.Regex.Replace(stripped, @"([a-z\d])([A-Z])", "$1_$2");
 
-            return stripped;
+            return stripped.ToLowerInvariant();
         }
 
         /// <summary>
@@ -229,6 +233,11 @@ namespace QDND.Data.Spells
                 DicePerLevel = "1d8",
                 MaxUpcastLevel = 9
             };
+            // spirit_guardians_radiant and spirit_guardians_necrotic are NOT aliased here.
+            // The upcast system only scales action-level damage dice; Spirit Guardians damage
+            // is delivered via status tick (AuraSystem → child status), which this system
+            // cannot reach. A status-patch-at-cast-time mechanism is required for true upcast
+            // scaling — not yet implemented.
 
             // Counterspell: No upcast scaling (auto-counter up to level 3, check for higher)
             _upcastRules["counterspell"] = new UpcastScaling
@@ -248,6 +257,7 @@ namespace QDND.Data.Spells
                 DicePerLevel = "1d4",
                 MaxUpcastLevel = 9
             };
+            _upcastRules["healing_word_mass"] = _upcastRules["mass_healing_word"];
 
             // === LEVEL 4 SPELLS ===
 
@@ -300,7 +310,7 @@ namespace QDND.Data.Spells
             // Chain Lightning: +1d10 lightning damage per level
             _upcastRules["chain_lightning"] = new UpcastScaling
             {
-                DicePerLevel = "1d10",
+                DicePerLevel = "1d8",
                 MaxUpcastLevel = 9
             };
 

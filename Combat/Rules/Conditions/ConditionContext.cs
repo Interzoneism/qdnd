@@ -142,6 +142,13 @@ namespace QDND.Combat.Rules.Conditions
         /// <summary>All combatants in the arena, for spatial queries (e.g., HasAllyWithinRange).</summary>
         public IReadOnlyList<QDND.Combat.Entities.Combatant> AllCombatants { get; set; }
 
+        /// <summary>
+        /// When true, unqualified functions (Tagged, Character, Dead, etc.) default to
+        /// <see cref="Target"/> instead of <see cref="Source"/>. Used for BG3TargetConditions
+        /// evaluation where the subject of the condition is the candidate target.
+        /// </summary>
+        public bool DefaultSubjectIsTarget { get; set; } = false;
+
         // ──────────────────────────────────────────────
         //  Factory methods
         // ──────────────────────────────────────────────
@@ -155,6 +162,24 @@ namespace QDND.Combat.Rules.Conditions
         /// <param name="isWeapon">True if this is a weapon attack (vs spell attack)</param>
         /// <param name="weapon">The weapon being used, if any</param>
         /// <returns>A new <see cref="ConditionContext"/> configured for attack rolls</returns>
+        /// <summary>
+        /// Creates a context for evaluating BG3TargetConditions — the unqualified subject
+        /// defaults to the candidate <paramref name="candidateTarget"/> rather than the source.
+        /// </summary>
+        public static ConditionContext ForTargetCondition(
+            Combatant caster,
+            Combatant candidateTarget,
+            QDND.Combat.Statuses.StatusManager statusManager = null)
+        {
+            return new ConditionContext
+            {
+                Source = caster,
+                Target = candidateTarget,
+                DefaultSubjectIsTarget = true,
+                StatusManager = statusManager,
+            };
+        }
+
         public static ConditionContext ForAttackRoll(
             Combatant source,
             Combatant target,

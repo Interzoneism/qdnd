@@ -328,13 +328,14 @@
       "description": "Enhanced speed and reflexes.",
       "icon": "haste",
       "durationType": "turns",
-      "defaultDuration": 3,
+      "defaultDuration": 10,
       "maxStacks": 1,
       "stacking": "refresh",
       "isBuff": true,
       "isDispellable": true,
       "isConcentration": true,
       "tags": ["buff", "arcane"],
+      "extraActionCharges": 1,
       "modifiers": [
         {
           "target": "armorClass",
@@ -343,19 +344,13 @@
         },
         {
           "target": "movementSpeed",
-          "type": "percentage",
-          "value": 100
-        }
-      ],
-      "triggerEffects": [
+          "type": "flat",
+          "value": 9
+        },
         {
-          "triggerOn": "OnRemove",
-          "effectType": "apply_status",
-          "statusId": "lethargic",
-          "triggerChance": 100,
-          "parameters": {
-            "statusDuration": 1
-          }
+          "target": "savingThrow",
+          "type": "advantage",
+          "condition": "ability:dexterity"
         }
       ]
     },
@@ -1131,12 +1126,14 @@
         {
           "target": "attackRoll",
           "type": "flat",
-          "value": -5
+          "value": -5,
+          "condition": "melee_twohanded_or_versatile"
         },
         {
           "target": "damageDealt",
           "type": "flat",
-          "value": 10
+          "value": 10,
+          "condition": "melee_twohanded_or_versatile"
         }
       ]
     },
