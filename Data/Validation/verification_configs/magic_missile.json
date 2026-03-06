@@ -1,0 +1,22 @@
+{
+  "action_id": "magic_missile",
+  "caster_class": "wizard",
+  "caster_level": 5,
+  "caster_race": "high_elf",
+  "target_count": 1,
+  "target_formation": "single",
+  "target_faction": "hostile",
+  "target_distance": 8.0,
+  "bg3_wiki_url": "https://bg3.wiki/wiki/Magic_Missile",
+  "expected_behavior": {
+    "spell_level": 1,
+    "school": "evocation",
+    "damage_dice": "3x(1d4+1)",
+    "damage_type": "force",
+    "requires_concentration": false,
+    "range": 18.0,
+    "description": "3 darts, each dealing 1d4+1 force damage. Always hits. No save.",
+    "upcast_per_level": "+1 dart"
+  },
+  "notes": "Auto-hit, no save. Expect exactly 3 damage instances of force damage. Total 3d4+3 = 6-15."
+}

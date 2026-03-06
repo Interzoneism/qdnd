@@ -1,0 +1,25 @@
+{
+  "action_id": "fireball",
+  "caster_class": "wizard",
+  "caster_level": 5,
+  "caster_race": "high_elf",
+  "target_count": 3,
+  "target_formation": "cluster",
+  "target_faction": "hostile",
+  "target_distance": 9.0,
+  "bg3_wiki_url": "https://bg3.wiki/wiki/Fireball",
+  "expected_behavior": {
+    "spell_level": 3,
+    "school": "evocation",
+    "damage_dice": "8d6",
+    "damage_type": "fire",
+    "save_type": "dexterity",
+    "half_damage_on_save": true,
+    "requires_concentration": false,
+    "area_type": "sphere",
+    "area_radius": 4.0,
+    "range": 18.0,
+    "upcast_per_level": "1d6"
+  },
+  "notes": "3 clustered targets within AoE. Expect all 3 to make DEX saves. 8d6 fire damage."
+}

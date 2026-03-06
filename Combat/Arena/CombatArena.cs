@@ -134,6 +134,7 @@ namespace QDND.Combat.Arena
         private DynamicScenarioMode _dynamicScenarioMode = DynamicScenarioMode.None;
         private string _dynamicActionTestId;
         private List<string> _dynamicActionBatchIds;
+        private string _verifyConfigPath;
         private bool _autoBattleVerboseAiLogs;
         private bool _autoBattleVerboseArenaLogs;
 
@@ -568,6 +569,7 @@ namespace QDND.Combat.Arena
             _dynamicActionTestId = parsed.ActionTestId;
             _dynamicTeamSize = parsed.TeamSize;
             _dynamicActionBatchIds = parsed.ActionBatchIds;
+            _verifyConfigPath = parsed.VerifyConfigPath;
 
             if (parsed.IsFullFidelity)
             {
@@ -1317,6 +1319,7 @@ namespace QDND.Combat.Arena
                 DynamicCharacterLevel = _dynamicCharacterLevel,
                 DynamicTeamSize = _dynamicTeamSize,
                 AutoBattleConfig = _autoBattleConfig,
+                VerifyConfigPath = _verifyConfigPath,
             };
             var bootVisuals = new ScenarioBootVisuals
             {

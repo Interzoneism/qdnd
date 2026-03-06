@@ -40,6 +40,9 @@ namespace QDND.Tools.AutoBattler
             /// <summary>Action IDs from --ff-action-batch.</summary>
             public List<string> ActionBatchIds { get; set; }
 
+            /// <summary>Path to SpellVerificationSetup JSON from --verify-config.</summary>
+            public string VerifyConfigPath { get; set; }
+
             /// <summary>Whether --full-fidelity was specified.</summary>
             public bool IsFullFidelity { get; set; }
 
@@ -142,6 +145,17 @@ namespace QDND.Tools.AutoBattler
                     throw new InvalidOperationException(
                         "--ff-action-batch requires at least one comma-separated action ID.");
             }
+            else if (args.TryGetValue("ff-spell-verify", out string spellVerifyId) &&
+                     !string.IsNullOrWhiteSpace(spellVerifyId) && spellVerifyId != "true")
+            {
+                result.ScenarioMode = DynamicScenarioMode.SpellVerify;
+                result.ActionTestId = spellVerifyId.Trim();
+                if (args.TryGetValue("verify-config", out string configPath) &&
+                    !string.IsNullOrEmpty(configPath) && configPath != "true")
+                {
+                    result.VerifyConfigPath = configPath;
+                }
+            }
             else if (args.ContainsKey("ff-short-gameplay"))
             {
                 result.ScenarioMode = DynamicScenarioMode.ShortGameplay;
@@ -165,7 +179,8 @@ namespace QDND.Tools.AutoBattler
 
                 if (!result.ScenarioSeedOverride.HasValue)
                 {
-                    int resolved = result.ScenarioMode == DynamicScenarioMode.ActionTest
+                    int resolved = (result.ScenarioMode == DynamicScenarioMode.ActionTest ||
+                                    result.ScenarioMode == DynamicScenarioMode.SpellVerify)
                         ? 1
                         : GenerateRuntimeSeed();
                     result.ResolvedScenarioSeed = resolved;

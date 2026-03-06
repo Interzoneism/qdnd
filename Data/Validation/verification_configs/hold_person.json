@@ -1,0 +1,20 @@
+{
+  "action_id": "hold_person",
+  "caster_class": "wizard",
+  "caster_level": 5,
+  "caster_race": "high_elf",
+  "target_count": 1,
+  "target_formation": "single",
+  "target_faction": "hostile",
+  "target_distance": 6.0,
+  "bg3_wiki_url": "https://bg3.wiki/wiki/Hold_Person",
+  "expected_behavior": {
+    "spell_level": 2,
+    "school": "enchantment",
+    "save_type": "wisdom",
+    "requires_concentration": true,
+    "applies_status": "paralyzed",
+    "description": "Target must succeed WIS save or be Paralyzed. Concentration."
+  },
+  "notes": "Control spell. Verify WIS save, Paralyzed condition, and Concentration tracking."
+}

@@ -1,0 +1,21 @@
+{
+  "action_id": "cure_wounds",
+  "caster_class": "cleric",
+  "caster_level": 5,
+  "caster_race": "human",
+  "target_count": 1,
+  "target_formation": "single",
+  "target_faction": "ally",
+  "target_distance": 1.0,
+  "targets_wounded": true,
+  "bg3_wiki_url": "https://bg3.wiki/wiki/Cure_Wounds",
+  "expected_behavior": {
+    "spell_level": 1,
+    "school": "evocation",
+    "healing_dice": "1d8 + WIS modifier",
+    "range": 1.5,
+    "requires_concentration": false,
+    "upcast_per_level": "1d8"
+  },
+  "notes": "Healing test. Target is an ally at 50% HP. Expect 1d8+WIS healing on touch range."
+}

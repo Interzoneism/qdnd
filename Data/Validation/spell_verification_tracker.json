@@ -1,0 +1,1155 @@
+{
+  "version": 1,
+  "last_updated": "2026-03-04",
+  "summary": {
+    "total": 120,
+    "pass": 1,
+    "fail": 0,
+    "partial": 0,
+    "blocked": 14,
+    "crash": 0,
+    "unverified": 105
+  },
+  "categories": {
+    "core_actions": {
+      "description": "Basic combat actions available to all characters",
+      "priority": 1,
+      "spells": {
+        "main_hand_attack": {
+          "name": "Main Hand Attack",
+          "status": "pass",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Melee_Attack",
+          "test_mode": "weapon",
+          "verified_date": "2026-03-04",
+          "notes": "Verified with Fighter L5, STR 16 (+3), longsword+shield. Attack roll d20+6 (STR+3, prof+3) correct. Extra Attack provides 2 hits per action. Damage type slashing correct. Most hits within 1d8+5 (dueling) range. One hit of 14 slightly exceeds expected max 13 — may indicate minor damage calc issue. Seed 42.",
+          "issues": ["One damage roll (14) exceeded theoretical max of 1d8+3+2(dueling)=13 by 1 point — investigate damage pipeline"]
+        },
+        "ranged_attack": {
+          "name": "Ranged Attack",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Ranged_Attack",
+          "test_mode": "weapon",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "dash": {
+          "name": "Dash",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Dash_(Action)",
+          "test_mode": "utility",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "disengage": {
+          "name": "Disengage",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Disengage_(Action)",
+          "test_mode": "utility",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "dodge_action": {
+          "name": "Dodge",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Dodge_(Action)",
+          "test_mode": "utility",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "hide": {
+          "name": "Hide",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Hide_(Action)",
+          "test_mode": "utility",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "help": {
+          "name": "Help",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Help_(Action)",
+          "test_mode": "utility",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "shove": {
+          "name": "Shove",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Shove_(Action)",
+          "test_mode": "utility",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "jump": {
+          "name": "Jump",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Jump_(Action)",
+          "test_mode": "utility",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "throw": {
+          "name": "Throw",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Throw_(Action)",
+          "test_mode": "utility",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "dip": {
+          "name": "Dip",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Dip_(Action)",
+          "test_mode": "utility",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        }
+      }
+    },
+    "weapon_actions": {
+      "description": "Weapon-specific martial actions",
+      "priority": 7,
+      "spells": {
+        "cleave": {
+          "name": "Cleave",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Cleave",
+          "test_mode": "weapon",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "lacerate": {
+          "name": "Lacerate",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Lacerate",
+          "test_mode": "weapon",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "smash": {
+          "name": "Smash",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Smash",
+          "test_mode": "weapon",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "topple": {
+          "name": "Topple",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Topple",
+          "test_mode": "weapon",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "pommel_strike": {
+          "name": "Pommel Strike",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Pommel_Strike",
+          "test_mode": "weapon",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "offhand_attack": {
+          "name": "Offhand Attack",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Offhand_Attack",
+          "test_mode": "weapon",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        }
+      }
+    },
+    "cantrips": {
+      "description": "At-will cantrip spells, tested at level 5 for scaling",
+      "priority": 2,
+      "spells": {
+        "fire_bolt": {
+          "name": "Fire Bolt",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Fire_Bolt",
+          "test_mode": "basic",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "ray_of_frost": {
+          "name": "Ray of Frost",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Ray_of_Frost",
+          "test_mode": "basic",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "sacred_flame": {
+          "name": "Sacred Flame",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Sacred_Flame",
+          "test_mode": "basic",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "eldritch_blast": {
+          "name": "Eldritch Blast",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Eldritch_Blast",
+          "test_mode": "basic",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "toll_the_dead": {
+          "name": "Toll the Dead",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Toll_the_Dead",
+          "test_mode": "basic",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "chill_touch": {
+          "name": "Chill Touch",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Chill_Touch",
+          "test_mode": "basic",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "shocking_grasp": {
+          "name": "Shocking Grasp",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Shocking_Grasp",
+          "test_mode": "basic",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "thorn_whip": {
+          "name": "Thorn Whip",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Thorn_Whip",
+          "test_mode": "basic",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "vicious_mockery": {
+          "name": "Vicious Mockery",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Vicious_Mockery",
+          "test_mode": "debuff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "poison_spray": {
+          "name": "Poison Spray",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Poison_Spray",
+          "test_mode": "basic",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "blade_ward": {
+          "name": "Blade Ward",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Blade_Ward",
+          "test_mode": "buff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "produce_flame": {
+          "name": "Produce Flame",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Produce_Flame",
+          "test_mode": "basic",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        }
+      }
+    },
+    "level_1_spells": {
+      "description": "Level 1 spells — most common spell slot level",
+      "priority": 3,
+      "spells": {
+        "magic_missile": {
+          "name": "Magic Missile",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Magic_Missile",
+          "test_mode": "basic",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "cure_wounds": {
+          "name": "Cure Wounds",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Cure_Wounds",
+          "test_mode": "healing",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "guiding_bolt": {
+          "name": "Guiding Bolt",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Guiding_Bolt",
+          "test_mode": "basic",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "healing_word": {
+          "name": "Healing Word",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Healing_Word",
+          "test_mode": "healing",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "shield_of_faith": {
+          "name": "Shield of Faith",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Shield_of_Faith",
+          "test_mode": "buff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "thunderwave": {
+          "name": "Thunderwave",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Thunderwave",
+          "test_mode": "aoe",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "burning_hands": {
+          "name": "Burning Hands",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Burning_Hands",
+          "test_mode": "aoe",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "chromatic_orb": {
+          "name": "Chromatic Orb",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Chromatic_Orb",
+          "test_mode": "basic",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "witch_bolt": {
+          "name": "Witch Bolt",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Witch_Bolt",
+          "test_mode": "basic",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "inflict_wounds": {
+          "name": "Inflict Wounds",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Inflict_Wounds",
+          "test_mode": "basic",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "bless": {
+          "name": "Bless",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Bless",
+          "test_mode": "buff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "bane": {
+          "name": "Bane",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Bane",
+          "test_mode": "debuff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "sleep": {
+          "name": "Sleep",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Sleep",
+          "test_mode": "debuff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "grease": {
+          "name": "Grease",
+          "status": "blocked",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Grease",
+          "test_mode": "blocked",
+          "verified_date": "2026-03-03",
+          "notes": "SpawnSurface functor is a stub — no surface created",
+          "issues": ["SpawnSurface functor not implemented"]
+        },
+        "dissonant_whispers": {
+          "name": "Dissonant Whispers",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Dissonant_Whispers",
+          "test_mode": "basic",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "hunters_mark": {
+          "name": "Hunter's Mark",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Hunter%27s_Mark",
+          "test_mode": "buff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "ensnaring_strike": {
+          "name": "Ensnaring Strike",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Ensnaring_Strike",
+          "test_mode": "buff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "hail_of_thorns": {
+          "name": "Hail of Thorns",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Hail_of_Thorns",
+          "test_mode": "aoe",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "mage_armor": {
+          "name": "Mage Armor",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Mage_Armour",
+          "test_mode": "buff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "armor_of_agathys": {
+          "name": "Armor of Agathys",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Armour_of_Agathys",
+          "test_mode": "buff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "faerie_fire": {
+          "name": "Faerie Fire",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Faerie_Fire",
+          "test_mode": "debuff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "command": {
+          "name": "Command",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Command",
+          "test_mode": "debuff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "sanctuary": {
+          "name": "Sanctuary",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Sanctuary",
+          "test_mode": "buff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "create_water": {
+          "name": "Create Water",
+          "status": "blocked",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Create_Water",
+          "test_mode": "blocked",
+          "verified_date": "2026-03-03",
+          "notes": "SpawnSurface functor is a stub — no water surface created",
+          "issues": ["SpawnSurface functor not implemented"]
+        },
+        "hex": {
+          "name": "Hex",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Hex",
+          "test_mode": "buff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        }
+      }
+    },
+    "level_2_spells": {
+      "description": "Level 2 spells",
+      "priority": 4,
+      "spells": {
+        "shatter": {
+          "name": "Shatter",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Shatter",
+          "test_mode": "aoe",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "scorching_ray": {
+          "name": "Scorching Ray",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Scorching_Ray",
+          "test_mode": "basic",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "hold_person": {
+          "name": "Hold Person",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Hold_Person",
+          "test_mode": "debuff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "blur": {
+          "name": "Blur",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Blur",
+          "test_mode": "buff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "moonbeam": {
+          "name": "Moonbeam",
+          "status": "blocked",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Moonbeam",
+          "test_mode": "blocked",
+          "verified_date": "2026-03-03",
+          "notes": "CreateZone functor is a stub — zone effects will not be created. Blocked until functor is implemented.",
+          "issues": ["CreateZone functor is a stub - zone effects will not be created"]
+        },
+        "silence": {
+          "name": "Silence",
+          "status": "blocked",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Silence",
+          "test_mode": "blocked",
+          "verified_date": "2026-03-03",
+          "notes": "CreateZone functor is a stub — zone effects will not be created. Blocked until functor is implemented.",
+          "issues": ["CreateZone functor is a stub - zone effects will not be created"]
+        },
+        "lesser_restoration": {
+          "name": "Lesser Restoration",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Lesser_Restoration",
+          "test_mode": "healing",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "web": {
+          "name": "Web",
+          "status": "blocked",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Web",
+          "test_mode": "blocked",
+          "verified_date": "2026-03-03",
+          "notes": "SpawnSurface functor is a stub — no web surface created",
+          "issues": ["SpawnSurface functor not implemented"]
+        },
+        "darkness": {
+          "name": "Darkness",
+          "status": "blocked",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Darkness",
+          "test_mode": "blocked",
+          "verified_date": "2026-03-03",
+          "notes": "SpawnSurface functor is a stub and ObscurementService zones not wired",
+          "issues": ["SpawnSurface functor not implemented", "ObscurementService AddZone is a TODO"]
+        },
+        "invisibility": {
+          "name": "Invisibility",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Invisibility",
+          "test_mode": "buff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "flaming_sphere": {
+          "name": "Flaming Sphere",
+          "status": "blocked",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Flaming_Sphere",
+          "test_mode": "blocked",
+          "verified_date": "2026-03-03",
+          "notes": "Summon-like spell — summon system is incomplete",
+          "issues": ["Summon system incomplete"]
+        },
+        "heat_metal": {
+          "name": "Heat Metal",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Heat_Metal",
+          "test_mode": "debuff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "mirror_image": {
+          "name": "Mirror Image",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Mirror_Image",
+          "test_mode": "buff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "spike_growth": {
+          "name": "Spike Growth",
+          "status": "blocked",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Spike_Growth",
+          "test_mode": "blocked",
+          "verified_date": "2026-03-03",
+          "notes": "SpawnSurface functor is a stub — no spike surface created",
+          "issues": ["SpawnSurface functor not implemented"]
+        },
+        "cloud_of_daggers": {
+          "name": "Cloud of Daggers",
+          "status": "blocked",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Cloud_of_Daggers",
+          "test_mode": "blocked",
+          "verified_date": "2026-03-03",
+          "notes": "CreateZone functor is a stub — zone effects will not be created. Blocked until functor is implemented.",
+          "issues": ["CreateZone functor is a stub - zone effects will not be created"]
+        },
+        "spiritual_weapon": {
+          "name": "Spiritual Weapon",
+          "status": "blocked",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Spiritual_Weapon",
+          "test_mode": "blocked",
+          "verified_date": "2026-03-03",
+          "notes": "Summon-like spell — summon system is incomplete",
+          "issues": ["Summon system incomplete"]
+        }
+      }
+    },
+    "level_3_spells": {
+      "description": "Level 3 spells — powerful and frequently used",
+      "priority": 5,
+      "spells": {
+        "fireball": {
+          "name": "Fireball",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Fireball",
+          "test_mode": "aoe",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "lightning_bolt": {
+          "name": "Lightning Bolt",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Lightning_Bolt",
+          "test_mode": "aoe",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "spirit_guardians": {
+          "name": "Spirit Guardians",
+          "status": "blocked",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Spirit_Guardians",
+          "test_mode": "blocked",
+          "verified_date": "2026-03-03",
+          "notes": "CreateZone functor is a stub — zone effects will not be created. Blocked until functor is implemented.",
+          "issues": ["CreateZone functor is a stub - zone effects will not be created"]
+        },
+        "haste": {
+          "name": "Haste",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Haste",
+          "test_mode": "buff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "slow": {
+          "name": "Slow",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Slow",
+          "test_mode": "debuff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "hunger_of_hadar": {
+          "name": "Hunger of Hadar",
+          "status": "blocked",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Hunger_of_Hadar",
+          "test_mode": "blocked",
+          "verified_date": "2026-03-03",
+          "notes": "CreateZone functor is a stub — zone effects will not be created. Blocked until functor is implemented.",
+          "issues": ["CreateZone functor is a stub - zone effects will not be created"]
+        },
+        "hypnotic_pattern": {
+          "name": "Hypnotic Pattern",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Hypnotic_Pattern",
+          "test_mode": "debuff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "mass_healing_word": {
+          "name": "Mass Healing Word",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Mass_Healing_Word",
+          "test_mode": "healing",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "call_lightning": {
+          "name": "Call Lightning",
+          "status": "blocked",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Call_Lightning",
+          "test_mode": "blocked",
+          "verified_date": "2026-03-03",
+          "notes": "CreateZone functor is a stub — zone effects will not be created. Blocked until functor is implemented.",
+          "issues": ["CreateZone functor is a stub - zone effects will not be created"]
+        },
+        "spirit_shroud": {
+          "name": "Spirit Shroud",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Spirit_Shroud",
+          "test_mode": "buff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "bestow_curse": {
+          "name": "Bestow Curse",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Bestow_Curse",
+          "test_mode": "debuff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "revivify": {
+          "name": "Revivify",
+          "status": "blocked",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Revivify",
+          "test_mode": "blocked",
+          "verified_date": "2026-03-03",
+          "notes": "Resurrect functor is a stub — cannot revive dead characters. Blocked until functor is implemented.",
+          "issues": ["Resurrect functor is a stub"]
+        }
+      }
+    },
+    "class_features": {
+      "description": "Class-specific abilities and features",
+      "priority": 6,
+      "spells": {
+        "action_surge": {
+          "name": "Action Surge",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Action_Surge",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "second_wind": {
+          "name": "Second Wind",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Second_Wind",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "trip_attack": {
+          "name": "Trip Attack",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Trip_Attack",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "menacing_attack": {
+          "name": "Menacing Attack",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Menacing_Attack",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "rage": {
+          "name": "Rage",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Rage",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "reckless_attack": {
+          "name": "Reckless Attack",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Reckless_Attack",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "frenzy": {
+          "name": "Frenzy",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Frenzy",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "cunning_action_dash": {
+          "name": "Cunning Action: Dash",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Cunning_Action:_Dash",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "cunning_action_disengage": {
+          "name": "Cunning Action: Disengage",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Cunning_Action:_Disengage",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "cunning_action_hide": {
+          "name": "Cunning Action: Hide",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Cunning_Action:_Hide",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "sneak_attack": {
+          "name": "Sneak Attack",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Sneak_Attack",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "flurry_of_blows": {
+          "name": "Flurry of Blows",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Flurry_of_Blows",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "stunning_strike": {
+          "name": "Stunning Strike",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Stunning_Strike",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "step_of_the_wind": {
+          "name": "Step of the Wind",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Step_of_the_Wind",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "patient_defence": {
+          "name": "Patient Defence",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Patient_Defence",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "divine_smite": {
+          "name": "Divine Smite",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Divine_Smite",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "lay_on_hands": {
+          "name": "Lay on Hands",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Lay_on_Hands",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "turn_undead": {
+          "name": "Turn Undead",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Turn_Undead",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "preserve_life": {
+          "name": "Preserve Life",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Preserve_Life",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "guided_strike": {
+          "name": "Guided Strike",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Guided_Strike",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "war_priest": {
+          "name": "War Priest",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/War_Priest",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "bardic_inspiration": {
+          "name": "Bardic Inspiration",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Bardic_Inspiration",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "wild_shape_wolf": {
+          "name": "Wild Shape: Wolf",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Wild_Shape:_Wolf",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "wild_shape_bear": {
+          "name": "Wild Shape: Bear",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Wild_Shape:_Bear",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "wild_shape_spider": {
+          "name": "Wild Shape: Spider",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Wild_Shape:_Spider",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "symbiotic_entity": {
+          "name": "Symbiotic Entity",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Symbiotic_Entity",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "create_sorcery_points": {
+          "name": "Create Sorcery Points",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Create_Sorcery_Points",
+          "test_mode": "class_feature",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        }
+      }
+    },
+    "feats": {
+      "description": "Feat-based abilities and toggles",
+      "priority": 9,
+      "spells": {
+        "great_weapon_master_toggle": {
+          "name": "Great Weapon Master (Toggle)",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Great_Weapon_Master",
+          "test_mode": "toggle",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "sharpshooter_toggle": {
+          "name": "Sharpshooter (Toggle)",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Sharpshooter",
+          "test_mode": "toggle",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "polearm_butt_attack": {
+          "name": "Polearm Master: Butt Attack",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Polearm_Master",
+          "test_mode": "weapon",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "tavern_brawler_throw": {
+          "name": "Tavern Brawler: Throw",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Tavern_Brawler",
+          "test_mode": "weapon",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        }
+      }
+    },
+    "racial_abilities": {
+      "description": "Race-specific abilities (primarily Dragonborn breath weapons)",
+      "priority": 8,
+      "spells": {
+        "acid_breath_line": {
+          "name": "Acid Breath (Line)",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Acid_Breath",
+          "test_mode": "racial",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "fire_breath_line": {
+          "name": "Fire Breath (Line)",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Fire_Breath",
+          "test_mode": "racial",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "fire_breath_cone": {
+          "name": "Fire Breath (Cone)",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Fire_Breath",
+          "test_mode": "racial",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "cold_breath_cone": {
+          "name": "Cold Breath (Cone)",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Cold_Breath",
+          "test_mode": "racial",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "lightning_breath_line": {
+          "name": "Lightning Breath (Line)",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Lightning_Breath",
+          "test_mode": "racial",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        },
+        "poison_breath_cone": {
+          "name": "Poison Breath (Cone)",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Poison_Breath",
+          "test_mode": "racial",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        }
+      }
+    },
+    "miscellaneous": {
+      "description": "High-level and miscellaneous spells",
+      "priority": 10,
+      "spells": {
+        "globe_of_invulnerability": {
+          "name": "Globe of Invulnerability",
+          "status": "unverified",
+          "bg3_wiki_url": "https://bg3.wiki/wiki/Globe_of_Invulnerability",
+          "test_mode": "buff",
+          "verified_date": null,
+          "notes": null,
+          "issues": []
+        }
+      }
+    }
+  }
+}

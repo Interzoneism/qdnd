@@ -12,7 +12,7 @@ namespace QDND.Combat.Arena
     {
         private const string GROUND_SURFACE_SHADER_CODE = @"
 shader_type spatial;
-render_mode blend_mix, cull_disabled, depth_draw_alpha_prepass, diffuse_burley, specular_schlick_ggx;
+render_mode blend_mix, cull_disabled, depth_prepass_alpha, diffuse_burley, specular_schlick_ggx;
 
 uniform vec4 base_color : source_color = vec4(0.5, 0.5, 0.5, 0.6);
 uniform vec4 edge_color : source_color = vec4(0.2, 0.2, 0.2, 0.4);
@@ -68,7 +68,7 @@ void fragment() {
 
         private const string CLOUD_SURFACE_SHADER_CODE = @"
 shader_type spatial;
-render_mode blend_mix, cull_disabled, depth_draw_alpha_prepass, diffuse_burley, specular_schlick_ggx;
+render_mode blend_mix, cull_disabled, depth_prepass_alpha, diffuse_burley, specular_schlick_ggx;
 
 uniform vec4 base_color : source_color = vec4(0.8, 0.85, 0.9, 0.5);
 uniform vec4 edge_color : source_color = vec4(0.35, 0.4, 0.45, 0.25);

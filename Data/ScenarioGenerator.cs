@@ -5,6 +5,7 @@ using QDND.Combat.Actions;
 using QDND.Combat.Entities;
 using QDND.Data.Backgrounds;
 using QDND.Data.CharacterModel;
+using QDND.Data.Validation;
 
 namespace QDND.Data
 {
@@ -248,8 +249,264 @@ namespace QDND.Data
                 Id = $"ff_action_test_{SanitizeIdFragment(normalizedActionId)}_seed_{Seed}",
                 Name = $"FF Action Test: {normalizedActionId}",
                 Seed = Seed,
+                InitiativeMode = InitiativeMode.UsePreset,
                 Units = new List<ScenarioUnit> { tester, target }
             };
+        }
+
+        /// <summary>
+        /// Generates a spell verification scenario from a <see cref="SpellVerificationSetup"/> config.
+        /// Supports configurable class, race, level, multiple targets with formations,
+        /// ally targets for healing, and wounded caster/targets.
+        /// </summary>
+        public ScenarioDefinition GenerateSpellVerificationScenario(
+            SpellVerificationSetup setup,
+            ActionRegistry actionRegistry = null)
+        {
+            if (setup == null) throw new ArgumentNullException(nameof(setup));
+            if (string.IsNullOrWhiteSpace(setup.ActionId))
+                throw new ArgumentException("ActionId is required.", nameof(setup));
+
+            string normalizedActionId = setup.ActionId.Trim();
+            int level = Math.Clamp(setup.CasterLevel, 1, 12);
+            int targetCount = Math.Clamp(setup.TargetCount, 1, 6);
+            ActionDefinition actionDef = actionRegistry?.GetAction(normalizedActionId);
+
+            // --- Determine caster class ---
+            string casterClassId = setup.CasterClass;
+            if (string.IsNullOrWhiteSpace(casterClassId))
+                casterClassId = InferClassFromAction(actionDef);
+
+            // --- Determine distance ---
+            float distance = setup.TargetDistance;
+            if (distance <= 0f)
+                distance = InferDistanceFromAction(actionDef);
+
+            // --- Build caster ---
+            var casterActions = new List<string> { normalizedActionId };
+            if (setup.AdditionalActions != null)
+                casterActions.AddRange(setup.AdditionalActions.Where(a => !string.IsNullOrWhiteSpace(a)));
+
+            var caster = CreateRandomUnit(new CharacterGenerationOptions
+            {
+                UnitId = "spell_verify_caster",
+                DisplayName = "Spell Verify Caster",
+                Faction = Faction.Player,
+                Level = level,
+                Initiative = 99,
+                InitiativeTiebreaker = 99,
+                X = 0f,
+                Y = 0f,
+                Z = 0f,
+                ForcedClassId = casterClassId,
+                ForcedSubclassId = setup.CasterSubclass,
+                ForcedRaceId = setup.CasterRace,
+                ForcedSubraceId = setup.CasterSubrace,
+                AbilityOverrides = casterActions,
+                ReplaceResolvedActions = true
+            });
+
+            // Apply equipment overrides
+            if (!string.IsNullOrWhiteSpace(setup.MainHandWeapon))
+                caster.MainHandWeaponId = setup.MainHandWeapon;
+            else
+                AutoEquipWeaponForAction(caster, normalizedActionId, actionRegistry);
+
+            if (!string.IsNullOrWhiteSpace(setup.OffHand))
+            {
+                // Determine if it's a shield or off-hand weapon
+                if (setup.OffHand.Contains("shield", StringComparison.OrdinalIgnoreCase))
+                    caster.ShieldId = setup.OffHand;
+                else
+                    caster.OffHandWeaponId = setup.OffHand;
+            }
+
+            if (!string.IsNullOrWhiteSpace(setup.Armor))
+                caster.ArmorId = setup.Armor;
+
+            // Apply ability score overrides — the provided scores should be the FINAL
+            // ability scores, so we must clear racial bonuses, ASI improvements, and
+            // ability_improvement feats that CreateRandomUnit generated.
+            if (setup.AbilityScores is { Length: 6 })
+            {
+                caster.BaseStrength = setup.AbilityScores[0];
+                caster.BaseDexterity = setup.AbilityScores[1];
+                caster.BaseConstitution = setup.AbilityScores[2];
+                caster.BaseIntelligence = setup.AbilityScores[3];
+                caster.BaseWisdom = setup.AbilityScores[4];
+                caster.BaseCharisma = setup.AbilityScores[5];
+
+                // Clear racial +2/+1 so they don't stack on top of overridden scores
+                caster.AbilityBonus2 = null;
+                caster.AbilityBonus1 = null;
+
+                // Clear ASI improvements (from feat level 4/8/12 ability_improvement choices)
+                caster.AbilityScoreImprovements = new Dictionary<string, int>();
+
+                // Remove ability_improvement feat entries so CharacterResolver features
+                // don't re-apply ability score increases
+                caster.FeatIds?.RemoveAll(f =>
+                    string.Equals(f, "ability_improvement", StringComparison.OrdinalIgnoreCase));
+                if (caster.FeatChoices != null)
+                    caster.FeatChoices.Remove("ability_improvement");
+            }
+
+            // Tag caster
+            caster.Tags ??= new List<string>();
+            string testTag = $"ability_test_actor:{normalizedActionId}";
+            if (!caster.Tags.Contains(testTag))
+                caster.Tags.Add(testTag);
+
+            // Wounded caster
+            if (setup.CasterWounded && caster.HP.HasValue && caster.HP.Value > 1)
+                caster.HP = caster.HP.Value / 2;
+
+            // --- Determine target faction ---
+            bool allyTargets = string.Equals(setup.TargetFaction, "ally", StringComparison.OrdinalIgnoreCase);
+            Faction targetFaction = allyTargets ? Faction.Player : Faction.Hostile;
+
+            // --- Build targets ---
+            var units = new List<ScenarioUnit> { caster };
+            var targetPositions = ComputeTargetPositions(distance, targetCount, setup.TargetFormation);
+
+            for (int i = 0; i < targetCount; i++)
+            {
+                var pos = targetPositions[i];
+                var targetActions = allyTargets
+                    ? new List<string>()
+                    : new List<string> { "main_hand_attack" };
+
+                var target = CreateRandomUnit(new CharacterGenerationOptions
+                {
+                    UnitId = $"spell_verify_target_{i + 1}",
+                    DisplayName = $"Verify Target {i + 1}",
+                    Faction = targetFaction,
+                    Level = level,
+                    Initiative = 1,
+                    InitiativeTiebreaker = i,
+                    X = pos.X,
+                    Y = pos.Y,
+                    Z = pos.Z,
+                    AbilityOverrides = targetActions.Count > 0 ? targetActions : null,
+                    ReplaceResolvedActions = targetActions.Count > 0
+                });
+
+                target.Tags ??= new List<string>();
+                if (!target.Tags.Contains("spell_verify_target"))
+                    target.Tags.Add("spell_verify_target");
+
+                // Wounded targets
+                if (setup.TargetsWounded && target.HP.HasValue && target.HP.Value > 1)
+                    target.HP = target.HP.Value / 2;
+
+                units.Add(target);
+            }
+
+            // If all targets are allies, we need at least one hostile for combat to work
+            if (allyTargets)
+            {
+                var dummy = CreateRandomUnit(new CharacterGenerationOptions
+                {
+                    UnitId = "spell_verify_dummy",
+                    DisplayName = "Dummy Hostile",
+                    Faction = Faction.Hostile,
+                    Level = 1,
+                    Initiative = 0,
+                    InitiativeTiebreaker = 0,
+                    X = distance + 10f,
+                    Y = 0f,
+                    Z = 0f,
+                    AbilityOverrides = new List<string> { "main_hand_attack" },
+                    ReplaceResolvedActions = true
+                });
+                units.Add(dummy);
+            }
+
+            return new ScenarioDefinition
+            {
+                Id = $"ff_spell_verify_{SanitizeIdFragment(normalizedActionId)}_seed_{Seed}",
+                Name = $"FF Spell Verify: {normalizedActionId}",
+                Seed = Seed,
+                InitiativeMode = InitiativeMode.UsePreset,
+                Units = units
+            };
+        }
+
+        private static string InferClassFromAction(ActionDefinition actionDef)
+        {
+            if (actionDef?.Tags == null || actionDef.Tags.Count == 0)
+                return "wizard";
+
+            var tags = actionDef.Tags;
+            bool hasTag(string t) => tags.Any(tag => string.Equals(tag, t, StringComparison.OrdinalIgnoreCase));
+            bool containsTag(string t) => tags.Any(tag => tag.Contains(t, StringComparison.OrdinalIgnoreCase));
+
+            if (hasTag("divine") || hasTag("cleric") || containsTag("cleric")) return "cleric";
+            if (hasTag("druid") || hasTag("nature") || containsTag("druid")) return "druid";
+            if (hasTag("bard") || containsTag("bard")) return "bard";
+            if (hasTag("warlock") || containsTag("warlock")) return "warlock";
+            if (hasTag("sorcerer") || containsTag("sorcerer")) return "sorcerer";
+            if (hasTag("ranger") || containsTag("ranger")) return "ranger";
+            if (hasTag("paladin") || containsTag("paladin")) return "paladin";
+            if (hasTag("arcane") || hasTag("wizard") || containsTag("wizard")) return "wizard";
+
+            return "wizard";
+        }
+
+        private static float InferDistanceFromAction(ActionDefinition actionDef)
+        {
+            if (actionDef == null) return 6f;
+
+            bool isMelee = actionDef.AttackType == AttackType.MeleeWeapon ||
+                           actionDef.AttackType == AttackType.MeleeSpell ||
+                           (actionDef.Tags?.Any(t => string.Equals(t, "melee", StringComparison.OrdinalIgnoreCase)) == true);
+            if (isMelee) return 1f;
+
+            bool isTouch = actionDef.Tags?.Any(t => string.Equals(t, "touch", StringComparison.OrdinalIgnoreCase)) == true;
+            if (isTouch) return 1f;
+
+            if (actionDef.Range > 0f)
+                return actionDef.Range / 2f;
+
+            return 6f;
+        }
+
+        private static List<(float X, float Y, float Z)> ComputeTargetPositions(
+            float distance, int count, string formation)
+        {
+            var positions = new List<(float X, float Y, float Z)>();
+            string normalizedFormation = (formation ?? "single").Trim().ToLowerInvariant();
+
+            switch (normalizedFormation)
+            {
+                case "line":
+                    for (int i = 0; i < count; i++)
+                        positions.Add((distance, 0f, i * 1f));
+                    break;
+
+                case "cluster":
+                    // All targets within a 3m radius around the primary position
+                    positions.Add((distance, 0f, 0f));
+                    for (int i = 1; i < count; i++)
+                    {
+                        float angle = (float)(2 * Math.PI * i / Math.Max(count - 1, 1));
+                        float r = 1.5f; // half of 3m radius
+                        positions.Add((distance + r * (float)Math.Cos(angle), 0f, r * (float)Math.Sin(angle)));
+                    }
+                    break;
+
+                case "spread":
+                    for (int i = 0; i < count; i++)
+                        positions.Add((distance, 0f, i * 6f));
+                    break;
+
+                default: // "single" or unrecognized
+                    for (int i = 0; i < count; i++)
+                        positions.Add((distance, 0f, i * 2f));
+                    break;
+            }
+
+            return positions;
         }
 
         public ScenarioDefinition GenerateMultiActionTestScenario(List<string> actionIds, int level = 3, QDND.Combat.Actions.ActionRegistry actionRegistry = null)

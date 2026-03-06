@@ -4,16 +4,6 @@
 - **[CODING_STANDARDS.md](CODING_STANDARDS.md)** — Mandatory coding standards (naming, namespaces, patterns, events, error handling)
 - **[.github/copilot-instructions.md](.github/copilot-instructions.md)** — AI agent architecture guide
 
-### Deprecated Documentation
-These files have been **removed** and must **not** be recreated:
-- `docs/RULES-WINDOWS-PASSIVES.md` (deleted PassiveRuleService system)
-- `docs/ACTION_REGISTRY_QUICK_REFERENCE.md` (redundant with action-registry.md)
-- `docs/bg3-status-system-quick-reference.md` (redundant with bg3-status-system.md)
-- `docs/special_spells.md` (raw list, data in ActionRegistry)
-- `Data/IMPLEMENTATION_OVERVIEW.txt` (one-time receipt)
-- `Data/LSX_PARSER_QUICKSTART.md` (redundant with README_LSX_PARSER.md)
-- `Examples/` folder (demo code, not part of game)
-
 ## Project scope
 BG3 combat parity. Explicitly excluded: resting outside combat, ambush, dialog, quests, world map, journal, illithid powers, any gameplay outside tactical combat.
 
@@ -32,6 +22,10 @@ BG3 combat parity. Explicitly excluded: resting outside combat, ambush, dialog, 
 ## Git / Source
 - Do not commit, the human user will do this
 - Do not push to git, the human user will do this
+
+## Godot location
+If you are working in a Windows environment: `C:\HQ\Godot\Godot_v4.6-stable_mono_win64\Godot_v4.6-stable_mono_win64.exe`
+If you are working in a WSL Ubuntu environment: `\martin\godot\Godot_v4.6-stable_mono_linux_x86_64`
 
 ## Godot-specific commands
 ### Automation helpers
