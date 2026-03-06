@@ -1165,3 +1165,206 @@ void fragment() {
         #endregion
     }
 }
+using System.Collections.Generic;
+using Godot;
+using QDND.Combat.Arena;
+using QDND.Combat.Environment;
+
+namespace QDND.Tools
+{
+    /// <summary>
+    /// Standalone visual sandbox for iterating surface rendering.
+    /// Right mouse drag: orbit, middle drag: pan, wheel: zoom.
+    /// </summary>
+    public partial class SurfaceTestScene : Node3D
+    {
+        private readonly List<string> _groundSurfaceIds = new()
+        {
+            "water",
+            "fire",
+            "ice",
+            "acid",
+            "oil",
+            "ground_poison",
+            "grease",
+            "blood",
+            "web",
+            "lightning",
+            "lava",
+            "spike_growth"
+        };
+
+        private readonly List<string> _cloudSurfaceIds = new()
+        {
+            "fog",
+            "darkness",
+            "stinking_cloud",
+            "cloudkill",
+            "steam",
+            "moonbeam",
+            "silence"
+        };
+
+        private Camera3D _camera;
+        private Node3D _surfacesRoot;
+        private SurfaceManager _surfaceManager;
+
+        private bool _orbiting;
+        private bool _panning;
+        private float _cameraYaw = -35f;
+        private float _cameraPitch = 62f;
+        private float _cameraDistance = 20f;
+        private Vector3 _orbitTarget = new(0f, 0f, 0f);
+
+        private const float OrbitSensitivity = 0.28f;
+        private const float PanSensitivity = 0.014f;
+        private const float MinCameraDistance = 7f;
+        private const float MaxCameraDistance = 42f;
+
+        public override void _Ready()
+        {
+            _camera = GetNode<Camera3D>("Camera3D");
+            _surfacesRoot = GetNode<Node3D>("Surfaces");
+            _surfaceManager = new SurfaceManager();
+
+            _camera.Current = true;
+            UpdateCameraTransform();
+            SpawnShowcaseSurfaces();
+        }
+
+        public override void _UnhandledInput(InputEvent @event)
+        {
+            if (@event is InputEventMouseButton mouseButton)
+            {
+                if (mouseButton.ButtonIndex == MouseButton.Right)
+                {
+                    _orbiting = mouseButton.Pressed;
+                    if (mouseButton.Pressed)
+                    {
+                        GetViewport().SetInputAsHandled();
+                    }
+                }
+                else if (mouseButton.ButtonIndex == MouseButton.Middle)
+                {
+                    _panning = mouseButton.Pressed;
+                    if (mouseButton.Pressed)
+                    {
+                        GetViewport().SetInputAsHandled();
+                    }
+                }
+                else if (mouseButton.Pressed && mouseButton.ButtonIndex == MouseButton.WheelUp)
+                {
+                    _cameraDistance = Mathf.Max(MinCameraDistance, _cameraDistance - 1.2f);
+                    UpdateCameraTransform();
+                    GetViewport().SetInputAsHandled();
+                }
+                else if (mouseButton.Pressed && mouseButton.ButtonIndex == MouseButton.WheelDown)
+                {
+                    _cameraDistance = Mathf.Min(MaxCameraDistance, _cameraDistance + 1.2f);
+                    UpdateCameraTransform();
+                    GetViewport().SetInputAsHandled();
+                }
+            }
+            else if (@event is InputEventMouseMotion mouseMotion)
+            {
+                if (_orbiting)
+                {
+                    _cameraYaw -= mouseMotion.Relative.X * OrbitSensitivity;
+                    _cameraPitch = Mathf.Clamp(_cameraPitch - mouseMotion.Relative.Y * OrbitSensitivity, 30f, 82f);
+                    UpdateCameraTransform();
+                    GetViewport().SetInputAsHandled();
+                }
+                else if (_panning)
+                {
+                    var basis = _camera.GlobalTransform.Basis;
+                    var right = new Vector3(basis.X.X, 0f, basis.X.Z).Normalized();
+                    var forward = new Vector3(-basis.Z.X, 0f, -basis.Z.Z).Normalized();
+                    _orbitTarget += (-right * mouseMotion.Relative.X + forward * mouseMotion.Relative.Y)
+                        * (PanSensitivity * _cameraDistance);
+                    UpdateCameraTransform();
+                    GetViewport().SetInputAsHandled();
+                }
+            }
+        }
+
+        private void UpdateCameraTransform()
+        {
+            float pitch = Mathf.DegToRad(_cameraPitch);
+            float yaw = Mathf.DegToRad(_cameraYaw);
+
+            var offset = new Vector3(
+                _cameraDistance * Mathf.Cos(pitch) * Mathf.Sin(yaw),
+                _cameraDistance * Mathf.Sin(pitch),
+                _cameraDistance * Mathf.Cos(pitch) * Mathf.Cos(yaw));
+
+            _camera.GlobalPosition = _orbitTarget + offset;
+            _camera.LookAt(_orbitTarget, Vector3.Up);
+        }
+
+        private void SpawnShowcaseSurfaces()
+        {
+            const float spacing = 3.1f;
+            float startXGround = -((_groundSurfaceIds.Count - 1) * spacing * 0.5f);
+            float startXCloud = -((_cloudSurfaceIds.Count - 1) * spacing * 0.5f);
+
+            for (int i = 0; i < _groundSurfaceIds.Count; i++)
+            {
+                string id = _groundSurfaceIds[i];
+                string label = id == "ground_poison" ? "poison" : id;
+                Vector3 position = new(startXGround + i * spacing, 0f, -4.2f);
+                CreateSurfacePreview(id, label, position, 1.2f);
+            }
+
+            for (int i = 0; i < _cloudSurfaceIds.Count; i++)
+            {
+                string id = _cloudSurfaceIds[i];
+                Vector3 position = new(startXCloud + i * spacing, 0f, 4.2f);
+                CreateSurfacePreview(id, id, position, 1.5f);
+            }
+        }
+
+        private void CreateSurfacePreview(string surfaceId, string label, Vector3 center, float radius)
+        {
+            SurfaceDefinition definition = _surfaceManager.GetDefinition(surfaceId);
+            if (definition == null)
+            {
+                definition = new SurfaceDefinition
+                {
+                    Id = surfaceId,
+                    Name = label,
+                    Type = SurfaceType.Custom,
+                    Layer = SurfaceLayer.Ground,
+                    IsLiquidVisual = surfaceId is not ("fire" or "web" or "spike_growth" or "plant_growth"
+                        or "black_powder" or "entangle" or "stone_wall" or "lava"),
+                    ColorHex = "#808080",
+                    VisualOpacity = 0.55f,
+                    WaveAmplitude = 0.01f,
+                    WaveSpeed = 1f
+                };
+            }
+
+            var instance = new SurfaceInstance(definition);
+            instance.InitializeGeometry(center, radius);
+
+            var visual = new SurfaceVisual
+            {
+                Name = $"Surface_{surfaceId}_{Mathf.Abs(center.X):0}_{Mathf.Abs(center.Z):0}"
+            };
+            visual.Initialize(instance);
+            _surfacesRoot.AddChild(visual);
+
+            var text = new Label3D
+            {
+                Text = label,
+                Position = center + new Vector3(0f, 1.6f, 0f),
+                FontSize = 42,
+                Billboard = BaseMaterial3D.BillboardModeEnum.Enabled,
+                NoDepthTest = true,
+                OutlineSize = 8,
+                OutlineModulate = Colors.Black,
+                Modulate = Colors.White
+            };
+            _surfacesRoot.AddChild(text);
+        }
+    }
+}

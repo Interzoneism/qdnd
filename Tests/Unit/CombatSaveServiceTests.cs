@@ -477,7 +477,7 @@ namespace QDND.Tests.Unit
 
             var action = new ActionDefinition
             {
-                Id = "Projectile_Fireball",
+                Id = "fireball",
                 Name = "Fireball",
                 Cooldown = new ActionCooldown
                 {
@@ -490,7 +490,7 @@ namespace QDND.Tests.Unit
             pipeline.RegisterAction(action);
 
             var caster = CreateTestCombatant("caster");
-            pipeline.ExecuteAction("Projectile_Fireball", caster, new List<Combatant>());
+            pipeline.ExecuteAction("fireball", caster, new List<Combatant>());
 
             // Act
             var exported = pipeline.ExportCooldowns();
@@ -498,7 +498,7 @@ namespace QDND.Tests.Unit
             // Assert
             Assert.Single(exported);
             Assert.Equal("caster", exported[0].CombatantId);
-            Assert.Equal("Projectile_Fireball", exported[0].ActionId);
+            Assert.Equal("fireball", exported[0].ActionId);
             Assert.Equal(0, exported[0].CurrentCharges);
             Assert.Equal(3, exported[0].RemainingCooldown);
         }

@@ -203,7 +203,7 @@ namespace QDND.Tests.Unit
                         hp = 20,
                         initiative = 10,
                         x = 0f, y = 0f, z = 0f,
-                        actions = new[] { "Target_MainHandAttack" },
+                        actions = new[] { "main_hand_attack" },
                         passives = new[] { "NONEXISTENT_PASSIVE_99999" }
                     }
                 }
@@ -305,7 +305,7 @@ namespace QDND.Tests.Unit
                         hp = 0,
                         initiative = 5,
                         x = 0f, y = 0f, z = 0f,
-                        actions = new[] { "Target_MainHandAttack" },
+                        actions = new[] { "main_hand_attack" },
                         passives = Array.Empty<string>()
                     }
                 }

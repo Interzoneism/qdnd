@@ -181,7 +181,7 @@ public class SaveLoadIntegrationTests : IDisposable
         snapshot.ActionCooldowns.Add(new CooldownSnapshot
         {
             CombatantId = "caster_1",
-            ActionId = "Projectile_Fireball",
+            ActionId = "fireball",
             MaxCharges = 2,
             CurrentCharges = 1,
             RemainingCooldown = 3,

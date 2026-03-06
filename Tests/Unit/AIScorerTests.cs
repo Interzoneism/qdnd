@@ -44,7 +44,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                ActionId = "Target_MainHandAttack",
+                ActionId = "main_hand_attack",
                 TargetId = target.Id
             };
 
@@ -94,7 +94,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                ActionId = "Target_MainHandAttack",
+                ActionId = "main_hand_attack",
                 TargetId = target.Id
             };
 
@@ -118,7 +118,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                ActionId = "Target_MainHandAttack",
+                ActionId = "main_hand_attack",
                 TargetId = target.Id
             };
 
@@ -143,7 +143,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                ActionId = "Target_MainHandAttack",
+                ActionId = "main_hand_attack",
                 TargetId = "invalid"
             };
 
@@ -298,7 +298,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.UseAbility,
-                ActionId = "Projectile_Fireball",
+                ActionId = "fireball",
                 TargetPosition = new Vector3(6, 0, 0)
             };
 
@@ -426,7 +426,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                ActionId = "Target_MainHandAttack",
+                ActionId = "main_hand_attack",
                 TargetId = target.Id
             };
 
@@ -456,7 +456,7 @@ namespace QDND.Tests.Unit
             var action = new AIAction
             {
                 ActionType = AIActionType.Attack,
-                ActionId = "Target_MainHandAttack",
+                ActionId = "main_hand_attack",
                 TargetId = target.Id
             };
 

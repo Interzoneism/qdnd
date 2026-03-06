@@ -216,7 +216,13 @@ namespace QDND.Combat.Arena
 
             // Update labels
             _reactorLabel.Text = $"{prompt.ReactorId} can react!";
-            _triggerLabel.Text = FormatTrigger(prompt.TriggerContext);
+            // Prefer pre-formatted contextInfo (e.g. from Counterspell wiring) over raw trigger format
+            string triggerText = null;
+            if (prompt.TriggerContext?.Data != null &&
+                prompt.TriggerContext.Data.TryGetValue("contextInfo", out var ci) &&
+                ci is string ciStr && !string.IsNullOrEmpty(ciStr))
+                triggerText = ciStr;
+            _triggerLabel.Text = triggerText ?? FormatTrigger(prompt.TriggerContext);
             _reactionLabel.Text = $"{prompt.Reaction.Name}\n{prompt.Reaction.Description}";
 
             // Show backdrop and panel

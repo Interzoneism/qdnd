@@ -23,7 +23,7 @@ namespace QDND.Tests.Integration
             // Register a variety of abilities
             registry.RegisterAction(new ActionDefinition
             {
-                Id = "Target_MainHandAttack",
+                Id = "main_hand_attack",
                 Name = "Basic Attack",
                 Description = "A simple melee attack",
                 TargetType = TargetType.SingleUnit,
@@ -32,7 +32,7 @@ namespace QDND.Tests.Integration
             
             registry.RegisterAction(new ActionDefinition
             {
-                Id = "Shout_ActionSurge",
+                Id = "action_surge",
                 Name = "Action Surge",
                 Description = "Gain an extra action",
                 TargetType = TargetType.Self,
@@ -50,7 +50,7 @@ namespace QDND.Tests.Integration
             
             registry.RegisterAction(new ActionDefinition
             {
-                Id = "Projectile_FireBolt",
+                Id = "fire_bolt",
                 Name = "Fire Bolt",
                 Description = "Ranged fire attack",
                 TargetType = TargetType.SingleUnit,
@@ -59,7 +59,7 @@ namespace QDND.Tests.Integration
             
             registry.RegisterAction(new ActionDefinition
             {
-                Id = "Projectile_MagicMissile",
+                Id = "magic_missile",
                 Name = "Magic Missile",
                 Description = "Never miss missiles",
                 TargetType = TargetType.MultiUnit,
@@ -68,7 +68,7 @@ namespace QDND.Tests.Integration
             
             registry.RegisterAction(new ActionDefinition
             {
-                Id = "Target_PoisonSpray",
+                Id = "poison_spray",
                 Name = "Poison Spray",
                 Description = "Ranged poison attack",
                 TargetType = TargetType.SingleUnit,
@@ -111,17 +111,17 @@ namespace QDND.Tests.Integration
             // Create combatants with specific abilities
             var fighter = new Combatant("ally_1", "Fighter", Faction.Player, 50, 15);
             fighter.Position = Vector3.Zero;
-            fighter.KnownActions = new List<string> { "Target_MainHandAttack", "Shout_ActionSurge", "second_wind" };
+            fighter.KnownActions = new List<string> { "main_hand_attack", "action_surge", "second_wind" };
             context.RegisterCombatant(fighter);
             
             var mage = new Combatant("ally_2", "Mage", Faction.Player, 30, 12);
             mage.Position = new Vector3(-2, 0, 0);
-            mage.KnownActions = new List<string> { "Target_MainHandAttack", "Projectile_FireBolt", "Projectile_MagicMissile" };
+            mage.KnownActions = new List<string> { "main_hand_attack", "fire_bolt", "magic_missile" };
             context.RegisterCombatant(mage);
             
             var goblin = new Combatant("enemy_1", "Goblin", Faction.Hostile, 20, 14);
             goblin.Position = new Vector3(6, 0, 0);
-            goblin.KnownActions = new List<string> { "Target_MainHandAttack", "Target_PoisonSpray" };
+            goblin.KnownActions = new List<string> { "main_hand_attack", "poison_spray" };
             context.RegisterCombatant(goblin);
             
             // Simulate GetActionsForCombatant method
@@ -136,7 +136,7 @@ namespace QDND.Tests.Integration
                 var knownAbilityIds = combatant.KnownActions;
                 if (knownAbilityIds == null || knownAbilityIds.Count == 0)
                 {
-                    var fallbackIds = new HashSet<string> { "attack", "dodge", "Target_MainHandAttack" };
+                    var fallbackIds = new HashSet<string> { "attack", "dodge", "main_hand_attack" };
                     return registry.GetAllActions().Where(a => fallbackIds.Contains(a.Id)).ToList();
                 }
 
@@ -156,32 +156,32 @@ namespace QDND.Tests.Integration
             var fighterAbilities = getAbilitiesForCombatant("ally_1");
             var fighterAbilityIds = fighterAbilities.Select(a => a.Id).ToHashSet();
             
-            Assert.Contains("Target_MainHandAttack", fighterAbilityIds);
-            Assert.Contains("Shout_ActionSurge", fighterAbilityIds);
+            Assert.Contains("main_hand_attack", fighterAbilityIds);
+            Assert.Contains("action_surge", fighterAbilityIds);
             Assert.Contains("second_wind", fighterAbilityIds);
-            Assert.DoesNotContain("Projectile_FireBolt", fighterAbilityIds);
-            Assert.DoesNotContain("Projectile_MagicMissile", fighterAbilityIds);
-            Assert.DoesNotContain("Target_PoisonSpray", fighterAbilityIds);
+            Assert.DoesNotContain("fire_bolt", fighterAbilityIds);
+            Assert.DoesNotContain("magic_missile", fighterAbilityIds);
+            Assert.DoesNotContain("poison_spray", fighterAbilityIds);
 
             // Act & Assert: Mage should only see their abilities
             var mageAbilities = getAbilitiesForCombatant("ally_2");
             var mageAbilityIds = mageAbilities.Select(a => a.Id).ToHashSet();
             
-            Assert.Contains("Target_MainHandAttack", mageAbilityIds);
-            Assert.Contains("Projectile_FireBolt", mageAbilityIds);
-            Assert.Contains("Projectile_MagicMissile", mageAbilityIds);
-            Assert.DoesNotContain("Shout_ActionSurge", mageAbilityIds);
+            Assert.Contains("main_hand_attack", mageAbilityIds);
+            Assert.Contains("fire_bolt", mageAbilityIds);
+            Assert.Contains("magic_missile", mageAbilityIds);
+            Assert.DoesNotContain("action_surge", mageAbilityIds);
             Assert.DoesNotContain("second_wind", mageAbilityIds);
-            Assert.DoesNotContain("Target_PoisonSpray", mageAbilityIds);
+            Assert.DoesNotContain("poison_spray", mageAbilityIds);
 
             // Act & Assert: Goblin should only see their abilities
             var goblinAbilities = getAbilitiesForCombatant("enemy_1");
             var goblinAbilityIds = goblinAbilities.Select(a => a.Id).ToHashSet();
             
-            Assert.Contains("Target_MainHandAttack", goblinAbilityIds);
-            Assert.Contains("Target_PoisonSpray", goblinAbilityIds);
-            Assert.DoesNotContain("Projectile_FireBolt", goblinAbilityIds);
-            Assert.DoesNotContain("Shout_ActionSurge", goblinAbilityIds);
+            Assert.Contains("main_hand_attack", goblinAbilityIds);
+            Assert.Contains("poison_spray", goblinAbilityIds);
+            Assert.DoesNotContain("fire_bolt", goblinAbilityIds);
+            Assert.DoesNotContain("action_surge", goblinAbilityIds);
             Assert.DoesNotContain("second_wind", goblinAbilityIds);
         }
 
@@ -209,7 +209,7 @@ namespace QDND.Tests.Integration
                 var knownAbilityIds = combatant.KnownActions;
                 if (knownAbilityIds == null || knownAbilityIds.Count == 0)
                 {
-                    var fallbackIds = new HashSet<string> { "attack", "dodge", "dash", "disengage", "hide", "shove", "help", "Target_MainHandAttack" };
+                    var fallbackIds = new HashSet<string> { "attack", "dodge", "dash", "disengage", "hide", "shove", "help", "main_hand_attack" };
                     return registry.GetAllActions().Where(a => fallbackIds.Contains(a.Id)).ToList();
                 }
 
@@ -230,7 +230,7 @@ namespace QDND.Tests.Integration
             var abilityIds = abilities.Select(a => a.Id).ToHashSet();
 
             // Assert: Should get fallback abilities
-            var fallbackIds = new[] { "attack", "dodge", "dash", "disengage", "hide", "shove", "help", "Target_MainHandAttack" };
+            var fallbackIds = new[] { "attack", "dodge", "dash", "disengage", "hide", "shove", "help", "main_hand_attack" };
             
             Assert.NotEmpty(abilities);
             Assert.True(abilityIds.Any(id => fallbackIds.Contains(id)), 
@@ -245,7 +245,7 @@ namespace QDND.Tests.Integration
             var context = CreateTestContext();
             
             var combatant = new Combatant("ally_1", "Ally", Faction.Player, 50, 10);
-            combatant.KnownActions = new List<string> { "Target_MainHandAttack" };
+            combatant.KnownActions = new List<string> { "main_hand_attack" };
             context.RegisterCombatant(combatant);
             
             // Simulate GetActionsForCombatant method

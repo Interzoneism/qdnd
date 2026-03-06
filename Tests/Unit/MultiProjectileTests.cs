@@ -24,7 +24,7 @@ namespace QDND.Tests.Unit
             
             var magicMissile = new ActionDefinition
             {
-                Id = "Projectile_MagicMissile",
+                Id = "magic_missile",
                 Name = "Magic Missile",
                 TargetType = TargetType.SingleUnit,
                 ProjectileCount = 3,  // Magic Missile fires 3 darts at level 1
@@ -43,7 +43,7 @@ namespace QDND.Tests.Unit
             pipeline.RegisterAction(magicMissile);
             
             // Act
-            var result = pipeline.ExecuteAction("Projectile_MagicMissile", caster, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("magic_missile", caster, new List<Combatant> { target });
             
             // Assert
             Assert.True(result.Success);
@@ -69,7 +69,7 @@ namespace QDND.Tests.Unit
             
             var scorchingRay = new ActionDefinition
             {
-                Id = "Projectile_ScorchingRay",
+                Id = "scorching_ray",
                 Name = "Scorching Ray",
                 TargetType = TargetType.SingleUnit,
                 ProjectileCount = 3,  // Scorching Ray fires 3 rays at level 2
@@ -89,7 +89,7 @@ namespace QDND.Tests.Unit
             pipeline.RegisterAction(scorchingRay);
             
             // Act
-            var result = pipeline.ExecuteAction("Projectile_ScorchingRay", caster, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("scorching_ray", caster, new List<Combatant> { target });
             
             // Assert
             Assert.True(result.Success);
@@ -136,7 +136,7 @@ namespace QDND.Tests.Unit
             
             var magicMissile = new ActionDefinition
             {
-                Id = "Projectile_MagicMissile",
+                Id = "magic_missile",
                 Name = "Magic Missile",
                 ProjectileCount = 3,
                 UpcastScaling = upcastScaling
@@ -160,7 +160,7 @@ namespace QDND.Tests.Unit
             
             var magicMissile = new ActionDefinition
             {
-                Id = "Projectile_MagicMissile",
+                Id = "magic_missile",
                 Name = "Magic Missile",
                 SpellLevel = 1,
                 CanUpcast = true,
@@ -194,7 +194,7 @@ namespace QDND.Tests.Unit
             pipeline.RegisterAction(magicMissile);
             
             // Act - Upcast to level 2 (+1 level = +1 dart)
-            var result = pipeline.ExecuteAction("Projectile_MagicMissile", caster, new List<Combatant> { target },
+            var result = pipeline.ExecuteAction("magic_missile", caster, new List<Combatant> { target },
                 new ActionExecutionOptions { UpcastLevel = 1 });
             
             // Assert
@@ -214,7 +214,7 @@ namespace QDND.Tests.Unit
             
             var scorchingRay = new ActionDefinition
             {
-                Id = "Projectile_ScorchingRay",
+                Id = "scorching_ray",
                 Name = "Scorching Ray",
                 TargetType = TargetType.SingleUnit,
                 ProjectileCount = 3,
@@ -238,7 +238,7 @@ namespace QDND.Tests.Unit
                 var pipeline = CreatePipeline();
                 pipeline.RegisterAction(scorchingRay);
                 
-                var result = pipeline.ExecuteAction("Projectile_ScorchingRay", caster, new List<Combatant> { target });
+                var result = pipeline.ExecuteAction("scorching_ray", caster, new List<Combatant> { target });
                 
                 // Count hits vs misses
                 int hits = result.EffectResults.Count(r => r.Success);
@@ -279,7 +279,7 @@ namespace QDND.Tests.Unit
 
             var magicMissile = new ActionDefinition
             {
-                Id = "Projectile_MagicMissile",
+                Id = "magic_missile",
                 Name = "Magic Missile",
                 TargetType = TargetType.SingleUnit,
                 ProjectileCount = 3,
@@ -305,7 +305,7 @@ namespace QDND.Tests.Unit
                 Assert.True((bool)args.Context.Data["attackWouldHit"]);
             };
 
-            var result = pipeline.ExecuteAction("Projectile_MagicMissile", caster, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("magic_missile", caster, new List<Combatant> { target });
 
             Assert.True(result.Success);
             Assert.Equal(3, attackReactionWindows);

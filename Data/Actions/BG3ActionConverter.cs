@@ -27,7 +27,7 @@ namespace QDND.Data.Actions
             var action = new ActionDefinition
             {
                 // Core identity
-                Id = spell.Id,
+                Id = MapExplicitId(spell.Id),
                 Name = spell.DisplayName ?? spell.Id,
                 Description = spell.Description ?? "",
                 Icon = spell.Icon ?? "",
@@ -82,6 +82,13 @@ namespace QDND.Data.Actions
                 VfxId = spell.SpellType.ToString().ToLowerInvariant(),
                 SfxId = spell.SpellSoundMagnitude
             };
+
+            // Wire multi-target counts from BG3 targeting fields.
+            if (spell.AmountOfTargetsCount > 1)
+                action.MaxTargets = spell.AmountOfTargetsCount;
+
+            if (spell.MaximumTargets > 0 && action.MaxTargets <= 1)
+                action.MaxTargets = spell.MaximumTargets;
 
             // Preserve raw formulas if requested
             if (includeRawFormulas)
@@ -150,6 +157,10 @@ namespace QDND.Data.Actions
                 float aoeRadius = ParseAreaRadius(spell.AreaRadius);
                 if (aoeRadius > 0)
                     return TargetType.Circle;
+
+                if (spell.AmountOfTargetsCount > 1)
+                    return TargetType.MultiUnit;
+
                 return TargetType.SingleUnit;
             }
 
@@ -162,15 +173,53 @@ namespace QDND.Data.Actions
                 return TargetType.Self;
             }
 
+            if (spellType == BG3SpellType.Target)
+            {
+                if (HasGroundTargetConditions(spell))
+                    return TargetType.Point;
+
+                if (spell.AmountOfTargetsCount > 1)
+                    return TargetType.MultiUnit;
+
+                return TargetType.SingleUnit;
+            }
+
             return spellType switch
             {
-                BG3SpellType.Target => TargetType.SingleUnit,
                 BG3SpellType.Multicast => TargetType.MultiUnit,
                 BG3SpellType.Rush => TargetType.Charge,
                 BG3SpellType.Teleportation => TargetType.Point,
                 BG3SpellType.Wall => TargetType.WallSegment,
                 BG3SpellType.Cone => TargetType.Cone,
                 _ => TargetType.SingleUnit
+            };
+        }
+
+        private static bool HasGroundTargetConditions(BG3SpellData spell)
+        {
+            if (string.IsNullOrEmpty(spell.TargetConditions))
+                return false;
+
+            string cond = spell.TargetConditions;
+            if (!cond.Contains("not Character()", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            // Strip negated usages, then check whether any positive Character() clause remains.
+            string stripped = Regex.Replace(cond, @"not\s+Character\(\)", "", RegexOptions.IgnoreCase);
+            return !stripped.Contains("Character()", StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
+        /// Explicit ID overrides for BG3 entries where the normalized ID would collide
+        /// with a different entry. Weapon attacks need distinct melee/ranged IDs.
+        /// </summary>
+        private static string MapExplicitId(string bg3Id)
+        {
+            return bg3Id switch
+            {
+                "Projectile_MainHandAttack" => "ranged_attack",
+                "Projectile_OffhandAttack" => "ranged_offhand_attack",
+                _ => SpellUpcastRules.NormalizeBG3SpellId(bg3Id)
             };
         }
 

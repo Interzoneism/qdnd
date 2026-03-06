@@ -64,13 +64,6 @@ namespace QDND.Data.Actions
                 if (verboseLogging && jsonLoaded > 0)
                     Console.WriteLine($"[ActionRegistryInitializer] JSON actions loaded: {jsonLoaded} from {dataActionsPath}");
 
-                // Propagate BG3TargetConditions from BG3-prefixed entries (e.g. "Target_HoldPerson")
-                // to their canonical snake_case counterparts ("hold_person").
-                // JSON actions don't carry TargetConditions in their definitions — this bridges the gap.
-                int conditionsPropagated = PropagateBG3TargetConditions(registry);
-                if (verboseLogging && conditionsPropagated > 0)
-                    Console.WriteLine($"[ActionRegistryInitializer] Propagated BG3TargetConditions to {conditionsPropagated} canonical actions");
-
                 stopwatch.Stop();
 
                 // Populate result
@@ -151,32 +144,7 @@ namespace QDND.Data.Actions
             return registry;
         }
 
-        /// <summary>
-        /// After both BG3 and JSON actions are loaded, copy BG3TargetConditions from BG3-prefixed
-        /// entries (e.g. "Target_HoldPerson") to their canonical snake_case counterparts ("hold_person").
-        /// </summary>
-        private static int PropagateBG3TargetConditions(ActionRegistry registry)
-        {
-            int count = 0;
-            foreach (var action in registry.GetAllActions())
-            {
-                if (string.IsNullOrEmpty(action.BG3TargetConditions))
-                    continue;
 
-                string normalizedId = SpellUpcastRules.NormalizeBG3SpellId(action.Id);
-                // If normalization produced no change the entry IS the canonical one — skip.
-                if (string.Equals(normalizedId, action.Id, StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                var canonical = registry.GetAction(normalizedId);
-                if (canonical != null && string.IsNullOrEmpty(canonical.BG3TargetConditions))
-                {
-                    canonical.BG3TargetConditions = action.BG3TargetConditions;
-                    count++;
-                }
-            }
-            return count;
-        }
 
         /// <summary>
         /// Load all JSON action packs from a Data/Actions directory into the registry.

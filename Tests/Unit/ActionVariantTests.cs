@@ -480,7 +480,7 @@ namespace QDND.Tests.Unit
             // Arrange
             var action = new TestActionDefinition
             {
-                Id = "Projectile_Fireball",
+                Id = "fireball",
                 Name = "Empowered Fireball",
                 Effects = new List<TestEffectDefinition>
                 {
@@ -590,7 +590,7 @@ namespace QDND.Tests.Unit
             // Arrange
             var action = new TestActionDefinition
             {
-                Id = "Projectile_MagicMissile",
+                Id = "magic_missile",
                 Name = "Magic Missile",
                 Effects = new List<TestEffectDefinition>
                 {
@@ -653,7 +653,7 @@ namespace QDND.Tests.Unit
             // Arrange
             var action = new TestActionDefinition
             {
-                Id = "Projectile_Fireball",
+                Id = "fireball",
                 Name = "Fireball",
                 Effects = new List<TestEffectDefinition>
                 {
@@ -748,7 +748,7 @@ namespace QDND.Tests.Unit
             // Arrange
             var action = new TestActionDefinition
             {
-                Id = "Projectile_MagicMissile",
+                Id = "magic_missile",
                 Name = "Magic Missile",
                 Cost = new TestActionCost
                 {
@@ -937,7 +937,7 @@ namespace QDND.Tests.Unit
             // Arrange - Simulate Quickened Spell metamagic
             var action = new TestActionDefinition
             {
-                Id = "Projectile_FireBolt",
+                Id = "fire_bolt",
                 Name = "Fire Bolt",
                 Cost = new TestActionCost
                 {

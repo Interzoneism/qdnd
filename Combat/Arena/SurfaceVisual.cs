@@ -6,7 +6,7 @@ namespace QDND.Combat.Arena
 {
     /// <summary>
     /// Visual representation of a surface instance.
-    /// Renders each surface blob as a shallow animated liquid-like overlay.
+    /// Renders each surface blob with category-specific shaders and optional cloud fog volumes.
     /// </summary>
     public partial class SurfaceVisual : Node3D
     {
@@ -127,10 +127,15 @@ void fragment() {
 
         private sealed class VisualStyle
         {
-            public Color BaseColor { get; set; }
-            public Color EdgeColor { get; set; }
+            public ShaderFamily Shader { get; set; }
+            public Color ColorShallow { get; set; }
+            public Color ColorDeep { get; set; }
+            public Color BorderColor { get; set; }
             public float Opacity { get; set; }
-            public float WaveAmplitude { get; set; }
+            public float Transparency { get; set; }
+            public float RefractionIntensity { get; set; }
+            public float BorderScale { get; set; }
+            public float WaveHeightScale { get; set; }
             public float WaveSpeed { get; set; }
             public float Roughness { get; set; }
             public float Metallic { get; set; }
@@ -138,9 +143,17 @@ void fragment() {
             public float NoiseScale { get; set; }
             public float NoiseSpeed { get; set; }
             public float EdgeSoftness { get; set; }
+            public float DissolveStrength { get; set; }
+            public float CloudDensity { get; set; }
+            public float HeightFade { get; set; }
             public float HeightOffset { get; set; }
-            public bool IsCloud { get; set; }
-            public bool IsLiquid { get; set; } = true;
+            public bool UseFogVolume { get; set; }
+            public float FogDensity { get; set; }
+            public float FogNoiseScale { get; set; }
+            public float FogNoiseSpeed { get; set; }
+            public float FogEdgeFade { get; set; }
+            public float FogHeightFade { get; set; }
+            public float FogHeight { get; set; }
         }
 
         private static readonly CylinderMesh GroundBlobMesh = new()
@@ -159,6 +172,8 @@ void fragment() {
         };
 
         private readonly List<MeshInstance3D> _blobMeshes = new();
+        private readonly List<FogVolume> _fogVolumes = new();
+        private bool _useFogVolumes = true;
         private string _surfaceId;
         private string _surfaceDefinitionId;
         private SurfaceType _surfaceType;
@@ -172,6 +187,13 @@ void fragment() {
                 mesh?.QueueFree();
             }
             _blobMeshes.Clear();
+
+            foreach (var fog in _fogVolumes)
+            {
+                fog?.QueueFree();
+            }
+            _fogVolumes.Clear();
+
             base._ExitTree();
         }
 
@@ -208,9 +230,15 @@ void fragment() {
             }
             _blobMeshes.Clear();
 
+            foreach (var fog in _fogVolumes)
+            {
+                fog?.QueueFree();
+            }
+            _fogVolumes.Clear();
+
             foreach (var blob in surface.Blobs)
             {
-                Mesh meshTemplate = style.IsCloud ? CloudBlobMesh : GroundBlobMesh;
+                Mesh meshTemplate = style.Shader == ShaderFamily.Cloud ? CloudBlobMesh : GroundBlobMesh;
                 var mesh = new MeshInstance3D
                 {
                     Mesh = meshTemplate,
@@ -221,40 +249,131 @@ void fragment() {
                 mesh.CastShadow = GeometryInstance3D.ShadowCastingSetting.Off;
                 AddChild(mesh);
                 _blobMeshes.Add(mesh);
+
+                if (style.Shader == ShaderFamily.Cloud && _useFogVolumes && style.UseFogVolume)
+                {
+                    var fog = new FogVolume
+                    {
+                        Position = (blob.Center - surface.Position) + new Vector3(0f, style.HeightOffset + style.FogHeight * 0.5f, 0f),
+                        Size = new Vector3(blob.Radius * 2f, style.FogHeight, blob.Radius * 2f),
+                        Material = BuildFogMaterial(style)
+                    };
+
+                    AddChild(fog);
+                    _fogVolumes.Add(fog);
+                }
             }
         }
 
         private static Material BuildMaterial(VisualStyle style)
         {
-            var mat = new ShaderMaterial
+            Shader shader = style.Shader switch
             {
-                Shader = style.IsCloud ? CloudSurfaceShader : GroundSurfaceShader
+                ShaderFamily.Liquid => LiquidSurfaceShader,
+                ShaderFamily.Solid => SolidSurfaceShader,
+                _ => CloudSurfaceShader
             };
 
-            var baseColor = style.BaseColor;
-            baseColor.A = style.Opacity;
-            var edgeColor = style.EdgeColor;
-            edgeColor.A = Mathf.Clamp(style.Opacity * 0.8f, 0.05f, 0.9f);
+            if (shader == null)
+                return BuildFallbackMaterial(style);
 
-            mat.SetShaderParameter("base_color", baseColor);
-            mat.SetShaderParameter("edge_color", edgeColor);
-            mat.SetShaderParameter("wave_amp", style.WaveAmplitude);
-            mat.SetShaderParameter("wave_speed", style.WaveSpeed);
-            mat.SetShaderParameter("noise_scale", style.NoiseScale);
-            mat.SetShaderParameter("noise_speed", style.NoiseSpeed);
-            mat.SetShaderParameter("emission_strength", style.EmissionStrength);
-            mat.SetShaderParameter("roughness_value", style.Roughness);
-            mat.SetShaderParameter("edge_softness", style.EdgeSoftness);
-            if (!style.IsCloud)
+            var mat = new ShaderMaterial
             {
-                mat.SetShaderParameter("metallic_value", style.Metallic);
+                Shader = shader
+            };
+
+            if (style.Shader == ShaderFamily.Liquid)
+            {
+                mat.SetShaderParameter("color_shallow", style.ColorShallow);
+                mat.SetShaderParameter("color_deep", style.ColorDeep);
+                mat.SetShaderParameter("transparency", style.Transparency);
+                mat.SetShaderParameter("metallic", style.Metallic);
+                mat.SetShaderParameter("roughness", style.Roughness);
+                mat.SetShaderParameter("wave_height_scale", style.WaveHeightScale);
+                mat.SetShaderParameter("wave_speed", style.WaveSpeed);
+                mat.SetShaderParameter("noise_scale", style.NoiseScale);
+                mat.SetShaderParameter("noise_speed", style.NoiseSpeed);
+                mat.SetShaderParameter("emission_strength", style.EmissionStrength);
+                mat.SetShaderParameter("edge_softness", style.EdgeSoftness);
+                mat.SetShaderParameter("border_color", style.BorderColor);
+                mat.SetShaderParameter("border_scale", style.BorderScale);
+                mat.SetShaderParameter("refraction_intensity", style.RefractionIntensity);
+                mat.SetShaderParameter("border_near", 0.05f);
+                mat.SetShaderParameter("border_far", 4000f);
+            }
+            else if (style.Shader == ShaderFamily.Solid)
+            {
+                mat.SetShaderParameter("color_primary", style.ColorShallow);
+                mat.SetShaderParameter("color_secondary", style.ColorDeep);
+                mat.SetShaderParameter("edge_color", style.BorderColor);
+                mat.SetShaderParameter("opacity", style.Opacity);
+                mat.SetShaderParameter("metallic", style.Metallic);
+                mat.SetShaderParameter("roughness", style.Roughness);
+                mat.SetShaderParameter("wave_height_scale", style.WaveHeightScale);
+                mat.SetShaderParameter("wave_speed", style.WaveSpeed);
+                mat.SetShaderParameter("noise_scale", style.NoiseScale);
+                mat.SetShaderParameter("noise_speed", style.NoiseSpeed);
+                mat.SetShaderParameter("emission_strength", style.EmissionStrength);
+                mat.SetShaderParameter("edge_softness", style.EdgeSoftness);
+                mat.SetShaderParameter("dissolve_strength", style.DissolveStrength);
             }
             else
             {
-                mat.SetShaderParameter("cloud_density", style.IsLiquid ? 1.08f : 0.95f);
+                mat.SetShaderParameter("color_primary", style.ColorShallow);
+                mat.SetShaderParameter("color_secondary", style.ColorDeep);
+                mat.SetShaderParameter("opacity", style.Opacity);
+                mat.SetShaderParameter("wave_height_scale", style.WaveHeightScale);
+                mat.SetShaderParameter("wave_speed", style.WaveSpeed);
+                mat.SetShaderParameter("noise_scale", style.NoiseScale);
+                mat.SetShaderParameter("noise_speed", style.NoiseSpeed);
+                mat.SetShaderParameter("cloud_density", style.CloudDensity);
+                mat.SetShaderParameter("edge_softness", style.EdgeSoftness);
+                mat.SetShaderParameter("emission_strength", style.EmissionStrength);
+                mat.SetShaderParameter("height_fade", style.HeightFade);
             }
 
             return mat;
+        }
+
+        private static Material BuildFogMaterial(VisualStyle style)
+        {
+            if (FogVolumeShader == null)
+            {
+                return new FogMaterial
+                {
+                    Density = style.FogDensity,
+                    Albedo = style.ColorShallow,
+                    HeightFalloff = Mathf.Max(0.01f, style.FogHeightFade),
+                    EdgeFade = style.FogEdgeFade
+                };
+            }
+
+            var mat = new ShaderMaterial
+            {
+                Shader = FogVolumeShader
+            };
+            mat.SetShaderParameter("fog_color", new Vector3(style.ColorShallow.R, style.ColorShallow.G, style.ColorShallow.B));
+            mat.SetShaderParameter("fog_density", style.FogDensity);
+            mat.SetShaderParameter("noise_scale", style.FogNoiseScale);
+            mat.SetShaderParameter("noise_speed", style.FogNoiseSpeed);
+            mat.SetShaderParameter("edge_fade", style.FogEdgeFade);
+            mat.SetShaderParameter("height_fade", style.FogHeightFade);
+            return mat;
+        }
+
+        private static Material BuildFallbackMaterial(VisualStyle style)
+        {
+            return new StandardMaterial3D
+            {
+                AlbedoColor = style.ColorShallow,
+                EmissionEnabled = style.EmissionStrength > 0f,
+                Emission = style.ColorShallow,
+                EmissionEnergyMultiplier = style.EmissionStrength,
+                Metallic = style.Metallic,
+                Roughness = style.Roughness,
+                Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
+                CullMode = BaseMaterial3D.CullModeEnum.Disabled
+            };
         }
 
         private static VisualStyle GetSurfaceStyle(SurfaceInstance surface)
@@ -262,70 +381,215 @@ void fragment() {
             var color = ParseHex(
                 surface.Definition.ColorHex,
                 GetSurfaceColorById(surface.Definition.Id, surface.Definition.Type));
-            color.A = Mathf.Clamp(surface.Definition.VisualOpacity, 0.12f, 0.95f);
 
             bool isCloud = surface.Definition.Layer == SurfaceLayer.Cloud;
             bool isLiquid = surface.Definition.IsLiquidVisual;
-            float baseWaveAmplitude = surface.Definition.WaveAmplitude <= 0f
-                ? (isCloud ? 0.016f : (isLiquid ? 0.008f : 0.004f))
-                : surface.Definition.WaveAmplitude;
-            float baseWaveSpeed = surface.Definition.WaveSpeed <= 0f
-                ? (isCloud ? 0.65f : 1.0f)
-                : surface.Definition.WaveSpeed;
+            float opacity = Mathf.Clamp(surface.Definition.VisualOpacity, 0.1f, 0.95f);
 
-            float roughness = isCloud ? 0.8f : (isLiquid ? 0.16f : 0.62f);
-            float metallic = surface.Definition.Type == SurfaceType.Ice ? 0.08f : 0.02f;
-            float emissionStrength = surface.Definition.Type switch
+            var style = new VisualStyle
             {
-                SurfaceType.Fire => 0.44f,
-                SurfaceType.Lightning => 0.34f,
-                SurfaceType.Blessed => 0.2f,
-                SurfaceType.Cursed => 0.22f,
-                _ => isCloud ? 0.11f : 0.13f
+                Shader = isCloud ? ShaderFamily.Cloud : (isLiquid ? ShaderFamily.Liquid : ShaderFamily.Solid),
+                ColorShallow = color,
+                ColorDeep = color.Darkened(0.45f),
+                BorderColor = color.Lightened(0.35f),
+                Opacity = opacity,
+                Transparency = 0.5f,
+                RefractionIntensity = isCloud ? 0f : 0.2f,
+                BorderScale = 1.35f,
+                WaveHeightScale = surface.Definition.WaveAmplitude > 0f
+                    ? surface.Definition.WaveAmplitude
+                    : (isCloud ? 0.018f : (isLiquid ? 0.01f : 0.006f)),
+                WaveSpeed = surface.Definition.WaveSpeed > 0f
+                    ? surface.Definition.WaveSpeed
+                    : (isCloud ? 0.45f : 1f),
+                Roughness = isCloud ? 0.86f : (isLiquid ? 0.16f : 0.55f),
+                Metallic = surface.Definition.Type == SurfaceType.Ice ? 0.1f : 0.02f,
+                EmissionStrength = isCloud ? 0.08f : 0.14f,
+                NoiseScale = isCloud ? 2f : (isLiquid ? 3.2f : 4.6f),
+                NoiseSpeed = isCloud ? 0.22f : (isLiquid ? 0.4f : 0.9f),
+                EdgeSoftness = isCloud ? 0.35f : 0.22f,
+                DissolveStrength = 0.35f,
+                CloudDensity = isCloud ? 1f : 0f,
+                HeightFade = 1.25f,
+                HeightOffset = isCloud ? 0.18f : 0.012f,
+                UseFogVolume = isCloud,
+                FogDensity = 0.28f,
+                FogNoiseScale = 2f,
+                FogNoiseSpeed = 0.15f,
+                FogEdgeFade = 0.35f,
+                FogHeightFade = 1.2f,
+                FogHeight = 2.2f
             };
 
-            float noiseScale = isCloud ? 2.2f : (isLiquid ? 3.2f : 2.6f);
-            float noiseSpeed = isCloud ? 0.18f : (isLiquid ? 0.42f : 0.28f);
-            float edgeSoftness = isCloud ? 0.38f : 0.24f;
-            float heightOffset = isCloud ? 0.18f : 0.012f;
+            ApplySurfaceOverrides(surface.Definition.Id, surface.Definition.Type, style);
+            return style;
+        }
 
-            if (surface.Definition.Type == SurfaceType.Fire)
+        private static void ApplySurfaceOverrides(string surfaceId, SurfaceType surfaceType, VisualStyle style)
+        {
+            string id = (surfaceId ?? string.Empty).ToLowerInvariant();
+
+            switch (id)
             {
-                noiseSpeed = 0.52f;
-                edgeSoftness = 0.3f;
-            }
-            else if (surface.Definition.Type == SurfaceType.Ice)
-            {
-                roughness = 0.1f;
-                metallic = 0.12f;
-            }
-            else if (surface.Definition.Type == SurfaceType.Acid)
-            {
-                noiseSpeed = 0.5f;
-                emissionStrength = 0.2f;
+                case "water":
+                    style.ColorShallow = new Color(0.18f, 0.56f, 0.87f);
+                    style.ColorDeep = new Color(0.05f, 0.2f, 0.4f);
+                    style.Transparency = 0.55f;
+                    style.RefractionIntensity = 0.3f;
+                    style.WaveHeightScale = 0.01f;
+                    style.BorderColor = new Color(0.95f, 0.98f, 1f, 1f);
+                    style.BorderScale = 1.35f;
+                    break;
+
+                case "ice":
+                    style.ColorShallow = new Color(0.7f, 0.88f, 0.96f);
+                    style.ColorDeep = new Color(0.3f, 0.55f, 0.75f);
+                    style.Transparency = 0.25f;
+                    style.RefractionIntensity = 0.15f;
+                    style.WaveHeightScale = 0f;
+                    style.Roughness = 0.05f;
+                    style.Metallic = 0.12f;
+                    style.BorderColor = new Color(0.92f, 0.98f, 1f, 1f);
+                    break;
+
+                case "acid":
+                    style.ColorShallow = new Color(0.55f, 0.85f, 0.15f);
+                    style.ColorDeep = new Color(0.2f, 0.4f, 0f);
+                    style.Transparency = 0.45f;
+                    style.RefractionIntensity = 0.2f;
+                    style.WaveHeightScale = 0.015f;
+                    style.NoiseSpeed = 0.58f;
+                    style.EmissionStrength = 0.2f;
+                    style.BorderColor = new Color(0.85f, 0.95f, 0.35f, 1f);
+                    break;
+
+                case "fire":
+                    style.Shader = ShaderFamily.Solid;
+                    style.ColorShallow = new Color(1f, 0.42f, 0.08f);
+                    style.ColorDeep = new Color(0.28f, 0.05f, 0.02f);
+                    style.BorderColor = new Color(1f, 0.84f, 0.45f, 1f);
+                    style.Opacity = Mathf.Max(style.Opacity, 0.66f);
+                    style.EmissionStrength = 0.6f;
+                    style.WaveHeightScale = 0.012f;
+                    style.WaveSpeed = 2.1f;
+                    style.NoiseScale = 5.8f;
+                    style.NoiseSpeed = 1.45f;
+                    style.EdgeSoftness = 0.28f;
+                    style.DissolveStrength = 0.52f;
+                    break;
+
+                case "oil":
+                    style.ColorShallow = new Color(0.1f, 0.1f, 0.1f);
+                    style.ColorDeep = new Color(0.02f, 0.02f, 0.02f);
+                    style.Transparency = 0.2f;
+                    style.RefractionIntensity = 0.1f;
+                    style.Roughness = 0.02f;
+                    style.WaveHeightScale = 0.006f;
+                    style.BorderColor = new Color(0.28f, 0.28f, 0.28f, 1f);
+                    break;
+
+                case "grease":
+                    // Grease is viscous, not a rippling liquid
+                    style.Shader = ShaderFamily.Solid;
+                    style.WaveHeightScale = 0f;
+                    break;
+
+                case "fog":
+                    style.ColorShallow = new Color(0.85f, 0.85f, 0.85f);
+                    style.ColorDeep = new Color(0.5f, 0.53f, 0.56f);
+                    style.Opacity = 0.46f;
+                    style.CloudDensity = 0.92f;
+                    style.FogDensity = 0.22f;
+                    style.FogNoiseScale = 1.6f;
+                    style.FogNoiseSpeed = 0.12f;
+                    break;
+
+                case "darkness":
+                    style.ColorShallow = new Color(0.05f, 0.03f, 0.08f);
+                    style.ColorDeep = new Color(0.01f, 0.01f, 0.03f);
+                    style.Opacity = 0.72f;
+                    style.CloudDensity = 1.35f;
+                    style.EmissionStrength = 0.02f;
+                    style.FogDensity = 0.8f;
+                    style.FogNoiseScale = 2.3f;
+                    style.FogNoiseSpeed = 0.1f;
+                    style.FogEdgeFade = 0.45f;
+                    style.FogHeightFade = 1.9f;
+                    break;
+
+                case "stinking_cloud":
+                    style.ColorShallow = new Color(0.61f, 0.73f, 0.4f);
+                    style.ColorDeep = new Color(0.28f, 0.4f, 0.16f);
+                    style.Opacity = 0.55f;
+                    style.CloudDensity = 1.08f;
+                    style.FogDensity = 0.42f;
+                    style.FogNoiseScale = 1.9f;
+                    style.FogNoiseSpeed = 0.11f;
+                    break;
+
+                case "cloudkill":
+                    style.ColorShallow = new Color(0.51f, 0.64f, 0.3f);
+                    style.ColorDeep = new Color(0.22f, 0.34f, 0.15f);
+                    style.Opacity = 0.6f;
+                    style.CloudDensity = 1.2f;
+                    style.FogDensity = 0.55f;
+                    style.FogNoiseScale = 2.2f;
+                    style.FogNoiseSpeed = 0.11f;
+                    break;
+
+                case "steam":
+                    style.ColorShallow = new Color(0.9f, 0.95f, 0.98f);
+                    style.ColorDeep = new Color(0.62f, 0.68f, 0.74f);
+                    style.Opacity = 0.34f;
+                    style.CloudDensity = 0.85f;
+                    style.FogDensity = 0.24f;
+                    style.FogNoiseScale = 1.45f;
+                    style.FogNoiseSpeed = 0.16f;
+                    break;
+
+                case "moonbeam":
+                    style.ColorShallow = new Color(0.98f, 0.96f, 0.7f);
+                    style.ColorDeep = new Color(0.68f, 0.62f, 0.32f);
+                    style.Opacity = 0.5f;
+                    style.CloudDensity = 0.95f;
+                    style.EmissionStrength = 0.18f;
+                    style.FogDensity = 0.2f;
+                    style.FogNoiseScale = 1.7f;
+                    break;
+
+                case "silence":
+                    style.ColorShallow = new Color(0.47f, 0.56f, 0.62f);
+                    style.ColorDeep = new Color(0.21f, 0.29f, 0.35f);
+                    style.Opacity = 0.42f;
+                    style.CloudDensity = 0.9f;
+                    style.FogDensity = 0.25f;
+                    style.FogNoiseScale = 1.75f;
+                    break;
             }
 
-            Color edgeColor = isCloud
-                ? color.Darkened(0.48f)
-                : color.Darkened(isLiquid ? 0.32f : 0.4f);
-
-            return new VisualStyle
+            if (surfaceType == SurfaceType.Lightning)
             {
-                BaseColor = color,
-                EdgeColor = edgeColor,
-                Opacity = color.A,
-                WaveAmplitude = baseWaveAmplitude,
-                WaveSpeed = baseWaveSpeed,
-                Roughness = roughness,
-                Metallic = metallic,
-                EmissionStrength = emissionStrength,
-                NoiseScale = noiseScale,
-                NoiseSpeed = noiseSpeed,
-                EdgeSoftness = edgeSoftness,
-                HeightOffset = heightOffset,
-                IsCloud = isCloud,
-                IsLiquid = isLiquid
-            };
+                style.EmissionStrength = Mathf.Max(style.EmissionStrength, 0.35f);
+                style.BorderColor = new Color(0.88f, 0.94f, 1f, 1f);
+                style.Transparency = Mathf.Min(style.Transparency, 0.42f);
+            }
+            else if (surfaceType == SurfaceType.Lava)
+            {
+                style.Shader = ShaderFamily.Solid;
+                style.ColorShallow = new Color(1f, 0.31f, 0.03f);
+                style.ColorDeep = new Color(0.23f, 0.03f, 0.01f);
+                style.BorderColor = new Color(1f, 0.72f, 0.35f, 1f);
+                style.Opacity = 0.78f;
+                style.EmissionStrength = 0.72f;
+                style.WaveSpeed = 1.8f;
+                style.NoiseSpeed = 1.05f;
+                style.DissolveStrength = 0.4f;
+            }
+            else if (surfaceType == SurfaceType.Ice)
+            {
+                style.Roughness = Mathf.Min(style.Roughness, 0.08f);
+                style.Metallic = Mathf.Max(style.Metallic, 0.08f);
+            }
         }
 
         private static Color ParseHex(string hex, Color fallback)
@@ -344,7 +608,7 @@ void fragment() {
                     "steam" => new Color(0.84f, 0.92f, 0.96f, 0.4f),
                     "electrified_steam" => new Color(0.76f, 0.86f, 1.0f, 0.46f),
                     "fog" => new Color(0.83f, 0.86f, 0.9f, 0.45f),
-                    "darkness" => new Color(0.2f, 0.12f, 0.28f, 0.56f),
+                    "darkness" => new Color(0.05f, 0.03f, 0.08f, 0.7f),
                     "moonbeam" => new Color(0.95f, 0.93f, 0.68f, 0.56f),
                     "silence" => new Color(0.47f, 0.56f, 0.62f, 0.42f),
                     "hunger_of_hadar" => new Color(0.25f, 0.16f, 0.34f, 0.58f),
@@ -370,7 +634,7 @@ void fragment() {
                 SurfaceType.Fire => new Color(1.0f, 0.45f, 0.08f, 0.62f),
                 SurfaceType.Ice => new Color(0.68f, 0.9f, 1.0f, 0.56f),
                 SurfaceType.Poison => new Color(0.25f, 0.72f, 0.28f, 0.52f),
-                SurfaceType.Oil => new Color(0.5f, 0.4f, 0.18f, 0.6f),
+                SurfaceType.Oil => new Color(0.12f, 0.12f, 0.12f, 0.6f),
                 SurfaceType.Water => new Color(0.2f, 0.56f, 0.88f, 0.54f),
                 SurfaceType.Acid => new Color(0.74f, 0.9f, 0.22f, 0.6f),
                 SurfaceType.Lightning => new Color(0.86f, 0.9f, 1.0f, 0.6f),

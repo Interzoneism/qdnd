@@ -192,7 +192,10 @@ namespace QDND.Combat.Services
             if (actionRegistry?.GetAction(normalized) != null)
                 return true;
 
-            return normalized.Equals("Target_MainHandAttack", StringComparison.OrdinalIgnoreCase)
+            return normalized.Equals("main_hand_attack", StringComparison.OrdinalIgnoreCase)
+                || normalized.Equals("ranged_attack", StringComparison.OrdinalIgnoreCase)
+                || normalized.Equals("dodge_action", StringComparison.OrdinalIgnoreCase)
+                || normalized.Equals("Target_MainHandAttack", StringComparison.OrdinalIgnoreCase)
                 || normalized.Equals("Projectile_MainHandAttack", StringComparison.OrdinalIgnoreCase)
                 || normalized.Equals("Shout_Dodge", StringComparison.OrdinalIgnoreCase);
         }

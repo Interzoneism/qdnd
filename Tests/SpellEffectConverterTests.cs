@@ -911,13 +911,13 @@ namespace QDND.Tests
         }
 
         [Fact]
-        public void ParseEffects_CompoundHasStatusCondition_FallsThroughToNull()
+        public void ParseEffects_CompoundHasStatusCondition_ParsesCompoundCondition()
         {
-            // Compound conditions with "and" are not yet supported — should return null condition
+            // Compound conditions with "and" are supported and preserved in normalized condition form.
             string formula = "IF(not HasStatus('DASH_STACKED_2') and HasStatus('DASH')):ApplyStatus(DASH_STACKED,100,1)";
             var effects = SpellEffectConverter.ParseEffects(formula);
             Assert.Single(effects);
-            Assert.Null(effects[0].Condition);
+            Assert.Equal("compound_status:!DASH_STACKED_2&DASH", effects[0].Condition);
         }
 
         [Fact]

@@ -136,7 +136,7 @@ namespace QDND.Tests.Simulation
 
             var basicAttack = new ActionDefinition
             {
-                Id = "Target_MainHandAttack",
+                Id = "main_hand_attack",
                 Name = "Basic Attack",
                 Cost = new ActionCost { UsesAction = true },
                 AttackType = AttackType.MeleeWeapon,
@@ -163,11 +163,11 @@ namespace QDND.Tests.Simulation
             int initialHP = target.Resources.CurrentHP;
 
             // Act
-            var result = setup.Effects.ExecuteAction("Target_MainHandAttack", actor, new List<Combatant> { target });
+            var result = setup.Effects.ExecuteAction("main_hand_attack", actor, new List<Combatant> { target });
 
             // Assert
             Assert.True(result.Success);
-            Assert.Equal("Target_MainHandAttack", result.ActionId);
+            Assert.Equal("main_hand_attack", result.ActionId);
 
             // Damage should be dealt if attack hit
             if (result.AttackResult?.IsSuccess == true)
@@ -292,7 +292,7 @@ namespace QDND.Tests.Simulation
 
             var fireball = new ActionDefinition
             {
-                Id = "Projectile_Fireball",
+                Id = "fireball",
                 Name = "Fireball",
                 Cost = new ActionCost { UsesAction = true },
                 SaveType = "DEX",
@@ -326,7 +326,7 @@ namespace QDND.Tests.Simulation
             var initialHPs = targets.Select(t => t.Resources.CurrentHP).ToList();
 
             // Act
-            var result = setup.Effects.ExecuteAction("Projectile_Fireball", wizard, targets);
+            var result = setup.Effects.ExecuteAction("fireball", wizard, targets);
 
             // Assert
             Assert.True(result.Success);
@@ -455,7 +455,7 @@ namespace QDND.Tests.Simulation
         }
 
         [Theory]
-        [InlineData("Target_MainHandAttack")]
+        [InlineData("main_hand_attack")]
         [InlineData("dash")]
         [InlineData("heal")]
         public void Ability_CommonAbilities_ExecuteSuccessfully(string actionId)
@@ -466,9 +466,9 @@ namespace QDND.Tests.Simulation
             // Define common abilities
             var abilities = new Dictionary<string, ActionDefinition>
             {
-                ["Target_MainHandAttack"] = new ActionDefinition
+                ["main_hand_attack"] = new ActionDefinition
                 {
-                    Id = "Target_MainHandAttack",
+                    Id = "main_hand_attack",
                     Name = "Basic Attack",
                     Cost = new ActionCost { UsesAction = true },
                     AttackType = AttackType.MeleeWeapon,

@@ -241,12 +241,37 @@ namespace QDND.Combat.Reactions
             if (!HasRequiredResources(reactor, reaction))
                 return false;
 
+            // Validate that the player-chosen slot level is still available before burning the reaction point
+            if (context?.Data != null &&
+                context.Data.TryGetValue("counterspellSlotLevel", out var slv) &&
+                slv is int specificLevel && specificLevel > 0)
+            {
+                var pool = reactor.ActionResources;
+                bool hasSlot = pool != null && (
+                    pool.Has("WarlockSpellSlot", 1, specificLevel) ||
+                    pool.Has("SpellSlot", 1, specificLevel) ||
+                    pool.Has($"spell_slot_{specificLevel}", 1));
+                if (!hasSlot)
+                    return false;
+            }
+
             // Consume reaction budget
             if (!reactor.ActionBudget.ConsumeReaction())
                 return false;
 
-            if (!ConsumeRequiredResources(reactor, reaction))
+            int consumedSlotLevel = ConsumeRequiredResources(reactor, reaction, context);
+            if (consumedSlotLevel == 0) // 0 = consumption failed
+            {
+                Data.RuntimeSafety.LogError($"[ReactionSystem] Slot consumption failed after reaction budget burned for {reactor?.Name}");
                 return false;
+            }
+
+            // Propagate consumed spell slot level back into context so CounterEffect uses it
+            if (consumedSlotLevel > 0)
+            {
+                context.CounterspellSlotLevel = consumedSlotLevel;
+                context.Data["counterspellSlotLevel"] = consumedSlotLevel;
+            }
 
             _events?.Dispatch(new RuleEvent
             {
@@ -304,18 +329,42 @@ namespace QDND.Combat.Reactions
             return HasSpellSlotAtOrAbove(reactor.ActionResources, minLevel);
         }
 
-        private static bool ConsumeRequiredResources(Combatant reactor, ReactionDefinition reaction)
+        /// <summary>
+        /// Consumes the required spell slot for a reaction, respecting a player-chosen level
+        /// stored in <c>context.Data["counterspellSlotLevel"]</c> when present.
+        /// </summary>
+        /// <returns>
+        /// &gt;0 — the spell slot level that was consumed.<br/>
+        /// -1  — no slot was required (non-slot reaction, success).<br/>
+        ///  0  — consumption failed (insufficient slots).
+        /// </returns>
+        private static int ConsumeRequiredResources(Combatant reactor, ReactionDefinition reaction, ReactionTriggerContext context = null)
         {
             if (reaction == null)
-                return true;
+                return -1;
 
             if (!TryGetSpellSlotRequirement(reaction, out int minLevel))
-                return true;
+                return -1;
 
             if (reactor?.ActionResources == null)
-                return false;
+                return 0;
 
-            return ConsumeSpellSlotAtOrAbove(reactor.ActionResources, minLevel);
+            var pool = reactor.ActionResources;
+
+            // Player (or AI) may have pre-selected a specific slot level via context
+            if (context?.Data != null &&
+                context.Data.TryGetValue("counterspellSlotLevel", out var slv) &&
+                slv is int specificLevel && specificLevel > 0)
+            {
+                // Consume exactly that level
+                if (pool.Consume("WarlockSpellSlot", 1, specificLevel) ||
+                    pool.Consume("SpellSlot", 1, specificLevel) ||
+                    pool.Consume($"spell_slot_{specificLevel}", 1))
+                    return specificLevel;
+                return 0;
+            }
+
+            return ConsumeSpellSlotAtOrAbove(pool, minLevel);
         }
 
         private static bool TryGetSpellSlotRequirement(ReactionDefinition reaction, out int minLevel)
@@ -364,23 +413,61 @@ namespace QDND.Combat.Reactions
             return false;
         }
 
-        private static bool ConsumeSpellSlotAtOrAbove(ResourcePool pool, int minLevel)
+        /// <summary>
+        /// Consumes the lowest available spell slot at or above <paramref name="minLevel"/>.
+        /// </summary>
+        /// <returns>The level of the slot consumed, or 0 on failure.</returns>
+        private static int ConsumeSpellSlotAtOrAbove(ResourcePool pool, int minLevel)
         {
             if (pool == null)
-                return false;
+                return 0;
 
             int startLevel = Math.Clamp(minLevel, 1, MaxSpellSlotLevel);
             for (int level = startLevel; level <= MaxSpellSlotLevel; level++)
             {
                 if (pool.Consume("WarlockSpellSlot", 1, level) || pool.Consume("SpellSlot", 1, level))
-                    return true;
+                    return level;
 
                 string flatSlot = $"spell_slot_{level}";
                 if (pool.Consume(flatSlot, 1))
-                    return true;
+                    return level;
             }
 
-            return false;
+            return 0;
+        }
+
+        /// <summary>
+        /// Returns all spell slot levels &gt;= <paramref name="minLevel"/> that have at least one
+        /// charge available. Checks WarlockSpellSlot, SpellSlot, and flat spell_slot_{N} keys.
+        /// Used by the UI SpellSlotPickerOverlay.
+        /// </summary>
+        public static List<(int level, int current, int max)> GetAvailableSpellSlots(ResourcePool pool, int minLevel)
+        {
+            var result = new List<(int, int, int)>();
+            if (pool == null)
+                return result;
+
+            int startLevel = Math.Clamp(minLevel, 1, MaxSpellSlotLevel);
+            for (int level = startLevel; level <= MaxSpellSlotLevel; level++)
+            {
+                if (pool.Has("WarlockSpellSlot", 1, level))
+                {
+                    result.Add((level, pool.GetCurrent("WarlockSpellSlot", level), pool.GetMax("WarlockSpellSlot", level)));
+                    continue;
+                }
+                if (pool.Has("SpellSlot", 1, level))
+                {
+                    result.Add((level, pool.GetCurrent("SpellSlot", level), pool.GetMax("SpellSlot", level)));
+                    continue;
+                }
+                string flatKey = $"spell_slot_{level}";
+                if (pool.HasResource(flatKey) && pool.Has(flatKey, 1))
+                {
+                    result.Add((level, pool.GetCurrent(flatKey), pool.GetMax(flatKey)));
+                }
+            }
+
+            return result;
         }
 
         private static bool ContainsInvariant(string value, string token)

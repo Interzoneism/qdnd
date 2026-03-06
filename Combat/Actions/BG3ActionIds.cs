@@ -1,56 +1,57 @@
 using System;
+using System.Text;
 
 namespace QDND.Combat.Actions;
 
 /// <summary>
-/// Single source of truth for BG3 action IDs.
-/// These match the IDs from BG3_Data/Spells/ LSX files.
+/// Single source of truth for canonical action IDs used at runtime.
+/// IDs are normalized snake_case, with helper methods handling legacy BG3-prefixed aliases.
 /// </summary>
 public static class BG3ActionIds
 {
     // ============================================================
     // Weapon Attacks
     // ============================================================
-    public const string MeleeMainHand = "Target_MainHandAttack";
-    public const string RangedMainHand = "Projectile_MainHandAttack";
-    public const string MeleeOffHand = "Target_OffhandAttack";
-    public const string RangedOffHand = "Projectile_OffhandAttack";
-    public const string UnarmedStrike = "Target_UnarmedStrike";
+    public const string MeleeMainHand = "main_hand_attack";
+    public const string RangedMainHand = "ranged_attack";
+    public const string MeleeOffHand = "offhand_attack";
+    public const string RangedOffHand = "ranged_offhand_attack";
+    public const string UnarmedStrike = "unarmed_strike";
 
     // ============================================================
     // Common Actions
     // ============================================================
-    public const string Dash = "Shout_Dash";
-    public const string Disengage = "Shout_Disengage";
-    public const string Dodge = "Shout_Dodge";
-    public const string Hide = "Shout_Hide";
-    public const string Shove = "Target_Shove";
-    public const string Help = "Target_Help";
-    public const string Throw = "Throw_Throw";
-    public const string Jump = "Shout_Jump";
-    public const string Dip = "Target_Dip";
+    public const string Dash = "dash";
+    public const string Disengage = "disengage";
+    public const string Dodge = "dodge_action";
+    public const string Hide = "hide";
+    public const string Shove = "shove";
+    public const string Help = "help";
+    public const string Throw = "throw";
+    public const string Jump = "jump";
+    public const string Dip = "dip";
 
     // ============================================================
     // Class Features
     // ============================================================
-    public const string ActionSurge = "Shout_ActionSurge";
-    public const string SecondWind = "Shout_SecondWind";
-    public const string Rage = "Shout_Rage";
-    public const string SneakAttack = "Target_SneakAttack";
-    public const string RecklessAttack = "Shout_RecklessAttack";
+    public const string ActionSurge = "action_surge";
+    public const string SecondWind = "second_wind";
+    public const string Rage = "rage";
+    public const string SneakAttack = "sneak_attack";
+    public const string RecklessAttack = "reckless_attack";
 
     // ============================================================
     // Spells (commonly referenced in code)
     // ============================================================
-    public const string EldritchBlast = "Projectile_EldritchBlast";
-    public const string MagicMissile = "Projectile_MagicMissile";
-    public const string FireBolt = "Projectile_FireBolt";
-    public const string SacredFlame = "Target_SacredFlame";
-    public const string GuidingBolt = "Projectile_GuidingBolt";
-    public const string CureWounds = "Target_CureWounds";
-    public const string HealingWord = "Target_HealingWord";
-    public const string ShieldSpell = "Target_Shield";
-    public const string Counterspell = "Target_Counterspell";
+    public const string EldritchBlast = "eldritch_blast";
+    public const string MagicMissile = "magic_missile";
+    public const string FireBolt = "fire_bolt";
+    public const string SacredFlame = "sacred_flame";
+    public const string GuidingBolt = "guiding_bolt";
+    public const string CureWounds = "cure_wounds";
+    public const string HealingWord = "healing_word";
+    public const string ShieldSpell = "shield";
+    public const string Counterspell = "counterspell";
 
     // ============================================================
     // Range Constants
@@ -80,9 +81,10 @@ public static class BG3ActionIds
             return false;
         if (string.Equals(actionId, bg3Id, StringComparison.OrdinalIgnoreCase))
             return true;
-        // Strip prefix and compare with underscore-separated form
-        string stripped = StripPrefix(bg3Id);
-        return string.Equals(actionId, stripped, StringComparison.OrdinalIgnoreCase);
+
+        string normalizedAction = NormalizeForComparison(actionId);
+        string normalizedTarget = NormalizeForComparison(bg3Id);
+        return string.Equals(normalizedAction, normalizedTarget, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -91,24 +93,71 @@ public static class BG3ActionIds
     public static string StripPrefix(string actionId)
     {
         if (string.IsNullOrEmpty(actionId)) return actionId;
-        string[] prefixes = { "Target_", "Projectile_", "Shout_", "Zone_", "Rush_", "Wall_", "Throw_", "Teleportation_" };
+        string[] prefixes =
+        {
+            "ProjectileStrike_",
+            "Target_",
+            "Projectile_",
+            "Shout_",
+            "Zone_",
+            "Rush_",
+            "Teleportation_",
+            "Throw_",
+            "Wall_"
+        };
+
         foreach (var prefix in prefixes)
         {
             if (actionId.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                 return actionId.Substring(prefix.Length);
         }
+
         return actionId;
+    }
+
+    private static string NormalizeForComparison(string actionId)
+    {
+        string stripped = StripPrefix(actionId);
+        if (string.IsNullOrWhiteSpace(stripped))
+            return string.Empty;
+
+        var builder = new StringBuilder(stripped.Length * 2);
+        for (int i = 0; i < stripped.Length; i++)
+        {
+            char c = stripped[i];
+            if (char.IsLetterOrDigit(c))
+            {
+                if (char.IsUpper(c) && i > 0)
+                {
+                    char previous = stripped[i - 1];
+                    if ((char.IsLower(previous) || char.IsDigit(previous)) &&
+                        builder.Length > 0 &&
+                        builder[^1] != '_')
+                    {
+                        builder.Append('_');
+                    }
+                }
+
+                builder.Append(char.ToLowerInvariant(c));
+            }
+            else if (builder.Length > 0 && builder[^1] != '_')
+            {
+                builder.Append('_');
+            }
+        }
+
+        return builder.ToString().Trim('_');
     }
 
     /// <summary>
     /// Check if the action ID is any form of melee main hand attack.
     /// </summary>
     public static bool IsMeleeAttack(string actionId) =>
-        Matches(actionId, MeleeMainHand) || Matches(actionId, MeleeOffHand) || Matches(actionId, UnarmedStrike);
+        Matches(actionId, MeleeMainHand) || Matches(actionId, UnarmedStrike);
 
     /// <summary>
     /// Check if the action ID is any form of ranged attack.
     /// </summary>
     public static bool IsRangedAttack(string actionId) =>
-        Matches(actionId, RangedMainHand) || Matches(actionId, RangedOffHand);
+        Matches(actionId, RangedMainHand);
 }

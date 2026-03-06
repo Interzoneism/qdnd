@@ -188,7 +188,7 @@ namespace QDND.Tests.Unit
 
             pipeline.RegisterAction(new ActionDefinition
             {
-                Id = "Projectile_MagicMissile",
+                Id = "magic_missile",
                 Name = "Magic Missile",
                 SpellLevel = 1,
                 TargetType = TargetType.SingleUnit,
@@ -246,7 +246,7 @@ namespace QDND.Tests.Unit
             };
 
             int hpBefore = target.Resources.CurrentHP;
-            var result = pipeline.ExecuteAction("Projectile_MagicMissile", caster, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("magic_missile", caster, new List<Combatant> { target });
 
             Assert.True(result.Success);
             Assert.True(shieldActionSucceeded);
@@ -278,7 +278,7 @@ namespace QDND.Tests.Unit
 
             pipeline.RegisterAction(new ActionDefinition
             {
-                Id = "Projectile_MagicMissile",
+                Id = "magic_missile",
                 Name = "Magic Missile",
                 SpellLevel = 1,
                 TargetType = TargetType.SingleUnit,
@@ -297,7 +297,7 @@ namespace QDND.Tests.Unit
             });
 
             int hpBefore = target.Resources.CurrentHP;
-            var result = pipeline.ExecuteAction("Projectile_MagicMissile", caster, new List<Combatant> { target });
+            var result = pipeline.ExecuteAction("magic_missile", caster, new List<Combatant> { target });
 
             Assert.True(result.Success);
             Assert.True(target.Resources.CurrentHP < hpBefore);

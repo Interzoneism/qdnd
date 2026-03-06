@@ -78,6 +78,24 @@ namespace QDND.Data.Actions
             // Resolve inheritance
             _parser.ResolveInheritance();
 
+            // Sort by type priority so cross-type ID collisions register deterministic winners.
+            // With overwrite=false, earlier registrations win.
+            var typeOrder = new Dictionary<BG3SpellType, int>
+            {
+                { BG3SpellType.Target, 0 },
+                { BG3SpellType.Shout, 1 },
+                { BG3SpellType.Zone, 2 },
+                { BG3SpellType.Rush, 3 },
+                { BG3SpellType.Teleportation, 4 },
+                { BG3SpellType.Projectile, 5 },
+                { BG3SpellType.Throw, 6 },
+                { BG3SpellType.Wall, 7 },
+            };
+
+            var orderedSpells = spells
+                .OrderBy(s => typeOrder.GetValueOrDefault(s.SpellType, 99))
+                .ThenBy(s => s.Id);
+
             // Collect errors and warnings from parser
             foreach (var error in _parser.Errors)
                 _errors.Add(error);
@@ -85,7 +103,7 @@ namespace QDND.Data.Actions
                 _warnings.Add(warning);
 
             // Convert and register each spell
-            foreach (var spell in spells)
+            foreach (var spell in orderedSpells)
             {
                 try
                 {

@@ -1216,6 +1216,7 @@ namespace QDND.Combat.Services
         private static bool IsDipAction(string actionId)
         {
             return string.Equals(actionId, "dip", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(actionId, "dip_action", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(actionId, "Target_Dip", StringComparison.OrdinalIgnoreCase);
         }
 
@@ -1421,6 +1422,7 @@ namespace QDND.Combat.Services
         {
             return string.Equals(actionId, "throw", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(actionId, "throw_action", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(actionId, "Throw_Throw", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(actionId, "Target_Throw", StringComparison.OrdinalIgnoreCase);
         }
 

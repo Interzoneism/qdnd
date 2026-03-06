@@ -46,7 +46,8 @@ namespace QDND.Combat.Actions.Effects
             }
             else
             {
-                // Ability check required: DC = 10 + target spell level, use Intelligence modifier
+                // Ability check required: DC = 10 + target spell level
+                // BG3 hardcodes Intelligence for Counterspell regardless of class — parity requirement
                 int dc = 10 + targetSpellLevel;
                 int intMod = context.Source.GetAbilityModifier(AbilityType.Intelligence);
                 int roll = context.Rules.Dice.RollD20();
@@ -72,5 +73,6 @@ namespace QDND.Combat.Actions.Effects
 
             return results;
         }
+
     }
 }

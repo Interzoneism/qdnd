@@ -21,7 +21,7 @@ namespace QDND.Tests.Unit
             // Register test abilities
             registry.RegisterAction(new ActionDefinition
             {
-                Id = "Projectile_Fireball",
+                Id = "fireball",
                 Name = "Fireball",
                 Description = "A classic fireball",
                 TargetType = TargetType.Point,
@@ -30,7 +30,7 @@ namespace QDND.Tests.Unit
             
             registry.RegisterAction(new ActionDefinition
             {
-                Id = "Projectile_MagicMissile",
+                Id = "magic_missile",
                 Name = "Magic Missile",
                 Description = "Never miss missiles",
                 TargetType = TargetType.SingleUnit,
@@ -39,7 +39,7 @@ namespace QDND.Tests.Unit
             
             registry.RegisterAction(new ActionDefinition
             {
-                Id = "Target_CureWounds",
+                Id = "cure_wounds",
                 Name = "Cure Wounds",
                 Description = "Heal an ally",
                 TargetType = TargetType.SingleUnit,
@@ -48,7 +48,7 @@ namespace QDND.Tests.Unit
             
             registry.RegisterAction(new ActionDefinition
             {
-                Id = "Shout_ActionSurge",
+                Id = "action_surge",
                 Name = "Action Surge",
                 Description = "Gain an extra action",
                 TargetType = TargetType.Self,
@@ -57,7 +57,7 @@ namespace QDND.Tests.Unit
             
             registry.RegisterAction(new ActionDefinition
             {
-                Id = "Target_MainHandAttack",
+                Id = "main_hand_attack",
                 Name = "Basic Attack",
                 Description = "A simple attack",
                 TargetType = TargetType.SingleUnit,
@@ -74,19 +74,19 @@ namespace QDND.Tests.Unit
             
             // Create wizard with spell abilities
             var wizard = new Combatant("wizard1", "Wizard", Faction.Player, 30, 10);
-            wizard.KnownActions = new List<string> { "Projectile_Fireball", "Projectile_MagicMissile" };
+            wizard.KnownActions = new List<string> { "fireball", "magic_missile" };
             combatants.Add(wizard);
             turnQueue.AddCombatant(wizard);
             
             // Create cleric with healing
             var cleric = new Combatant("cleric1", "Cleric", Faction.Player, 40, 9);
-            cleric.KnownActions = new List<string> { "Target_CureWounds" };
+            cleric.KnownActions = new List<string> { "cure_wounds" };
             combatants.Add(cleric);
             turnQueue.AddCombatant(cleric);
             
             // Create fighter with melee abilities
             var fighter = new Combatant("fighter1", "Fighter", Faction.Hostile, 50, 11);
-            fighter.KnownActions = new List<string> { "Shout_ActionSurge", "Target_MainHandAttack" };
+            fighter.KnownActions = new List<string> { "action_surge", "main_hand_attack" };
             combatants.Add(fighter);
             turnQueue.AddCombatant(fighter);
             
@@ -115,10 +115,10 @@ namespace QDND.Tests.Unit
             
             // Assert
             Assert.Equal(2, filteredAbilities.Count);
-            Assert.Contains(filteredAbilities, a => a.Id == "Projectile_Fireball");
-            Assert.Contains(filteredAbilities, a => a.Id == "Projectile_MagicMissile");
-            Assert.DoesNotContain(filteredAbilities, a => a.Id == "Target_CureWounds");
-            Assert.DoesNotContain(filteredAbilities, a => a.Id == "Shout_ActionSurge");
+            Assert.Contains(filteredAbilities, a => a.Id == "fireball");
+            Assert.Contains(filteredAbilities, a => a.Id == "magic_missile");
+            Assert.DoesNotContain(filteredAbilities, a => a.Id == "cure_wounds");
+            Assert.DoesNotContain(filteredAbilities, a => a.Id == "action_surge");
         }
         
         [Fact]
@@ -137,8 +137,8 @@ namespace QDND.Tests.Unit
             
             // Assert
             Assert.Single(filteredAbilities);
-            Assert.Contains(filteredAbilities, a => a.Id == "Target_CureWounds");
-            Assert.DoesNotContain(filteredAbilities, a => a.Id == "Projectile_Fireball");
+            Assert.Contains(filteredAbilities, a => a.Id == "cure_wounds");
+            Assert.DoesNotContain(filteredAbilities, a => a.Id == "fireball");
         }
         
         [Fact]
@@ -201,8 +201,8 @@ namespace QDND.Tests.Unit
             var (turnQueue, combatants) = CreateTestEnvironment(registry);
             var fighter = combatants.First(c => c.Id == "fighter1");
             
-            // Fighter knows: Shout_ActionSurge, Target_MainHandAttack
-            // Fighter should NOT get: Projectile_Fireball, Projectile_MagicMissile, Target_CureWounds
+            // Fighter knows: action_surge, main_hand_attack
+            // Fighter should NOT get: fireball, magic_missile, cure_wounds
             
             var knownAbilities = fighter.KnownActions;
             var filteredAbilities = registry.GetAllActions()
@@ -210,9 +210,9 @@ namespace QDND.Tests.Unit
                 .ToList();
             
             // Assert
-            Assert.DoesNotContain(filteredAbilities, a => a.Id == "Projectile_Fireball");
-            Assert.DoesNotContain(filteredAbilities, a => a.Id == "Projectile_MagicMissile");
-            Assert.DoesNotContain(filteredAbilities, a => a.Id == "Target_CureWounds");
+            Assert.DoesNotContain(filteredAbilities, a => a.Id == "fireball");
+            Assert.DoesNotContain(filteredAbilities, a => a.Id == "magic_missile");
+            Assert.DoesNotContain(filteredAbilities, a => a.Id == "cure_wounds");
             
             // Should only have what fighter knows
             Assert.All(filteredAbilities, a => Assert.Contains(a.Id, fighter.KnownActions));
