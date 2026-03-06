@@ -309,7 +309,8 @@ namespace QDND.Combat.Actions.Effects
                 return results;
             }
 
-            float radius = definition.Value > 0f ? definition.Value : 2.5f;
+            float abilityRadius = context.Ability?.AreaRadius ?? 0f;
+            float radius = definition.Value > 0f ? definition.Value : (abilityRadius > 0f ? abilityRadius : 2.5f);
             int transformed = context.Surfaces.ApplySurfaceEvent(transformType, position.Value, radius, sourceId);
 
             results.Add(EffectResult.Succeeded(Type, sourceId, null, transformed,

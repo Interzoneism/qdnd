@@ -50,6 +50,12 @@ namespace QDND.Combat.Statuses
         private readonly Func<IEnumerable<Combatant>> _getCombatants;
         private readonly Func<string, Combatant> _resolveCombatant;
 
+        // Bug 5: Track which targets were already damaged by each aura owner this round.
+        // Key = aura owner ID, Value = set of target IDs already hit this round.
+        // Cleared at the start of the aura owner's own turn via ProcessTurnStartAuras.
+        private readonly Dictionary<string, HashSet<string>> _damagedThisRound
+            = new Dictionary<string, HashSet<string>>(StringComparer.OrdinalIgnoreCase);
+
         public AuraSystem(
             StatusManager statusManager,
             Func<IEnumerable<Combatant>> getCombatants,
@@ -61,13 +67,15 @@ namespace QDND.Combat.Statuses
         }
 
         /// <summary>
-        /// Called at each combatant's turn end. Checks all active auras and applies/removes
+        /// Called at each combatant's turn end. Checks all active end-of-turn auras and applies/removes
         /// the aura status to/from this combatant based on proximity.
+        /// Skips auras with AuraTurnStart = true (those are handled by ProcessTurnStartAuras).
         /// </summary>
         public void ProcessTurnEndAuras(string combatantId)
         {
             var target = _resolveCombatant(combatantId);
-            if (target == null || target.LifeState == CombatantLifeState.Dead)
+            if (target == null || target.LifeState == CombatantLifeState.Dead
+                || target.LifeState == CombatantLifeState.Unconscious)
                 return;
 
             var allCombatants = _getCombatants();
@@ -79,17 +87,65 @@ namespace QDND.Combat.Statuses
 
                 // Snapshot to list so LINQ doesn't re-evaluate during iteration
                 var auraStatuses = _statusManager.GetStatuses(auraSource.Id)
-                    .Where(s => s.Definition.AuraRadius > 0f && !string.IsNullOrEmpty(s.Definition.AuraStatusId))
+                    .Where(s => s.Definition.AuraRadius > 0f
+                             && !string.IsNullOrEmpty(s.Definition.AuraStatusId)
+                             && !s.Definition.AuraTurnStart)  // skip turn-start auras
                     .ToList();
 
                 foreach (var auraStatus in auraStatuses)
                 {
-                    ProcessSingleAura(target, auraSource, auraStatus);
+                    ProcessSingleAura(target, auraSource, auraStatus, roundTracked: false);
                 }
             }
         }
 
-        private void ProcessSingleAura(Combatant target, Combatant auraSource, StatusInstance auraStatus)
+        /// <summary>
+        /// Called at each combatant's turn start. Checks all active turn-start auras
+        /// (AuraTurnStart = true, e.g. Spirit Guardians) and applies/removes the aura child
+        /// status to/from this combatant based on proximity.
+        /// Also clears this combatant's own round-damage tracking (as aura owner).
+        /// </summary>
+        /// <summary>
+        /// Clears the entire round-damage tracking dictionary. Called at round end to ensure
+        /// aura owners whose turns were skipped (stunned, killed) don't retain stale entries.
+        /// </summary>
+        public void ClearRoundTracking()
+        {
+            _damagedThisRound.Clear();
+        }
+
+        public void ProcessTurnStartAuras(string combatantId)
+        {
+            // Clear round tracking for this combatant as an aura owner so enemies
+            // can be hit again in the new round.
+            _damagedThisRound.Remove(combatantId);
+
+            var target = _resolveCombatant(combatantId);
+            if (target == null || target.LifeState == CombatantLifeState.Dead
+                || target.LifeState == CombatantLifeState.Unconscious)
+                return;
+
+            var allCombatants = _getCombatants();
+
+            foreach (var auraSource in allCombatants)
+            {
+                if (auraSource.Id == combatantId) continue; // Don't aura yourself
+                if (auraSource.LifeState == CombatantLifeState.Dead) continue;
+
+                var auraStatuses = _statusManager.GetStatuses(auraSource.Id)
+                    .Where(s => s.Definition.AuraRadius > 0f
+                             && !string.IsNullOrEmpty(s.Definition.AuraStatusId)
+                             && s.Definition.AuraTurnStart)  // only turn-start auras
+                    .ToList();
+
+                foreach (var auraStatus in auraStatuses)
+                {
+                    ProcessSingleAura(target, auraSource, auraStatus, roundTracked: true);
+                }
+            }
+        }
+
+        private void ProcessSingleAura(Combatant target, Combatant auraSource, StatusInstance auraStatus, bool roundTracked)
         {
             float distance = target.Position.DistanceTo(auraSource.Position);
             bool inRange = distance <= auraStatus.Definition.AuraRadius;
@@ -116,6 +172,17 @@ namespace QDND.Combat.Statuses
 
             if (inRange && !hasChildStatus)
             {
+                // Bug 5: For turn-start auras, skip targets already damaged this round
+                // to prevent double-damage (e.g. entered aura + turn-start both firing).
+                if (roundTracked)
+                {
+                    if (_damagedThisRound.TryGetValue(auraSource.Id, out var alreadyHit)
+                        && alreadyHit.Contains(target.Id))
+                    {
+                        return;
+                    }
+                }
+
                 // Apply the aura's child status.
                 // Determine the effective source for DC purposes (summon's owner if applicable).
                 int? saveDC = auraSource.OwnerSpellSaveDC;
@@ -135,6 +202,17 @@ namespace QDND.Combat.Statuses
                 if (instance != null && saveDC.HasValue)
                 {
                     instance.SaveDCOverride = saveDC.Value;
+                }
+
+                // Bug 5: Record this target as damaged this round for the aura owner.
+                if (roundTracked)
+                {
+                    if (!_damagedThisRound.TryGetValue(auraSource.Id, out var hitSet))
+                    {
+                        hitSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                        _damagedThisRound[auraSource.Id] = hitSet;
+                    }
+                    hitSet.Add(target.Id);
                 }
 
                 RuntimeSafety.Log($"[AuraSystem] Applied '{childStatusId}' to {target.Id} " +

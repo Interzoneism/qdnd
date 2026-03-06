@@ -282,6 +282,14 @@ namespace QDND.Combat.Services
             // BG3/5e: Reaction resets at the start of this combatant's own turn.
             combatant.ActionBudget.ResetReactionForRound();
             combatant.ActionBudget.ResetForTurn();
+
+            // Grant extra actions from statuses (e.g., Haste)
+            int extraActions = 0;
+            foreach (var s in _statusManager.GetStatuses(combatant.Id))
+                extraActions += s.Definition.ExtraActionCharges;
+            if (extraActions > 0)
+                combatant.ActionBudget.GrantAdditionalAction(extraActions);
+
             combatant.AttackedThisTurn.Clear();
 
             // Replenish BG3 turn-based resources
@@ -331,10 +339,17 @@ namespace QDND.Combat.Services
             _effectPipeline.ProcessTurnStart(combatant.Id);
             _surfaceManager?.ProcessTurnStart(combatant);
 
+            // Process turn-start auras (e.g. Spirit Guardians: damage at start of enemy's turn).
+            // ProcessTurnStartAuras must run before ProcessTurnStart so the child status is applied
+            // before its TickAtTurnStart tick fires.
+            _auraSystem?.ProcessTurnStartAuras(combatant.Id);
+            _statusManager.ProcessTurnStart(combatant.Id);
+
             // Check for incapacitating conditions (paralyzed, stunned, petrified, etc.)
             var activeStatuses = _statusManager.GetStatuses(combatant.Id);
             var incapacitatingStatus = activeStatuses
-                .FirstOrDefault(s => ConditionEffects.IsIncapacitating(s.Definition.Id));
+                .FirstOrDefault(s => ConditionEffects.IsIncapacitating(s.Definition.Id)
+                    || (s.Definition.Tags ?? Enumerable.Empty<string>()).Any(t => ConditionEffects.IsIncapacitating(t)));
             if (incapacitatingStatus != null && combatant.LifeState == CombatantLifeState.Alive)
             {
                 _log($"{combatant.Name} is {incapacitatingStatus.Definition.Id} — skipping turn");
@@ -659,6 +674,7 @@ namespace QDND.Combat.Services
                 _statusManager.ProcessRoundEnd();
                 _effectPipeline.ProcessRoundEnd();
                 _surfaceManager?.ProcessRoundEnd();
+                _auraSystem?.ClearRoundTracking();
             }
 
             // Start next turn

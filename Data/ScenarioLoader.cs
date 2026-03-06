@@ -113,6 +113,15 @@ namespace QDND.Data
     /// </summary>
     public class ScenarioLoader
     {
+        // Full set of D&D 5e creature types. Used to detect whether a scenario unit already
+        // has a creature-type tag before defaulting to HUMANOID.
+        private static readonly HashSet<string> CreatureTypeTags = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "HUMANOID", "UNDEAD", "BEAST", "FIEND", "FEY",
+            "CONSTRUCT", "ABERRATION", "DRAGON", "MONSTROSITY",
+            "ELEMENTAL", "GIANT", "OOZE", "PLANT", "CELESTIAL"
+        };
+
         private Random _rng;
         private CharacterDataRegistry _charRegistry;
         private DataRegistry _dataRegistry;
@@ -316,6 +325,12 @@ namespace QDND.Data
                 else
                 {
                     combatant.Tags = new List<string>();
+                }
+
+                // Default creature type: HUMANOID (unless scenario explicitly sets a creature type tag)
+                if (!combatant.Tags.Any(t => CreatureTypeTags.Contains(t)))
+                {
+                    combatant.Tags.Add("HUMANOID");
                 }
                 
                 // Check if unit has character build data

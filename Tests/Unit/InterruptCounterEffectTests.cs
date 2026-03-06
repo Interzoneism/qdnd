@@ -126,7 +126,9 @@ namespace QDND.Tests.Unit
                 TriggerSourceId = "enemy_wizard",
                 ActionId = "Projectile_Fireball",
                 IsCancellable = true,
-                WasCancelled = false
+                WasCancelled = false,
+                TriggerSpellLevel = 3,      // Fireball is a 3rd-level spell
+                CounterspellSlotLevel = 3   // Countering with a 3rd-level slot → auto-cancel
             };
 
             var effectContext = new EffectContext

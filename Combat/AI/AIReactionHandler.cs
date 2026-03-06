@@ -103,6 +103,13 @@ namespace QDND.Combat.AI
                 if (opportunity != null && opportunity.ShouldReact)
                 {
                     // AI decided to react — execute it
+                    // For counterspell, ensure the slot level is stored so the handler can use it.
+                    if (triggerContext.TriggerType == ReactionTriggerType.SpellCastNearby &&
+                        reaction.Tags.Contains("counterspell"))
+                    {
+                        triggerContext.Data["counterspellSlotLevel"] = Math.Max(3, triggerContext.TriggerSpellLevel);
+                    }
+
                     if (_reactionSystem.UseReaction(combatant, reaction, triggerContext))
                         return (combatantId, reaction);
                 }

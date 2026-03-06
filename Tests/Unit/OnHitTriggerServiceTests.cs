@@ -7,6 +7,7 @@ using QDND.Combat.Entities;
 using QDND.Combat.Rules;
 using QDND.Combat.Services;
 using QDND.Combat.Statuses;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Tests.Unit
 {
@@ -394,6 +395,8 @@ namespace QDND.Tests.Unit
                     FeatIds = new List<string> { "great_weapon_master" }
                 }
             };
+            // BG3: GWM bonus attack works with any melee weapon, not just heavy weapons
+            fighter.MainHandWeapon = new WeaponDefinition { Properties = WeaponProperty.None };
 
             OnHitTriggers.RegisterGWMBonusAttack(onHitService);
 
@@ -437,6 +440,8 @@ namespace QDND.Tests.Unit
                     FeatIds = new List<string> { "great_weapon_master" }
                 }
             };
+            // BG3: GWM bonus attack works with any melee weapon, not just heavy weapons
+            fighter.MainHandWeapon = new WeaponDefinition { Properties = WeaponProperty.None };
 
             OnHitTriggers.RegisterGWMBonusAttack(onHitService);
 
@@ -475,6 +480,44 @@ namespace QDND.Tests.Unit
 
             // Assert - No bonus action granted (no feat)
             Assert.Equal(bonusActionsBeforemodify, fighter.ActionBudget.BonusActionCharges);
+        }
+
+        [Fact]
+        public void GWM_GrantsBonusAction_WithNonHeavyMeleeWeapon()
+        {
+            // BG3 rule: GWM bonus attack works with any melee weapon, not just heavy ones.
+            var (pipeline, onHitService, rules, statuses) = CreatePipeline();
+            var fighter = CreateCombatant("fighter");
+            var target = CreateCombatant("target");
+
+            fighter.ResolvedCharacter = new Data.CharacterModel.ResolvedCharacter
+            {
+                Sheet = new Data.CharacterModel.CharacterSheet
+                {
+                    FeatIds = new List<string> { "great_weapon_master" }
+                }
+            };
+            // Equip a non-heavy weapon (e.g. shortsword: Finesse + Light, definitely not Heavy)
+            fighter.MainHandWeapon = new WeaponDefinition { Properties = WeaponProperty.Finesse | WeaponProperty.Light };
+
+            OnHitTriggers.RegisterGWMBonusAttack(onHitService);
+
+            int initialBonusActions = fighter.ActionBudget.BonusActionCharges;
+
+            var context = new OnHitContext
+            {
+                Attacker = fighter,
+                Target = target,
+                IsCritical = true,
+                IsKill = false,
+                DamageDealt = 5,
+                DamageType = "piercing",
+                AttackType = AttackType.MeleeWeapon
+            };
+
+            onHitService.ProcessOnCritical(context);
+
+            Assert.Equal(initialBonusActions + 1, fighter.ActionBudget.BonusActionCharges);
         }
 
         #endregion

@@ -19,8 +19,9 @@ namespace QDND.Combat.Rules
 
         /// <summary>
         /// Threshold for melee auto-crits (paralyzed/unconscious/frozen targets).
+        /// BG3: 10ft = 3m.
         /// </summary>
-        public const float MeleeAutocritRangeMeters = 1.5f;
+        public const float MeleeAutocritRangeMeters = 3.0f;
 
         /// <summary>
         /// BG3-style baseline movement budget (30ft ≈ 9m).

@@ -466,7 +466,7 @@ namespace QDND.Combat.Services
             if (!hasGWM)
                 return false;
 
-            // GWM bonus attack only triggers from melee weapon attacks, not ranged
+            // GWM bonus attack triggers from any melee attack (BG3: not restricted to heavy weapons)
             if (context.AttackType != AttackType.MeleeWeapon)
                 return false;
 

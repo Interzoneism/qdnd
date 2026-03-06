@@ -39,7 +39,8 @@ namespace QDND.Combat.Statuses
             {
                 var target = _resolveCombatant?.Invoke(status.TargetId);
                 if (target != null && target.IsActive &&
-                    !_statusManager.HasStatus(status.TargetId, "lethargic"))
+                    !_statusManager.HasStatus(status.TargetId, "lethargic") &&
+                    !_statusManager.HasStatus(status.TargetId, "haste_lethargy"))
                 {
                     _statusManager.ApplyStatus(
                         "lethargic",

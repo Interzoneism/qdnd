@@ -60,16 +60,32 @@ namespace QDND.Combat.Rules.Boosts
                 if (string.IsNullOrWhiteSpace(boostPart))
                     continue;
 
+                var partText = boostPart.Trim();
+                var partCondition = condition; // inherit top-level condition by default
+
+                // Handle IF() prefix on individual boost parts, e.g. "Boost1;IF(cond):Boost2"
+                if (partText.StartsWith("IF(", StringComparison.OrdinalIgnoreCase))
+                {
+                    var partColonIdx = FindConditionEnd(partText);
+                    if (partColonIdx == -1)
+                    {
+                        RuntimeSafety.LogWarning($"[BoostParser] IF() boost part missing colon separator — skipped. Raw: {partText}");
+                        continue;
+                    }
+                    partCondition = ExtractCondition(partText, 3, partColonIdx);
+                    partText = partText.Substring(partColonIdx + 1).Trim();
+                }
+
                 try
                 {
-                    var boost = ParseSingleBoost(boostPart.Trim(), condition);
+                    var boost = ParseSingleBoost(partText, partCondition);
                     if (boost != null)
                         results.Add(boost);
                 }
                 catch (BoostParseException ex)
                 {
                     // Log warning but continue parsing remaining boosts
-                    RuntimeSafety.LogWarning($"[BoostParser] Skipping unparseable boost '{boostPart.Trim()}': {ex.Message}");
+                    RuntimeSafety.LogWarning($"[BoostParser] Skipping unparseable boost '{partText}': {ex.Message}");
                 }
             }
 

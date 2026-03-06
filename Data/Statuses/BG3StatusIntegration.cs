@@ -249,34 +249,50 @@ namespace QDND.Data.Statuses
                     continue;
                 }
 
-                // Advantage(AttackRoll)
-                var advantageMatch = Regex.Match(trimmed, @"Advantage\s*\(\s*(\w+)\s*\)", RegexOptions.IgnoreCase);
+                // Advantage(AttackRoll) or Advantage(AttackRoll, Ability)
+                var advantageMatch = Regex.Match(trimmed,
+                    @"Advantage\s*\(\s*(\w+)(?:\s*,\s*(\w+))?\s*\)", RegexOptions.IgnoreCase);
                 if (advantageMatch.Success)
                 {
                     var target = ParseModifierTarget(advantageMatch.Groups[1].Value);
                     if (target.HasValue)
                     {
-                        statusDef.Modifiers.Add(new StatusModifier
+                        var mod = new StatusModifier
                         {
                             Target = target.Value,
                             Type = ModifierType.Advantage
-                        });
+                        };
+                        if (advantageMatch.Groups[2].Success)
+                            mod.Condition = $"ability:{advantageMatch.Groups[2].Value.ToLowerInvariant()}";
+                        statusDef.Modifiers.Add(mod);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[BG3StatusIntegration] Advantage: unresolved target '{advantageMatch.Groups[1].Value}' in: {trimmed}");
                     }
                     continue;
                 }
 
-                // Disadvantage(AttackRoll)
-                var disadvantageMatch = Regex.Match(trimmed, @"Disadvantage\s*\(\s*(\w+)\s*\)", RegexOptions.IgnoreCase);
+                // Disadvantage(AttackRoll) or Disadvantage(AttackRoll, Ability)
+                var disadvantageMatch = Regex.Match(trimmed,
+                    @"Disadvantage\s*\(\s*(\w+)(?:\s*,\s*(\w+))?\s*\)", RegexOptions.IgnoreCase);
                 if (disadvantageMatch.Success)
                 {
                     var target = ParseModifierTarget(disadvantageMatch.Groups[1].Value);
                     if (target.HasValue)
                     {
-                        statusDef.Modifiers.Add(new StatusModifier
+                        var mod = new StatusModifier
                         {
                             Target = target.Value,
                             Type = ModifierType.Disadvantage
-                        });
+                        };
+                        if (disadvantageMatch.Groups[2].Success)
+                            mod.Condition = $"ability:{disadvantageMatch.Groups[2].Value.ToLowerInvariant()}";
+                        statusDef.Modifiers.Add(mod);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"[BG3StatusIntegration] Disadvantage: unresolved target '{disadvantageMatch.Groups[1].Value}' in: {trimmed}");
                     }
                     continue;
                 }
@@ -345,6 +361,35 @@ namespace QDND.Data.Statuses
                     continue;
                 }
 
+                // ActionResource(ActionPoint,N,0) — extra action charges (e.g. Haste)
+                // ActionResource(Movement,N,0) — flat movement bonus
+                var actionResourceMatch = Regex.Match(trimmed,
+                    @"ActionResource\s*\(\s*(ActionPoint|Movement)\s*,\s*(-?[\d.]+)\s*,\s*\d+\s*\)",
+                    RegexOptions.IgnoreCase);
+                if (actionResourceMatch.Success)
+                {
+                    string resourceType = actionResourceMatch.Groups[1].Value;
+                    float.TryParse(actionResourceMatch.Groups[2].Value,
+                        System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        out float resourceAmount);
+
+                    if (resourceType.Equals("ActionPoint", StringComparison.OrdinalIgnoreCase))
+                    {
+                        statusDef.ExtraActionCharges += (int)resourceAmount;
+                    }
+                    else // Movement
+                    {
+                        statusDef.Modifiers.Add(new StatusModifier
+                        {
+                            Target = ModifierTarget.MovementSpeed,
+                            Type = ModifierType.Flat,
+                            Value = resourceAmount
+                        });
+                    }
+                    continue;
+                }
+
                 Console.WriteLine($"[BG3StatusIntegration] Unsupported boost: {trimmed}");
             }
         }
@@ -365,6 +410,10 @@ namespace QDND.Data.Statuses
                 "skillcheck" => ModifierTarget.SkillCheck,
                 "initiative" => ModifierTarget.Initiative,
                 "damage" => ModifierTarget.DamageDealt,
+                // Extended BG3 target aliases
+                "allsavingthrows" => ModifierTarget.SavingThrow,
+                "allabilities" => ModifierTarget.SkillCheck,
+                "allabilitycheck" => ModifierTarget.SkillCheck,
                 _ => null
             };
         }

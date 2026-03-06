@@ -122,6 +122,8 @@ namespace QDND.Combat.Statuses
             { "hypnotized", ConditionType.Incapacitated },
             { "hypnotic_pattern", ConditionType.Incapacitated },
             { "banished", ConditionType.Incapacitated },
+            { "lethargic", ConditionType.Incapacitated },
+            { "haste_lethargy", ConditionType.Incapacitated },
 
             // Invisible
             { "invisible", ConditionType.Invisible },

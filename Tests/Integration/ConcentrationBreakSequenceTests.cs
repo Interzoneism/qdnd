@@ -347,8 +347,8 @@ namespace QDND.Tests.Integration
         public void HpDropToZero_BreaksConcentrationImmediately()
         {
             var (system, statuses, _) = CreateSystem();
-            statuses.ApplyStatus("target1", "spirit_guardians");
-            system.StartConcentration("caster1", "spirit_guardians_action", "spirit_guardians", "target1");
+            statuses.ApplyStatus("target1", "spirit_guardians_radiant_aura");
+            system.StartConcentration("caster1", "spirit_guardians_action", "spirit_guardians_radiant_aura", "target1");
 
             Assert.True(system.IsConcentrating("caster1"));
 
@@ -359,7 +359,7 @@ namespace QDND.Tests.Integration
             system.ProcessHpDropToZero("caster1");
 
             Assert.False(system.IsConcentrating("caster1"));
-            Assert.False(statuses.HasStatus("target1", "spirit_guardians"));
+            Assert.False(statuses.HasStatus("target1", "spirit_guardians_radiant_aura"));
             Assert.False(saveMade); // HP-drop break skips the saving throw entirely
         }
     }

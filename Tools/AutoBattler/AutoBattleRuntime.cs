@@ -500,13 +500,21 @@ namespace QDND.Tools.AutoBattler
 
             if (!hasRuntimeBehavior)
             {
-                _logger.Write(new LogEntry
+                // Skip logging for AI-helper bookkeeping statuses and statuses that
+                // intentionally suppress the combat log (DisableCombatlog flag).
+                bool suppressLog = def.Id.StartsWith("ai_helper", StringComparison.OrdinalIgnoreCase)
+                    || def.DisableCombatlog;
+
+                if (!suppressLog)
                 {
-                    Event = LogEventType.STATUS_NO_RUNTIME_BEHAVIOR,
-                    UnitId = instance.TargetId,
-                    StatusId = instance.Definition.Id,
-                    Source = instance.SourceId
-                });
+                    _logger.Write(new LogEntry
+                    {
+                        Event = LogEventType.STATUS_NO_RUNTIME_BEHAVIOR,
+                        UnitId = instance.TargetId,
+                        StatusId = instance.Definition.Id,
+                        Source = instance.SourceId
+                    });
+                }
             }
         }
 

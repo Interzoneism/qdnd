@@ -1080,6 +1080,7 @@ namespace QDND.Combat.Arena
 
             _targetValidator = new TargetValidator(losService, c => c.Position);
             _targetValidator.Statuses = _statusManager;
+            _targetValidator.ConditionEval = QDND.Combat.Rules.Conditions.ConditionEvaluator.Instance;
             _reactionCoordinator.SetTargetValidator(_targetValidator);
 
             // Subscribe to status events for visual feedback

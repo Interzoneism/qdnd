@@ -1330,6 +1330,16 @@ namespace QDND.Combat.Arena
             }
         }
 
+        // Fallback mappings: when an animation isn't in the player, try these alternatives
+        // before giving up with a warning. Keys are case-insensitive matched against the
+        // requested animation name.  Values are tried in order.
+        private static readonly Dictionary<string, string[]> AnimationFallbacks = new(StringComparer.OrdinalIgnoreCase)
+        {
+            { "Hit_Knockback",    new[] { "Hit", "Idle" } },
+            { "Idle_Shield_Break", new[] { "Idle" } },
+            { "OverhandThrow",    new[] { "Punch_Cross", "Punch_Jab", "Idle" } },
+        };
+
         private string ResolveAnimationName(string animationName)
         {
             if (_animationPlayer == null || string.IsNullOrWhiteSpace(animationName))
@@ -1342,6 +1352,29 @@ namespace QDND.Combat.Arena
                 return cached;
             }
 
+            string resolved = TryResolveExact(animationName);
+
+            if (string.IsNullOrEmpty(resolved) && AnimationFallbacks.TryGetValue(animationName, out var fallbacks))
+            {
+                foreach (var fallback in fallbacks)
+                {
+                    resolved = TryResolveExact(fallback);
+                    if (!string.IsNullOrEmpty(resolved))
+                        break;
+                }
+            }
+
+            if (string.IsNullOrEmpty(resolved))
+            {
+                GD.PushWarning($"[CombatantVisual] Animation '{animationName}' was not found for {_entity?.Name ?? Name}");
+            }
+
+            _resolvedAnimationNames[animationName] = resolved;
+            return resolved;
+        }
+
+        private string TryResolveExact(string animationName)
+        {
             string resolved = null;
             foreach (var name in _animationPlayer.GetAnimationList())
             {
@@ -1367,12 +1400,6 @@ namespace QDND.Combat.Arena
                 }
             }
 
-            if (string.IsNullOrEmpty(resolved))
-            {
-                GD.PushWarning($"[CombatantVisual] Animation '{animationName}' was not found for {_entity?.Name ?? Name}");
-            }
-
-            _resolvedAnimationNames[animationName] = resolved;
             return resolved;
         }
 

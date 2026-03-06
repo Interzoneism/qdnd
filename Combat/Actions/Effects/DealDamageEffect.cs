@@ -84,16 +84,53 @@ namespace QDND.Combat.Actions.Effects
 
                 // Check if this is a weapon attack that should use equipped weapon damage
                 string effectiveDiceFormula = definition.DiceFormula;
+
+                // Resolve LevelMapValue tokens in the dice formula (e.g. "LevelMapValue(MartialArtsDie)")
+                if (!string.IsNullOrEmpty(effectiveDiceFormula) &&
+                    effectiveDiceFormula.Contains("LevelMapValue", StringComparison.OrdinalIgnoreCase))
+                {
+                    var lvlMatch = System.Text.RegularExpressions.Regex.Match(
+                        effectiveDiceFormula,
+                        @"LevelMapValue\((\w+)\)",
+                        System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                    if (lvlMatch.Success)
+                    {
+                        string mapName = lvlMatch.Groups[1].Value;
+                        string mapClassName = LevelMapResolver.GetClassForMap(mapName);
+                        int classLevel = mapClassName != null
+                            ? (context.Source?.ResolvedCharacter?.Sheet?.GetClassLevel(mapClassName) ?? 1)
+                            : (context.Source?.ResolvedCharacter?.Sheet?.TotalLevel ?? 1);
+                        string resolved = LevelMapResolver.Resolve(mapName, classLevel);
+                        effectiveDiceFormula = effectiveDiceFormula.Replace(lvlMatch.Value, resolved);
+                    }
+                }
+
                 string effectiveDamageType = definition.DamageType;
                 int weaponAbilityMod = 0;
                 int weaponEnchantmentBonus = 0;
 
                 if (context.Ability != null && context.Source != null)
                 {
-                    bool isWeaponAttack = context.Ability.AttackType == AttackType.MeleeWeapon ||
-                                          context.Ability.AttackType == AttackType.RangedWeapon;
-                    
-                    if (isWeaponAttack)
+                    bool isUnarmedAttack = context.Ability.Tags?.Contains("unarmed") == true;
+                    bool isWeaponAttack = !isUnarmedAttack &&
+                                          (context.Ability.AttackType == AttackType.MeleeWeapon ||
+                                           context.Ability.AttackType == AttackType.RangedWeapon);
+
+                    if (isUnarmedAttack)
+                    {
+                        // Unarmed attacks use the formula's dice (e.g. MartialArtsDie), NOT the equipped weapon's dice.
+                        // Monks use the higher of STR or DEX for unarmed damage; everyone else uses STR.
+                        bool isMonkUnarmed = (context.Source.ResolvedCharacter?.Sheet?.GetClassLevel("Monk") ?? 0) > 0;
+                        weaponAbilityMod = isMonkUnarmed
+                            ? Math.Max(
+                                context.Source.GetAbilityModifier(AbilityType.Strength),
+                                context.Source.GetAbilityModifier(AbilityType.Dexterity))
+                            : context.Source.GetAbilityModifier(AbilityType.Strength);
+
+                        // Unarmed strikes always deal bludgeoning damage.
+                        effectiveDamageType = "bludgeoning";
+                    }
+                    else if (isWeaponAttack)
                     {
                         var weapon = context.Source.MainHandWeapon;
                         
@@ -154,6 +191,7 @@ namespace QDND.Combat.Actions.Effects
                             }
                         }
                     }
+                    // isUnarmedAttack handled above; no else-default needed
                 }
 
                 // Resolve "MainMeleeWeaponDamageType" sentinel at runtime if still unresolved
@@ -485,6 +523,17 @@ namespace QDND.Combat.Actions.Effects
                     Target = target,
                     BaseValue = baseDamage
                 };
+
+                // Add attack context tags so conditional status modifiers (e.g., GWM) can filter correctly
+                // Unarmed strikes (tagged "unarmed") must NOT get melee_attack — BG3's IsWeaponAttack() excludes MeleeUnarmedAttack.
+                bool isUnarmedDmg = context.Ability?.Tags?.Contains("unarmed") == true;
+                bool isMeleeWeaponDmg = !isUnarmedDmg && context.Ability?.AttackType == AttackType.MeleeWeapon;
+                if (isMeleeWeaponDmg) damageQuery.Tags.Add("melee_attack");
+                if (isMeleeWeaponDmg && context.Source?.MainHandWeapon?.IsTwoHanded == true) damageQuery.Tags.Add("weapon:two_handed");
+                if (isMeleeWeaponDmg && context.Source?.MainHandWeapon?.IsVersatile == true) damageQuery.Tags.Add("weapon:versatile");
+                if (isUnarmedDmg) damageQuery.Tags.Add("unarmed_attack");
+                bool isRangedWeaponDmg = context.Ability?.AttackType == AttackType.RangedWeapon;
+                if (isRangedWeaponDmg) damageQuery.Tags.Add("ranged_attack");
 
                 if (!string.IsNullOrEmpty(effectiveDamageType))
                     damageQuery.Tags.Add(DamageTypes.ToTag(effectiveDamageType));

@@ -777,7 +777,7 @@ namespace QDND.Combat.Actions
             }
 
             // Check for SpellCastNearby reactions (counterspell, etc.)
-            var spellCastTrigger = TryTriggerAbilityCastReactionsWithTags(source, action, targets, effectiveTags);
+            var spellCastTrigger = TryTriggerAbilityCastReactionsWithTags(source, action, targets, effectiveTags, options);
             if (spellCastTrigger?.Cancel == true && spellCastTrigger.Context.IsCancellable)
             {
                 return ActionExecutionResult.Failure(actionId, source.Id, "Ability was countered by a reaction");
@@ -861,6 +861,8 @@ namespace QDND.Combat.Actions
                 if (isMeleeAttack) attackTags.Add("melee_attack");
                 if (isRangedAttack) attackTags.Add("ranged_attack");
                 if (isSpellAttack) attackTags.Add("spell_attack");
+                if (isMeleeAttack && source.MainHandWeapon?.IsTwoHanded == true) attackTags.Add("weapon:two_handed");
+                if (isMeleeAttack && source.MainHandWeapon?.IsVersatile == true) attackTags.Add("weapon:versatile");
                 attackTags.ToList().ForEach(t => attackQuery.Tags.Add(t));
 
                 var condAdvantages = new List<string>();
@@ -869,8 +871,8 @@ namespace QDND.Combat.Actions
                 if (Statuses != null)
                 {
                     float attackDistance = source.Position.DistanceTo(primaryTarget.Position);
-                    var srcIds = Statuses.GetStatuses(source.Id).Select(s => s.Definition.Id);
-                    var tgtIds = Statuses.GetStatuses(primaryTarget.Id).Select(s => s.Definition.Id);
+                    var srcIds = Statuses.GetStatuses(source.Id).SelectMany(s => new[] { s.Definition.Id }.Concat(s.Definition.Tags ?? Enumerable.Empty<string>()));
+                    var tgtIds = Statuses.GetStatuses(primaryTarget.Id).SelectMany(s => new[] { s.Definition.Id }.Concat(s.Definition.Tags ?? Enumerable.Empty<string>()));
                     var srcEffects = ConditionEffects.GetAggregateEffects(srcIds, isMeleeAttack);
                     var tgtEffects = ConditionEffects.GetAggregateEffects(tgtIds, isMeleeAttack);
                     condAdvantages.AddRange(srcEffects.AttackAdvantageSources.Select(id => $"Attacker {id}"));
@@ -891,6 +893,8 @@ namespace QDND.Combat.Actions
                         condAdvantages.Add("Helped");
                     if (Statuses.HasStatus(primaryTarget.Id, "hidden"))
                         condDisadvantages.Add("Target Hidden");
+                    if (QDND.Combat.Rules.Boosts.BoostEvaluator.HasSourceAdvantageOnAttack(source, primaryTarget, Statuses))
+                        condAdvantages.Add("SourceAdvantageOnAttack");
                     if (isRangedAttack)
                     {
                         // Crossbow Expert: removes ranged disadvantage in melee, but ONLY for crossbow attacks
@@ -1743,6 +1747,8 @@ namespace QDND.Combat.Actions
                     if (isMeleeAttack) attackTags.Add("melee_attack");
                     if (isRangedAttack) attackTags.Add("ranged_attack");
                     if (isSpellAttack) attackTags.Add("spell_attack");
+                    if (isMeleeAttack && source.MainHandWeapon?.IsTwoHanded == true) attackTags.Add("weapon:two_handed");
+                    if (isMeleeAttack && source.MainHandWeapon?.IsVersatile == true) attackTags.Add("weapon:versatile");
                     attackTags.ToList().ForEach(t => attackQuery.Tags.Add(t));
 
                     var condAdvantages = new List<string>();
@@ -1751,8 +1757,8 @@ namespace QDND.Combat.Actions
                     if (Statuses != null)
                     {
                         float attackDistance = source.Position.DistanceTo(targetForProjectile.Position);
-                        var srcIds = Statuses.GetStatuses(source.Id).Select(s => s.Definition.Id);
-                        var tgtIds = Statuses.GetStatuses(targetForProjectile.Id).Select(s => s.Definition.Id);
+                        var srcIds = Statuses.GetStatuses(source.Id).SelectMany(s => new[] { s.Definition.Id }.Concat(s.Definition.Tags ?? Enumerable.Empty<string>()));
+                        var tgtIds = Statuses.GetStatuses(targetForProjectile.Id).SelectMany(s => new[] { s.Definition.Id }.Concat(s.Definition.Tags ?? Enumerable.Empty<string>()));
                         var srcEffects = ConditionEffects.GetAggregateEffects(srcIds, isMeleeAttack);
                         var tgtEffects = ConditionEffects.GetAggregateEffects(tgtIds, isMeleeAttack);
                         condAdvantages.AddRange(srcEffects.AttackAdvantageSources.Select(id => $"Attacker {id}"));
@@ -2588,6 +2594,14 @@ namespace QDND.Combat.Actions
             if (Statuses == null || target == null || string.IsNullOrWhiteSpace(saveType))
                 return false;
             string normalized = saveType.Trim().ToLowerInvariant();
+
+            // Boost-based auto-fail (any ability type, e.g. AbilityFailedSavingThrow from Hold Person)
+            if (Enum.TryParse<AbilityType>(normalized, ignoreCase: true, out var abilityType))
+            {
+                if (QDND.Combat.Rules.Boosts.BoostEvaluator.ShouldAutoFailSaveFromBoosts(target, abilityType))
+                    return true;
+            }
+
             if (normalized != "strength" && normalized != "dexterity")
                 return false;
 
@@ -2597,7 +2611,7 @@ namespace QDND.Combat.Actions
             if (normalized == "dexterity" && activeStatuses.Any(s => s?.Definition?.Tags?.Contains("auto_fail_save_dexterity") == true))
                 return true;
 
-            var tgtIds = activeStatuses.Select(s => s.Definition.Id);
+            var tgtIds = activeStatuses.SelectMany(s => new[] { s.Definition.Id }.Concat(s.Definition.Tags ?? Enumerable.Empty<string>()));
             var tgtEffects = ConditionEffects.GetAggregateEffects(tgtIds);
             return tgtEffects.AutoFailStrDexSaves;
         }
@@ -2649,7 +2663,8 @@ namespace QDND.Combat.Actions
             Combatant source,
             ActionDefinition action,
             List<Combatant> targets,
-            HashSet<string> effectiveTags)
+            HashSet<string> effectiveTags,
+            ActionExecutionOptions options = null)
         {
             if (Reactions == null || GetCombatants == null)
                 return null;
@@ -2664,6 +2679,7 @@ namespace QDND.Combat.Actions
                 TriggerSourceId = source.Id,
                 AffectedId = targets.FirstOrDefault()?.Id,
                 ActionId = action.Id,
+                TriggerSpellLevel = action.SpellLevel + (options?.UpcastLevel ?? 0),
                 Position = source.Position,
                 IsCancellable = !effectiveTags.Contains("uncounterable"),
                 Data = new Dictionary<string, object>

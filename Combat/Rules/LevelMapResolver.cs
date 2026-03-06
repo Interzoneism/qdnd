@@ -29,6 +29,18 @@ public static class LevelMapResolver
             "d8cantrip"  => characterLevel switch { < 5 => "1d8",  < 10 => "2d8",  _ => "3d8" },
             "d6cantrip"  => characterLevel switch { < 5 => "1d6",  < 10 => "2d6",  _ => "3d6" },
             "d4cantrip"  => characterLevel switch { < 5 => "1d4",  < 10 => "2d4",  _ => "3d4" },
+            // Superiority Die (Battle Master Fighter maneuvers)
+            "superioritydie" => characterLevel switch { < 7 => "1d8", < 15 => "1d10", _ => "1d12" },
+            // Sneak Attack alias
+            "sneakattack" => Resolve("sneakattackdamage", characterLevel),
+            // Bardic Inspiration die
+            "bardicinspiration" => characterLevel switch { < 5 => "1d6", < 10 => "1d8", < 15 => "1d10", _ => "1d12" },
+            // Wild Shape bonus damage (Moon Druid scaling, medium forms)
+            "wildshapedamagemedium" => characterLevel switch { < 6 => "0", < 9 => "1d4", < 12 => "1d6", _ => "1d8" },
+            // Second Wind: 1d10 + fighter level (flat bonus equal to fighter class level)
+            "secondwindheal" => characterLevel.ToString(),
+            // Monk Martial Arts die scaling
+            "martialartsdie" => characterLevel switch { >= 11 => "1d8", >= 5 => "1d6", _ => "1d4" },
             _ => "0"
         };
     }
@@ -43,6 +55,8 @@ public static class LevelMapResolver
         {
             "ragedamage" => "Barbarian",
             "sneakattackdamage" => "Rogue",
+            "secondwindheal" => "Fighter",
+            "martialartsdie" => "Monk",
             _ => null
         };
     }

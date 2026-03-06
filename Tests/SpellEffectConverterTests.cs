@@ -931,5 +931,17 @@ namespace QDND.Tests
             Assert.Equal("requires_status:some_status", effects[0].Condition);
             Assert.Null(effects[1].Condition); // unconditional
         }
+
+        [Fact]
+        public void ParseSingleEffect_InnerParenDivisor_ExtractsMultiplierAndDice()
+        {
+            var effects = SpellEffectConverter.ParseEffects("DealDamage((1d10/2),Piercing,Magical)", isFailEffect: true);
+            Assert.Single(effects);
+            var effect = effects[0];
+            Assert.Equal("damage", effect.Type);
+            Assert.Equal("1d10", effect.DiceFormula);
+            Assert.True(effect.Parameters.TryGetValue("damageMultiplier", out var m));
+            Assert.Equal(0.5f, Convert.ToSingle(m), 3);
+        }
     }
 }

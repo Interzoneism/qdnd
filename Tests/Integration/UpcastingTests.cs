@@ -336,6 +336,28 @@ namespace QDND.Tests.Integration
             return action;
         }
         
+        [Theory]
+        [InlineData("Projectile_MagicMissile", "magic_missile")]
+        [InlineData("Zone_BurningHands", "burning_hands")]
+        [InlineData("Target_HoldPerson", "hold_person")]
+        [InlineData("Target_CureWounds", "cure_wounds")]
+        [InlineData("Projectile_Fireball", "fireball")]
+        [InlineData("Target_MassHealingWord", "mass_healing_word")]
+        public void NormalizeBG3SpellId_StripsPrefix_ReturnsSnakeCase(string bg3Id, string expected)
+        {
+            var result = SpellUpcastRules.NormalizeBG3SpellId(bg3Id);
+            Assert.Equal(expected, result);
+        }
+
+        [Theory]
+        [InlineData("Projectile_MagicMissile")]
+        [InlineData("Zone_BurningHands")]
+        [InlineData("Target_HoldPerson")]
+        public void GetUpcastScaling_BG3PrefixedId_ReturnsNonNull(string bg3Id)
+        {
+            Assert.NotNull(SpellUpcastRules.GetUpcastScaling(bg3Id));
+        }
+
         private ActionDefinition CreateScorchingRay()
         {
             var action = new ActionDefinition

@@ -23,6 +23,15 @@ namespace QDND.Combat.Rules.Boosts
         AC,
 
         /// <summary>
+        /// Prevents a specified ability modifier from contributing to AC.
+        /// Used by conditions like Stunned, Paralyzed, and Dazed.
+        /// In D&amp;D 5e, paralyzed/stunned creatures lose their Dexterity modifier to AC.
+        /// Syntax: BlockAbilityModifierFromAC(AbilityName)
+        /// Example: BlockAbilityModifierFromAC(Dexterity)
+        /// </summary>
+        BlockAbilityModifierFromAC,
+
+        /// <summary>
         /// Grants advantage on a specific roll type.
         /// Syntax: Advantage(RollType) or Advantage(RollType, Ability)
         /// Examples: 
@@ -339,6 +348,82 @@ namespace QDND.Combat.Rules.Boosts
         /// - ACOverrideFormula(10, true, Wisdom) — Monk Unarmored Defense
         /// - ACOverrideFormula(13, true) — Draconic Resilience
         /// </summary>
-        ACOverrideFormula
+        ACOverrideFormula,
+
+        // ============================================================
+        // TIER 6: RELATIONSHIP / TARGETING MECHANICS
+        // ============================================================
+
+        /// <summary>
+        /// Forces auto-fail on saving throws for the specified ability.
+        /// Syntax: AbilityFailedSavingThrow(AbilityName)
+        /// Example: AbilityFailedSavingThrow(Strength) — Held creature auto-fails STR saves
+        /// </summary>
+        AbilityFailedSavingThrow,
+
+        /// <summary>
+        /// Grants the boost source entity advantage on attacks against the holder of this boost.
+        /// Applied to the target; checked by attackers when rolling attacks against this target.
+        /// Syntax: SourceAdvantageOnAttack()
+        /// </summary>
+        SourceAdvantageOnAttack,
+
+        /// <summary>
+        /// Prevents the holder from attacking/harming the entity that applied this status.
+        /// Syntax: CannotHarmCauseEntity()
+        /// Example: Charmed creature cannot attack its charmer
+        /// </summary>
+        CannotHarmCauseEntity,
+
+        // ============================================================
+        // OUT-OF-SCOPE / IGNORED BOOST TYPES
+        // Parsed so BG3 data doesn't generate warnings, but never
+        // evaluated by BoostEvaluator — silently ignored at runtime.
+        // ============================================================
+
+        /// <summary>
+        /// Stealth disturbance mechanic — not in scope for tactical combat.
+        /// Syntax: DetectDisturbancesBlock()
+        /// </summary>
+        DetectDisturbancesBlock,
+
+        /// <summary>
+        /// AI archetype hint — has no runtime combat effect.
+        /// Syntax: AiArchetypeOverride(ArchetypeId)
+        /// </summary>
+        AiArchetypeOverride,
+
+        /// <summary>
+        /// Vision range cap from darkness/obscurement spells — not in scope for combat mechanics.
+        /// Syntax: SightRangeMaximum(range)
+        /// </summary>
+        SightRangeMaximum,
+
+        /// <summary>
+        /// Prevents ability modifiers from being added to damage rolls (e.g. off-hand attacks
+        /// without Two-Weapon Fighting). Gameplay-relevant but stubbed for now.
+        /// Syntax: BlockAbilityModifierDamageBonus()
+        /// </summary>
+        BlockAbilityModifierDamageBonus,
+
+        /// <summary>
+        /// Overrides the attack type of a weapon (e.g. MeleeSpellAttack for Shillelagh).
+        /// Gameplay-relevant but stubbed for now.
+        /// Syntax: WeaponAttackTypeOverride(AttackType)
+        /// </summary>
+        WeaponAttackTypeOverride,
+
+        /// <summary>
+        /// Visual/environmental light emission — out of scope for combat mechanics.
+        /// Syntax: GameplayLight(radius, shadows, intensity)
+        /// </summary>
+        GameplayLight,
+
+        /// <summary>
+        /// Adds a weapon property to the wielded weapon (e.g. Unstowable, Magical).
+        /// Gameplay-relevant (e.g. Magic Weapon spell) but stubbed for now.
+        /// Syntax: WeaponProperty(PropertyName)
+        /// </summary>
+        WeaponProperty
     }
 }

@@ -158,6 +158,16 @@ namespace QDND.Data
             log($"BG3 Status Registry: {statusCount} statuses loaded and registered with StatusManager");
             combatContext.RegisterService(r.BG3StatusRegistry);
 
+            // Re-register JSON statuses that define aura behavior (AuraRadius > 0).
+            // The BG3 txt parser does not parse AuraRadius/AuraStatusId fields, so any JSON
+            // status with aura data would be silently overwritten by the BG3 txt version.
+            // Re-registering here ensures JSON aura definitions win.
+            foreach (var statusDef in r.DataRegistry.GetAllStatuses())
+            {
+                if (statusDef.AuraRadius > 0f)
+                    r.StatusManager.RegisterStatus(statusDef);
+            }
+
             // Initialize BG3 Passive Registry
             r.PassiveRegistry = new PassiveRegistry();
             string passiveFile = Path.Combine(bg3StatsPath, "Passive.txt");

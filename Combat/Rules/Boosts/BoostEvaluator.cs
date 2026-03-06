@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules.Conditions;
+using QDND.Combat.Statuses;
 using QDND.Data.CharacterModel;
 
 namespace QDND.Combat.Rules.Boosts
@@ -151,6 +152,32 @@ namespace QDND.Combat.Rules.Boosts
             }
 
             return total;
+        }
+
+        /// <summary>
+        /// Checks if a specific ability modifier is blocked from contributing to AC
+        /// by an active BlockAbilityModifierFromAC boost.
+        /// Used in D&amp;D 5e for Paralyzed, Stunned, Dazed, etc.
+        /// </summary>
+        /// <param name="combatant">The combatant to check.</param>
+        /// <param name="ability">The ability modifier to check (e.g., Dexterity).</param>
+        /// <returns>True if the ability modifier is blocked from contributing to AC.</returns>
+        public static bool IsAbilityModifierBlockedFromAC(Combatant combatant, AbilityType ability)
+        {
+            if (combatant == null)
+                return false;
+
+            var query = new BoostQuery(BoostType.BlockAbilityModifierFromAC);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            foreach (var boost in relevantBoosts)
+            {
+                var blockedAbility = boost.Definition.GetStringParameter(0, "");
+                if (blockedAbility.Equals(ability.ToString(), StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -1080,6 +1107,10 @@ namespace QDND.Combat.Rules.Boosts
             // Advantage/Disadvantage(RollType) or Advantage/Disadvantage(RollType, Ability)
             var rollTypeParam = boost.Definition.GetStringParameter(0, "");
 
+            // AttackTarget is a target-side boost — resolved via HasAdvantageAgainstTarget(), not here
+            if (rollTypeParam.Equals("AttackTarget", StringComparison.OrdinalIgnoreCase))
+                return false;
+
             // Check for special keywords
             if (rollTypeParam.Equals("AllSavingThrows", StringComparison.OrdinalIgnoreCase))
             {
@@ -1114,6 +1145,116 @@ namespace QDND.Combat.Rules.Boosts
             }
 
             return false;
+        }
+
+        // ============================================================
+        // TIER 6: RELATIONSHIP / TARGETING MECHANIC EVALUATORS
+        // ============================================================
+
+        /// <summary>
+        /// Checks if attackers have advantage on attacks against this target due to
+        /// Advantage(AttackTarget) boosts on the target (e.g., from Hold Person, Faerie Fire).
+        /// Call this from the ATTACKER's perspective when building the attack roll.
+        /// </summary>
+        public static bool HasAdvantageAgainstTarget(Combatant target)
+        {
+            if (target == null) return false;
+
+            foreach (var boost in target.Boosts.AllBoosts)
+            {
+                if (boost.Definition.Type != BoostType.Advantage) continue;
+                if (boost.IsConditional) continue;
+
+                var param = boost.Definition.GetStringParameter(0, "");
+                if (param.Equals("AttackTarget", StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if the attacker has advantage against the target due to SourceAdvantageOnAttack boosts
+        /// (e.g., True Strike, Vow of Enmity). Only grants advantage to the caster who applied the
+        /// status, not to all attackers — cross-references the status SourceId to verify.
+        /// </summary>
+        public static bool HasSourceAdvantageOnAttack(Combatant attacker, Combatant target, StatusManager statuses)
+        {
+            if (attacker == null || target == null || statuses == null) return false;
+
+            var query = new BoostQuery(BoostType.SourceAdvantageOnAttack);
+            var boosts = QueryBoosts(target, query);
+            if (!boosts.Any()) return false;
+
+            var targetStatuses = statuses.GetStatuses(target.Id);
+            if (targetStatuses == null) return false;
+
+            foreach (var boost in boosts)
+            {
+                if (boost.Source != "Status") continue;
+                var statusInstance = targetStatuses.FirstOrDefault(si =>
+                    string.Equals(si.Definition.Id, boost.SourceId, StringComparison.OrdinalIgnoreCase));
+                if (statusInstance != null &&
+                    string.Equals(statusInstance.SourceId, attacker.Id, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if the combatant should auto-fail a saving throw for the given ability
+        /// due to AbilityFailedSavingThrow boosts.
+        /// </summary>
+        public static bool ShouldAutoFailSaveFromBoosts(Combatant combatant, AbilityType ability)
+        {
+            if (combatant == null) return false;
+
+            var query = new BoostQuery(BoostType.AbilityFailedSavingThrow);
+            var boosts = QueryBoosts(combatant, query);
+
+            foreach (var boost in boosts)
+            {
+                var abilityParam = boost.Definition.GetStringParameter(0, "");
+                if (abilityParam.Equals(ability.ToString(), StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks whether the actor is allowed to harm the target, given any
+        /// CannotHarmCauseEntity boosts on the actor. The boost's SourceId is the
+        /// status ID that applied it; we cross-reference the corresponding StatusInstance
+        /// to find the actual entity that applied the status.
+        /// Returns false if the actor has a boost preventing them from harming target.
+        /// </summary>
+        public static bool CanHarm(Combatant actor, Combatant target, StatusManager statuses)
+        {
+            if (actor == null || target == null) return true;
+
+            var query = new BoostQuery(BoostType.CannotHarmCauseEntity);
+            var boosts = QueryBoosts(actor, query);
+            if (boosts.Count == 0) return true;
+
+            var actorStatuses = statuses?.GetStatuses(actor.Id);
+            if (actorStatuses == null) return true;
+
+            foreach (var boost in boosts)
+            {
+                if (boost.Source != "Status") continue;
+                // boost.SourceId is the status ID (e.g., "CHARMED") that applied this boost
+                var matchingStatus = actorStatuses.FirstOrDefault(si =>
+                    string.Equals(si.Definition.Id, boost.SourceId, StringComparison.OrdinalIgnoreCase));
+
+                if (matchingStatus != null &&
+                    string.Equals(matchingStatus.SourceId, target.Id, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 
