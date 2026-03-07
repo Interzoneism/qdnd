@@ -148,6 +148,7 @@ namespace QDND.Data.Parsers
             
             var allSpells = new List<BG3SpellData>();
             var files = Directory.GetFiles(directoryPath, pattern);
+            Array.Sort(files);
             
             Console.WriteLine($"[BG3SpellParser] Found {files.Length} spell files in {directoryPath}");
             
@@ -301,6 +302,10 @@ namespace QDND.Data.Parsers
                 spell.RootSpellId = parent.RootSpellId;
             if (spell.MaximumTargets == 0 && parent.MaximumTargets > 0)
                 spell.MaximumTargets = parent.MaximumTargets;
+            if (string.IsNullOrEmpty(spell.AmountOfTargets) && !string.IsNullOrEmpty(parent.AmountOfTargets))
+                spell.AmountOfTargets = parent.AmountOfTargets;
+            if (spell.AmountOfTargetsCount == 0 && parent.AmountOfTargetsCount > 0)
+                spell.AmountOfTargetsCount = parent.AmountOfTargetsCount;
 
             if (string.IsNullOrEmpty(spell.WeaponTypes) && !string.IsNullOrEmpty(parent.WeaponTypes))
                 spell.WeaponTypes = parent.WeaponTypes;
@@ -417,6 +422,13 @@ namespace QDND.Data.Parsers
                 case "MaximumTargets":
                     if (int.TryParse(value, out var maxTargets))
                         spell.MaximumTargets = maxTargets;
+                    break;
+                case "AmountOfTargets":
+                    spell.AmountOfTargets = value;
+                    if (int.TryParse(value, out var amtTargets))
+                        spell.AmountOfTargetsCount = amtTargets;
+                    else
+                        _warnings.Add($"Non-integer AmountOfTargets '{value}' for spell {spell.Id} - level-scaling not yet supported");
                     break;
                 case "RootSpellID":
                     spell.RootSpellId = value;

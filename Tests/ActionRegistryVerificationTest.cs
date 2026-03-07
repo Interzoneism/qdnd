@@ -34,7 +34,7 @@ namespace QDND.Tests
             Console.WriteLine("[4/6] Testing basic queries...");
             
             // Test: Get action by ID
-            var fireball = registry.GetAction("Projectile_Fireball");
+            var fireball = registry.GetAction("fireball");
             if (fireball != null)
             {
                 Console.WriteLine($"  ✓ Found Fireball: {fireball.Name} (Level {fireball.SpellLevel})");

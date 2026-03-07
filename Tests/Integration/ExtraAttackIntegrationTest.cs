@@ -62,7 +62,7 @@ namespace QDND.Tests.Integration
             fighter.ActionBudget.ResetForTurn();
             
             // Act - execute first attack
-            var result = pipeline.ExecuteAction("Target_MainHandAttack", fighter, new List<Combatant> { enemy });
+            var result = pipeline.ExecuteAction("main_hand_attack", fighter, new List<Combatant> { enemy });
             
             // Assert
             Assert.True(result.Success);
@@ -80,8 +80,8 @@ namespace QDND.Tests.Integration
             fighter.ActionBudget.ResetForTurn();
             
             // Act - execute both attacks
-            pipeline.ExecuteAction("Target_MainHandAttack", fighter, new List<Combatant> { enemy });
-            var result = pipeline.ExecuteAction("Target_MainHandAttack", fighter, new List<Combatant> { enemy });
+            pipeline.ExecuteAction("main_hand_attack", fighter, new List<Combatant> { enemy });
+            var result = pipeline.ExecuteAction("main_hand_attack", fighter, new List<Combatant> { enemy });
             
             // Assert
             Assert.True(result.Success);
@@ -99,11 +99,11 @@ namespace QDND.Tests.Integration
             fighter.ActionBudget.ResetForTurn();
             
             // Act - use both attacks
-            pipeline.ExecuteAction("Target_MainHandAttack", fighter, new List<Combatant> { enemy });
-            pipeline.ExecuteAction("Target_MainHandAttack", fighter, new List<Combatant> { enemy });
+            pipeline.ExecuteAction("main_hand_attack", fighter, new List<Combatant> { enemy });
+            pipeline.ExecuteAction("main_hand_attack", fighter, new List<Combatant> { enemy });
             
             // Try third attack
-            var (canUse, reason) = pipeline.CanUseAbility("Target_MainHandAttack", fighter);
+            var (canUse, reason) = pipeline.CanUseAbility("main_hand_attack", fighter);
             
             // Assert
             Assert.False(canUse);
@@ -127,13 +127,13 @@ namespace QDND.Tests.Integration
             fighter.ActionBudget.ResetForTurn();
             
             // Act & Assert - should be able to attack 3 times
-            pipeline.ExecuteAction("Target_MainHandAttack", fighter, new List<Combatant> { enemy });
+            pipeline.ExecuteAction("main_hand_attack", fighter, new List<Combatant> { enemy });
             Assert.True(fighter.ActionBudget.HasAction);
             
-            pipeline.ExecuteAction("Target_MainHandAttack", fighter, new List<Combatant> { enemy });
+            pipeline.ExecuteAction("main_hand_attack", fighter, new List<Combatant> { enemy });
             Assert.True(fighter.ActionBudget.HasAction);
             
-            pipeline.ExecuteAction("Target_MainHandAttack", fighter, new List<Combatant> { enemy });
+            pipeline.ExecuteAction("main_hand_attack", fighter, new List<Combatant> { enemy });
             Assert.False(fighter.ActionBudget.HasAction);
         }
         
@@ -147,8 +147,8 @@ namespace QDND.Tests.Integration
             fighter.ActionBudget.ResetForTurn();
             
             // Act - use both attacks
-            pipeline.ExecuteAction("Target_MainHandAttack", fighter, new List<Combatant> { enemy });
-            pipeline.ExecuteAction("Target_MainHandAttack", fighter, new List<Combatant> { enemy });
+            pipeline.ExecuteAction("main_hand_attack", fighter, new List<Combatant> { enemy });
+            pipeline.ExecuteAction("main_hand_attack", fighter, new List<Combatant> { enemy });
             Assert.Equal(0, fighter.ActionBudget.AttacksRemaining);
             
             // Act - reset turn
@@ -164,13 +164,13 @@ namespace QDND.Tests.Integration
         {
             // Arrange
             var fighter = CreateFighter(level: 5);
-            fighter.KnownActions.Add("Projectile_FireBolt");
+            fighter.KnownActions.Add("fire_bolt");
             var enemy = CreateEnemy();
             var pipeline = CreatePipeline();
             fighter.ActionBudget.ResetForTurn();
             
             // Act - cast spell
-            var result = pipeline.ExecuteAction("Projectile_FireBolt", fighter, new List<Combatant> { enemy });
+            var result = pipeline.ExecuteAction("fire_bolt", fighter, new List<Combatant> { enemy });
             
             // Assert - spell should consume action and reset attacks
             Assert.True(result.Success);
@@ -182,20 +182,20 @@ namespace QDND.Tests.Integration
         public void ExtraAction_ThenSpell_StillAllowsWeaponAttacksFromRemainingAction()
         {
             var fighter = CreateFighter(level: 5);
-            fighter.KnownActions.Add("Projectile_FireBolt");
+            fighter.KnownActions.Add("fire_bolt");
             var enemy = CreateEnemy();
             var pipeline = CreatePipeline();
             fighter.ActionBudget.ResetForTurn();
 
             fighter.ActionBudget.GrantAdditionalAction();
 
-            var spellResult = pipeline.ExecuteAction("Projectile_FireBolt", fighter, new List<Combatant> { enemy });
+            var spellResult = pipeline.ExecuteAction("fire_bolt", fighter, new List<Combatant> { enemy });
 
             Assert.True(spellResult.Success);
             Assert.True(fighter.ActionBudget.HasAction);
             Assert.True(fighter.ActionBudget.AttacksRemaining > 0);
 
-            var (canUseAttack, reason) = pipeline.CanUseAbility("Target_MainHandAttack", fighter);
+            var (canUseAttack, reason) = pipeline.CanUseAbility("main_hand_attack", fighter);
             Assert.True(canUseAttack, reason);
         }
         
@@ -210,7 +210,7 @@ namespace QDND.Tests.Integration
             rogue.ActionBudget.ResetForTurn();
             
             // Act - main hand attack
-            pipeline.ExecuteAction("Target_MainHandAttack", rogue, new List<Combatant> { enemy });
+            pipeline.ExecuteAction("main_hand_attack", rogue, new List<Combatant> { enemy });
             
             // Assert - should be able to use off-hand attack
             var (canUse, reason) = pipeline.CanUseAbility("offhand_attack", rogue);
@@ -276,7 +276,7 @@ namespace QDND.Tests.Integration
                 }
             };
             
-            fighter.KnownActions.Add("Target_MainHandAttack");
+            fighter.KnownActions.Add("main_hand_attack");
             
             // Set MaxAttacks based on ExtraAttacks
             fighter.ActionBudget.MaxAttacks = 1 + extraAttacks;
@@ -302,7 +302,7 @@ namespace QDND.Tests.Integration
                 }
             };
             
-            rogue.KnownActions.Add("Target_MainHandAttack");
+            rogue.KnownActions.Add("main_hand_attack");
             
             return rogue;
         }
@@ -334,7 +334,7 @@ namespace QDND.Tests.Integration
             // Register basic melee attack
             pipeline.RegisterAction(new ActionDefinition
             {
-                Id = "Target_MainHandAttack",
+                Id = "main_hand_attack",
                 Name = "Main Hand Attack",
                 TargetType = QDND.Combat.Actions.TargetType.SingleUnit,
                 Range = 1.5f,
@@ -356,7 +356,7 @@ namespace QDND.Tests.Integration
             // Register Fire Bolt for spell testing
             pipeline.RegisterAction(new ActionDefinition
             {
-                Id = "Projectile_FireBolt",
+                Id = "fire_bolt",
                 Name = "Fire Bolt",
                 TargetType = QDND.Combat.Actions.TargetType.SingleUnit,
                 Range = 36f,

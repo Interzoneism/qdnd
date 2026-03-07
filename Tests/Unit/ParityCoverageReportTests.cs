@@ -458,7 +458,7 @@ namespace QDND.Tests.Unit
                                 max_hp = 50,
                                 pos = new[] { 0.0, 0.0, 0.0 },
                                 alive = true,
-                                abilities = new[] { "Target_MainHandAttack", "Shout_Dash", "spell_magic_missile" }
+                                abilities = new[] { "main_hand_attack", "dash", "spell_magic_missile" }
                             },
                             new
                             {
@@ -469,7 +469,7 @@ namespace QDND.Tests.Unit
                                 max_hp = 20,
                                 pos = new[] { 5.0, 0.0, 0.0 },
                                 alive = true,
-                                abilities = new[] { "Target_MainHandAttack" }
+                                abilities = new[] { "main_hand_attack" }
                             }
                         }
                     })
@@ -481,7 +481,7 @@ namespace QDND.Tests.Unit
                 var report = ParityCoverageReport.GenerateFromLog(tempFile);
 
                 // Assert
-                Assert.Equal(3, report.TotalAbilitiesGranted); // 3 unique abilities (Target_MainHandAttack is shared)
+                Assert.Equal(3, report.TotalAbilitiesGranted); // 3 unique abilities (main_hand_attack is shared)
             }
             finally
             {

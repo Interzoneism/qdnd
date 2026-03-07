@@ -146,6 +146,12 @@ namespace QDND.Data.Spells
         
         /// <summary>Maximum number of targets this spell can affect.</summary>
         public int MaximumTargets { get; set; }
+
+        /// <summary>Raw BG3 AmountOfTargets value.</summary>
+        public string AmountOfTargets { get; set; }
+
+        /// <summary>Parsed numeric target count from AmountOfTargets.</summary>
+        public int AmountOfTargetsCount { get; set; }
         
         /// <summary>The root/base spell this variant belongs to (e.g. for upcast variants).</summary>
         public string RootSpellId { get; set; }

@@ -124,7 +124,7 @@ namespace QDND.Tests.Unit
             {
                 TriggerType = ReactionTriggerType.SpellCastNearby,
                 TriggerSourceId = "enemy_wizard",
-                ActionId = "Projectile_Fireball",
+                ActionId = "fireball",
                 IsCancellable = true,
                 WasCancelled = false,
                 TriggerSpellLevel = 3,      // Fireball is a 3rd-level spell
@@ -147,7 +147,7 @@ namespace QDND.Tests.Unit
             Assert.True(result.Success);
             Assert.Equal("counter", result.EffectType);
             Assert.Contains("Countered", result.Message);
-            Assert.Contains("Projectile_Fireball", result.Message);
+            Assert.Contains("fireball", result.Message);
             Assert.True(triggerContext.WasCancelled);
         }
 
@@ -196,7 +196,7 @@ namespace QDND.Tests.Unit
             {
                 TriggerType = ReactionTriggerType.SpellCastNearby,
                 TriggerSourceId = "enemy_wizard",
-                ActionId = "Projectile_Fireball",
+                ActionId = "fireball",
                 IsCancellable = false
             };
 

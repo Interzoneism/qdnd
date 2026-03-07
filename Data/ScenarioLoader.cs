@@ -366,7 +366,7 @@ namespace QDND.Data
                                 Console.Error.WriteLine($"[ScenarioLoader] Unit '{unit.Id}' has no resolved abilities after class/build resolution — no fallback.");
                             }
 
-                            // Every combatant should always know Target_MainHandAttack - it represents
+                            // Every combatant should always know main_hand_attack - it represents
                             // the fundamental D&D 5e "Attack" action available to all creatures.
                             EnsureBasicAttack(allAbilities, actionIdResolver);
 
@@ -525,7 +525,7 @@ namespace QDND.Data
                 // If the combatant wields a ranged weapon, ensure they have ranged_attack
                 if (combatant.MainHandWeapon?.IsRanged == true)
                 {
-                    var rangedId = actionIdResolver.Resolve("Projectile_MainHandAttack");
+                    var rangedId = actionIdResolver.Resolve("ranged_attack");
                     var rangedActionId = rangedId.IsResolved ? rangedId.ResolvedId : "ranged_attack";
                     combatant.KnownActions ??= new List<string>();
                     if (!combatant.KnownActions.Any(a => string.Equals(a, rangedActionId, StringComparison.OrdinalIgnoreCase)))
@@ -586,13 +586,14 @@ namespace QDND.Data
             if (actionIds == null)
                 return;
 
-            var basicAttack = resolver.Resolve("Target_MainHandAttack");
-            var fallbackId = basicAttack.IsResolved ? basicAttack.ResolvedId : "Target_MainHandAttack";
+            var basicAttack = resolver.Resolve("main_hand_attack");
+            var fallbackId = basicAttack.IsResolved ? basicAttack.ResolvedId : "main_hand_attack";
 
-            // Check both the resolved form AND the BG3 alias to prevent inserting main_hand_attack
-            // when Target_MainHandAttack is already present (they refer to the same attack).
+            // Check both the canonical ID and BG3 alias to avoid duplicate insertions when
+            // legacy scenarios still carry Target_MainHandAttack.
             bool alreadyHasBasicAttack = actionIds.Any(a =>
                 string.Equals(a, fallbackId, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(a, "main_hand_attack", StringComparison.OrdinalIgnoreCase)
                 || string.Equals(a, "Target_MainHandAttack", StringComparison.OrdinalIgnoreCase));
 
             if (!alreadyHasBasicAttack)

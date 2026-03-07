@@ -27,6 +27,7 @@ namespace QDND.Combat.Services
         private readonly ReactionSystem _reactionSystem;
         private IReactionResolver _reactionResolver;
         private readonly Action<ReactionPrompt, Action<bool>> _showReactionPrompt;
+        private Action<ReactionPrompt, Action<int>> _showSlotPicker;
         private readonly CombatStateMachine _stateMachine;
         private readonly EffectPipeline _effectPipeline;
         private readonly CombatContext _combatContext;
@@ -70,6 +71,13 @@ namespace QDND.Combat.Services
         /// </summary>
         public void SetReactionResolver(IReactionResolver resolver) =>
             _reactionResolver = resolver;
+
+        /// <summary>
+        /// Inject the slot picker delegate after construction. When set, Counterspell use
+        /// will display a spell slot level picker before finalising the reaction decision.
+        /// </summary>
+        public void SetShowSlotPicker(Action<ReactionPrompt, Action<int>> showSlotPicker) =>
+            _showSlotPicker = showSlotPicker;
 
         /// <summary>
         /// Inject the target validator after construction. TargetValidator is created
@@ -297,7 +305,30 @@ namespace QDND.Combat.Services
             {
                 // Player-controlled in normal play: show UI and pause combat
                 _stateMachine.TryTransition(CombatState.ReactionPrompt, $"Awaiting {reactor.Name}'s reaction decision");
-                _showReactionPrompt(prompt, (useReaction) => HandleReactionDecision(prompt, useReaction));
+
+                if (IsCounterspellReaction(prompt.Reaction) && _showSlotPicker != null)
+                {
+                    // Enhanced two-step flow: prompt first, then slot picker
+                    string casterName = triggerSource?.Name ?? prompt.TriggerContext?.TriggerSourceId ?? "Unknown";
+                    string spellName = FormatSpellName(prompt.TriggerContext?.ActionId);
+                    int spellLevel = prompt.TriggerContext?.TriggerSpellLevel ?? 0;
+                    string contextInfo = $"{casterName} is casting {spellName} (Level {spellLevel})";
+                    if (prompt.TriggerContext?.Data != null)
+                        prompt.TriggerContext.Data["contextInfo"] = contextInfo;
+
+                    _showReactionPrompt(prompt, (useReaction) =>
+                    {
+                        if (useReaction)
+                            ShowCounterspellSlotPicker(prompt);
+                        else
+                            HandleReactionDecision(prompt, false);
+                    });
+                }
+                else
+                {
+                    _showReactionPrompt(prompt, (useReaction) => HandleReactionDecision(prompt, useReaction));
+                }
+
                 _log($"Reaction prompt shown to player: {prompt.Reaction.Name}");
             }
             else
@@ -393,6 +424,50 @@ namespace QDND.Combat.Services
             }
         }
 
+        // ── Counterspell slot picker helpers ──────────────────────────────────
+
+        private void ShowCounterspellSlotPicker(ReactionPrompt prompt)
+        {
+            _showSlotPicker?.Invoke(prompt, (slotLevel) =>
+            {
+                if (slotLevel < 0)
+                {
+                    // Cancelled — treat as decline
+                    HandleReactionDecision(prompt, false);
+                }
+                else
+                {
+                    if (prompt.TriggerContext?.Data != null)
+                        prompt.TriggerContext.Data["counterspellSlotLevel"] = slotLevel;
+                    if (prompt.TriggerContext != null)
+                        prompt.TriggerContext.CounterspellSlotLevel = slotLevel;
+                    HandleReactionDecision(prompt, true);
+                }
+            });
+        }
+
+        private static bool IsCounterspellReaction(ReactionDefinition reaction)
+        {
+            if (reaction == null) return false;
+            return string.Equals(reaction.Id, QDND.Combat.Reactions.ReactionIds.Counterspell,
+                StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string FormatSpellName(string actionId)
+        {
+            if (string.IsNullOrEmpty(actionId)) return "a spell";
+            var prefixes = new[] { "Target_", "Projectile_", "Shout_", "Zone_", "Throw_", "Rush_", "Cone_", "Melee_", "Mount_" };
+            foreach (var prefix in prefixes)
+            {
+                if (actionId.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    actionId = actionId[prefix.Length..];
+                    break;
+                }
+            }
+            return actionId.Replace('_', ' ');
+        }
+
         // ── Initialization: grant baseline reactions to all combatants ────────
 
         public void GrantBaselineReactions(IEnumerable<Combatant> combatants)
@@ -422,12 +497,12 @@ namespace QDND.Combat.Services
                 {
                     bool hasShield = combatant.KnownActions.Any(a =>
                         string.Equals(a, "shield", StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(a, "Projectile_Shield", StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(a, "Target_Shield", StringComparison.OrdinalIgnoreCase));
+                        string.Equals(a, "Target_Shield", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(a, "Projectile_Shield", StringComparison.OrdinalIgnoreCase));
                     bool hasCounterspell = combatant.KnownActions.Any(a =>
                         string.Equals(a, "counterspell", StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(a, "Projectile_Counterspell", StringComparison.OrdinalIgnoreCase) ||
-                        string.Equals(a, "Target_Counterspell", StringComparison.OrdinalIgnoreCase));
+                        string.Equals(a, "Target_Counterspell", StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(a, "Projectile_Counterspell", StringComparison.OrdinalIgnoreCase));
                     bool hasUncannyDodge = combatant.PassiveIds?.Any(p =>
                         p.IndexOf("UncannyDodge", StringComparison.OrdinalIgnoreCase) >= 0) == true;
                     bool hasDeflectMissiles = combatant.ResolvedCharacter?.Features?.Any(f =>

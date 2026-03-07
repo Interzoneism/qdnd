@@ -53,6 +53,7 @@ namespace QDND.Combat.UI
 
         // ── Overlays ───────────────────────────────────────────────
         private ReactionPromptOverlay _reactionPrompt;
+        private SpellSlotPickerOverlay _spellSlotPicker;
         private CharacterInventoryScreen _characterInventoryScreen;
         private HudWindowManager _windowManager;
         private TurnAnnouncementOverlay _turnAnnouncement;
@@ -369,6 +370,12 @@ void fragment() {
             _multiTargetPrompt = new MultiTargetPromptOverlay();
             _multiTargetPrompt.Visible = false;
             AddChild(_multiTargetPrompt);
+
+            _spellSlotPicker = new SpellSlotPickerOverlay();
+            _spellSlotPicker.Visible = false;
+            _spellSlotPicker.OnSlotChosen += OnSpellSlotChosen;
+            _spellSlotPicker.OnCancelled += OnSpellSlotCancelled;
+            _windowManager.AddChild(_spellSlotPicker);
         }
 
         private void CreateTooltip()
@@ -832,6 +839,11 @@ void fragment() {
             {
                 _reactionPrompt.OnUseReaction -= OnReactionUse;
                 _reactionPrompt.OnDeclineReaction -= OnReactionDecline;
+            }
+            if (_spellSlotPicker != null)
+            {
+                _spellSlotPicker.OnSlotChosen -= OnSpellSlotChosen;
+                _spellSlotPicker.OnCancelled -= OnSpellSlotCancelled;
             }
 
             // Stop layout save timer and save final state
@@ -1634,13 +1646,36 @@ void fragment() {
         // ── Reaction Handling ──────────────────────────────────────
 
         private Action<bool> _reactionCallback;
+        private Action<int> _slotPickerCallback;
 
-        public void ShowReactionPrompt(string name, string description, string iconPath, Action<bool> callback)
+        public void ShowReactionPrompt(string name, string description, string iconPath, Action<bool> callback, string contextInfo = null)
         {
             _reactionCallback = callback;
-            _reactionPrompt?.ShowPrompt(name, description, iconPath);
+            _reactionPrompt?.ShowPrompt(name, description, iconPath, contextInfo);
             if (_reactionPrompt != null)
                 _windowManager?.ShowModal(_reactionPrompt);
+        }
+
+        public void ShowSpellSlotPicker(string spellName, System.Collections.Generic.List<(int level, int current, int max)> slots, Action<int> callback)
+        {
+            _slotPickerCallback = callback;
+            _spellSlotPicker?.ShowPicker(spellName, slots);
+            if (_spellSlotPicker != null)
+                _windowManager?.ShowModal(_spellSlotPicker);
+        }
+
+        private void OnSpellSlotChosen(int level)
+        {
+            _windowManager?.CloseModal(_spellSlotPicker);
+            _slotPickerCallback?.Invoke(level);
+            _slotPickerCallback = null;
+        }
+
+        private void OnSpellSlotCancelled()
+        {
+            _windowManager?.CloseModal(_spellSlotPicker);
+            _slotPickerCallback?.Invoke(-1);
+            _slotPickerCallback = null;
         }
 
         private void OnReactionUse()

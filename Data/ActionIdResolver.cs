@@ -34,7 +34,12 @@ namespace QDND.Data
             "Target_",
             "Projectile_",
             "Shout_",
-            "Zone_"
+            "Zone_",
+            "Rush_",
+            "Teleportation_",
+            "Throw_",
+            "Wall_",
+            "ProjectileStrike_"
         };
 
         private static readonly string[] FlavorSuffixes =
@@ -44,7 +49,8 @@ namespace QDND.Data
             "_mind_flayer"
         };
 
-        // Explicit remaps for known stale/variant IDs seen in scenarios.
+        // Explicit remaps are kept for backwards compatibility with legacy scenario files
+        // that still embed historical BG3-prefixed IDs.
         private static readonly Dictionary<string, string> ExplicitRemaps = new(StringComparer.OrdinalIgnoreCase)
         {
             ["Projectile_EldritchBlast"] = "eldritch_blast",
@@ -345,11 +351,20 @@ namespace QDND.Data
                 return null;
 
             var trimmed = actionId.Trim();
+            string bestPrefix = null;
             foreach (var prefix in KnownPrefixes)
             {
                 if (trimmed.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                    return trimmed.Substring(prefix.Length);
+                {
+                    if (bestPrefix == null || prefix.Length > bestPrefix.Length)
+                    {
+                        bestPrefix = prefix;
+                    }
+                }
             }
+
+            if (!string.IsNullOrEmpty(bestPrefix))
+                return trimmed.Substring(bestPrefix.Length);
 
             return trimmed;
         }

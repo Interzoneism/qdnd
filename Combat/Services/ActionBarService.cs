@@ -41,19 +41,20 @@ namespace QDND.Combat.Services
 
         private static readonly string[][] CommonActionAliasGroups = new[]
         {
-            new[] { "Target_MainHandAttack", "main_hand_attack" },
-            new[] { "Projectile_MainHandAttack", "ranged_attack" },
-            new[] { "Target_UnarmedStrike", "unarmed_strike" },
-            new[] { "Target_OffhandAttack", "offhand_attack" },
-            new[] { "Shout_Dash", "dash", "dash_action" },
-            new[] { "Shout_Disengage", "disengage", "disengage_action" },
-            new[] { "Shout_Dodge", "dodge_action" },
-            new[] { "Shout_Hide", "hide" },
-            new[] { "Target_Shove", "shove" },
-            new[] { "Target_Help", "help", "help_action" },
-            new[] { "Throw_Throw", "throw" },
-            new[] { "Shout_Jump", "jump", "jump_action" },
-            new[] { "Target_Dip", "dip" }
+            new[] { "main_hand_attack", "Target_MainHandAttack" },
+            new[] { "ranged_attack", "Projectile_MainHandAttack" },
+            new[] { "unarmed_strike", "Target_UnarmedAttack", "Target_UnarmedStrike" },
+            new[] { "offhand_attack", "Target_OffhandAttack", "Target_OffHandAttack" },
+            new[] { "ranged_offhand_attack", "Projectile_OffhandAttack", "Projectile_OffHandAttack" },
+            new[] { "dash", "dash_action", "Shout_Dash" },
+            new[] { "disengage", "disengage_action", "Shout_Disengage" },
+            new[] { "dodge_action", "Shout_Dodge" },
+            new[] { "hide", "hide_action", "Shout_Hide" },
+            new[] { "shove", "Target_Shove" },
+            new[] { "help", "help_action", "Target_Help" },
+            new[] { "throw", "throw_action", "Throw_Throw", "Target_Throw" },
+            new[] { "jump", "jump_action", "Shout_Jump" },
+            new[] { "dip", "dip_action", "Target_Dip" }
         };
 
         public List<ActionDefinition> GetActionsForCombatant(string combatantId)
@@ -466,20 +467,22 @@ namespace QDND.Combat.Services
 
                 bool shouldAdd = action.Id switch
                 {
-                    "Target_MainHandAttack" or "main_hand_attack" => combatant.MainHandWeapon == null || !combatant.MainHandWeapon.IsRanged,
-                    "Projectile_MainHandAttack" or "ranged_attack" => combatant.MainHandWeapon != null && combatant.MainHandWeapon.IsRanged,
-                    "Target_UnarmedStrike" or "unarmed_strike" => combatant.MainHandWeapon == null,
-                    "Target_OffhandAttack" or "offhand_attack" => combatant.OffHandWeapon != null,
-                    // BG3 prefixed common actions
-                    "Shout_Dash" or "Shout_Disengage" or "Shout_Dodge" or "Shout_Hide" or "Shout_Jump" or
-                    "Target_Shove" or "Target_Help" or "Target_Dip" or "Throw_Throw" or
-                    // Legacy lowercase common actions
+                    "main_hand_attack" or "Target_MainHandAttack" => combatant.MainHandWeapon == null || !combatant.MainHandWeapon.IsRanged,
+                    "ranged_attack" or "Projectile_MainHandAttack" => combatant.MainHandWeapon != null && combatant.MainHandWeapon.IsRanged,
+                    "unarmed_strike" or "Target_UnarmedAttack" or "Target_UnarmedStrike" => combatant.MainHandWeapon == null,
+                    "offhand_attack" or "Target_OffhandAttack" or "Target_OffHandAttack" => combatant.OffHandWeapon != null,
+                    "ranged_offhand_attack" or "Projectile_OffhandAttack" or "Projectile_OffHandAttack" =>
+                        combatant.OffHandWeapon != null && combatant.OffHandWeapon.IsRanged,
+                    // Canonical common actions
                     "dash" or "dash_action" or
                     "disengage" or "disengage_action" or
                     "shove" or
                     "help" or "help_action" or
                     "jump" or "jump_action" or
-                    "dodge_action" or "hide" or "throw" or "dip" => true,
+                    "dodge_action" or "hide" or "hide_action" or "throw" or "throw_action" or "dip" or "dip_action" or
+                    // Legacy BG3-prefixed aliases
+                    "Shout_Dash" or "Shout_Disengage" or "Shout_Dodge" or "Shout_Hide" or "Shout_Jump" or
+                    "Target_Shove" or "Target_Help" or "Target_Dip" or "Throw_Throw" or "Target_Throw" => true,
                     _ => false
                 };
 

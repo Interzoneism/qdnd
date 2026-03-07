@@ -13,6 +13,7 @@ namespace QDND.Combat.UI.Overlays
         public event Action OnDeclineReaction;
 
         private Label _reactionNameLabel;
+        private Label _contextLabel;
         private RichTextLabel _descriptionLabel;
         private Button _useButton;
         private Button _declineButton;
@@ -48,6 +49,15 @@ namespace QDND.Combat.UI.Overlays
             _reactionNameLabel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
             HudTheme.StyleHeader(_reactionNameLabel, HudTheme.FontLarge);
             header.AddChild(_reactionNameLabel);
+
+            // Context info (e.g. "Lich is casting Fireball (Level 5)")
+            _contextLabel = new Label();
+            _contextLabel.Text = "";
+            _contextLabel.Visible = false;
+            _contextLabel.HorizontalAlignment = HorizontalAlignment.Center;
+            _contextLabel.AutowrapMode = TextServer.AutowrapMode.Word;
+            HudTheme.StyleLabel(_contextLabel, HudTheme.FontMedium, HudTheme.WarmWhite);
+            vbox.AddChild(_contextLabel);
 
             // Description
             _descriptionLabel = new RichTextLabel();
@@ -105,13 +115,21 @@ namespace QDND.Combat.UI.Overlays
         }
 
         /// <summary>
-        /// Show the reaction prompt.
+        /// Show the reaction prompt. When <paramref name="contextInfo"/> is non-null it is
+        /// displayed as a sub-header below the reaction name (e.g. who is casting what).
         /// </summary>
-        public void ShowPrompt(string name, string description, string iconPath)
+        public void ShowPrompt(string name, string description, string iconPath, string contextInfo = null)
         {
             _reactionNameLabel.Text = name;
             _descriptionLabel.Clear();
             _descriptionLabel.AppendText(description);
+
+            if (_contextLabel != null)
+            {
+                _contextLabel.Text = contextInfo ?? "";
+                _contextLabel.Visible = !string.IsNullOrEmpty(contextInfo);
+            }
+
             Visible = true;
 
             // Center on screen

@@ -10,6 +10,7 @@ using QDND.Combat.Services;
 using QDND.Combat.States;
 using QDND.Combat.Animation;
 using QDND.Combat.UI;
+using QDND.Combat.UI.Overlays;
 using QDND.Data;
 
 namespace QDND.Tools.AutoBattler
@@ -1150,12 +1151,26 @@ namespace QDND.Tools.AutoBattler
                 // The ReactionPromptUI._onDecision callback handles the resolution
                 promptUI.SimulateDecision(true);
                 _reactionPromptHandled = true;
+
+                // Immediately check if Counterspell slot picker appeared (two-step flow)
+                HandleSpellSlotPickerIfVisible();
             }
             else
             {
                 // Prompt not showing, maybe auto-resolved by AI policy
                 Log("Reaction prompt state but UI not showing - likely auto-resolved");
                 _reactionPromptHandled = true;
+            }
+        }
+
+        private void HandleSpellSlotPickerIfVisible()
+        {
+            var slotPicker = _arena.GetTree().Root.FindChild("SpellSlotPickerOverlay", true, false)
+                as SpellSlotPickerOverlay;
+            if (slotPicker != null && slotPicker.Visible)
+            {
+                Log("Auto-selecting highest available spell slot for Counterspell");
+                slotPicker.SimulateChooseHighest();
             }
         }
 

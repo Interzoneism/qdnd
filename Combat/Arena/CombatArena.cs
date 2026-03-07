@@ -1035,6 +1035,19 @@ namespace QDND.Combat.Arena
             // Inject resolver back into coordinator (breaks the construction cycle).
             _reactionCoordinator.SetReactionResolver(_reactionResolver);
 
+            // Wire Counterspell slot picker: reads available spell slots and delegates to HudController.
+            _reactionCoordinator.SetShowSlotPicker((prompt, callback) =>
+            {
+                var reactor = _combatContext.GetCombatant(prompt.ReactorId);
+                var pool = reactor?.ActionResources;
+                var slots = ReactionSystem.GetAvailableSpellSlots(pool, 3);
+                var hud = _hudLayer?.GetNodeOrNull<QDND.Combat.UI.HudController>("HudController");
+                if (hud != null)
+                    hud.ShowSpellSlotPicker("Counterspell", slots, callback);
+                else
+                    callback?.Invoke(-1); // No HUD — treat as cancelled
+            });
+
             // Wire BG3 interrupt-driven reactions FIRST so its OnReactionUsed handler runs before the coordinator's
             var bg3ReactionIntegration = new BG3ReactionIntegration(reactionSystem, _interruptRegistry);
             bg3ReactionIntegration.RegisterCoreInterrupts();

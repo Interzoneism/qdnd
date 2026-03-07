@@ -24,10 +24,10 @@ namespace QDND.Combat.AI
     {
         public static readonly HashSet<string> All = new(StringComparer.OrdinalIgnoreCase)
         {
-            "Target_MainHandAttack",
             "main_hand_attack",
-            "Projectile_MainHandAttack",
-            "ranged_attack"
+            "ranged_attack",
+            "Target_MainHandAttack",
+            "Projectile_MainHandAttack"
         };
 
         /// <summary>
@@ -38,6 +38,18 @@ namespace QDND.Combat.AI
         {
             if (knownActions != null)
             {
+                if (knownActions.Any(id => string.Equals(id, "main_hand_attack", StringComparison.OrdinalIgnoreCase)))
+                    return "main_hand_attack";
+
+                if (knownActions.Any(id => string.Equals(id, "ranged_attack", StringComparison.OrdinalIgnoreCase)))
+                    return "ranged_attack";
+
+                if (knownActions.Any(id => string.Equals(id, "Target_MainHandAttack", StringComparison.OrdinalIgnoreCase)))
+                    return "main_hand_attack";
+
+                if (knownActions.Any(id => string.Equals(id, "Projectile_MainHandAttack", StringComparison.OrdinalIgnoreCase)))
+                    return "ranged_attack";
+
                 foreach (var id in knownActions)
                 {
                     if (All.Contains(id))
@@ -1530,7 +1542,7 @@ namespace QDND.Combat.AI
         /// </summary>
         private AIAction GenerateDodgeCandidate(Combatant actor)
         {
-            var actionId = ResolveCommonActionId("Shout_Dodge", "dodge_action");
+            var actionId = ResolveCommonActionId("dodge_action", "Shout_Dodge");
             if (actionId == null) return null;
 
             // Don't dodge if already dodging
@@ -1549,7 +1561,7 @@ namespace QDND.Combat.AI
         /// </summary>
         private AIAction GenerateHideCandidate(Combatant actor)
         {
-            var actionId = ResolveCommonActionId("hide", "Shout_Hide", "hide_action");
+            var actionId = ResolveCommonActionId("hide", "hide_action", "Shout_Hide");
             if (actionId == null) return null;
 
             // Only propose if the actor actually has this action
@@ -1576,7 +1588,7 @@ namespace QDND.Combat.AI
         private List<AIAction> GenerateHelpCandidates(Combatant actor)
         {
             var candidates = new List<AIAction>();
-            var actionId = ResolveCommonActionId("help", "Target_Help", "help_action");
+            var actionId = ResolveCommonActionId("help", "help_action", "Target_Help");
             if (actionId == null) return candidates;
 
             // Only propose if the actor actually has this action
@@ -1609,7 +1621,7 @@ namespace QDND.Combat.AI
         /// </summary>
         private AIAction GenerateDipCandidate(Combatant actor)
         {
-            var actionId = ResolveCommonActionId("dip", "Target_Dip", "dip_action");
+            var actionId = ResolveCommonActionId("dip", "dip_action", "Target_Dip");
             if (actionId == null) return null;
 
             // Only propose if the actor actually has this action
@@ -1657,7 +1669,7 @@ namespace QDND.Combat.AI
         private List<AIAction> GenerateThrowCandidates(Combatant actor)
         {
             var candidates = new List<AIAction>();
-            var actionId = ResolveCommonActionId("throw", "Throw_Throw", "throw_action");
+            var actionId = ResolveCommonActionId("throw", "throw_action", "Throw_Throw");
             if (actionId == null) return candidates;
 
             // Only propose if the actor actually has this action
@@ -2844,7 +2856,7 @@ namespace QDND.Combat.AI
             }
 
             // Custom scoring for common combat actions
-            if (IsCommonAction(action.ActionId, "Shout_Dodge", "dodge_action"))
+            if (IsCommonAction(action.ActionId, "dodge_action", "Shout_Dodge"))
             {
                 ScoreDodgeAction(action, actor, profile);
                 return;
@@ -2864,22 +2876,22 @@ namespace QDND.Combat.AI
                 ScoreRageAction(action, actor, profile);
                 return;
             }
-            if (IsCommonAction(action.ActionId, "hide", "Shout_Hide", "hide_action", "cunning_action_hide", "Shout_Hide_BonusAction"))
+            if (IsCommonAction(action.ActionId, "hide", "hide_action", "cunning_action_hide", "Shout_Hide", "Shout_Hide_BonusAction"))
             {
                 ScoreHideAction(action, actor, profile);
                 return;
             }
-            if (IsCommonAction(action.ActionId, "help", "Target_Help", "help_action"))
+            if (IsCommonAction(action.ActionId, "help", "help_action", "Target_Help"))
             {
                 ScoreHelpAction(action, actor, profile);
                 return;
             }
-            if (IsCommonAction(action.ActionId, "dip", "Target_Dip", "dip_action"))
+            if (IsCommonAction(action.ActionId, "dip", "dip_action", "Target_Dip"))
             {
                 ScoreDipAction(action, actor, profile);
                 return;
             }
-            if (IsCommonAction(action.ActionId, "throw", "Throw_Throw", "throw_action"))
+            if (IsCommonAction(action.ActionId, "throw", "throw_action", "Throw_Throw"))
             {
                 ScoreThrowAction(action, actor, profile);
                 return;
@@ -3665,7 +3677,7 @@ namespace QDND.Combat.AI
             // For attacks/abilities, check if in range (with tolerance matching TargetValidator)
             if (action.ActionType == AIActionType.Attack)
             {
-                float attackRange = 1.5f; // Default BG3 melee range (Target_MainHandAttack)
+                float attackRange = 1.5f; // Default BG3 melee range (main_hand_attack)
                 if (_effectPipeline != null && !string.IsNullOrEmpty(action.ActionId))
                 {
                     var actionDef = _effectPipeline.GetAction(action.ActionId);

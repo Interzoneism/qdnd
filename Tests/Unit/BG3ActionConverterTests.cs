@@ -105,9 +105,9 @@ namespace QDND.Tests.Unit
                 (BG3SpellType.Shout, TargetType.Self),
                 (BG3SpellType.Zone, TargetType.Circle),
                 (BG3SpellType.Multicast, TargetType.MultiUnit),
-                (BG3SpellType.Rush, TargetType.Point),
+                (BG3SpellType.Rush, TargetType.Charge),
                 (BG3SpellType.Teleportation, TargetType.Point),
-                (BG3SpellType.Wall, TargetType.Line),
+                (BG3SpellType.Wall, TargetType.WallSegment),
                 (BG3SpellType.Cone, TargetType.Cone)
             };
 

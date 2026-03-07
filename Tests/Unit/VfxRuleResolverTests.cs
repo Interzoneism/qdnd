@@ -17,7 +17,7 @@ namespace QDND.Tests.Unit
             var request = new VfxRequest("corr", VfxEventPhase.Impact)
             {
                 PresetId = "status_heal",
-                ActionId = "Projectile_Fireball",
+                ActionId = "fireball",
                 AttackType = AttackType.RangedSpell,
                 DamageType = DamageType.Fire
             };
@@ -50,7 +50,7 @@ namespace QDND.Tests.Unit
             var resolver = new VfxRuleResolver(BuildBundle());
             var request = new VfxRequest("corr", VfxEventPhase.Projectile)
             {
-                ActionId = "Projectile_Fireball",
+                ActionId = "fireball",
                 AttackType = AttackType.RangedSpell,
                 DamageType = DamageType.Fire
             };
@@ -115,7 +115,7 @@ namespace QDND.Tests.Unit
                 },
                 ActionOverrides = new List<VfxActionOverrideRule>
                 {
-                    new() { ActionId = "Projectile_Fireball", Phase = "Projectile", PresetId = "proj_fire" },
+                    new() { ActionId = "fireball", Phase = "Projectile", PresetId = "proj_fire" },
                     new() { ActionId = "Shout_HealingWord", Phase = "Impact", PresetId = "status_heal" },
                     new() { ActionId = "Shout_HealingWord", VariantId = "mass_heal", Phase = "Impact", PresetId = "area_circle_blast" }
                 },
