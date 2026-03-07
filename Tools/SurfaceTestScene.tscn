@@ -1,6 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://5cvephtig1gs"]
+[gd_scene format=3 uid="uid://5cvephtig1gs"]
 
-[ext_resource type="Script" path="res://Tools/SurfaceTestScene.cs" id="1_surface_test"]
+[ext_resource type="Script" uid="uid://cuqd2n30fxt26" path="res://Tools/SurfaceTestScene.cs" id="1_surface_test"]
 
 [sub_resource type="Environment" id="Environment_surface_test"]
 background_mode = 1
@@ -10,6 +10,8 @@ ambient_light_color = Color(0.42, 0.44, 0.48, 1)
 ambient_light_energy = 0.7
 volumetric_fog_enabled = true
 volumetric_fog_density = 0.0
+volumetric_fog_ambient_inject = 1.03
+volumetric_fog_sky_affect = 0.937
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_ground"]
 size = Vector2(30, 30)
@@ -17,26 +19,25 @@ size = Vector2(30, 30)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ground"]
 albedo_color = Color(0.31, 0.33, 0.35, 1)
 roughness = 0.9
-metallic = 0.0
 
-[node name="SurfaceTestScene" type="Node3D"]
+[node name="SurfaceTestScene" type="Node3D" unique_id=1847236367]
 script = ExtResource("1_surface_test")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=973336861]
 environment = SubResource("Environment_surface_test")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1886329116]
 transform = Transform3D(0.939693, -0.262003, 0.219846, 0, 0.642788, 0.766044, -0.34202, -0.719846, 0.604023, 0, 14.5715, 0)
 light_energy = 1.05
 shadow_enabled = true
 
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(0.819152, 0.0, -0.573576, -0.496732, 0.5, -0.709406, 0.286788, 0.866025, 0.409576, -11.0, 15.0, 11.0)
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1292044063]
+transform = Transform3D(-0.09907931, 0.92389286, -0.36960053, -0.31989723, 0.32213825, 0.891006, 0.9422575, 0.20651442, 0.2636335, -11, 15, 11)
 current = true
 far = 200.0
 
-[node name="Ground" type="MeshInstance3D" parent="."]
+[node name="Ground" type="MeshInstance3D" parent="." unique_id=164650795]
 mesh = SubResource("PlaneMesh_ground")
 surface_material_override/0 = SubResource("StandardMaterial3D_ground")
 
-[node name="Surfaces" type="Node3D" parent="."]
+[node name="Surfaces" type="Node3D" parent="." unique_id=1974685787]
