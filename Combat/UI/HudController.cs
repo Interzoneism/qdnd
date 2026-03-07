@@ -98,6 +98,7 @@ namespace QDND.Combat.UI
         private PopupMenu _variantPopup;
         private List<ActionVariant> _pendingVariants;
         private string _pendingVariantActionId;
+        private string _pendingActionItemInstanceId;
 
         // ── Upcast popup ────────────────────────────────────────────
         private bool _isUpcastMode;
@@ -1450,6 +1451,9 @@ void fragment() {
             var entry = Arena.ActionBarModel.Actions.FirstOrDefault(a => a.SlotIndex == index);
             if (entry == null || string.IsNullOrWhiteSpace(entry.ActionId)) return;
 
+            string itemInstanceId = entry.ItemInstanceId;
+            _pendingActionItemInstanceId = itemInstanceId;
+
             var action = Arena.GetActionById(entry.ActionId);
             if (action == null) return;
 
@@ -1500,12 +1504,32 @@ void fragment() {
                 }
                 else
                 {
-                    Arena.SelectAction(action.Id);
+                    if (!string.IsNullOrWhiteSpace(itemInstanceId))
+                    {
+                        Arena.SelectAction(action.Id, new ActionExecutionOptions
+                        {
+                            ItemInstanceId = itemInstanceId
+                        });
+                    }
+                    else
+                    {
+                        Arena.SelectAction(action.Id);
+                    }
                 }
             }
             else
             {
-                Arena.SelectAction(action.Id);
+                if (!string.IsNullOrWhiteSpace(itemInstanceId))
+                {
+                    Arena.SelectAction(action.Id, new ActionExecutionOptions
+                    {
+                        ItemInstanceId = itemInstanceId
+                    });
+                }
+                else
+                {
+                    Arena.SelectAction(action.Id);
+                }
             }
         }
 
@@ -1524,9 +1548,14 @@ void fragment() {
                 if (upcastAction != null)
                 {
                     int upcastLevel = (int)id - baseLevel;
-                    var opts = new ActionExecutionOptions { UpcastLevel = upcastLevel };
+                    var opts = new ActionExecutionOptions
+                    {
+                        UpcastLevel = upcastLevel,
+                        ItemInstanceId = _pendingActionItemInstanceId
+                    };
                     Arena.SelectAction(upcastAction.Id, opts);
                 }
+                _pendingActionItemInstanceId = null;
                 return;
             }
 
@@ -1537,12 +1566,17 @@ void fragment() {
             var action = Arena?.GetActionById(_pendingVariantActionId);
             if (action != null)
             {
-                var options = new ActionExecutionOptions { VariantId = variant.VariantId };
+                var options = new ActionExecutionOptions
+                {
+                    VariantId = variant.VariantId,
+                    ItemInstanceId = _pendingActionItemInstanceId
+                };
                 Arena.SelectAction(action.Id, options);
             }
 
             _pendingVariants = null;
             _pendingVariantActionId = null;
+            _pendingActionItemInstanceId = null;
         }
 
         private void OnActionHovered(int index)

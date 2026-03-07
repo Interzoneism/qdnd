@@ -351,6 +351,16 @@ namespace QDND.Combat.Actions
         public string BG3SourceId { get; set; }
 
         /// <summary>
+        /// Optional linked spell action ID for item wrapper actions (e.g., scrolls).
+        /// </summary>
+        public string LinkedSpellId { get; set; }
+
+        /// <summary>
+        /// Optional linked status ID for item-driven status applications (e.g., potions).
+        /// </summary>
+        public string LinkedStatusId { get; set; }
+
+        /// <summary>
         /// Whether this action is a summon action (spawns creatures/objects).
         /// Summon actions are forbidden in canonical parity scenarios.
         /// </summary>

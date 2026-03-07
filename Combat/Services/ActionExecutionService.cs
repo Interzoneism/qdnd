@@ -459,6 +459,12 @@ namespace QDND.Combat.Services
                 return;
             }
 
+            if (!string.IsNullOrWhiteSpace(options?.ItemInstanceId))
+            {
+                UseItemOnTarget(actorId, options.ItemInstanceId, targetId, options);
+                return;
+            }
+
             var action = _effectPipeline.GetAction(actionId);
             if (action == null)
             {
@@ -523,6 +529,16 @@ namespace QDND.Combat.Services
             }
             if (actor == null) return;
 
+            if (!string.IsNullOrWhiteSpace(options?.ItemInstanceId))
+            {
+                string primaryTargetId = targetIds?.FirstOrDefault();
+                if (!string.IsNullOrWhiteSpace(primaryTargetId))
+                    UseItemOnTarget(actorId, options.ItemInstanceId, primaryTargetId, options);
+                else
+                    UseItem(actorId, options.ItemInstanceId, options);
+                return;
+            }
+
             var action = _effectPipeline.GetAction(actionId);
             if (action == null)
             {
@@ -581,6 +597,12 @@ namespace QDND.Combat.Services
             if (actor == null)
             {
                 _log("Invalid actor for ability execution");
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(options?.ItemInstanceId))
+            {
+                UseItem(actorId, options.ItemInstanceId, options);
                 return;
             }
 
@@ -647,6 +669,12 @@ namespace QDND.Combat.Services
             if (actor == null)
             {
                 _log("Invalid actor for ability execution");
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(options?.ItemInstanceId))
+            {
+                UseItemAtPosition(actorId, options.ItemInstanceId, targetPosition, options);
                 return;
             }
 
@@ -946,7 +974,8 @@ namespace QDND.Combat.Services
                     SkipRangeValidation = options?.SkipRangeValidation ?? false,
                     IgnoreReactionBudgetCheck = options?.IgnoreReactionBudgetCheck ?? false,
                     SkipReactionBudgetConsumption = options?.SkipReactionBudgetConsumption ?? false,
-                    TriggerContext = options?.TriggerContext
+                    TriggerContext = options?.TriggerContext,
+                    ItemInstanceId = options?.ItemInstanceId
                 };
 
                 var result = _effectPipeline.ExecuteAction(action.Id, actor, currentTargets, attackOptions);

@@ -51,6 +51,10 @@ namespace QDND.Combat.UI
         // Category for grouping
         public string Category { get; set; } // "attack", "spell", "item", "special"
 
+        // Inventory linkage for consumable item actions
+        public string ItemInstanceId { get; set; }
+        public string ItemDefinitionId { get; set; }
+
         // Spell-level grouping (0 = cantrip, 1-9 = spell level, -1 = non-spell)
         public int SpellLevel { get; set; } = -1;
 

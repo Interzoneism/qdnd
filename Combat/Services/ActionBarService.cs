@@ -70,6 +70,7 @@ namespace QDND.Combat.Services
 
             // Filter actions to only those the combatant knows
             var actions = new List<ActionDefinition>();
+            var seenActionIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             if (combatant.KnownActions != null)
             {
                 foreach (var actionId in combatant.KnownActions)
@@ -77,7 +78,8 @@ namespace QDND.Combat.Services
                     var action = _actionRegistry?.GetAction(actionId);
                     if (action != null)
                     {
-                        actions.Add(action);
+                        if (seenActionIds.Add(action.Id))
+                            actions.Add(action);
                     }
                     else
                     {
@@ -85,6 +87,28 @@ namespace QDND.Combat.Services
                             $"missing_action:{combatantId}:{actionId}",
                             $"GetActionsForCombatant: Action {actionId} not found in any registry for {combatantId}");
                     }
+                }
+            }
+
+            if (_combatContext != null && _combatContext.TryGetService<InventoryService>(out var inventoryService))
+            {
+                var usableItems = inventoryService.GetUsableItems(combatantId);
+                foreach (var item in usableItems)
+                {
+                    if (item == null || string.IsNullOrWhiteSpace(item.UseActionId) || item.Quantity <= 0)
+                        continue;
+
+                    var itemAction = _actionRegistry?.GetAction(item.UseActionId);
+                    if (itemAction == null)
+                    {
+                        _logOnce(
+                            $"missing_item_action:{combatantId}:{item.UseActionId}",
+                            $"GetActionsForCombatant: Item action {item.UseActionId} not found for {combatantId}");
+                        continue;
+                    }
+
+                    if (seenActionIds.Add(itemAction.Id))
+                        actions.Add(itemAction);
                 }
             }
 
@@ -450,11 +474,39 @@ namespace QDND.Combat.Services
             RuntimeSafety.Log($"[DEBUG-ABILITIES] {combatant.Name} ({combatantId}) known={string.Join(", ", combatant.KnownActions ?? new List<string>())} resolved={string.Join(", ", actionDefs.Select(a => a.Id))}");
             var commonActions = GetCommonActions();
 
+            var usableItemsByActionId = new Dictionary<string, InventoryItem>(StringComparer.OrdinalIgnoreCase);
+            var itemQuantityByActionId = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            if (_combatContext != null && _combatContext.TryGetService<InventoryService>(out var inventoryService))
+            {
+                foreach (var item in inventoryService.GetUsableItems(combatantId))
+                {
+                    if (item == null || string.IsNullOrWhiteSpace(item.UseActionId) || item.Quantity <= 0)
+                        continue;
+
+                    if (!usableItemsByActionId.ContainsKey(item.UseActionId))
+                        usableItemsByActionId[item.UseActionId] = item;
+
+                    if (!itemQuantityByActionId.TryGetValue(item.UseActionId, out int currentQty))
+                        currentQty = 0;
+
+                    itemQuantityByActionId[item.UseActionId] = currentQty + Math.Max(0, item.Quantity);
+                }
+            }
+
             // Filter out internal summon-command actions (IsSummon = true on actions like
             // Hound of Ill Omen or Accursed Specter that ARE the summon mechanic themselves).
             // Castable spells that have a summon *effect* (e.g., flaming_sphere) do NOT carry
             // IsSummon = true and must pass through so they appear on the action bar.
-            var nonSummonActions = actionDefs.Where(a => !a.IsSummon).ToList();
+            var nonSummonActions = actionDefs
+                .Where(a => !a.IsSummon)
+                .Where(a =>
+                {
+                    if (!string.Equals(ClassifyActionCategory(a), "item", StringComparison.OrdinalIgnoreCase))
+                        return true;
+
+                    return usableItemsByActionId.ContainsKey(a.Id);
+                })
+                .ToList();
             var filteredCommonActions = commonActions.Where(a => !a.IsSummon).ToList();
 
             var finalAbilities = new List<ActionDefinition>(nonSummonActions);
@@ -501,21 +553,32 @@ namespace QDND.Combat.Services
             foreach (var def in finalAbilities)
             {
                 var category = ClassifyActionCategory(def);
+                usableItemsByActionId.TryGetValue(def.Id, out var itemInstance);
+                bool isItem = string.Equals(category, "item", StringComparison.OrdinalIgnoreCase)
+                    && itemInstance != null;
+                int itemCharges = isItem && itemQuantityByActionId.TryGetValue(def.Id, out int qty)
+                    ? qty
+                    : 0;
+
                 var entry = new ActionBarEntry
                 {
                     ActionId = def.Id,
                     DisplayName = def.Name,
-                    Description = def.Description,
-                    IconPath = ResolveIconPath(def.Icon, category),
+                    Description = isItem ? BuildItemActionDescription(def, itemInstance, itemCharges) : def.Description,
+                    IconPath = isItem && !string.IsNullOrWhiteSpace(itemInstance.IconPath)
+                        ? itemInstance.IconPath
+                        : ResolveIconPath(def.Icon, category),
                     SlotIndex = slotIndex++,
                     ActionPointCost = def.Cost.UsesAction ? 1 : 0,
                     BonusActionCost = def.Cost.UsesBonusAction ? 1 : 0,
                     MovementCost = def.Cost.MovementCost,
                     CooldownTotal = def.Cooldown?.TurnCooldown ?? 0,
-                    ChargesMax = def.Cooldown?.MaxCharges ?? 0,
-                    ChargesRemaining = def.Cooldown?.MaxCharges ?? 0,
+                    ChargesMax = isItem ? itemCharges : (def.Cooldown?.MaxCharges ?? 0),
+                    ChargesRemaining = isItem ? itemCharges : (def.Cooldown?.MaxCharges ?? 0),
                     ResourceCosts = BuildActionBarResourceCosts(def),
                     Category = category,
+                    ItemInstanceId = isItem ? itemInstance.InstanceId : null,
+                    ItemDefinitionId = isItem ? itemInstance.DefinitionId : null,
                     SpellLevel = ResolveActionSpellLevel(def),
                     Usability = ActionUsability.Available,
                     Range = def.Range,
@@ -708,6 +771,8 @@ namespace QDND.Combat.Services
                     ChargesRemaining = a.ChargesRemaining,
                     ChargesMax = a.ChargesMax,
                     Category = a.Category,
+                    ItemInstanceId = a.ItemInstanceId,
+                    ItemDefinitionId = a.ItemDefinitionId,
                     IsToggle = a.IsToggle,
                     IsToggledOn = a.IsToggledOn,
                     ToggleGroup = a.ToggleGroup,
@@ -955,6 +1020,78 @@ namespace QDND.Combat.Services
             if (!string.IsNullOrEmpty(formula))
                 return formula;
             return null;
+        }
+
+        private static string BuildItemActionDescription(ActionDefinition action, InventoryItem item, int quantity)
+        {
+            if (item == null)
+                return action?.Description ?? "No description available.";
+
+            var lines = new List<string>
+            {
+                $"Rarity: {FormatRarity(item.Rarity)}"
+            };
+
+            if (!string.IsNullOrWhiteSpace(item.Description))
+                lines.Add(item.Description);
+            else if (!string.IsNullOrWhiteSpace(action?.Description))
+                lines.Add(action.Description);
+
+            if (item.SpecialEffects != null)
+            {
+                foreach (var effect in item.SpecialEffects)
+                {
+                    if (!string.IsNullOrWhiteSpace(effect) && !lines.Contains(effect, StringComparer.OrdinalIgnoreCase))
+                        lines.Add(effect);
+                }
+            }
+
+            lines.Add($"Use: {BuildActionCostLabel(action?.Cost, item.UseCosts)}");
+            lines.Add($"Category: {item.Category}");
+            if (item.Weight > 0)
+                lines.Add($"Weight: {item.Weight} lb");
+            if (quantity > 0)
+                lines.Add($"Charges: {quantity}");
+
+            return string.Join("\n", lines);
+        }
+
+        private static string BuildActionCostLabel(ActionCost cost, string fallbackUseCosts)
+        {
+            var parts = new List<string>();
+
+            if (cost?.UsesAction == true)
+                parts.Add("Action");
+            if (cost?.UsesBonusAction == true)
+                parts.Add("Bonus Action");
+            if (cost?.UsesReaction == true)
+                parts.Add("Reaction");
+
+            if (parts.Count == 0 && !string.IsNullOrWhiteSpace(fallbackUseCosts))
+            {
+                foreach (var token in fallbackUseCosts.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                {
+                    if (token.StartsWith("ActionPoint", StringComparison.OrdinalIgnoreCase))
+                        parts.Add("Action");
+                    else if (token.StartsWith("BonusActionPoint", StringComparison.OrdinalIgnoreCase))
+                        parts.Add("Bonus Action");
+                    else if (token.StartsWith("ReactionActionPoint", StringComparison.OrdinalIgnoreCase))
+                        parts.Add("Reaction");
+                }
+            }
+
+            return parts.Count > 0
+                ? string.Join(" + ", parts.Distinct(StringComparer.OrdinalIgnoreCase))
+                : "Action";
+        }
+
+        private static string FormatRarity(ItemRarity rarity)
+        {
+            return rarity switch
+            {
+                ItemRarity.VeryRare => "Very Rare",
+                _ => rarity.ToString(),
+            };
         }
     }
 }

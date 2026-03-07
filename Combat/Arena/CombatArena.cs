@@ -207,7 +207,8 @@ namespace QDND.Combat.Arena
                 SkipRangeValidation = opts.SkipRangeValidation,
                 IgnoreReactionBudgetCheck = opts.IgnoreReactionBudgetCheck,
                 SkipReactionBudgetConsumption = opts.SkipReactionBudgetConsumption,
-                TriggerContext = opts.TriggerContext
+                TriggerContext = opts.TriggerContext,
+                ItemInstanceId = opts.ItemInstanceId
             };
         }
 
@@ -1135,10 +1136,18 @@ namespace QDND.Combat.Arena
             _combatContext.RegisterService(_restService);
 
             // Inventory management
-            var _inventoryService = new InventoryService(charRegistry, _statsRegistry);
+            var _inventoryService = new InventoryService(charRegistry, _statsRegistry, _combatContext);
             _combatContext.RegisterService(_inventoryService);
             _inventoryService.OnEquipmentChanged += (combatantId, _) =>
-                _actionBarService?.Populate(combatantId);
+            {
+                if (string.Equals(combatantId, ActiveCombatantId, StringComparison.Ordinal))
+                    _actionBarService?.Populate(combatantId);
+            };
+            _inventoryService.OnInventoryChanged += combatantId =>
+            {
+                if (string.Equals(combatantId, ActiveCombatantId, StringComparison.Ordinal))
+                    _actionBarService?.Populate(combatantId);
+            };
             
             // Wire ResolveCombatant callbacks for status and concentration systems
             _statusManager.ResolveCombatant = id => _combatContext?.GetCombatant(id);
@@ -1738,7 +1747,8 @@ namespace QDND.Combat.Arena
                     SkipRangeValidation = options.SkipRangeValidation,
                     IgnoreReactionBudgetCheck = options.IgnoreReactionBudgetCheck,
                     SkipReactionBudgetConsumption = options.SkipReactionBudgetConsumption,
-                    TriggerContext = options.TriggerContext
+                    TriggerContext = options.TriggerContext,
+                    ItemInstanceId = options.ItemInstanceId
                 }
                 : null;
 

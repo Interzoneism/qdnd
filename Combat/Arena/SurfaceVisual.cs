@@ -125,9 +125,13 @@ void fragment() {
 
         private static readonly Shader GroundSurfaceShader = new() { Code = GROUND_SURFACE_SHADER_CODE };
         private static readonly Shader CloudSurfaceShader = new() { Code = CLOUD_SURFACE_SHADER_CODE };
-        private static readonly Shader LiquidSurfaceShader = GroundSurfaceShader;
         private static readonly Shader SolidSurfaceShader = GroundSurfaceShader;
         private static readonly Shader FogVolumeShader = null;
+        private static Shader _liquidShaderFile;
+        private static NoiseTexture2D _waveTextureA;
+        private static NoiseTexture2D _waveTextureB;
+        private static NoiseTexture2D _normalTextureA;
+        private static NoiseTexture2D _normalTextureB;
 
         private enum ShaderFamily { Cloud, Liquid, Solid }
 
@@ -142,12 +146,19 @@ void fragment() {
             public float RefractionIntensity { get; set; }
             public float BorderScale { get; set; }
             public float WaveHeightScale { get; set; }
+            public float WaveScale { get; set; }
+            public float WaveHeight { get; set; }
             public float WaveSpeed { get; set; }
             public float Roughness { get; set; }
             public float Metallic { get; set; }
             public float EmissionStrength { get; set; }
             public float NoiseScale { get; set; }
             public float NoiseSpeed { get; set; }
+            public float NormalScale { get; set; }
+            public float NormalSpeed { get; set; }
+            public float NormalStrength { get; set; }
+            public float MaxVisibleDepth { get; set; }
+            public float EdgeFadeDistance { get; set; }
             public float EdgeSoftness { get; set; }
             public float DissolveStrength { get; set; }
             public float CloudDensity { get; set; }
@@ -275,21 +286,6 @@ void fragment() {
             if (surface == null || surface.CellCount == 0)
                 return mesh;
 
-            int minX = int.MaxValue;
-            int minZ = int.MaxValue;
-            int maxX = int.MinValue;
-            int maxZ = int.MinValue;
-            foreach (var cell in surface.Cells)
-            {
-                if (cell.X < minX) minX = cell.X;
-                if (cell.Z < minZ) minZ = cell.Z;
-                if (cell.X > maxX) maxX = cell.X;
-                if (cell.Z > maxZ) maxZ = cell.Z;
-            }
-
-            int spanX = Math.Max(1, maxX - minX + 1);
-            int spanZ = Math.Max(1, maxZ - minZ + 1);
-
             var vertices = new List<Vector3>();
             var normals = new List<Vector3>();
             var uvs = new List<Vector2>();
@@ -299,14 +295,16 @@ void fragment() {
             {
                 var world = surface.CellToWorld(cell);
                 var local = world - surface.Position;
-                float padNoise = (CellHash(cell.X, cell.Z) - 0.5f) * surface.CellSize * 0.08f;
+                float padNoise = style.Shader == ShaderFamily.Liquid
+                    ? 0f
+                    : (CellHash(cell.X, cell.Z) - 0.5f) * surface.CellSize * 0.08f;
                 float half = surface.CellSize * 0.5f + style.CellPaddingMeters + padNoise;
                 float y = style.HeightOffset;
 
-                float u0 = (cell.X - minX) / (float)spanX;
-                float u1 = (cell.X - minX + 1f) / spanX;
-                float v0 = (cell.Z - minZ) / (float)spanZ;
-                float v1 = (cell.Z - minZ + 1f) / spanZ;
+                float x0 = world.X - half;
+                float x1 = world.X + half;
+                float z0 = world.Z - half;
+                float z1 = world.Z + half;
 
                 int start = vertices.Count;
                 vertices.Add(new Vector3(local.X - half, y, local.Z - half));
@@ -319,10 +317,10 @@ void fragment() {
                 normals.Add(Vector3.Up);
                 normals.Add(Vector3.Up);
 
-                uvs.Add(new Vector2(u0, v0));
-                uvs.Add(new Vector2(u1, v0));
-                uvs.Add(new Vector2(u1, v1));
-                uvs.Add(new Vector2(u0, v1));
+                uvs.Add(new Vector2(x0, z0));
+                uvs.Add(new Vector2(x1, z0));
+                uvs.Add(new Vector2(x1, z1));
+                uvs.Add(new Vector2(x0, z1));
 
                 indices.Add(start + 0);
                 indices.Add(start + 1);
@@ -355,11 +353,68 @@ void fragment() {
             }
         }
 
+        private static Shader GetLiquidShader()
+        {
+            _liquidShaderFile ??= GD.Load<Shader>("res://assets/shaders/surface_liquid.gdshader");
+            return _liquidShaderFile ?? GroundSurfaceShader;
+        }
+
+        private static NoiseTexture2D CreateNoiseTexture(FastNoiseLite noise, bool asNormalMap)
+        {
+            return new NoiseTexture2D
+            {
+                Width = 512,
+                Height = 512,
+                Seamless = true,
+                SeamlessBlendSkirt = 0.5f,
+                GenerateMipmaps = true,
+                AsNormalMap = asNormalMap,
+                Noise = noise
+            };
+        }
+
+        private static void EnsureNoiseTextures()
+        {
+            if (_waveTextureA != null && _waveTextureB != null && _normalTextureA != null && _normalTextureB != null)
+                return;
+
+            var waveNoiseA = new FastNoiseLite
+            {
+                NoiseType = FastNoiseLite.NoiseTypeEnum.Simplex,
+                Frequency = 0.005f,
+                FractalType = FastNoiseLite.FractalTypeEnum.Fbm,
+                FractalOctaves = 3
+            };
+            _waveTextureA = CreateNoiseTexture(waveNoiseA, false);
+
+            var waveNoiseB = new FastNoiseLite
+            {
+                NoiseType = FastNoiseLite.NoiseTypeEnum.Cellular,
+                Frequency = 0.02f,
+                FractalType = FastNoiseLite.FractalTypeEnum.None
+            };
+            _waveTextureB = CreateNoiseTexture(waveNoiseB, false);
+
+            var normalNoiseA = new FastNoiseLite
+            {
+                NoiseType = FastNoiseLite.NoiseTypeEnum.Simplex,
+                Frequency = 0.007f
+            };
+            _normalTextureA = CreateNoiseTexture(normalNoiseA, true);
+
+            var normalNoiseB = new FastNoiseLite
+            {
+                NoiseType = FastNoiseLite.NoiseTypeEnum.Simplex,
+                Frequency = 0.02f
+            };
+            _normalTextureB = CreateNoiseTexture(normalNoiseB, true);
+        }
+
         private static Material BuildMaterial(VisualStyle style)
         {
             Shader shader = style.Shader switch
             {
-                ShaderFamily.Liquid => LiquidSurfaceShader,
+                ShaderFamily.Liquid => GetLiquidShader(),
                 ShaderFamily.Solid => SolidSurfaceShader,
                 _ => CloudSurfaceShader
             };
@@ -374,22 +429,31 @@ void fragment() {
 
             if (style.Shader == ShaderFamily.Liquid)
             {
+                EnsureNoiseTextures();
+
                 mat.SetShaderParameter("color_shallow", style.ColorShallow);
                 mat.SetShaderParameter("color_deep", style.ColorDeep);
                 mat.SetShaderParameter("transparency", style.Transparency);
                 mat.SetShaderParameter("metallic", style.Metallic);
                 mat.SetShaderParameter("roughness", style.Roughness);
-                mat.SetShaderParameter("wave_height_scale", style.WaveHeightScale);
+                mat.SetShaderParameter("wave_texture_a", _waveTextureA);
+                mat.SetShaderParameter("wave_texture_b", _waveTextureB);
+                mat.SetShaderParameter("normal_texture_a", _normalTextureA);
+                mat.SetShaderParameter("normal_texture_b", _normalTextureB);
+                mat.SetShaderParameter("wave_scale", style.WaveScale);
                 mat.SetShaderParameter("wave_speed", style.WaveSpeed);
-                mat.SetShaderParameter("noise_scale", style.NoiseScale);
-                mat.SetShaderParameter("noise_speed", style.NoiseSpeed);
+                mat.SetShaderParameter("wave_height", style.WaveHeight);
+                mat.SetShaderParameter("normal_scale", style.NormalScale);
+                mat.SetShaderParameter("normal_speed", style.NormalSpeed);
+                mat.SetShaderParameter("normal_strength", style.NormalStrength);
+                mat.SetShaderParameter("max_visible_depth", style.MaxVisibleDepth);
+                mat.SetShaderParameter("edge_fade_distance", style.EdgeFadeDistance);
                 mat.SetShaderParameter("emission_strength", style.EmissionStrength);
-                mat.SetShaderParameter("edge_softness", style.EdgeSoftness);
                 mat.SetShaderParameter("border_color", style.BorderColor);
                 mat.SetShaderParameter("border_scale", style.BorderScale);
                 mat.SetShaderParameter("refraction_intensity", style.RefractionIntensity);
-                mat.SetShaderParameter("border_near", 0.05f);
-                mat.SetShaderParameter("border_far", 4000f);
+                mat.SetShaderParameter("border_near", 0.5f);
+                mat.SetShaderParameter("border_far", 100f);
             }
             else if (style.Shader == ShaderFamily.Solid)
             {
@@ -483,26 +547,35 @@ void fragment() {
                 ColorDeep = color.Darkened(0.45f),
                 BorderColor = color.Lightened(0.35f),
                 Opacity = opacity,
-                Transparency = 0.5f,
-                RefractionIntensity = isCloud ? 0f : 0.2f,
-                BorderScale = 1.35f,
+                Transparency = isLiquid ? 0.6f : 0.5f,
+                RefractionIntensity = isCloud ? 0f : (isLiquid ? 0.05f : 0.2f),
+                BorderScale = isLiquid ? 1f : 1.35f,
                 WaveHeightScale = surface.Definition.WaveAmplitude > 0f
                     ? surface.Definition.WaveAmplitude
                     : (isCloud ? 0.018f : (isLiquid ? 0.01f : 0.006f)),
+                WaveScale = isLiquid ? 8f : 1f,
+                WaveHeight = isLiquid ? 0.003f : 0f,
                 WaveSpeed = surface.Definition.WaveSpeed > 0f
                     ? surface.Definition.WaveSpeed
-                    : (isCloud ? 0.45f : 1f),
+                    : (isCloud ? 0.45f : (isLiquid ? 0.08f : 1f)),
                 Roughness = isCloud ? 0.86f : (isLiquid ? 0.16f : 0.55f),
                 Metallic = surface.Definition.Type == SurfaceType.Ice ? 0.1f : 0.02f,
                 EmissionStrength = isCloud ? 0.08f : 0.14f,
                 NoiseScale = isCloud ? 2f : (isLiquid ? 3.2f : 4.6f),
                 NoiseSpeed = isCloud ? 0.22f : (isLiquid ? 0.4f : 0.9f),
+                NormalScale = isLiquid ? 0.08f : 0f,
+                NormalSpeed = isLiquid ? 0.04f : 0f,
+                NormalStrength = isLiquid ? 0.15f : 0f,
+                MaxVisibleDepth = isLiquid ? 2f : 0f,
+                EdgeFadeDistance = isLiquid ? 0.3f : 0f,
                 EdgeSoftness = isCloud ? 0.35f : 0.22f,
                 DissolveStrength = 0.35f,
                 CloudDensity = isCloud ? 1f : 0f,
                 HeightFade = 1.25f,
                 HeightOffset = isCloud ? 0.18f : 0.012f,
-                CellPaddingMeters = Mathf.Max(0f, surface.Definition.VisualPaddingCells * surface.CellSize),
+                CellPaddingMeters = isLiquid
+                    ? surface.CellSize * 0.25f
+                    : Mathf.Max(0f, surface.Definition.VisualPaddingCells * surface.CellSize),
                 UseFogVolume = isCloud,
                 FogDensity = 0.28f,
                 FogNoiseScale = 2f,
@@ -523,13 +596,13 @@ void fragment() {
             switch (id)
             {
                 case "water":
-                    style.ColorShallow = new Color(0.18f, 0.56f, 0.87f);
-                    style.ColorDeep = new Color(0.05f, 0.2f, 0.4f);
-                    style.Transparency = 0.55f;
-                    style.RefractionIntensity = 0.3f;
-                    style.WaveHeightScale = 0.01f;
-                    style.BorderColor = new Color(0.95f, 0.98f, 1f, 1f);
-                    style.BorderScale = 1.35f;
+                    style.ColorShallow = new Color(0.01f, 0.2f, 0.3f);
+                    style.ColorDeep = new Color(0.05f, 0.15f, 0.35f);
+                    style.Transparency = 0.6f;
+                    style.RefractionIntensity = 0.05f;
+                    style.WaveHeight = 0.003f;
+                    style.Roughness = 0.15f;
+                    style.BorderColor = new Color(1f, 1f, 1f, 1f);
                     break;
 
                 case "ice":
@@ -538,20 +611,19 @@ void fragment() {
                     style.Transparency = 0.25f;
                     style.RefractionIntensity = 0.15f;
                     style.WaveHeightScale = 0f;
+                    style.WaveHeight = 0f;
                     style.Roughness = 0.05f;
                     style.Metallic = 0.12f;
                     style.BorderColor = new Color(0.92f, 0.98f, 1f, 1f);
                     break;
 
                 case "acid":
-                    style.ColorShallow = new Color(0.55f, 0.85f, 0.15f);
-                    style.ColorDeep = new Color(0.2f, 0.4f, 0f);
-                    style.Transparency = 0.45f;
-                    style.RefractionIntensity = 0.2f;
-                    style.WaveHeightScale = 0.015f;
-                    style.NoiseSpeed = 0.58f;
-                    style.EmissionStrength = 0.2f;
-                    style.BorderColor = new Color(0.85f, 0.95f, 0.35f, 1f);
+                    style.ColorShallow = new Color(0.4f, 0.75f, 0.05f);
+                    style.ColorDeep = new Color(0.15f, 0.35f, 0f);
+                    style.Transparency = 0.5f;
+                    style.WaveSpeed = 0.12f;
+                    style.Roughness = 0.2f;
+                    style.EmissionStrength = 0.15f;
                     break;
 
                 case "fire":
@@ -570,19 +642,56 @@ void fragment() {
                     break;
 
                 case "oil":
-                    style.ColorShallow = new Color(0.1f, 0.1f, 0.1f);
-                    style.ColorDeep = new Color(0.02f, 0.02f, 0.02f);
-                    style.Transparency = 0.2f;
-                    style.RefractionIntensity = 0.1f;
+                    style.ColorShallow = new Color(0.05f, 0.05f, 0.05f);
+                    style.ColorDeep = new Color(0.01f, 0.01f, 0.01f);
+                    style.Transparency = 0.3f;
+                    style.Metallic = 0.1f;
                     style.Roughness = 0.02f;
-                    style.WaveHeightScale = 0.006f;
-                    style.BorderColor = new Color(0.28f, 0.28f, 0.28f, 1f);
+                    style.WaveHeight = 0.001f;
+                    style.BorderColor = new Color(0.2f, 0.2f, 0.2f, 1f);
+                    style.BorderScale = 0f;
+                    break;
+
+                case "blood":
+                    style.ColorShallow = new Color(0.4f, 0.05f, 0.08f);
+                    style.ColorDeep = new Color(0.15f, 0.02f, 0.04f);
+                    style.Transparency = 0.35f;
+                    style.WaveHeight = 0.001f;
+                    style.Roughness = 0.3f;
+                    break;
+
+                case "mud":
+                    style.ColorShallow = new Color(0.35f, 0.22f, 0.1f);
+                    style.ColorDeep = new Color(0.15f, 0.1f, 0.05f);
+                    style.Transparency = 0.15f;
+                    style.WaveHeight = 0.0005f;
+                    style.Roughness = 0.8f;
+                    break;
+
+                case "electrified_water":
+                    style.ColorShallow = new Color(0.22f, 0.42f, 0.85f);
+                    style.ColorDeep = new Color(0.04f, 0.2f, 0.42f);
+                    style.Transparency = 0.6f;
+                    style.RefractionIntensity = 0.05f;
+                    style.WaveHeight = 0.003f;
+                    style.Roughness = 0.15f;
+                    style.BorderColor = new Color(1f, 1f, 1f, 1f);
+                    style.EmissionStrength = 0.25f;
+                    break;
+
+                case "deep_water":
+                    style.ColorShallow = new Color(0.02f, 0.12f, 0.25f);
+                    style.ColorDeep = new Color(0.01f, 0.06f, 0.15f);
+                    style.Transparency = 0.45f;
+                    style.WaveHeight = 0.003f;
+                    style.Roughness = 0.15f;
                     break;
 
                 case "grease":
                     // Grease is viscous, not a rippling liquid
                     style.Shader = ShaderFamily.Solid;
                     style.WaveHeightScale = 0f;
+                    style.CellPaddingMeters = 0f;
                     break;
 
                 case "fog":
@@ -658,11 +767,12 @@ void fragment() {
                     break;
             }
 
-            if (surfaceType == SurfaceType.Lightning)
+            if (surfaceType == SurfaceType.Lightning && id != "electrified_water")
             {
-                style.EmissionStrength = Mathf.Max(style.EmissionStrength, 0.35f);
+                style.EmissionStrength = Mathf.Max(style.EmissionStrength, style.Shader == ShaderFamily.Liquid ? 0.25f : 0.35f);
                 style.BorderColor = new Color(0.88f, 0.94f, 1f, 1f);
-                style.Transparency = Mathf.Min(style.Transparency, 0.42f);
+                if (style.Shader != ShaderFamily.Liquid)
+                    style.Transparency = Mathf.Min(style.Transparency, 0.42f);
             }
             else if (surfaceType == SurfaceType.Lava)
             {
