@@ -60,6 +60,28 @@ namespace QDND.Data.Parsers
             return dict;
         }
 
+        /// <summary>
+        /// Parses one or more BG3 Character.txt files and resolves inheritance across
+        /// the merged entry set. Earlier files take precedence on duplicate entry names.
+        /// </summary>
+        /// <param name="filePaths">Character.txt file paths in priority order (first wins).</param>
+        /// <returns>Dictionary mapping entry name → <see cref="BG3CharacterData"/>.</returns>
+        public Dictionary<string, BG3CharacterData> ParseCharacters(params string[] filePaths)
+        {
+            return ParseAcrossFiles(
+                filePaths,
+                "Character",
+                (name, entry) =>
+                {
+                    var ch = new BG3CharacterData { Name = name, ParentId = entry.ParentId };
+                    foreach (var (k, v) in entry.Properties)
+                        ch.RawProperties[k] = v;
+                    MapCharacterProperties(ch);
+                    return ch;
+                },
+                MergeCharacter);
+        }
+
         // ── Weapons ──────────────────────────────────────────────────────────
 
         /// <summary>
@@ -84,6 +106,28 @@ namespace QDND.Data.Parsers
 
             ResolveInheritance(dict, (child, parent) => MergeWeapon(child, parent));
             return dict;
+        }
+
+        /// <summary>
+        /// Parses one or more BG3 Weapon.txt files and resolves inheritance across
+        /// the merged entry set. Earlier files take precedence on duplicate entry names.
+        /// </summary>
+        /// <param name="filePaths">Weapon.txt file paths in priority order (first wins).</param>
+        /// <returns>Dictionary mapping entry name → <see cref="BG3WeaponData"/>.</returns>
+        public Dictionary<string, BG3WeaponData> ParseWeapons(params string[] filePaths)
+        {
+            return ParseAcrossFiles(
+                filePaths,
+                "Weapon",
+                (name, entry) =>
+                {
+                    var wpn = new BG3WeaponData { Name = name, ParentId = entry.ParentId };
+                    foreach (var (k, v) in entry.Properties)
+                        wpn.RawProperties[k] = v;
+                    MapWeaponProperties(wpn);
+                    return wpn;
+                },
+                MergeWeapon);
         }
 
         // ── Objects ───────────────────────────────────────────────────────
@@ -112,6 +156,28 @@ namespace QDND.Data.Parsers
             return dict;
         }
 
+        /// <summary>
+        /// Parses one or more BG3 Object.txt files and resolves inheritance across
+        /// the merged entry set. Earlier files take precedence on duplicate entry names.
+        /// </summary>
+        /// <param name="filePaths">Object.txt file paths in priority order (first wins).</param>
+        /// <returns>Dictionary mapping entry name → <see cref="BG3ObjectData"/>.</returns>
+        public Dictionary<string, BG3ObjectData> ParseObjects(params string[] filePaths)
+        {
+            return ParseAcrossFiles(
+                filePaths,
+                "Object",
+                (name, entry) =>
+                {
+                    var obj = new BG3ObjectData { Name = name, ParentId = entry.ParentId };
+                    foreach (var (k, v) in entry.Properties)
+                        obj.RawProperties[k] = v;
+                    MapObjectProperties(obj);
+                    return obj;
+                },
+                MergeObject);
+        }
+
         // ── Armor ────────────────────────────────────────────────────────────
 
         /// <summary>
@@ -136,6 +202,28 @@ namespace QDND.Data.Parsers
 
             ResolveInheritance(dict, (child, parent) => MergeArmor(child, parent));
             return dict;
+        }
+
+        /// <summary>
+        /// Parses one or more BG3 Armor.txt files and resolves inheritance across
+        /// the merged entry set. Earlier files take precedence on duplicate entry names.
+        /// </summary>
+        /// <param name="filePaths">Armor.txt file paths in priority order (first wins).</param>
+        /// <returns>Dictionary mapping entry name → <see cref="BG3ArmorData"/>.</returns>
+        public Dictionary<string, BG3ArmorData> ParseArmors(params string[] filePaths)
+        {
+            return ParseAcrossFiles(
+                filePaths,
+                "Armor",
+                (name, entry) =>
+                {
+                    var arm = new BG3ArmorData { Name = name, ParentId = entry.ParentId };
+                    foreach (var (k, v) in entry.Properties)
+                        arm.RawProperties[k] = v;
+                    MapArmorProperties(arm);
+                    return arm;
+                },
+                MergeArmor);
         }
 
         /// <summary>
@@ -180,6 +268,36 @@ namespace QDND.Data.Parsers
         {
             public string ParentId;
             public readonly Dictionary<string, string> Properties = new(StringComparer.Ordinal);
+        }
+
+        private Dictionary<string, T> ParseAcrossFiles<T>(
+            IEnumerable<string> filePaths,
+            string expectedType,
+            Func<string, RawEntry, T> create,
+            Action<T, T> merge) where T : class
+        {
+            var dict = new Dictionary<string, T>(StringComparer.Ordinal);
+            if (filePaths == null)
+                return dict;
+
+            foreach (var filePath in filePaths)
+            {
+                if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
+                    continue;
+
+                var raw = ParseRawEntries(filePath, expectedType);
+                foreach (var (name, entry) in raw)
+                {
+                    // Preserve first-file precedence so Shared overrides SharedDev duplicates.
+                    if (dict.ContainsKey(name))
+                        continue;
+
+                    dict[name] = create(name, entry);
+                }
+            }
+
+            ResolveInheritance(dict, merge);
+            return dict;
         }
 
         /// <summary>

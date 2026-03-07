@@ -61,73 +61,113 @@ namespace QDND.Data.Stats
         /// </param>
         public void LoadFromDirectory(string statsDirectory)
         {
-            if (!Directory.Exists(statsDirectory))
+            LoadFromDirectories(statsDirectory);
+        }
+
+        /// <summary>
+        /// Loads stat files from one or more source directories and resolves inheritance
+        /// across each merged category before registration.
+        /// </summary>
+        /// <param name="statsDirectories">Directories in priority order (first wins).</param>
+        public void LoadFromDirectories(params string[] statsDirectories)
+        {
+            if (statsDirectories == null || statsDirectories.Length == 0)
             {
-                _errors.Add($"Stats directory not found: {statsDirectory}");
+                _errors.Add("No stats directories provided");
                 return;
             }
 
+            var directories = statsDirectories
+                .Where(d => !string.IsNullOrWhiteSpace(d))
+                .ToArray();
+
+            if (directories.Length == 0)
+            {
+                _errors.Add("No stats directories provided");
+                return;
+            }
+
+            foreach (var dir in directories)
+            {
+                if (!Directory.Exists(dir))
+                    _errors.Add($"Stats directory not found: {dir}");
+            }
+
+            var existingDirectories = directories.Where(Directory.Exists).ToArray();
+            if (existingDirectories.Length == 0)
+                return;
+
             var parser = new BG3StatsParser();
 
-            // ── Characters ───────────────────────────────────
-            var charFile = Path.Combine(statsDirectory, "Character.txt");
-            if (File.Exists(charFile))
+            var charFiles = existingDirectories
+                .Select(d => Path.Combine(d, "Character.txt"))
+                .Where(File.Exists)
+                .ToArray();
+            if (charFiles.Length > 0)
             {
-                var chars = parser.ParseCharacters(charFile);
-                foreach (var (name, data) in chars)
+                var chars = parser.ParseCharacters(charFiles);
+                foreach (var (_, data) in chars)
                     RegisterCharacter(data);
-                Console.WriteLine($"[StatsRegistry] Loaded {chars.Count} characters from Character.txt");
+                Console.WriteLine($"[StatsRegistry] Loaded {chars.Count} characters from {charFiles.Length} file(s)");
             }
             else
             {
-                _warnings.Add($"Character.txt not found in {statsDirectory}");
+                _warnings.Add($"Character.txt not found in any provided stats directory ({string.Join(", ", existingDirectories)})");
             }
 
-            // ── Weapons ──────────────────────────────────────
-            var wpnFile = Path.Combine(statsDirectory, "Weapon.txt");
-            if (File.Exists(wpnFile))
+            var wpnFiles = existingDirectories
+                .Select(d => Path.Combine(d, "Weapon.txt"))
+                .Where(File.Exists)
+                .ToArray();
+            if (wpnFiles.Length > 0)
             {
-                var wpns = parser.ParseWeapons(wpnFile);
-                foreach (var (name, data) in wpns)
+                var wpns = parser.ParseWeapons(wpnFiles);
+                foreach (var (_, data) in wpns)
                     RegisterWeapon(data);
-                Console.WriteLine($"[StatsRegistry] Loaded {wpns.Count} weapons from Weapon.txt");
+                Console.WriteLine($"[StatsRegistry] Loaded {wpns.Count} weapons from {wpnFiles.Length} file(s)");
             }
             else
             {
-                _warnings.Add($"Weapon.txt not found in {statsDirectory}");
+                _warnings.Add($"Weapon.txt not found in any provided stats directory ({string.Join(", ", existingDirectories)})");
             }
 
-            // ── Armor ────────────────────────────────────────
-            var armFile = Path.Combine(statsDirectory, "Armor.txt");
-            if (File.Exists(armFile))
+            var armFiles = existingDirectories
+                .Select(d => Path.Combine(d, "Armor.txt"))
+                .Where(File.Exists)
+                .ToArray();
+            if (armFiles.Length > 0)
             {
-                var arms = parser.ParseArmors(armFile);
-                foreach (var (name, data) in arms)
+                var arms = parser.ParseArmors(armFiles);
+                foreach (var (_, data) in arms)
                     RegisterArmor(data);
-                Console.WriteLine($"[StatsRegistry] Loaded {arms.Count} armors from Armor.txt");
+                Console.WriteLine($"[StatsRegistry] Loaded {arms.Count} armors from {armFiles.Length} file(s)");
             }
             else
             {
-                _warnings.Add($"Armor.txt not found in {statsDirectory}");
+                _warnings.Add($"Armor.txt not found in any provided stats directory ({string.Join(", ", existingDirectories)})");
             }
 
-            // ── Objects ──────────────────────────────────────
-            var objFile = Path.Combine(statsDirectory, "Object.txt");
-            if (File.Exists(objFile))
+            var objFiles = existingDirectories
+                .Select(d => Path.Combine(d, "Object.txt"))
+                .Where(File.Exists)
+                .ToArray();
+            if (objFiles.Length > 0)
             {
-                var objs = parser.ParseObjects(objFile);
-                foreach (var (name, data) in objs)
+                var objs = parser.ParseObjects(objFiles);
+                foreach (var (_, data) in objs)
                     RegisterObject(data);
-                Console.WriteLine($"[StatsRegistry] Loaded {objs.Count} objects from Object.txt");
+                Console.WriteLine($"[StatsRegistry] Loaded {objs.Count} objects from {objFiles.Length} file(s)");
             }
             else
             {
-                _warnings.Add($"Object.txt not found in {statsDirectory}");
+                _warnings.Add($"Object.txt not found in any provided stats directory ({string.Join(", ", existingDirectories)})");
             }
 
-            // Propagate parser diagnostics
             _errors.AddRange(parser.Errors);
             _warnings.AddRange(parser.Warnings);
+
+            Console.WriteLine(
+                $"[StatsRegistry] Loaded from {existingDirectories.Length} directories: {CharacterCount} characters, {WeaponCount} weapons, {ArmorCount} armors, {ObjectCount} objects");
         }
 
         // =====================================================================
@@ -149,7 +189,10 @@ namespace QDND.Data.Stats
             }
 
             if (_characters.ContainsKey(character.Name) && !overwrite)
+            {
+                Console.WriteLine($"[StatsRegistry] Skipping duplicate character '{character.Name}' (keeping first-loaded entry)");
                 return false;
+            }
 
             _characters[character.Name] = character;
 
@@ -183,7 +226,10 @@ namespace QDND.Data.Stats
             }
 
             if (_weapons.ContainsKey(weapon.Name) && !overwrite)
+            {
+                Console.WriteLine($"[StatsRegistry] Skipping duplicate weapon '{weapon.Name}' (keeping first-loaded entry)");
                 return false;
+            }
 
             _weapons[weapon.Name] = weapon;
 
@@ -217,7 +263,10 @@ namespace QDND.Data.Stats
             }
 
             if (_armors.ContainsKey(armor.Name) && !overwrite)
+            {
+                Console.WriteLine($"[StatsRegistry] Skipping duplicate armor '{armor.Name}' (keeping first-loaded entry)");
                 return false;
+            }
 
             _armors[armor.Name] = armor;
 
@@ -263,7 +312,10 @@ namespace QDND.Data.Stats
             }
 
             if (_objects.ContainsKey(obj.Name) && !overwrite)
+            {
+                Console.WriteLine($"[StatsRegistry] Skipping duplicate object '{obj.Name}' (keeping first-loaded entry)");
                 return false;
+            }
 
             _objects[obj.Name] = obj;
             return true;

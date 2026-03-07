@@ -134,7 +134,6 @@ namespace QDND.Combat.Arena
         private DynamicScenarioMode _dynamicScenarioMode = DynamicScenarioMode.None;
         private string _dynamicActionTestId;
         private List<string> _dynamicActionBatchIds;
-        private string _verifyConfigPath;
         private bool _autoBattleVerboseAiLogs;
         private bool _autoBattleVerboseArenaLogs;
 
@@ -569,7 +568,6 @@ namespace QDND.Combat.Arena
             _dynamicActionTestId = parsed.ActionTestId;
             _dynamicTeamSize = parsed.TeamSize;
             _dynamicActionBatchIds = parsed.ActionBatchIds;
-            _verifyConfigPath = parsed.VerifyConfigPath;
 
             if (parsed.IsFullFidelity)
             {
@@ -1211,14 +1209,14 @@ namespace QDND.Combat.Arena
             _actionBarModel = new ActionBarModel();
             _actionBarService = new ActionBarService(
                 _combatContext, _actionRegistry, _actionBarModel,
-                _dataRegistry?.PassiveRegistry, _effectPipeline,
+                _passiveRegistry, _effectPipeline,
                 LogOnce);
 
             // SelectionService — owns selected-combatant/ability state and all Godot-free validation logic.
             _selectionService = new SelectionService(
                 _combatContext,
                 _effectPipeline,
-                _dataRegistry?.PassiveRegistry,
+                _passiveRegistry,
                 CanPlayerControl,
                 Log,
                 RefreshActionBarUsability,
@@ -1333,7 +1331,6 @@ namespace QDND.Combat.Arena
                 DynamicCharacterLevel = _dynamicCharacterLevel,
                 DynamicTeamSize = _dynamicTeamSize,
                 AutoBattleConfig = _autoBattleConfig,
-                VerifyConfigPath = _verifyConfigPath,
             };
             var bootVisuals = new ScenarioBootVisuals
             {

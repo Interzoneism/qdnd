@@ -96,10 +96,6 @@ namespace QDND.Data
 
             r.MetamagicService = new MetamagicService(r.RulesEngine);
             combatContext.RegisterService(r.MetamagicService);
-            foreach (var statusDef in r.DataRegistry.GetAllStatuses())
-            {
-                r.StatusManager.RegisterStatus(statusDef);
-            }
 
             r.ConcentrationSystem = new ConcentrationSystem(r.StatusManager, r.RulesEngine)
             {
@@ -143,8 +139,9 @@ namespace QDND.Data
 
             // Initialize BG3 Stats Registry (Characters, Weapons, Armor)
             r.StatsRegistry = new StatsRegistry();
-            string bg3StatsPath = Path.Combine(bg3DataPath, "Stats");
-            r.StatsRegistry.LoadFromDirectory(bg3StatsPath);
+            string sharedPath = Path.Combine(bg3DataPath, "Shared", "Public", "Shared", "Stats", "Generated", "Data");
+            string sharedDevPath = Path.Combine(bg3DataPath, "Shared", "Public", "SharedDev", "Stats", "Generated", "Data");
+            r.StatsRegistry.LoadFromDirectories(sharedPath, sharedDevPath);
             log($"Stats Registry: {r.StatsRegistry.CharacterCount} characters, {r.StatsRegistry.WeaponCount} weapons, {r.StatsRegistry.ArmorCount} armors");
             combatContext.RegisterService(r.StatsRegistry);
             scenarioLoader.SetStatsRegistry(r.StatsRegistry);
@@ -153,33 +150,33 @@ namespace QDND.Data
             // Initialize BG3 Status Registry with boost bridge
             r.BG3StatusRegistry = new StatusRegistry();
             r.BG3StatusIntegration = new QDND.Combat.Statuses.BG3StatusIntegration(r.StatusManager, r.BG3StatusRegistry);
-            string bg3StatusPath = Path.Combine(bg3DataPath, "Statuses");
-            int statusCount = r.BG3StatusIntegration.LoadBG3Statuses(bg3StatusPath);
-            log($"BG3 Status Registry: {statusCount} statuses loaded and registered with StatusManager");
+            int statusCount = r.BG3StatusIntegration.LoadBG3Statuses(sharedPath, sharedDevPath);
+            if (statusCount == 0)
+                logError("[CombatArena] FATAL: 0 BG3 statuses loaded - verify BG3_Data/Shared directory exists");
+            else
+                log($"BG3 Status Registry: {statusCount} statuses loaded and registered with StatusManager");
             combatContext.RegisterService(r.BG3StatusRegistry);
-
-            // Re-register JSON statuses that define aura behavior (AuraRadius > 0).
-            // The BG3 txt parser does not parse AuraRadius/AuraStatusId fields, so any JSON
-            // status with aura data would be silently overwritten by the BG3 txt version.
-            // Re-registering here ensures JSON aura definitions win.
-            foreach (var statusDef in r.DataRegistry.GetAllStatuses())
-            {
-                if (statusDef.AuraRadius > 0f)
-                    r.StatusManager.RegisterStatus(statusDef);
-            }
 
             // Initialize BG3 Passive Registry
             r.PassiveRegistry = new PassiveRegistry();
-            string passiveFile = Path.Combine(bg3StatsPath, "Passive.txt");
-            int passiveCount = r.PassiveRegistry.LoadPassives(passiveFile);
-            log($"Passive Registry: {passiveCount} passives loaded");
+            string sharedPassiveFile = Path.Combine(sharedPath, "Passive.txt");
+            string sharedDevPassiveFile = Path.Combine(sharedDevPath, "Passive.txt");
+            int passiveCount = r.PassiveRegistry.LoadPassives(sharedPassiveFile, sharedDevPassiveFile);
+            if (passiveCount == 0)
+                logError("[CombatArena] FATAL: 0 passives loaded - verify BG3_Data/Shared directory exists");
+            else
+                log($"Passive Registry: {passiveCount} passives loaded");
             combatContext.RegisterService(r.PassiveRegistry);
 
             // Initialize BG3 Interrupt Registry
             r.InterruptRegistry = new InterruptRegistry();
-            string interruptFile = Path.Combine(bg3StatsPath, "Interrupt.txt");
-            int interruptCount = r.InterruptRegistry.LoadInterrupts(interruptFile);
-            log($"Interrupt Registry: {interruptCount} interrupts loaded");
+            string sharedInterruptFile = Path.Combine(sharedPath, "Interrupt.txt");
+            string sharedDevInterruptFile = Path.Combine(sharedDevPath, "Interrupt.txt");
+            int interruptCount = r.InterruptRegistry.LoadInterrupts(sharedInterruptFile, sharedDevInterruptFile);
+            if (interruptCount == 0)
+                logError("[CombatArena] FATAL: 0 interrupts loaded - verify BG3_Data/Shared directory exists");
+            else
+                log($"Interrupt Registry: {interruptCount} interrupts loaded");
             combatContext.RegisterService(r.InterruptRegistry);
 
             // Wire FunctorExecutor for BG3 status/passive functor execution

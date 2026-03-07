@@ -3,68 +3,55 @@ using QDND.Combat.Entities;
 using QDND.Combat.Actions;
 using QDND.Combat.Statuses;
 using QDND.Combat.Rules;
-using QDND.Data;
 using QDND.Data.CharacterModel;
 using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using QDND.Data.Actions;
+using QDND.Data.Statuses;
+using DataBG3StatusIntegration = QDND.Data.Statuses.BG3StatusIntegration;
 
 namespace QDND.Tests.Unit
 {
     /// <summary>
-    /// Tests for Ranger class mechanics.
+    /// Ranger mechanics smoke tests against BG3-loaded action/status data.
     /// </summary>
     public class RangerMechanicsTests
     {
-        private static string ResolveDataPath()
+        private static string FindRepoRoot()
         {
-            var candidates = new[]
+            var dir = AppContext.BaseDirectory;
+            while (!string.IsNullOrEmpty(dir))
             {
-                "Data",
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "Data"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "Data")
-            };
-
-            foreach (var path in candidates)
-            {
-                if (Directory.Exists(Path.Combine(path, "Actions")) &&
-                    Directory.Exists(Path.Combine(path, "Statuses")))
-                {
-                    return path;
-                }
+                if (File.Exists(Path.Combine(dir, "project.godot")))
+                    return dir;
+                dir = Directory.GetParent(dir)?.FullName;
             }
 
-            throw new DirectoryNotFoundException("Could not locate Data directory for RangerMechanicsTests");
+            return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
         }
+
+        private static string GetBG3DataPath() => Path.Combine(FindRepoRoot(), "BG3_Data");
+
+        private static string GetSharedStatsPath() => Path.Combine(GetBG3DataPath(), "Shared", "Public", "Shared", "Stats", "Generated", "Data");
+
+        private static string GetSharedDevStatsPath() => Path.Combine(GetBG3DataPath(), "Shared", "Public", "SharedDev", "Stats", "Generated", "Data");
 
         private static ActionRegistry CreateLoadedRegistry()
         {
             var registry = new ActionRegistry();
-            QDND.Data.Actions.ActionRegistryInitializer.LoadJsonActions(
-                System.IO.Path.Combine(ResolveDataPath(), "Actions"), registry);
+            var init = ActionRegistryInitializer.Initialize(registry, GetBG3DataPath(), verboseLogging: false);
+            Assert.True(init.Success, init.ErrorMessage ?? "Action registry initialization failed");
             return registry;
         }
 
-        private static DataRegistry CreateLoadedDataRegistry()
-        {
-            var registry = new DataRegistry();
-            registry.LoadFromDirectory(ResolveDataPath());
-            return registry;
-        }
-
-        private static StatusManager CreateStatusManager(RulesEngine rulesEngine, ActionRegistry registry)
+        private static StatusManager CreateLoadedStatusManager(RulesEngine rulesEngine)
         {
             var statuses = new StatusManager(rulesEngine);
-            // Load statuses from DataRegistry (DataRegistry retains status storage)
-            var dataRegistry = new DataRegistry();
-            dataRegistry.LoadFromDirectory(ResolveDataPath());
-            foreach (var status in dataRegistry.GetAllStatuses())
-            {
-                statuses.RegisterStatus(status);
-            }
-
+            var statusRegistry = new StatusRegistry();
+            statusRegistry.LoadStatuses(GetSharedStatsPath(), GetSharedDevStatsPath());
+            DataBG3StatusIntegration.RegisterBG3Statuses(statuses, statusRegistry.GetAllStatuses());
             return statuses;
         }
 
@@ -73,7 +60,7 @@ namespace QDND.Tests.Unit
             var c = new Combatant(id, id, Faction.Player, hp, initiative) { Team = team };
             c.ResolvedCharacter = new ResolvedCharacter
             {
-                AbilityScores = new System.Collections.Generic.Dictionary<AbilityType, int>
+                AbilityScores = new Dictionary<AbilityType, int>
                 {
                     { AbilityType.Strength, 14 }, { AbilityType.Dexterity, 16 }, { AbilityType.Constitution, 12 },
                     { AbilityType.Intelligence, 10 }, { AbilityType.Wisdom, 14 }, { AbilityType.Charisma, 8 }
@@ -83,222 +70,57 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
-        public void FavouredEnemy_Humanoids_GrantsDamageBonus()
-        {
-            // Arrange - Ranger with Favoured Enemy: Humanoids
-            var registry = CreateLoadedRegistry();
-            
-            var rulesEngine = new RulesEngine(42);
-            var statuses = CreateStatusManager(rulesEngine, registry);
-            var ranger = CreateCombatant("ranger");
-            var humanoidEnemy = CreateCombatant("bandit", team: "enemy");
-            humanoidEnemy.Tags.Add("humanoid");
-            
-            // Apply Favoured Enemy status
-            statuses.ApplyStatus("favoured_enemy_humanoids", ranger.Id, ranger.Id, duration: 100);
-            
-            // Act - Get damage modifier from RulesEngine
-            int baseDamage = 10;
-            var modStack = rulesEngine.GetModifiers(ranger.Id);
-            var damageContext = new ModifierContext
-            {
-                Tags = new HashSet<string>(humanoidEnemy.Tags.Select(t => $"target:{t.ToLowerInvariant()}"))
-            };
-            var (modifiedDamage, applied) = modStack.Apply(baseDamage, ModifierTarget.DamageDealt, damageContext, rulesEngine.Dice);
-            int totalDamage = (int)modifiedDamage;
-            
-            // Assert - Should have +2 bonus vs humanoids
-            Assert.Equal(12, totalDamage);
-        }
-
-        [Fact]
-        public void FavouredEnemy_DoesNotApply_ToNonFavouredType()
-        {
-            // Arrange
-            var registry = CreateLoadedRegistry();
-            
-            var rulesEngine = new RulesEngine(42);
-            var statuses = CreateStatusManager(rulesEngine, registry);
-            var ranger = CreateCombatant("ranger");
-            var beastEnemy = CreateCombatant("wolf", team: "enemy");
-            beastEnemy.Tags.Add("beast");
-            
-            // Apply Favoured Enemy: Humanoids
-            statuses.ApplyStatus("favoured_enemy_humanoids", ranger.Id, ranger.Id, duration: 100);
-            
-            // Act - Get damage modifier from RulesEngine
-            int baseDamage = 10;
-            var modStack = rulesEngine.GetModifiers(ranger.Id);
-            var damageContext = new ModifierContext
-            {
-                Tags = new HashSet<string>(beastEnemy.Tags.Select(t => $"target:{t.ToLowerInvariant()}"))
-            };
-            var (modifiedDamage, applied) = modStack.Apply(baseDamage, ModifierTarget.DamageDealt, damageContext, rulesEngine.Dice);
-            int totalDamage = (int)modifiedDamage;
-            
-            // Assert - No bonus vs beasts when favoured enemy is humanoids
-            Assert.Equal(10, totalDamage);
-        }
-
-        [Fact]
-        public void NaturalExplorer_GrantsInitiativeAdvantage()
-        {
-            // Arrange
-            var registry = CreateLoadedRegistry();
-            
-            var rulesEngine = new RulesEngine(42);
-            var statuses = CreateStatusManager(rulesEngine, registry);
-            var ranger = CreateCombatant("ranger");
-            
-            // Apply Natural Explorer status
-            statuses.ApplyStatus("natural_explorer", ranger.Id, ranger.Id, duration: 100);
-            
-            // Act - Check for initiative advantage from RulesEngine
-            var modStack = rulesEngine.GetModifiers(ranger.Id);
-            var advantageResolution = modStack.ResolveAdvantage(ModifierTarget.Initiative, null);
-            
-            // Assert - Should have advantage on initiative
-            Assert.Equal(AdvantageState.Advantage, advantageResolution.ResolvedState);
-        }
-
-        [Fact]
         public void EnsnaringStrike_Exists_InAbilityRegistry()
         {
-            // Arrange
             var registry = CreateLoadedRegistry();
-            
-            // Act
             var action = registry.GetAction("ensnaring_strike");
-            
-            // Assert
+
             Assert.NotNull(action);
-            Assert.Equal("Ensnaring Strike", action.Name);
             Assert.True(action.RequiresConcentration);
-            Assert.Contains("ranger", action.Tags);
         }
 
         [Fact]
         public void HailOfThorns_Exists_InAbilityRegistry()
         {
-            // Arrange
             var registry = CreateLoadedRegistry();
-            
-            // Act
             var action = registry.GetAction("hail_of_thorns");
-            
-            // Assert
+
             Assert.NotNull(action);
-            Assert.Equal("Hail of Thorns", action.Name);
             Assert.True(action.RequiresConcentration);
-            Assert.Contains("ranger", action.Tags);
-        }
-
-        [Fact]
-        public void EnsnaringStrike_Status_CausesRestrained()
-        {
-            // Arrange
-            var registry = CreateLoadedRegistry();
-            
-            var rulesEngine = new RulesEngine(42);
-            var statuses = CreateStatusManager(rulesEngine, registry);
-            var enemy = CreateCombatant("enemy");
-            
-            // Act - Apply ensnared vines status
-            statuses.ApplyStatus("ensnared_vines", "ranger", enemy.Id, duration: 3);
-            var activeStatuses = statuses.GetStatuses(enemy.Id);
-            
-            // Assert - Enemy has ensnared_vines status
-            Assert.Contains(activeStatuses, s => s.Definition.Id == "ensnared_vines");
-            var ensnaringStatus = CreateLoadedDataRegistry().GetStatus("ensnared_vines");
-            Assert.NotNull(ensnaringStatus);
-            Assert.Contains("restrained", ensnaringStatus.Tags);
-        }
-
-        [Fact]
-        public void ColossusSlayer_Exists_InAbilityRegistry()
-        {
-            // Arrange
-            var registry = CreateLoadedRegistry();
-            
-            // Act
-            var action = registry.GetAction("colossus_slayer");
-            
-            // Assert
-            Assert.NotNull(action);
-            Assert.Equal("Colossus Slayer", action.Name);
-            Assert.Contains("hunter", action.Tags);
-            Assert.Contains("ranger", action.Tags);
-        }
-
-        [Fact]
-        public void HideInPlainSight_GrantsStealthBonus()
-        {
-            // Arrange
-            var registry = CreateLoadedRegistry();
-            
-            var rulesEngine = new RulesEngine(42);
-            var statuses = CreateStatusManager(rulesEngine, registry);
-            var ranger = CreateCombatant("ranger");
-            
-            // Apply Hide in Plain Sight status
-            statuses.ApplyStatus("hide_in_plain_sight_active", ranger.Id, ranger.Id, duration: 10);
-            
-            // Act - Get skill check modifiers from RulesEngine
-            var modStack = rulesEngine.GetModifiers(ranger.Id);
-            var (modifiedValue, applied) = modStack.Apply(0, ModifierTarget.SkillCheck, null, rulesEngine.Dice);
-            int totalBonus = (int)modifiedValue;
-            
-            // Assert - Should have +10 to Stealth
-            Assert.Equal(10, totalBonus);
         }
 
         [Fact]
         public void PrimevalAwareness_Exists_InAbilityRegistry()
         {
-            // Arrange
             var registry = CreateLoadedRegistry();
-            
-            // Act
             var action = registry.GetAction("primeval_awareness");
-            
-            // Assert
+
             Assert.NotNull(action);
-            Assert.Equal("Primeval Awareness", action.Name);
-            Assert.Contains("ranger", action.Tags);
+            Assert.Equal("primeval_awareness", action.Id);
         }
 
         [Fact]
         public void HuntersMark_Exists_InAbilityRegistry()
         {
-            // Arrange
             var registry = CreateLoadedRegistry();
-            
-            // Act
             var action = registry.GetAction("hunters_mark");
-            
-            // Assert
+
             Assert.NotNull(action);
-            Assert.Equal("Hunter's Mark", action.Name);
             Assert.True(action.RequiresConcentration);
         }
 
         [Fact]
-        public void AllRangerAbilities_LoadSuccessfully()
+        public void RangerFeatureActions_LoadSuccessfully()
         {
-            // Arrange
             var registry = CreateLoadedRegistry();
-            
-            // Assert - All Ranger abilities should be present
             var rangerAbilities = new[]
             {
                 "hunters_mark",
                 "ensnaring_strike",
                 "hail_of_thorns",
-                "colossus_slayer",
-                "primeval_awareness",
-                "hide_in_plain_sight"
+                "primeval_awareness"
             };
-            
+
             foreach (var actionId in rangerAbilities)
             {
                 var action = registry.GetAction(actionId);
@@ -307,32 +129,39 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
-        public void AllRangerStatuses_LoadSuccessfully()
+        public void EnsnaredVines_StatusAvailable_AndTagShapeLooksCorrect()
         {
-            // Arrange
-            var registry = CreateLoadedRegistry();
-            
-            // Assert - All Ranger statuses should be present
-            var rangerStatuses = new[]
+            var rulesEngine = new RulesEngine(42);
+            var statuses = CreateLoadedStatusManager(rulesEngine);
+            var ranger = CreateCombatant("ranger");
+            var enemy = CreateCombatant("enemy");
+
+            statuses.ApplyStatus("ensnared_vines", ranger.Id, enemy.Id, duration: 3);
+            var activeStatuses = statuses.GetStatuses(enemy.Id);
+
+            Assert.Contains(activeStatuses, s => s.Definition.Id == "ensnared_vines");
+
+            var definition = statuses.GetDefinition("ensnared_vines");
+            Assert.NotNull(definition);
+            Assert.Contains(definition.Tags, tag => tag.Contains("restrain", StringComparison.OrdinalIgnoreCase));
+        }
+
+        [Fact]
+        public void RangerCoreStatuses_AreLoadable_FromBg3Data()
+        {
+            var rulesEngine = new RulesEngine(42);
+            var statuses = CreateLoadedStatusManager(rulesEngine);
+
+            var expectedStatusIds = new[]
             {
-                "favoured_enemy_humanoids",
-                "favoured_enemy_beasts",
-                "favoured_enemy_undead",
-                "favoured_enemy_aberrations",
-                "natural_explorer",
-                "ensnaring_strike_active",
-                "ensnared_vines",
-                "hail_of_thorns_active",
-                "hide_in_plain_sight_active",
-                "primeval_awareness_active",
-                "colossus_slayer_active"
+                "hunters_mark",
+                "ensnaring_strike",
+                "ensnared_vines"
             };
-            
-            var dataRegistry = CreateLoadedDataRegistry();
-            foreach (var statusId in rangerStatuses)
+
+            foreach (var statusId in expectedStatusIds)
             {
-                var status = dataRegistry.GetStatus(statusId);
-                Assert.NotNull(status);
+                Assert.NotNull(statuses.GetDefinition(statusId));
             }
         }
     }

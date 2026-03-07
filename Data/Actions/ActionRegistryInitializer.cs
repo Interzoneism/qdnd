@@ -1,14 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using QDND.Combat.Actions;
 using QDND.Data;
 using QDND.Data.Actions;
-using QDND.Data.Spells;
 
 namespace QDND.Data.Actions
 {
@@ -51,18 +46,17 @@ namespace QDND.Data.Actions
 
                 // Load all BG3 spells
                 if (verboseLogging)
-                    Console.WriteLine($"[ActionRegistryInitializer] Loading spells from: {bg3DataPath}/Spells");
+                    Console.WriteLine($"[ActionRegistryInitializer] Loading spells from: {bg3DataPath}/Shared/Public/Shared/Stats/Generated/Data and SharedDev");
 
                 int loaded = loader.LoadAllSpells(bg3DataPath, registry);
+                Console.WriteLine($"[ActionRegistryInitializer] BG3 data is the sole source of truth — no JSON supplements loaded");
 
-                // Load JSON actions from Data/Actions/*.json (snake_case IDs).
-                // Register with overwrite=false so BG3 data takes precedence.
-                string dataActionsPath = ResolveDataActionsPath(bg3DataPath);
-                int jsonLoaded = LoadJsonActions(dataActionsPath, registry);
-                loaded += jsonLoaded;
+                // Register snake_case aliases for all BG3 actions so that legacy IDs
+                // like "pommel_strike", "fireball", "shove" continue to resolve.
+                RegisterAliases(registry);
 
-                if (verboseLogging && jsonLoaded > 0)
-                    Console.WriteLine($"[ActionRegistryInitializer] JSON actions loaded: {jsonLoaded} from {dataActionsPath}");
+                // Register consumable item actions that have no BG3 equivalent.
+                RegisterCustomActions(registry);
 
                 stopwatch.Stop();
 
@@ -124,6 +118,54 @@ namespace QDND.Data.Actions
         }
 
         /// <summary>
+        /// Register snake_case aliases so that both legacy IDs (e.g. "fireball") and
+        /// BG3-format IDs (e.g. "Projectile_Fireball") resolve to the same action.
+        /// </summary>
+        private static void RegisterAliases(ActionRegistry registry)
+        {
+            // 1. Explicit remaps from ActionIdResolver (BG3Id → snakeCaseId).
+            //    Register the snake_case form as an alias pointing to the canonical BG3 ID.
+            foreach (var kvp in ActionIdResolver.ExplicitRemaps)
+            {
+                // kvp.Key   = BG3 ID  (e.g. "Target_Shove")
+                // kvp.Value = alias   (e.g. "shove")
+                registry.RegisterAlias(kvp.Value, kvp.Key);
+            }
+
+            // 2. Auto-generate snake_case aliases for every registered BG3 action that
+            //    wasn't already covered by the explicit remaps above.
+            //    Strip the BG3 prefix then convert to snake_case.
+            foreach (var action in registry.GetAllActions())
+            {
+                var stripped = ActionIdResolver.StripKnownPrefix(action.Id);
+                if (string.IsNullOrEmpty(stripped) || stripped == action.Id)
+                    continue; // ID had no recognized prefix — skip
+
+                var snakeAlias = ActionIdResolver.ToSnakeCase(stripped);
+                if (!string.IsNullOrEmpty(snakeAlias))
+                    registry.RegisterAlias(snakeAlias, action.Id); // TryAdd — first registration wins
+            }
+
+            // 3. Special cases where the auto-generated alias doesn't match conventions.
+            registry.RegisterAlias("primeval_awareness", "Shout_PrimevalAwareness_SenseCreatures");
+        }
+
+        /// <summary>
+        /// Register actions that have no BG3 equivalent (consumables, custom items, etc.).
+        /// </summary>
+        private static void RegisterCustomActions(ActionRegistry registry)
+        {
+            registry.RegisterAction(new ActionDefinition
+            {
+                Id = "use_potion_healing",
+                Name = "Healing Potion",
+                TargetType = TargetType.SingleUnit,
+                TargetFilter = TargetFilter.Self | TargetFilter.Allies,
+                Cost = new ActionCost { UsesAction = true },
+            }, overwrite: false);
+        }
+
+        /// <summary>
         /// Initialize with lazy loading (load on demand).
         /// Creates the registry but doesn't populate it yet.
         /// </summary>
@@ -142,72 +184,6 @@ namespace QDND.Data.Actions
             var registry = new ActionRegistry();
             Initialize(registry, "BG3_Data", verboseLogging: false);
             return registry;
-        }
-
-
-
-        /// <summary>
-        /// Load all JSON action packs from a Data/Actions directory into the registry.
-        /// Actions are registered with overwrite=false so existing BG3 entries are preserved.
-        /// </summary>
-        /// <param name="dataActionsPath">Absolute path to the Data/Actions directory.</param>
-        /// <param name="registry">Registry to populate.</param>
-        /// <returns>Number of actions successfully registered.</returns>
-        public static int LoadJsonActions(string dataActionsPath, ActionRegistry registry)
-        {
-            if (string.IsNullOrEmpty(dataActionsPath) || !Directory.Exists(dataActionsPath))
-                return 0;
-
-            int count = 0;
-            var jsonOptions = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                Converters = { new JsonStringEnumConverter() }
-            };
-
-            foreach (var file in Directory.GetFiles(dataActionsPath, "*.json")
-                .OrderBy(p => p, StringComparer.OrdinalIgnoreCase))
-            {
-                try
-                {
-                    string json = File.ReadAllText(file);
-                    var pack = JsonSerializer.Deserialize<ActionPack>(json, jsonOptions);
-                    if (pack?.Actions == null) continue;
-
-                    foreach (var action in pack.Actions)
-                    {
-                        if (action != null && registry.RegisterAction(action, overwrite: false))
-                            count++;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"[ActionRegistryInitializer] Failed to load {file}: {ex.Message}");
-                }
-            }
-
-            return count;
-        }
-
-        /// <summary>
-        /// Derive the Data/Actions directory path from the BG3_Data path.
-        /// </summary>
-        private static string ResolveDataActionsPath(string bg3DataPath)
-        {
-            string path = bg3DataPath ?? "BG3_Data";
-            if (path.StartsWith("res://", StringComparison.Ordinal))
-                path = path.Substring("res://".Length);
-
-            try
-            {
-                string projectRoot = Directory.GetParent(Path.GetFullPath(path))?.FullName
-                    ?? Directory.GetCurrentDirectory();
-                return Path.Combine(projectRoot, "Data", "Actions");
-            }
-            catch
-            {
-                return Path.Combine(Directory.GetCurrentDirectory(), "Data", "Actions");
-            }
         }
     }
 

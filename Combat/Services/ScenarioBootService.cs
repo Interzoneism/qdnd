@@ -14,7 +14,6 @@ using QDND.Combat.Statuses;
 using QDND.Data;
 using QDND.Data.CharacterModel;
 using QDND.Data.Passives;
-using QDND.Data.Validation;
 using QDND.Tools.AutoBattler;
 
 namespace QDND.Combat.Services
@@ -34,7 +33,6 @@ namespace QDND.Combat.Services
         public int DynamicCharacterLevel;
         public int DynamicTeamSize;
         public AutoBattleConfig AutoBattleConfig;
-        public string VerifyConfigPath;
     }
 
     /// <summary>
@@ -68,8 +66,7 @@ namespace QDND.Combat.Services
             ActionTest,
             ShortGameplay,
             TeamBattle,
-            ActionBatch,
-            SpellVerify
+            ActionBatch
         }
 
         // ─── Dependencies ────────────────────────────────────────────────────────
@@ -95,7 +92,6 @@ namespace QDND.Combat.Services
         private readonly List<string> _dynamicActionBatchIds;
         private readonly int _dynamicCharacterLevel;
         private readonly int _dynamicTeamSize;
-        private readonly string _verifyConfigPath;
 
         // ─── Visual-spawning refs ────────────────────────────────────────────────
 
@@ -153,7 +149,6 @@ namespace QDND.Combat.Services
             _dynamicActionBatchIds = config.DynamicActionBatchIds;
             _dynamicCharacterLevel = config.DynamicCharacterLevel;
             _dynamicTeamSize = config.DynamicTeamSize;
-            _verifyConfigPath = config.VerifyConfigPath;
 
             _arena = visuals.Arena;
             _combatantsContainer = visuals.CombatantsContainer;
@@ -218,7 +213,6 @@ namespace QDND.Combat.Services
             {
                 DynamicScenarioMode.ActionTest => BuildActionTestScenario(scenarioGenerator),
                 DynamicScenarioMode.ActionBatch => BuildActionBatchScenario(scenarioGenerator),
-                DynamicScenarioMode.SpellVerify => BuildSpellVerifyScenario(scenarioGenerator),
                 DynamicScenarioMode.ShortGameplay => scenarioGenerator.GenerateShortGameplayScenario(_dynamicCharacterLevel),
                 DynamicScenarioMode.TeamBattle => scenarioGenerator.GenerateRandomScenario(_dynamicTeamSize, _dynamicTeamSize, _dynamicCharacterLevel),
                 _ => throw new InvalidOperationException("Dynamic scenario mode was not set.")
@@ -229,8 +223,7 @@ namespace QDND.Combat.Services
             // Activate tag-based test policy for action-testing modes so that
             // ability_test_actor-tagged combatants bypass requirement/resource checks.
             bool isTestMode = _dynamicScenarioMode == DynamicScenarioMode.ActionTest
-                           || _dynamicScenarioMode == DynamicScenarioMode.ActionBatch
-                           || _dynamicScenarioMode == DynamicScenarioMode.SpellVerify;
+                           || _dynamicScenarioMode == DynamicScenarioMode.ActionBatch;
             if (isTestMode)
             {
                 var testPolicy = new TagBasedAbilityTestPolicy();
@@ -283,41 +276,6 @@ namespace QDND.Combat.Services
 
             var actionRegistry = _combatContext.GetService<ActionRegistry>();
             return scenarioGenerator.GenerateMultiActionTestScenario(_dynamicActionBatchIds, _dynamicCharacterLevel, actionRegistry);
-        }
-
-        private ScenarioDefinition BuildSpellVerifyScenario(ScenarioGenerator scenarioGenerator)
-        {
-            if (string.IsNullOrWhiteSpace(_dynamicActionTestId))
-                throw new InvalidOperationException("Spell verify mode requires --ff-spell-verify <action_id>.");
-
-            if (!IsKnownAbilityId(_dynamicActionTestId))
-                throw new InvalidOperationException(
-                    $"Action '{_dynamicActionTestId}' was not found in loaded actions.");
-
-            var actionRegistry = _combatContext.GetService<ActionRegistry>();
-            SpellVerificationSetup setup = null;
-
-            // Try to load verification config if provided
-            string configPath = _verifyConfigPath;
-            if (!string.IsNullOrWhiteSpace(configPath) && System.IO.File.Exists(configPath))
-            {
-                try
-                {
-                    string json = System.IO.File.ReadAllText(configPath);
-                    setup = System.Text.Json.JsonSerializer.Deserialize<SpellVerificationSetup>(json,
-                        new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                }
-                catch (Exception ex)
-                {
-                    GD.PushWarning($"[ScenarioBootService] Failed to load verify config: {ex.Message}");
-                }
-            }
-
-            // Fall back to default setup
-            setup ??= new SpellVerificationSetup { ActionId = _dynamicActionTestId };
-            setup.ActionId = _dynamicActionTestId; // Ensure CLI action ID takes precedence
-
-            return scenarioGenerator.GenerateSpellVerificationScenario(setup, actionRegistry);
         }
 
         /// <summary>

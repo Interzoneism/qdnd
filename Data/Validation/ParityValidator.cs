@@ -107,11 +107,12 @@ namespace QDND.Data.Validation
             StatusRegistry statusRegistry = null;
             try
             {
-                string statusDir = Path.Combine(bg3DataDirectory, "Statuses");
+                string sharedDir = Path.Combine(bg3DataDirectory, "Shared", "Public", "Shared", "Stats", "Generated", "Data");
+                string sharedDevDir = Path.Combine(bg3DataDirectory, "Shared", "Public", "SharedDev", "Stats", "Generated", "Data");
                 statusRegistry = new StatusRegistry();
-                if (Directory.Exists(statusDir))
+                if (Directory.Exists(sharedDir) || Directory.Exists(sharedDevDir))
                 {
-                    statusRegistry.LoadStatuses(statusDir);
+                    statusRegistry.LoadStatuses(sharedDir, sharedDevDir);
                 }
 
                 result.TotalChecks++;
@@ -141,11 +142,12 @@ namespace QDND.Data.Validation
             PassiveRegistry passiveRegistry = null;
             try
             {
-                string passiveFile = Path.Combine(bg3DataDirectory, "Stats", "Passive.txt");
+                string sharedPassiveFile = Path.Combine(bg3DataDirectory, "Shared", "Public", "Shared", "Stats", "Generated", "Data", "Passive.txt");
+                string sharedDevPassiveFile = Path.Combine(bg3DataDirectory, "Shared", "Public", "SharedDev", "Stats", "Generated", "Data", "Passive.txt");
                 passiveRegistry = new PassiveRegistry();
-                if (File.Exists(passiveFile))
+                if (File.Exists(sharedPassiveFile) || File.Exists(sharedDevPassiveFile))
                 {
-                    passiveRegistry.LoadPassives(passiveFile);
+                    passiveRegistry.LoadPassives(sharedPassiveFile, sharedDevPassiveFile);
                 }
 
                 result.TotalChecks++;
@@ -168,11 +170,12 @@ namespace QDND.Data.Validation
             InterruptRegistry interruptRegistry = null;
             try
             {
-                string interruptFile = Path.Combine(bg3DataDirectory, "Stats", "Interrupt.txt");
+                string sharedInterruptFile = Path.Combine(bg3DataDirectory, "Shared", "Public", "Shared", "Stats", "Generated", "Data", "Interrupt.txt");
+                string sharedDevInterruptFile = Path.Combine(bg3DataDirectory, "Shared", "Public", "SharedDev", "Stats", "Generated", "Data", "Interrupt.txt");
                 interruptRegistry = new InterruptRegistry();
-                if (File.Exists(interruptFile))
+                if (File.Exists(sharedInterruptFile) || File.Exists(sharedDevInterruptFile))
                 {
-                    interruptRegistry.LoadInterrupts(interruptFile);
+                    interruptRegistry.LoadInterrupts(sharedInterruptFile, sharedDevInterruptFile);
                 }
 
                 result.TotalChecks++;
@@ -239,7 +242,7 @@ namespace QDND.Data.Validation
             ValidateStatusCrossReferences(statusRegistry, result);
 
             // Action effect → status cross-references
-            ValidateActionEffectStatuses(actionRegistry, dataRegistry, statusRegistry, result);
+            ValidateActionEffectStatuses(actionRegistry, statusRegistry, result);
 
             return result;
         }
@@ -428,7 +431,6 @@ namespace QDND.Data.Validation
 
         private static void ValidateActionEffectStatuses(
             ActionRegistry actionRegistry,
-            DataRegistry dataRegistry,
             StatusRegistry statusRegistry,
             ParityValidationResult result)
         {
@@ -444,15 +446,7 @@ namespace QDND.Data.Validation
                     if (effect.Type == "apply_status" && !string.IsNullOrEmpty(effect.StatusId))
                     {
                         result.TotalChecks++;
-                        bool found = false;
-
-                        // Check legacy DataRegistry statuses
-                        if (dataRegistry.GetStatus(effect.StatusId) != null)
-                            found = true;
-
-                        // Check BG3 StatusRegistry
-                        if (!found && statusRegistry != null && statusRegistry.HasStatus(effect.StatusId))
-                            found = true;
+                        bool found = statusRegistry != null && statusRegistry.HasStatus(effect.StatusId);
 
                         if (!found)
                         {

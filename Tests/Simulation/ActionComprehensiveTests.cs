@@ -11,6 +11,7 @@ using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
 using QDND.Combat.Actions;
 using QDND.Data;
+using QDND.Data.Actions;
 using QDND.Tests.Helpers;
 
 namespace QDND.Tests.Simulation
@@ -47,14 +48,14 @@ namespace QDND.Tests.Simulation
                 Context.RegisterService(Effects);
             }
 
-            public void LoadAbilitiesFromDirectory(string directory)
+            public void LoadAbilitiesFromBg3Data()
             {
-                if (!Directory.Exists(directory))
+                var bg3DataPath = Path.Combine(FindRepoRoot(), "BG3_Data");
+                var init = ActionRegistryInitializer.Initialize(Registry, bg3DataPath, verboseLogging: false);
+                if (!init.Success)
                 {
-                    throw new DirectoryNotFoundException($"Abilities directory not found: {directory}");
+                    throw new InvalidOperationException($"Action registry initialization failed: {init.ErrorMessage}");
                 }
-
-                QDND.Data.Actions.ActionRegistryInitializer.LoadJsonActions(directory, Registry);
 
                 // Register all loaded actions with the effect pipeline
                 foreach (var action in Registry.GetAllActions())
@@ -78,17 +79,7 @@ namespace QDND.Tests.Simulation
         {
             // Arrange
             var setup = new AbilityTestSetup(seed: 12345);
-            var abilitiesDir = "Data/Actions";
-
-            try
-            {
-                setup.LoadAbilitiesFromDirectory(abilitiesDir);
-            }
-            catch (DirectoryNotFoundException)
-            {
-                // Skip test if abilities directory doesn't exist
-                return;
-            }
+            setup.LoadAbilitiesFromBg3Data();
 
             var actor = CreateCombatant("actor", "Actor", Faction.Player, 100);
             var target = CreateCombatant("target", "Target", Faction.Hostile, 100);
@@ -512,6 +503,22 @@ namespace QDND.Tests.Simulation
             // Assert
             Assert.True(result.Success || !string.IsNullOrEmpty(result.ErrorMessage));
             Assert.Equal(actionId, result.ActionId);
+        }
+
+        private static string FindRepoRoot()
+        {
+            var dir = AppContext.BaseDirectory;
+            while (!string.IsNullOrEmpty(dir))
+            {
+                if (File.Exists(Path.Combine(dir, "project.godot")))
+                {
+                    return dir;
+                }
+
+                dir = Directory.GetParent(dir)?.FullName;
+            }
+
+            return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
         }
     }
 }

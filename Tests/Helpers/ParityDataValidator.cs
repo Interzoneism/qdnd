@@ -8,6 +8,8 @@ using QDND.Combat.Actions;
 using QDND.Data;
 using QDND.Data.Actions;
 using QDND.Data.CharacterModel;
+using QDND.Data.Statuses;
+using DataBG3StatusIntegration = QDND.Data.Statuses.BG3StatusIntegration;
 
 namespace QDND.Tests.Helpers
 {
@@ -55,8 +57,8 @@ namespace QDND.Tests.Helpers
                 lines.Add("");
                 lines.Add("=== Action Coverage Inventory ===");
                 lines.Add($"Total actions granted across scenarios: {CoverageInventory.TotalGrantedActions}");
-                lines.Add($"Actions available in Data/Actions: {CoverageInventory.ActionsInDataRegistry}");
-                lines.Add($"Granted actions present in Data/Actions: {CoverageInventory.GrantedActionsPresentInDataRegistry}");
+                lines.Add($"Actions available in ActionRegistry: {CoverageInventory.ActionsInDataRegistry}");
+                lines.Add($"Granted actions present in ActionRegistry: {CoverageInventory.GrantedActionsPresentInDataRegistry}");
                 lines.Add($"Granted actions BG3-only: {CoverageInventory.GrantedActionsBg3Only}");
                 lines.Add($"Granted actions missing from both: {CoverageInventory.GrantedActionsMissingFromBoth}");
                 lines.Add($"Forbidden summon actions: {CoverageInventory.ForbiddenSummonActions}");
@@ -425,19 +427,31 @@ namespace QDND.Tests.Helpers
 
         private List<ActionEntry> LoadActionEntries(ParityValidationReport report)
         {
-            var dir = Path.Combine(_dataRoot, "Actions");
             var entries = new List<ActionEntry>();
+            var bg3DataPath = Path.Combine(_repoRoot, "BG3_Data");
 
-            foreach (var file in GetJsonFiles(dir))
+            if (!Directory.Exists(bg3DataPath))
             {
-                var pack = DeserializeFromFile<ActionPack>(file, report, "action_pack");
-                if (pack?.Actions == null)
-                {
-                    report.AddError($"Schema mismatch in {file}: missing top-level actions array.");
-                    continue;
-                }
+                report.AddError($"Missing BG3_Data directory: {bg3DataPath}");
+                return entries;
+            }
 
-                entries.AddRange(pack.Actions.Select(def => new ActionEntry(file, def)));
+            var registry = new ActionRegistry();
+            var init = ActionRegistryInitializer.Initialize(registry, bg3DataPath, verboseLogging: false);
+            if (!init.Success)
+            {
+                report.AddError($"Failed to initialize ActionRegistry from BG3 data: {init.ErrorMessage}");
+                return entries;
+            }
+
+            if (init.ErrorCount > 0)
+            {
+                report.AddWarning($"ActionRegistry initialization reported {init.ErrorCount} parser errors.");
+            }
+
+            foreach (var action in registry.GetAllActions())
+            {
+                entries.Add(new ActionEntry("BG3_Data/Shared/Public/*/Stats/Generated/Data/Spell_*.txt", action));
             }
 
             return entries;
@@ -445,19 +459,34 @@ namespace QDND.Tests.Helpers
 
         private List<StatusEntry> LoadStatusEntries(ParityValidationReport report)
         {
-            var dir = Path.Combine(_dataRoot, "Statuses");
             var entries = new List<StatusEntry>();
+            var sharedDir = Path.Combine(_repoRoot, "BG3_Data", "Shared", "Public", "Shared", "Stats", "Generated", "Data");
+            var sharedDevDir = Path.Combine(_repoRoot, "BG3_Data", "Shared", "Public", "SharedDev", "Stats", "Generated", "Data");
 
-            foreach (var file in GetJsonFiles(dir))
+            var statusRegistry = new StatusRegistry();
+            var loaded = statusRegistry.LoadStatuses(sharedDir, sharedDevDir);
+            if (loaded <= 0)
             {
-                var pack = DeserializeFromFile<StatusPack>(file, report, "status_pack");
-                if (pack?.Statuses == null)
-                {
-                    report.AddError($"Schema mismatch in {file}: missing top-level statuses array.");
-                    continue;
-                }
+                report.AddError("Failed to load BG3 statuses for parity validation.");
+                return entries;
+            }
 
-                entries.AddRange(pack.Statuses.Select(def => new StatusEntry(file, def)));
+            if (statusRegistry.Errors.Count > 0)
+            {
+                report.AddWarning($"StatusRegistry loading reported {statusRegistry.Errors.Count} parser errors.");
+            }
+
+            foreach (var bg3Status in statusRegistry.GetAllStatuses())
+            {
+                try
+                {
+                    var definition = DataBG3StatusIntegration.ConvertToStatusDefinition(bg3Status);
+                    entries.Add(new StatusEntry("BG3_Data/Shared/Public/*/Stats/Generated/Data/Status_*.txt", definition));
+                }
+                catch (Exception ex)
+                {
+                    report.AddWarning($"Failed to convert BG3 status '{bg3Status.StatusId}': {ex.Message}");
+                }
             }
 
             return entries;
@@ -1065,22 +1094,22 @@ namespace QDND.Tests.Helpers
         public int TotalGrantedActions { get; set; }
 
         /// <summary>
-        /// Number of actions available in Data/Actions registry.
+        /// Number of actions available in the initialized ActionRegistry.
         /// </summary>
         public int ActionsInDataRegistry { get; set; }
 
         /// <summary>
-        /// Number of granted actions that resolve to Data/Actions.
+        /// Number of granted actions that resolve directly in ActionRegistry.
         /// </summary>
         public int GrantedActionsPresentInDataRegistry { get; set; }
 
         /// <summary>
-        /// Number of granted actions that are BG3-only (not in Data/Actions).
+        /// Number of granted actions that are only found via BG3 fallback resolution.
         /// </summary>
         public int GrantedActionsBg3Only { get; set; }
 
         /// <summary>
-        /// Number of granted actions missing from both Data/Actions and BG3 registry.
+        /// Number of granted actions missing from both primary and fallback registries.
         /// </summary>
         public int GrantedActionsMissingFromBoth { get; set; }
 
@@ -1105,7 +1134,7 @@ namespace QDND.Tests.Helpers
         public List<string> Bg3OnlyActionIds { get; set; } = new();
 
         /// <summary>
-        /// IDs of granted actions missing from both Data/Actions and BG3 registry.
+        /// IDs of granted actions missing from both primary and fallback registries.
         /// </summary>
         public List<string> MissingFromBothActionIds { get; set; } = new();
 

@@ -47,7 +47,7 @@ namespace QDND.Data.Actions
         }
 
         /// <summary>
-        /// Load all spells from the BG3_Data/Spells directory.
+        /// Load all spells from raw BG3 Shared/SharedDev stats data directories.
         /// </summary>
         /// <param name="bg3DataPath">Path to BG3_Data directory (e.g., "res://BG3_Data" or absolute path).</param>
         /// <param name="registry">The action registry to populate.</param>
@@ -61,11 +61,12 @@ namespace QDND.Data.Actions
             }
 
             // Convert Godot res:// path to absolute if needed
-            string spellsPath = ConvertToAbsolutePath(bg3DataPath, "Spells");
+            string spellsPath = ConvertToAbsolutePath(bg3DataPath, "Shared/Public/Shared/Stats/Generated/Data");
 
             if (!Directory.Exists(spellsPath))
             {
-                _errors.Add($"Spells directory not found: {spellsPath}");
+                _errors.Add($"Shared stats data directory not found: {spellsPath}");
+                Console.Error.WriteLine($"[ActionDataLoader] Shared stats data directory not found: {spellsPath}");
                 return 0;
             }
 
@@ -74,6 +75,19 @@ namespace QDND.Data.Actions
 
             // Parse all Spell_*.txt files
             var spells = _parser.ParseDirectory(spellsPath, "Spell_*.txt");
+
+            // Parse SharedDev directory for additional BG3 spells (class features, high-level spells, etc.)
+            string sharedDevPath = ConvertToAbsolutePath(bg3DataPath, "Shared/Public/SharedDev/Stats/Generated/Data");
+            if (Directory.Exists(sharedDevPath))
+            {
+                var sharedDevSpells = _parser.ParseDirectory(sharedDevPath, "Spell_*.txt");
+                spells.AddRange(sharedDevSpells);
+                Console.WriteLine($"[ActionDataLoader] Added {sharedDevSpells.Count} SharedDev spells");
+            }
+            else
+            {
+                _warnings.Add($"SharedDev spells directory not found: {sharedDevPath}");
+            }
 
             // Resolve inheritance
             _parser.ResolveInheritance();

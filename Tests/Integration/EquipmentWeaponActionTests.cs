@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Xunit;
 using Xunit.Abstractions;
+using QDND.Combat.Actions;
+using QDND.Data.Actions;
 using QDND.Data.CharacterModel;
 
 namespace QDND.Tests.Integration
@@ -22,33 +22,41 @@ namespace QDND.Tests.Integration
     {
         private readonly ITestOutputHelper _output;
         private readonly CharacterDataRegistry _registry;
+        private readonly ActionRegistry _actionRegistry;
+        private readonly string _repoRoot;
         private readonly string _dataPath;
 
         public EquipmentWeaponActionTests(ITestOutputHelper output)
         {
             _output = output;
-            _dataPath = ResolveDataPath();
+            _repoRoot = ResolveRepoRoot();
+            _dataPath = Path.Combine(_repoRoot, "Data");
             _registry = new CharacterDataRegistry();
             _registry.LoadFromDirectory(_dataPath);
+
+            _actionRegistry = new ActionRegistry();
+            var init = ActionRegistryInitializer.Initialize(
+                _actionRegistry,
+                Path.Combine(_repoRoot, "BG3_Data"),
+                verboseLogging: false);
+            if (!init.Success)
+            {
+                throw new InvalidOperationException(init.ErrorMessage ?? "Failed to initialize action registry");
+            }
         }
 
-        private static string ResolveDataPath()
+        private static string ResolveRepoRoot()
         {
-            var candidates = new[]
+            var dir = AppContext.BaseDirectory;
+            while (!string.IsNullOrEmpty(dir))
             {
-                "Data",
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "Data"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "Data")
-            };
+                if (File.Exists(Path.Combine(dir, "project.godot")))
+                    return dir;
 
-            foreach (var path in candidates)
-            {
-                if (Directory.Exists(Path.Combine(path, "Classes")))
-                    return path;
+                dir = Directory.GetParent(dir)?.FullName;
             }
 
-            throw new DirectoryNotFoundException("Could not locate Data directory for EquipmentWeaponActionTests");
+            return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
         }
 
         // =================================================================
@@ -155,7 +163,6 @@ namespace QDND.Tests.Integration
         [Fact]
         public void AllWeapons_GrantedActionsExistInActionRegistry()
         {
-            // Load action definitions from JSON
             var actionIds = LoadAllActionIds();
             var weapons = _registry.GetAllWeapons();
             var missing = new List<string>();
@@ -391,69 +398,23 @@ namespace QDND.Tests.Integration
 
         private HashSet<string> LoadAllActionIds()
         {
-            var ids = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            var actionFiles = Directory.GetFiles(Path.Combine(_dataPath, "Actions"), "*.json");
-
-            foreach (var file in actionFiles)
-            {
-                try
-                {
-                    var json = File.ReadAllText(file);
-                    using var doc = JsonDocument.Parse(json);
-                    if (doc.RootElement.TryGetProperty("actions", out var actions))
-                    {
-                        foreach (var action in actions.EnumerateArray())
-                        {
-                            if (action.TryGetProperty("id", out var id))
-                                ids.Add(id.GetString());
-                        }
-                    }
-                }
-                catch { /* skip unparseable files */ }
-            }
-
-            return ids;
+            return _actionRegistry.GetAllActionIds()
+                .Where(id => !string.IsNullOrWhiteSpace(id))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
         }
 
         private List<ActionRecord> LoadWeaponActions()
         {
-            var results = new List<ActionRecord>();
-            var actionFiles = Directory.GetFiles(Path.Combine(_dataPath, "Actions"), "*.json");
-
-            foreach (var file in actionFiles)
-            {
-                try
+            return _actionRegistry.GetAllActions()
+                .Where(action => action.Tags != null && action.Tags.Contains("weapon_action"))
+                .Select(action => new ActionRecord
                 {
-                    var json = File.ReadAllText(file);
-                    using var doc = JsonDocument.Parse(json);
-                    if (doc.RootElement.TryGetProperty("actions", out var actions))
-                    {
-                        foreach (var action in actions.EnumerateArray())
-                        {
-                            var tags = new List<string>();
-                            if (action.TryGetProperty("tags", out var tagsArr))
-                            {
-                                foreach (var t in tagsArr.EnumerateArray())
-                                    tags.Add(t.GetString());
-                            }
-
-                            if (tags.Contains("weapon_action"))
-                            {
-                                results.Add(new ActionRecord
-                                {
-                                    Id = action.TryGetProperty("id", out var id) ? id.GetString() : null,
-                                    Name = action.TryGetProperty("name", out var name) ? name.GetString() : null,
-                                    Description = action.TryGetProperty("description", out var desc) ? desc.GetString() : null,
-                                    Tags = tags
-                                });
-                            }
-                        }
-                    }
-                }
-                catch { /* skip */ }
-            }
-
-            return results;
+                    Id = action.Id,
+                    Name = action.Name,
+                    Description = action.Description,
+                    Tags = action.Tags?.ToList() ?? new List<string>()
+                })
+                .ToList();
         }
 
         private class ActionRecord

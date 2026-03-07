@@ -59,7 +59,7 @@ namespace QDND.Data.Parsers
                         if (currentStatus != null)
                         {
                             statuses.Add(currentStatus);
-                            _parsedStatuses[currentStatus.StatusId] = currentStatus;
+                            _parsedStatuses.TryAdd(currentStatus.StatusId, currentStatus);
                         }
 
                         // Parse entry name: new entry "StatusName"
@@ -119,7 +119,7 @@ namespace QDND.Data.Parsers
                 if (currentStatus != null)
                 {
                     statuses.Add(currentStatus);
-                    _parsedStatuses[currentStatus.StatusId] = currentStatus;
+                    _parsedStatuses.TryAdd(currentStatus.StatusId, currentStatus);
                 }
             }
             catch (Exception ex)
