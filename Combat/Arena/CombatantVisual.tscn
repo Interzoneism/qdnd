@@ -1,7 +1,6 @@
 [gd_scene format=4 uid="uid://d2gc8y0v5dpwv"]
 
 [ext_resource type="Script" uid="uid://cslsy4j8vmme5" path="res://Combat/Arena/CombatantVisual.cs" id="1_combatant_visual_script"]
-[ext_resource type="AnimationLibrary" uid="uid://dhc4p7u6e1cvg" path="res://assets/Animation Library/Unreal-Godot/UAL2_Standard.glb" id="3_0od5d"]
 [ext_resource type="AnimationLibrary" uid="uid://g6he6nsrv1v0" path="res://Animations.res" id="3_uuxsw"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_0od5d"]
@@ -756,7 +755,6 @@ skeleton = NodePath("..")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="ModelRoot" unique_id=18110620]
 libraries/ = ExtResource("3_uuxsw")
-libraries/UAL2_Standard = ExtResource("3_0od5d")
 
 [node name="SelectionRing" type="MeshInstance3D" parent="." unique_id=1030920624]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
