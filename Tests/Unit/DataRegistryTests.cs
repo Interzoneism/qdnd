@@ -2,184 +2,16 @@ using System;
 using System.Collections.Generic;
 using Xunit;
 using QDND.Data;
-using QDND.Combat.Statuses;
-using QDND.Combat.Rules;
+using QDND.Data.CharacterModel;
 
 namespace QDND.Tests.Unit
 {
     /// <summary>
     /// Unit tests for DataRegistry validation logic.
-    /// Tests ensure validation catches errors and warnings correctly.
+    /// Tests ensure scenario/beast-form registration and validation behave correctly.
     /// </summary>
     public class DataRegistryTests
     {
-        #region Status Registration Tests
-
-        [Fact]
-        public void RegisterStatus_Valid_NoErrors()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterStatus(new StatusDefinition
-            {
-                Id = "test_status",
-                Name = "Test Status",
-                DurationType = DurationType.Turns,
-                DefaultDuration = 3,
-                MaxStacks = 1
-            });
-
-            var result = registry.Validate();
-
-            Assert.False(result.HasErrors);
-        }
-
-        [Fact]
-        public void RegisterStatus_MissingName_ReportsError()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterStatus(new StatusDefinition
-            {
-                Id = "test",
-                Name = "",
-                MaxStacks = 1
-            });
-
-            var result = registry.Validate();
-
-            Assert.True(result.HasErrors);
-            Assert.Contains(result.Issues, i => i.Message.Contains("Missing Name"));
-        }
-
-        [Fact]
-        public void RegisterStatus_NegativeDuration_ReportsWarning()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterStatus(new StatusDefinition
-            {
-                Id = "test",
-                Name = "Test",
-                DurationType = DurationType.Turns,
-                DefaultDuration = -1, // Invalid
-                MaxStacks = 1
-            });
-
-            var result = registry.Validate();
-
-            Assert.True(result.HasWarnings);
-            Assert.Contains(result.Issues, i => i.Message.Contains("will expire immediately"));
-        }
-
-        [Fact]
-        public void RegisterStatus_ZeroDuration_ReportsWarning()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterStatus(new StatusDefinition
-            {
-                Id = "test",
-                Name = "Test",
-                DurationType = DurationType.Rounds,
-                DefaultDuration = 0,
-                MaxStacks = 1
-            });
-
-            var result = registry.Validate();
-
-            Assert.True(result.HasWarnings);
-        }
-
-        [Fact]
-        public void RegisterStatus_PermanentWithZeroDuration_NoWarning()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterStatus(new StatusDefinition
-            {
-                Id = "test",
-                Name = "Test Permanent",
-                DurationType = DurationType.Permanent,
-                DefaultDuration = 0, // Fine for permanent
-                MaxStacks = 1
-            });
-
-            var result = registry.Validate();
-
-            // Permanent statuses don't warn about zero duration
-            Assert.DoesNotContain(result.Issues, i => i.Message.Contains("will expire immediately"));
-        }
-
-        [Fact]
-        public void RegisterStatus_ZeroMaxStacks_ReportsError()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterStatus(new StatusDefinition
-            {
-                Id = "test",
-                Name = "Test",
-                MaxStacks = 0 // Invalid - must be at least 1
-            });
-
-            var result = registry.Validate();
-
-            Assert.True(result.HasErrors);
-            Assert.Contains(result.Issues, i => i.Message.Contains("MaxStacks"));
-        }
-
-        [Fact]
-        public void RegisterStatus_BlockedActionsAlias_NormalizesBonusActionToken()
-        {
-            var registry = new DataRegistry();
-            var status = new StatusDefinition
-            {
-                Id = "blocked_alias",
-                Name = "Blocked Alias",
-                MaxStacks = 1,
-                BlockedActions = new HashSet<string> { "bonusAction" }
-            };
-
-            registry.RegisterStatus(status);
-
-            var stored = registry.GetStatus("blocked_alias");
-            Assert.NotNull(stored);
-            Assert.Contains("bonus_action", stored.BlockedActions);
-            Assert.DoesNotContain("bonusAction", stored.BlockedActions);
-        }
-
-        [Fact]
-        public void ValidateStatuses_UnknownBlockedActionToken_ReportsError()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterStatus(new StatusDefinition
-            {
-                Id = "bad_block",
-                Name = "Bad Block",
-                MaxStacks = 1,
-                BlockedActions = new HashSet<string> { "not_a_real_token" }
-            });
-
-            var result = registry.Validate();
-
-            Assert.True(result.HasErrors);
-            Assert.Contains(result.Issues, i => i.Message.Contains("Unknown blockedActions token"));
-        }
-
-        [Fact]
-        public void RegisterStatus_NegativeMaxStacks_ReportsError()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterStatus(new StatusDefinition
-            {
-                Id = "test",
-                Name = "Test",
-                MaxStacks = -5
-            });
-
-            var result = registry.Validate();
-
-            Assert.True(result.HasErrors);
-            Assert.Contains(result.Issues, i => i.Message.Contains("MaxStacks"));
-        }
-
-        #endregion
-
         #region Scenario Registration Tests
 
         [Fact]
@@ -312,30 +144,55 @@ namespace QDND.Tests.Unit
 
         #endregion
 
-        #region Lookup Tests
+        #region Beast Form Registration Tests
 
         [Fact]
-        public void GetStatus_Registered_ReturnsIt()
+        public void RegisterBeastForm_Registered_ReturnsIt()
         {
             var registry = new DataRegistry();
-            var status = new StatusDefinition { Id = "status_id", Name = "Test Status", MaxStacks = 1 };
-            registry.RegisterStatus(status);
+            var beast = new BeastForm
+            {
+                Id = "wolf",
+                Name = "Wolf",
+                BaseHP = 11,
+                AC = 13
+            };
 
-            var retrieved = registry.GetStatus("status_id");
+            registry.RegisterBeastForm(beast);
 
+            var retrieved = registry.GetBeastForm("wolf");
             Assert.NotNull(retrieved);
-            Assert.Equal("status_id", retrieved.Id);
+            Assert.Equal("wolf", retrieved.Id);
+            Assert.Equal("Wolf", retrieved.Name);
         }
 
         [Fact]
-        public void GetStatus_NotRegistered_ReturnsNull()
+        public void GetBeastForm_NotRegistered_ReturnsNull()
+        {
+            var registry = new DataRegistry();
+            Assert.Null(registry.GetBeastForm("missing"));
+        }
+
+        [Fact]
+        public void RegisterBeastForm_NullThrows()
         {
             var registry = new DataRegistry();
 
-            var retrieved = registry.GetStatus("nonexistent");
-
-            Assert.Null(retrieved);
+            Assert.Throws<ArgumentNullException>(() => registry.RegisterBeastForm(null));
         }
+
+        [Fact]
+        public void RegisterBeastForm_EmptyIdThrows()
+        {
+            var registry = new DataRegistry();
+
+            Assert.Throws<ArgumentException>(() =>
+                registry.RegisterBeastForm(new BeastForm { Id = "", Name = "Bear" }));
+        }
+
+        #endregion
+
+        #region Lookup Tests
 
         [Fact]
         public void GetScenario_Registered_ReturnsIt()
@@ -399,13 +256,13 @@ namespace QDND.Tests.Unit
                 Category = "Status",
                 ItemId = "test_status",
                 Message = "Duration issue",
-                FilePath = "Data/Statuses/sample.json"
+                FilePath = "Data/Scenarios/sample.json"
             };
 
             var str = issue.ToString();
 
             Assert.Contains("[WARN]", str);
-            Assert.Contains("(Data/Statuses/sample.json)", str);
+            Assert.Contains("(Data/Scenarios/sample.json)", str);
         }
 
         [Fact]
@@ -476,18 +333,6 @@ namespace QDND.Tests.Unit
         #region Collection Retrieval Tests
 
         [Fact]
-        public void GetAllStatuses_ReturnsAllRegistered()
-        {
-            var registry = new DataRegistry();
-            registry.RegisterStatus(new StatusDefinition { Id = "s1", Name = "Status 1", MaxStacks = 1 });
-            registry.RegisterStatus(new StatusDefinition { Id = "s2", Name = "Status 2", MaxStacks = 1 });
-
-            var all = registry.GetAllStatuses();
-
-            Assert.Equal(2, all.Count);
-        }
-
-        [Fact]
         public void GetAllScenarios_ReturnsAllRegistered()
         {
             var registry = new DataRegistry();
@@ -500,6 +345,18 @@ namespace QDND.Tests.Unit
             var all = registry.GetAllScenarios();
 
             Assert.Single(all);
+        }
+
+        [Fact]
+        public void GetAllBeastForms_ReturnsAllRegistered()
+        {
+            var registry = new DataRegistry();
+            registry.RegisterBeastForm(new BeastForm { Id = "wolf", Name = "Wolf" });
+            registry.RegisterBeastForm(new BeastForm { Id = "bear", Name = "Bear" });
+
+            var all = registry.GetAllBeastForms();
+
+            Assert.Equal(2, all.Count);
         }
 
         #endregion
@@ -519,29 +376,11 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
-        public void RegisterStatus_NullThrows()
-        {
-            var registry = new DataRegistry();
-
-            Assert.Throws<ArgumentNullException>(() => registry.RegisterStatus(null));
-        }
-
-        [Fact]
         public void RegisterScenario_NullThrows()
         {
             var registry = new DataRegistry();
 
             Assert.Throws<ArgumentNullException>(() => registry.RegisterScenario(null));
-        }
-
-        [Fact]
-
-        public void RegisterStatus_EmptyIdThrows()
-        {
-            var registry = new DataRegistry();
-
-            Assert.Throws<ArgumentException>(() =>
-                registry.RegisterStatus(new StatusDefinition { Id = "", Name = "Test" }));
         }
 
         [Fact]

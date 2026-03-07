@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using QDND.Data.Actions;
 using QDND.Data.Parsers;
+using QDND.Data.Spells;
 
 namespace QDND.Tests.Helpers
 {
@@ -38,14 +39,25 @@ namespace QDND.Tests.Helpers
             var metrics = new FunctorCoverageMetrics();
 
             var repoRoot = ResolveRepoRoot();
-            var spellsDir = Path.Combine(repoRoot, "BG3_Data", "Spells");
-            if (!Directory.Exists(spellsDir))
+            var sharedSpellsDir = Path.Combine(repoRoot, "BG3_Data", "Shared", "Public", "Shared", "Stats", "Generated", "Data");
+            var sharedDevSpellsDir = Path.Combine(repoRoot, "BG3_Data", "Shared", "Public", "SharedDev", "Stats", "Generated", "Data");
+            if (!Directory.Exists(sharedSpellsDir) && !Directory.Exists(sharedDevSpellsDir))
             {
                 return metrics;
             }
 
             var parser = new BG3SpellParser();
-            var spells = parser.ParseDirectory(spellsDir);
+
+            var spells = new List<BG3SpellData>();
+            if (Directory.Exists(sharedSpellsDir))
+            {
+                spells.AddRange(parser.ParseDirectory(sharedSpellsDir, "Spell_*.txt"));
+            }
+            if (Directory.Exists(sharedDevSpellsDir))
+            {
+                spells.AddRange(parser.ParseDirectory(sharedDevSpellsDir, "Spell_*.txt"));
+            }
+
             parser.ResolveInheritance();
 
             metrics.TotalSpellsParsed = spells.Count;

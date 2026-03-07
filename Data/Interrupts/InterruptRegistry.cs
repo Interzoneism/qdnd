@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using QDND.Data.Parsers;
 
@@ -13,7 +14,7 @@ namespace QDND.Data.Interrupts
     /// Typical usage:
     /// <code>
     /// var registry = new InterruptRegistry();
-    /// registry.LoadInterrupts("BG3_Data/Stats/Interrupt.txt");
+    /// registry.LoadInterrupts("BG3_Data/Shared/Public/Shared/Stats/Generated/Data/Interrupt.txt");
     ///
     /// var counterspell = registry.GetInterrupt("Interrupt_Counterspell");
     /// var onHitReactions = registry.GetInterruptsByContext(BG3InterruptContext.OnCastHit);
@@ -176,34 +177,55 @@ namespace QDND.Data.Interrupts
         // ---------------------------------------------------------------
 
         /// <summary>
-        /// Parse and register all interrupts from a BG3 Interrupt.txt file.
+        /// Parse and register interrupts from one or more BG3 Interrupt.txt files.
         /// Resolves inheritance automatically.
         /// </summary>
-        /// <param name="filePath">Path to the Interrupt.txt file.</param>
+        /// <param name="filePaths">Paths to Interrupt.txt files (Shared first, then SharedDev).</param>
         /// <returns>Number of interrupts successfully registered.</returns>
-        public int LoadInterrupts(string filePath)
+        public int LoadInterrupts(params string[] filePaths)
         {
+            if (filePaths == null || filePaths.Length == 0)
+            {
+                _errors.Add("No interrupt file paths provided");
+                return 0;
+            }
+
             var parser = new BG3InterruptParser();
-            var parsed = parser.ParseFile(filePath);
+            var allParsed = new List<BG3InterruptData>();
+
+            foreach (var filePath in filePaths)
+            {
+                if (string.IsNullOrWhiteSpace(filePath))
+                    continue;
+
+                if (!File.Exists(filePath))
+                {
+                    _warnings.Add($"Interrupt file not found: {filePath}");
+                    continue;
+                }
+
+                var parsed = parser.ParseFile(filePath);
+                allParsed.AddRange(parsed);
+            }
 
             // Resolve inheritance
             parser.ResolveInheritance();
 
             int registered = 0;
-            foreach (var interrupt in parsed)
+            foreach (var interrupt in allParsed)
             {
                 // Skip context-only stubs (e.g., "Interrupt_ON_SPELL_CAST")
                 if (interrupt.IsContextStub)
                     continue;
 
-                if (RegisterInterrupt(interrupt, overwrite: true))
+                if (RegisterInterrupt(interrupt, overwrite: false))
                     registered++;
             }
 
             _errors.AddRange(parser.Errors);
             _warnings.AddRange(parser.Warnings);
 
-            Godot.GD.Print($"[InterruptRegistry] Loaded {registered} interrupts from {filePath} ({_interrupts.Count} total, {parser.Warnings.Count} warnings)");
+            Console.WriteLine($"[InterruptRegistry] Loaded {registered} interrupts from {filePaths.Length} source file(s) ({_interrupts.Count} total, {parser.Warnings.Count} parser warning(s))");
 
             return registered;
         }

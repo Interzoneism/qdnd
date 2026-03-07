@@ -22,8 +22,8 @@ namespace QDND.Tests.Unit
                 Console.WriteLine("");
                 Console.WriteLine("=== Action Coverage Inventory ===");
                 Console.WriteLine($"Total actions granted across scenarios: {report.CoverageInventory.TotalGrantedActions}");
-                Console.WriteLine($"Actions available in Data/Actions: {report.CoverageInventory.ActionsInDataRegistry}");
-                Console.WriteLine($"Granted actions present in Data/Actions: {report.CoverageInventory.GrantedActionsPresentInDataRegistry}");
+                Console.WriteLine($"Actions available in ActionRegistry: {report.CoverageInventory.ActionsInDataRegistry}");
+                Console.WriteLine($"Granted actions present in ActionRegistry: {report.CoverageInventory.GrantedActionsPresentInDataRegistry}");
                 Console.WriteLine($"Granted actions BG3-only: {report.CoverageInventory.GrantedActionsBg3Only}");
                 Console.WriteLine($"Granted actions missing from both: {report.CoverageInventory.GrantedActionsMissingFromBoth}");
                 Console.WriteLine($"Forbidden summon actions: {report.CoverageInventory.ForbiddenSummonActions}");

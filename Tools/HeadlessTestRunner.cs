@@ -89,8 +89,9 @@ namespace QDND.Tools
             var registry = new DataRegistry();
             string dataPath = ProjectSettings.GlobalizePath("res://Data");
             registry.LoadFromDirectory(dataPath);
-            
-            Assert(registry.GetAllStatuses().Count > 0, "Expected statuses to be loaded");
+
+            Assert(registry.GetAllScenarios().Count > 0 || registry.GetAllBeastForms().Count > 0,
+                "Expected scenarios or beast forms to be loaded");
         }
 
         private void TestDataRegistryValidation()

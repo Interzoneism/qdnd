@@ -27,26 +27,13 @@ namespace QDND.Tests.Integration
             _presentationBus = new PresentationRequestBus();
             _capturedRequests = new List<PresentationRequest>();
             _presentationBus.OnRequestPublished += request => _capturedRequests.Add(request);
-
-            // Attempt to load abilities from JSON (for data-driven test)
             _registry = new ActionRegistry();
-            string[] possiblePaths = new[]
-            {
-                Path.Combine("Data", "Actions"),
-                Path.Combine("..", "..", "..", "..", "Data", "Actions")
-            };
 
-            foreach (var path in possiblePaths)
+            var bg3DataPath = Path.Combine(FindRepoRoot(), "BG3_Data");
+            if (Directory.Exists(bg3DataPath))
             {
-                if (Directory.Exists(path))
-                {
-                    int loaded = ActionRegistryInitializer.LoadJsonActions(path, _registry);
-                    if (loaded > 0)
-                    {
-                        _dataLoaded = true;
-                        break;
-                    }
-                }
+                var init = ActionRegistryInitializer.Initialize(_registry, bg3DataPath, verboseLogging: false);
+                _dataLoaded = init.Success && init.ActionsLoaded > 0;
             }
         }
 
@@ -358,6 +345,22 @@ namespace QDND.Tests.Integration
                     }
                     break;
             }
+        }
+
+        private static string FindRepoRoot()
+        {
+            var dir = AppContext.BaseDirectory;
+            while (!string.IsNullOrEmpty(dir))
+            {
+                if (File.Exists(Path.Combine(dir, "project.godot")))
+                {
+                    return dir;
+                }
+
+                dir = Directory.GetParent(dir)?.FullName;
+            }
+
+            return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
         }
     }
 }

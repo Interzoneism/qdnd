@@ -51,7 +51,7 @@ namespace QDND.Data
 
         // Explicit remaps are kept for backwards compatibility with legacy scenario files
         // that still embed historical BG3-prefixed IDs.
-        private static readonly Dictionary<string, string> ExplicitRemaps = new(StringComparer.OrdinalIgnoreCase)
+        public static readonly Dictionary<string, string> ExplicitRemaps = new(StringComparer.OrdinalIgnoreCase)
         {
             ["Projectile_EldritchBlast"] = "eldritch_blast",
             ["Projectile_Fireball"] = "fireball",
@@ -345,7 +345,7 @@ namespace QDND.Data
             return candidates;
         }
 
-        private static string StripKnownPrefix(string actionId)
+        public static string StripKnownPrefix(string actionId)
         {
             if (string.IsNullOrWhiteSpace(actionId))
                 return null;
@@ -369,7 +369,7 @@ namespace QDND.Data
             return trimmed;
         }
 
-        private static string ToSnakeCase(string value)
+        public static string ToSnakeCase(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
                 return string.Empty;

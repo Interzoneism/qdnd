@@ -15,6 +15,9 @@ namespace QDND.Tests.Integration
     /// </summary>
     public class BG3StatusIntegrationTests
     {
+        private const string SharedStatsPath = "BG3_Data/Shared/Public/Shared/Stats/Generated/Data";
+        private const string SharedDevStatsPath = "BG3_Data/Shared/Public/SharedDev/Stats/Generated/Data";
+
         public static void RunAllTests()
         {
             Console.WriteLine("=== BG3 Status Integration Tests ===\n");
@@ -36,7 +39,7 @@ namespace QDND.Tests.Integration
             Console.WriteLine("Test: Status Registry Loading");
 
             var registry = new StatusRegistry();
-            int loaded = registry.LoadStatuses("BG3_Data/Statuses");
+            int loaded = registry.LoadStatuses(SharedStatsPath, SharedDevStatsPath);
 
             Assert(loaded > 0, $"Should load statuses, got {loaded}");
             Assert(registry.Count == loaded, $"Registry count should match loaded count");
@@ -54,7 +57,7 @@ namespace QDND.Tests.Integration
             Console.WriteLine("Test: Status Parser Inheritance");
 
             var registry = new StatusRegistry();
-            registry.LoadStatuses("BG3_Data/Statuses");
+            registry.LoadStatuses(SharedStatsPath, SharedDevStatsPath);
 
             // Find a status that uses inheritance
             // KNOCKED_OUT uses KNOCKED_OUT_BASE
@@ -261,7 +264,7 @@ namespace QDND.Tests.Integration
             var integration = new QDND.Combat.Statuses.BG3StatusIntegration(statusManager, statusRegistry);
 
             // Load statuses
-            integration.LoadBG3Statuses("BG3_Data/Statuses");
+            integration.LoadBG3Statuses(SharedStatsPath, SharedDevStatsPath);
 
             // Create test combatant
             var combatant = CreateTestCombatant("TestWarrior", "test_warrior_1");

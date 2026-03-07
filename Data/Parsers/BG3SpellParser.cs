@@ -61,7 +61,7 @@ namespace QDND.Data.Parsers
                         if (currentSpell != null)
                         {
                             spells.Add(currentSpell);
-                            _parsedSpells[currentSpell.Id] = currentSpell;
+                            _parsedSpells.TryAdd(currentSpell.Id, currentSpell);
                         }
                         
                         // Parse entry name: new entry "SpellName"
@@ -121,7 +121,7 @@ namespace QDND.Data.Parsers
                 if (currentSpell != null)
                 {
                     spells.Add(currentSpell);
-                    _parsedSpells[currentSpell.Id] = currentSpell;
+                    _parsedSpells.TryAdd(currentSpell.Id, currentSpell);
                 }
             }
             catch (Exception ex)

@@ -105,7 +105,7 @@ using QDND.Data.Spells;
 var parser = new BG3SpellParser();
 
 // Parse all spell files from directory
-var spells = parser.ParseDirectory("BG3_Data/Spells");
+var spells = parser.ParseDirectory("BG3_Data/Shared/Public/Shared/Stats/Generated/Data");
 
 // Resolve inheritance
 parser.ResolveInheritance();
@@ -124,7 +124,7 @@ parser.PrintStatistics();
 
 ```csharp
 var parser = new BG3SpellParser();
-var spells = parser.ParseFile("BG3_Data/Spells/Spell_Target.txt");
+var spells = parser.ParseFile("BG3_Data/Shared/Public/Shared/Stats/Generated/Data/Spell_Target.txt");
 parser.ResolveInheritance();
 ```
 
@@ -132,7 +132,7 @@ parser.ResolveInheritance();
 
 ```csharp
 var parser = new BG3SpellParser();
-parser.ParseDirectory("BG3_Data/Spells");
+parser.ParseDirectory("BG3_Data/Shared/Public/Shared/Stats/Generated/Data");
 parser.ResolveInheritance();
 
 // Get specific spell
@@ -328,4 +328,4 @@ Test 4: Checking 'Target_MainHandAttack' spell...
 
 - [ActionDefinition.cs](../Combat/Actions/ActionDefinition.cs) - Target data model
 - [DataRegistry.cs](../Data/DataRegistry.cs) - Central data registry
-- BG3_Data/Spells/ - Source spell files
+- BG3_Data/Shared/Public/Shared/Stats/Generated/Data/ - Source spell files

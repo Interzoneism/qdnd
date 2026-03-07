@@ -63,8 +63,10 @@ var statusManager = new StatusManager(rulesEngine);
 var statusRegistry = new StatusRegistry();
 var integration = new BG3StatusIntegration(statusManager, statusRegistry);
 
-// Load all Status_*.txt files from BG3_Data/Statuses
-int loaded = integration.LoadBG3Statuses("res://BG3_Data/Statuses");
+// Load all Status_*.txt files from BG3 raw stats directories
+int loaded = integration.LoadBG3Statuses(
+    "res://BG3_Data/Shared/Public/Shared/Stats/Generated/Data",
+    "res://BG3_Data/Shared/Public/SharedDev/Stats/Generated/Data");
 Console.WriteLine($"Loaded {loaded} BG3 statuses");
 ```
 

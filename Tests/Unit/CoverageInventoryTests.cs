@@ -37,8 +37,8 @@ namespace QDND.Tests.Unit
             
             _output.WriteLine("");
             _output.WriteLine($"Total granted actions: {report.CoverageInventory.TotalGrantedActions}");
-            _output.WriteLine($"Actions in Data registry: {report.CoverageInventory.ActionsInDataRegistry}");
-            _output.WriteLine($"Granted actions present in Data/Actions: {report.CoverageInventory.GrantedActionsPresentInDataRegistry}");
+            _output.WriteLine($"Actions in ActionRegistry: {report.CoverageInventory.ActionsInDataRegistry}");
+            _output.WriteLine($"Granted actions present in ActionRegistry: {report.CoverageInventory.GrantedActionsPresentInDataRegistry}");
             _output.WriteLine($"Granted actions BG3-only: {report.CoverageInventory.GrantedActionsBg3Only}");
             _output.WriteLine($"Granted actions missing from both: {report.CoverageInventory.GrantedActionsMissingFromBoth}");
             _output.WriteLine($"Forbidden summon actions: {report.CoverageInventory.ForbiddenSummonActions}");

@@ -12,6 +12,7 @@ namespace QDND.Combat.Actions
     public class ActionRegistry
     {
         private readonly Dictionary<string, ActionDefinition> _actions = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, string> _aliases = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, List<string>> _tagIndex = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<int, List<string>> _spellLevelIndex = new();
         private readonly Dictionary<SpellSchool, List<string>> _schoolIndex = new();
@@ -144,6 +145,16 @@ namespace QDND.Combat.Actions
         }
 
         /// <summary>
+        /// Register an alias ID that resolves to a canonical action ID.
+        /// Uses TryAdd semantics — first alias for a given key wins.
+        /// </summary>
+        public void RegisterAlias(string aliasId, string canonicalId)
+        {
+            if (!string.IsNullOrEmpty(aliasId) && !string.IsNullOrEmpty(canonicalId))
+                _aliases.TryAdd(aliasId, canonicalId);
+        }
+
+        /// <summary>
         /// Get an action by ID.
         /// </summary>
         /// <param name="actionId">The action ID to retrieve.</param>
@@ -152,8 +163,12 @@ namespace QDND.Combat.Actions
         {
             if (string.IsNullOrEmpty(actionId))
                 return null;
-
-            return _actions.TryGetValue(actionId, out var action) ? action : null;
+            if (_actions.TryGetValue(actionId, out var action))
+                return action;
+            // Fallback: check aliases
+            if (_aliases.TryGetValue(actionId, out var canonicalId))
+                return _actions.TryGetValue(canonicalId, out var aliased) ? aliased : null;
+            return null;
         }
 
         /// <summary>
@@ -163,7 +178,9 @@ namespace QDND.Combat.Actions
         /// <returns>True if the action exists in the registry.</returns>
         public bool HasAction(string actionId)
         {
-            return !string.IsNullOrEmpty(actionId) && _actions.ContainsKey(actionId);
+            if (string.IsNullOrEmpty(actionId)) return false;
+            return _actions.ContainsKey(actionId) ||
+                   (_aliases.TryGetValue(actionId, out var canonicalId) && _actions.ContainsKey(canonicalId));
         }
 
         /// <summary>
@@ -176,12 +193,15 @@ namespace QDND.Combat.Actions
         }
 
         /// <summary>
-        /// Get all action IDs.
+        /// Get all action IDs (canonical IDs plus all registered alias IDs).
         /// </summary>
-        /// <returns>Collection of all registered action IDs.</returns>
+        /// <returns>Collection of all registered action IDs and aliases.</returns>
         public IReadOnlyCollection<string> GetAllActionIds()
         {
-            return _actions.Keys.ToList();
+            var ids = new HashSet<string>(_actions.Keys, StringComparer.OrdinalIgnoreCase);
+            foreach (var alias in _aliases.Keys)
+                ids.Add(alias);
+            return ids.ToList();
         }
 
         /// <summary>
@@ -360,6 +380,7 @@ namespace QDND.Combat.Actions
         public void Clear()
         {
             _actions.Clear();
+            _aliases.Clear();
             _tagIndex.Clear();
             _spellLevelIndex.Clear();
             _schoolIndex.Clear();

@@ -124,6 +124,11 @@ void fragment() {
 
         private static readonly Shader GroundSurfaceShader = new() { Code = GROUND_SURFACE_SHADER_CODE };
         private static readonly Shader CloudSurfaceShader = new() { Code = CLOUD_SURFACE_SHADER_CODE };
+        private static readonly Shader LiquidSurfaceShader = GroundSurfaceShader;
+        private static readonly Shader SolidSurfaceShader = GroundSurfaceShader;
+        private static readonly Shader FogVolumeShader = null;
+
+        private enum ShaderFamily { Cloud, Liquid, Solid }
 
         private sealed class VisualStyle
         {

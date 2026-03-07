@@ -29,9 +29,9 @@ namespace QDND.Tests.Integration
         public void StatsRegistry_LoadsBG3Characters()
         {
             var registry = new StatsRegistry();
-            string bg3StatsPath = FindBG3StatsPath();
-            _output.WriteLine($"Using BG3 stats path: {bg3StatsPath}");
-            registry.LoadFromDirectory(bg3StatsPath);
+            var (sharedPath, sharedDevPath) = FindBG3StatsPaths();
+            _output.WriteLine($"Using BG3 stats paths: {sharedPath}, {sharedDevPath}");
+            registry.LoadFromDirectories(sharedPath, sharedDevPath);
 
             _output.WriteLine($"Loaded {registry.CharacterCount} characters");
             Assert.True(registry.CharacterCount > 0, $"Should load characters, got {registry.CharacterCount}");
@@ -167,8 +167,8 @@ namespace QDND.Tests.Integration
 
             // Load StatsRegistry with path resolution
             var statsRegistry = new StatsRegistry();
-            string bg3StatsPath = FindBG3StatsPath();
-            statsRegistry.LoadFromDirectory(bg3StatsPath);
+            var (sharedPath, sharedDevPath) = FindBG3StatsPaths();
+            statsRegistry.LoadFromDirectories(sharedPath, sharedDevPath);
             loader.SetStatsRegistry(statsRegistry);
 
             // Load CharacterDataRegistry
@@ -207,22 +207,25 @@ namespace QDND.Tests.Integration
             throw new FileNotFoundException($"Could not find scenario at {relativePath}");
         }
 
-        private string FindBG3StatsPath()
+        private (string sharedPath, string sharedDevPath) FindBG3StatsPaths()
         {
             var possiblePaths = new[]
             {
-                "BG3_Data/Stats",
-                Path.Combine("..", "..", "..", "BG3_Data/Stats"),
-                Path.Combine("..", "..", "..", "..", "BG3_Data/Stats")
+                "BG3_Data",
+                Path.Combine("..", "..", "..", "BG3_Data"),
+                Path.Combine("..", "..", "..", "..", "BG3_Data")
             };
 
-            foreach (var path in possiblePaths)
+            foreach (var basePath in possiblePaths)
             {
-                if (Directory.Exists(path))
-                    return path;
+                string sharedPath = Path.Combine(basePath, "Shared", "Public", "Shared", "Stats", "Generated", "Data");
+                string sharedDevPath = Path.Combine(basePath, "Shared", "Public", "SharedDev", "Stats", "Generated", "Data");
+
+                if (Directory.Exists(sharedPath) || Directory.Exists(sharedDevPath))
+                    return (sharedPath, sharedDevPath);
             }
 
-            throw new DirectoryNotFoundException("Could not find BG3_Data/Stats directory");
+            throw new DirectoryNotFoundException("Could not find BG3_Data/Shared/Public/*/Stats/Generated/Data directories");
         }
     }
 }

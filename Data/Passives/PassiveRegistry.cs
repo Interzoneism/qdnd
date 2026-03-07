@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using QDND.Data;
 using QDND.Data.Parsers;
@@ -189,23 +190,44 @@ namespace QDND.Data.Passives
         }
 
         /// <summary>
-        /// Load passives from BG3_Data/Stats/Passive.txt file.
+        /// Load passives from one or more BG3 passive data files.
         /// </summary>
-        /// <param name="filePath">Path to Passive.txt file.</param>
+        /// <param name="filePaths">Paths to Passive.txt files (Shared first, then SharedDev).</param>
         /// <returns>Number of passives loaded.</returns>
-        public int LoadPassives(string filePath)
+        public int LoadPassives(params string[] filePaths)
         {
+            if (filePaths == null || filePaths.Length == 0)
+            {
+                _errors.Add("No passive file paths provided");
+                return 0;
+            }
+
             var parser = new BG3PassiveParser();
-            var passives = parser.ParseFile(filePath);
+
+            var allPassives = new List<BG3PassiveData>();
+            foreach (var filePath in filePaths)
+            {
+                if (string.IsNullOrWhiteSpace(filePath))
+                    continue;
+
+                if (!File.Exists(filePath))
+                {
+                    _warnings.Add($"Passive file not found: {filePath}");
+                    continue;
+                }
+
+                var parsed = parser.ParseFile(filePath);
+                allPassives.AddRange(parsed);
+            }
 
             // Resolve inheritance
             parser.ResolveInheritance();
 
             // Register all passives
             int registeredCount = 0;
-            foreach (var passive in passives)
+            foreach (var passive in allPassives)
             {
-                if (RegisterPassive(passive, overwrite: true))
+                if (RegisterPassive(passive, overwrite: false))
                 {
                     registeredCount++;
                 }
@@ -215,7 +237,7 @@ namespace QDND.Data.Passives
             _errors.AddRange(parser.Errors);
             _warnings.AddRange(parser.Warnings);
 
-            GodotLogger.Info($"[PassiveRegistry] Loaded {registeredCount} passives from {filePath}");
+            GodotLogger.Info($"[PassiveRegistry] Loaded {registeredCount} passives from {filePaths.Length} source file(s)");
             if (parser.Errors.Count > 0)
             {
                 GodotLogger.Warn($"[PassiveRegistry] Encountered {parser.Errors.Count} errors during parsing");

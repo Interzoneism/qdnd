@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-This project uses unpacked BG3 game data as authoritative reference for D&D 5e combat mechanics. All source files are **read-only** and live in `BG3_Data/`. Runtime-curated data (simplified for gameplay) lives in `Data/`.
+This project uses unpacked BG3 game data as authoritative reference for D&D 5e combat mechanics. All source files are **read-only** and live in `BG3_Data/`. Runtime registries are populated directly from BG3 raw stats directories.
 
 **Critical Gap**: Extraction date and BG3 patch version are currently undocumented. Future data refreshes MUST track provenance metadata.
 
@@ -22,8 +22,8 @@ All files unpacked from Baldur's Gate 3 `Shared.pak`.
 
 | Path | Format | Count/Size | Content | Cosmetic Stripping |
 |------|--------|------------|---------|-------------------|
-| `BG3_Data/Spells/` | TXT (Larian Stats) | 1467 spell entries<br>8 files | All spell types: Target, Projectile, Shout, Zone, Rush, Teleportation, Throw, ProjectileStrike | Icons, animations, VFX, sounds removed |
-| `BG3_Data/Statuses/` | TXT (Larian Stats) | 1082 status entries<br>11 files | BOOST, INCAPACITATED, POLYMORPHED, EFFECT, KNOCKED_DOWN, FEAR, DOWNED, HEAL, INVISIBLE, SNEAKING, DEACTIVATED | Visual/audio effects stripped |
+| `BG3_Data/Shared/Public/Shared/Stats/Generated/Data/Spell_*.txt` + `BG3_Data/Shared/Public/SharedDev/Stats/Generated/Data/Spell_*.txt` | TXT (Larian Stats) | 1467 spell entries<br>8 files | All spell types: Target, Projectile, Shout, Zone, Rush, Teleportation, Throw, ProjectileStrike | Icons, animations, VFX, sounds removed |
+| `BG3_Data/Shared/Public/Shared/Stats/Generated/Data/Status_*.txt` + `BG3_Data/Shared/Public/SharedDev/Stats/Generated/Data/Status_*.txt` | TXT (Larian Stats) | 1082 status entries<br>11 files | BOOST, INCAPACITATED, POLYMORPHED, EFFECT, KNOCKED_DOWN, FEAR, DOWNED, HEAL, INVISIBLE, SNEAKING, DEACTIVATED | Visual/audio effects stripped |
 | `BG3_Data/Stats/Character.txt` | TXT | 4416 lines | Base stat blocks: heroes, NPCs, monsters, racial/gender templates | Material references removed |
 | `BG3_Data/Stats/Weapon.txt` | TXT | 227 weapon entries<br>1655 lines | All weapons with D&D damage, properties, proficiency, unlocked spells | Visual templates removed |
 | `BG3_Data/Stats/Armor.txt` | TXT | 352 armor entries<br>1990 lines | AC, type, proficiency, ability mod caps, boosts | Material/skin data removed |
@@ -72,13 +72,11 @@ Simplified, gameplay-focused data derived from `BG3_Data/` or hand-authored for 
 
 | Path | Format | Count | Content | Derivation |
 |------|--------|-------|---------|-----------|
-| `Data/Actions/*.json` | JSON | 195 files, 194 unique IDs | Canonical runtime actions | Curated subset + custom actions |
-| `Data/Statuses/*.json` | JSON | 114 files, 108 unique IDs | Canonical runtime statuses | Curated subset from BG3 statuses |
 | `Data/Scenarios/*.json` | JSON | Multiple | Pre-built combat scenarios | Hand-authored for testing/gameplay |
 | `Data/Races/*.json` | JSON | (count TBD) | Racial trait data | Simplified from Progressions + Races.lsx |
 | `Data/Classes/*.json` | JSON | (count TBD) | Class progression data | Simplified from ClassDescriptions + Progressions |
 | `Data/Feats/*.json` | JSON | (count TBD) | Feat definitions | Simplified from FeatDescriptions + Passive.txt |
-| `Data/Spells/*.json` | JSON | (count TBD) | Spell definitions | Simplified from BG3_Data/Spells/*.txt |
+| `Data/Spells/*.json` | JSON | (count TBD) | Spell metadata/derived artifacts | Derived from BG3 raw stats as needed |
 | `Data/Passives/*.json` | JSON | (count TBD) | Passive ability data | Simplified from Passive.txt |
 | `Data/Validation/parity_allowlist.json` | JSON | N/A | Known parity gaps (temporary) | Hand-maintained, reviewed in CI |
 
@@ -165,8 +163,8 @@ Simplified, gameplay-focused data derived from `BG3_Data/` or hand-authored for 
 **Checks Performed**:
 1. **Duplicate IDs**: No duplicate action/status/class/feat/race IDs across all loaded data
 2. **Cross-Reference Integrity**:
-   - Granted actions exist in union registry (Data/Actions + BG3 ActionRegistry)
-   - Applied statuses exist in union registry (Data/Statuses + BG3 StatusRegistry)
+   - Granted actions exist in ActionRegistry loaded from BG3 raw stats
+   - Applied statuses exist in StatusRegistry loaded from BG3 raw stats
    - Passive unlock refs target valid spells/interrupts
 3. **Effect Handler Coverage**: All action effect types registered in `EffectPipeline`
 4. **JSON Schema Compliance**: All JSON data deserializes to typed models without errors
@@ -226,19 +224,19 @@ Simplified, gameplay-focused data derived from `BG3_Data/` or hand-authored for 
 ### ActionRegistry Population
 
 **Source Hierarchy**:
-1. `Data/Actions/*.json` (curated runtime — highest priority)
-2. `BG3_Data/Spells/*.txt` parsed via `BG3DataLoader` (reference)
+1. `BG3_Data/Shared/Public/Shared/Stats/Generated/Data/Spell_*.txt`
+2. `BG3_Data/Shared/Public/SharedDev/Stats/Generated/Data/Spell_*.txt`
 3. `BG3_Data/Stats/Weapon.txt` unlock refs (weapon actions)
 
-**Duplicate Resolution**: Runtime (Data/Actions) overrides BG3 parsed data if ID collision occurs.
+**Duplicate Resolution**: SharedDev and explicit converter remaps resolve collisions during ActionRegistry initialization.
 
 ### StatusRegistry Population
 
 **Source Hierarchy**:
-1. `Data/Statuses/*.json` (curated runtime — highest priority)
-2. `BG3_Data/Statuses/*.txt` parsed via `BG3DataLoader` (reference)
+1. `BG3_Data/Shared/Public/Shared/Stats/Generated/Data/Status_*.txt`
+2. `BG3_Data/Shared/Public/SharedDev/Stats/Generated/Data/Status_*.txt`
 
-**Duplicate Resolution**: Runtime (Data/Statuses) overrides BG3 parsed data if ID collision occurs.
+**Duplicate Resolution**: SharedDev and status parser inheritance/overwrite rules resolve collisions during StatusRegistry loading.
 
 ### ClassRegistry Population
 

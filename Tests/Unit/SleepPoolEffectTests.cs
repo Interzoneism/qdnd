@@ -7,6 +7,7 @@ using QDND.Combat.Actions;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
 using System.IO;
+using QDND.Data.Actions;
 
 namespace QDND.Tests.Unit
 {
@@ -15,28 +16,6 @@ namespace QDND.Tests.Unit
     /// </summary>
     public class SleepPoolEffectTests
     {
-        private static string ResolveDataPath()
-        {
-            var candidates = new[]
-            {
-                "Data",
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "Data"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "..", "Data")
-            };
-
-            foreach (var path in candidates)
-            {
-                if (Directory.Exists(Path.Combine(path, "Actions")) &&
-                    Directory.Exists(Path.Combine(path, "Statuses")))
-                {
-                    return path;
-                }
-            }
-
-            throw new DirectoryNotFoundException("Could not locate Data directory for SleepPoolEffectTests");
-        }
-
         private EffectContext CreateContext(Combatant source, List<Combatant> targets, int seed = 42)
         {
             var rules = new RulesEngine();
@@ -304,12 +283,13 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
-        public void SleepSpell_LoadedFromJSON_UsesSleepPoolEffect()
+        public void SleepSpell_LoadedFromBg3Registry_UsesSleepPoolEffect()
         {
             // Arrange
             var registry = new ActionRegistry();
-            QDND.Data.Actions.ActionRegistryInitializer.LoadJsonActions(
-                System.IO.Path.Combine(ResolveDataPath(), "Actions"), registry);
+            var bg3DataPath = Path.Combine(FindRepoRoot(), "BG3_Data");
+            var init = ActionRegistryInitializer.Initialize(registry, bg3DataPath, verboseLogging: false);
+            Assert.True(init.Success, init.ErrorMessage ?? "Action registry initialization failed");
 
             // Act
             var sleepAbility = registry.GetAction("sleep");
@@ -321,6 +301,22 @@ namespace QDND.Tests.Unit
             Assert.Equal("5d8", sleepAbility.Effects[0].DiceFormula);
             Assert.Equal("asleep", sleepAbility.Effects[0].StatusId);
             Assert.Equal(2, sleepAbility.Effects[0].StatusDuration);
+        }
+
+        private static string FindRepoRoot()
+        {
+            var dir = AppContext.BaseDirectory;
+            while (!string.IsNullOrEmpty(dir))
+            {
+                if (File.Exists(Path.Combine(dir, "project.godot")))
+                {
+                    return dir;
+                }
+
+                dir = Directory.GetParent(dir)?.FullName;
+            }
+
+            return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
         }
     }
 }

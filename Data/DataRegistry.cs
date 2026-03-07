@@ -4,8 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using QDND.Combat.Actions;
-using QDND.Combat.Statuses;
 using QDND.Data.Passives;
 
 namespace QDND.Data
@@ -124,11 +122,10 @@ namespace QDND.Data
 
     /// <summary>
     /// Central data registry for game content.
-    /// Handles loading, validation, and access to abilities, statuses, and scenarios.
+    /// Handles loading, validation, and access to scenarios and beast forms.
     /// </summary>
     public class DataRegistry
     {
-        private readonly Dictionary<string, StatusDefinition> _statuses = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, ScenarioDefinition> _scenarios = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, CharacterModel.BeastForm> _beastForms = new(StringComparer.OrdinalIgnoreCase);
 
@@ -140,17 +137,6 @@ namespace QDND.Data
         public PassiveRegistry PassiveRegistry { get; } = new PassiveRegistry();
 
         // --- Registration ---
-
-        public void RegisterStatus(StatusDefinition status)
-        {
-            if (status == null) throw new ArgumentNullException(nameof(status));
-            if (string.IsNullOrEmpty(status.Id))
-                throw new ArgumentException("Status must have an Id");
-
-            status.BlockedActions = StatusActionBlockNormalizer.Normalize(status.BlockedActions);
-
-            _statuses[status.Id] = status;
-        }
 
         public void RegisterScenario(ScenarioDefinition scenario)
         {
@@ -172,11 +158,6 @@ namespace QDND.Data
 
         // --- Lookup ---
 
-        public StatusDefinition GetStatus(string id)
-        {
-            return _statuses.TryGetValue(id, out var status) ? status : null;
-        }
-
         public ScenarioDefinition GetScenario(string name)
         {
             return _scenarios.TryGetValue(name, out var scenario) ? scenario : null;
@@ -187,46 +168,10 @@ namespace QDND.Data
             return _beastForms.TryGetValue(id, out var beastForm) ? beastForm : null;
         }
 
-        public IReadOnlyCollection<StatusDefinition> GetAllStatuses() => _statuses.Values;
         public IReadOnlyCollection<ScenarioDefinition> GetAllScenarios() => _scenarios.Values;
         public IReadOnlyCollection<CharacterModel.BeastForm> GetAllBeastForms() => _beastForms.Values;
 
         // --- Loading ---
-
-        public int LoadStatusesFromFile(string path)
-        {
-            if (!File.Exists(path))
-            {
-                Console.Error.WriteLine($"[Registry] Status file not found: {path}");
-                return 0;
-            }
-
-            try
-            {
-                string json = File.ReadAllText(path);
-                var pack = JsonSerializer.Deserialize<StatusPack>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true,
-                    Converters = { new JsonStringEnumConverter() }
-                });
-
-                if (pack?.Statuses == null)
-                    return 0;
-
-                foreach (var status in pack.Statuses)
-                {
-                    RegisterStatus(status);
-                }
-
-                _loadedFiles.Add(path);
-                return pack.Statuses.Count;
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"[Registry] Failed to load statuses from {path}: {ex.Message}");
-                return 0;
-            }
-        }
 
         public int LoadScenarioFromFile(string path)
         {
@@ -300,22 +245,11 @@ namespace QDND.Data
         /// </summary>
         public void LoadFromDirectory(string basePath)
         {
-            string statusesPath = Path.Combine(basePath, "Statuses");
             string scenariosPath = Path.Combine(basePath, "Scenarios");
             string characterModelPath = Path.Combine(basePath, "CharacterModel");
 
-            int totalStatuses = 0;
             int totalScenarios = 0;
             int totalBeastForms = 0;
-
-            if (Directory.Exists(statusesPath))
-            {
-                foreach (var file in Directory.GetFiles(statusesPath, "*.json")
-                    .OrderBy(path => path, StringComparer.OrdinalIgnoreCase))
-                {
-                    totalStatuses += LoadStatusesFromFile(file);
-                }
-            }
 
             if (Directory.Exists(scenariosPath))
             {
@@ -336,7 +270,6 @@ namespace QDND.Data
             }
 
             Console.WriteLine($"[Registry] Loaded from {basePath}:");
-            Console.WriteLine($"  - {totalStatuses} statuses");
             Console.WriteLine($"  - {totalScenarios} scenarios");
             Console.WriteLine($"  - {totalBeastForms} beast forms");
         }
@@ -350,54 +283,10 @@ namespace QDND.Data
         {
             var result = new ValidationResult();
 
-            ValidateStatuses(result);
             ValidateScenarios(result);
             CheckDependencies(result);
 
             return result;
-        }
-
-        private void ValidateStatuses(ValidationResult result)
-        {
-            foreach (var status in _statuses.Values)
-            {
-                // Required fields
-                if (string.IsNullOrEmpty(status.Name))
-                {
-                    result.AddError("Status", status.Id, "Missing Name");
-                }
-
-                // Duration validation
-                if (status.DurationType != DurationType.Permanent && status.DefaultDuration <= 0)
-                {
-                    result.AddWarning("Status", status.Id,
-                        "Non-permanent status with duration <= 0 will expire immediately");
-                }
-
-                // Stack validation
-                if (status.MaxStacks < 1)
-                {
-                    result.AddError("Status", status.Id, "MaxStacks must be at least 1");
-                }
-
-                // Modifier validation
-                if (status.Modifiers != null)
-                {
-                    foreach (var mod in status.Modifiers)
-                    {
-                        if (string.IsNullOrEmpty(mod.Target.ToString()))
-                        {
-                            result.AddWarning("Status", status.Id, "Modifier has no target");
-                        }
-                    }
-                }
-
-                var unknownBlockedTokens = StatusActionBlockNormalizer.FindUnknownTokens(status.BlockedActions);
-                foreach (var token in unknownBlockedTokens)
-                {
-                    result.AddError("Status", status.Id, $"Unknown blockedActions token: {token}");
-                }
-            }
         }
 
         private void ValidateScenarios(ValidationResult result)
@@ -443,7 +332,7 @@ namespace QDND.Data
             // This is a stub for more complex dependency checking
 
             result.AddInfo("Registry", "Dependencies",
-                $"Checked {_statuses.Count} statuses, {_scenarios.Count} scenarios");
+                $"Checked {_scenarios.Count} scenarios");
         }
 
         /// <summary>
@@ -567,27 +456,9 @@ namespace QDND.Data
         public void PrintStats()
         {
             Console.WriteLine("[Registry] Statistics:");
-            Console.WriteLine($"  - Statuses: {_statuses.Count}");
             Console.WriteLine($"  - Scenarios: {_scenarios.Count}");
+            Console.WriteLine($"  - Beast forms: {_beastForms.Count}");
             Console.WriteLine($"  - Loaded files: {_loadedFiles.Count}");
         }
-    }
-
-    // --- Helper classes for JSON deserialization ---
-
-    public class ActionPack
-    {
-        public string PackId { get; set; }
-        public string Version { get; set; }
-        
-        [JsonPropertyName("actions")]
-        public List<ActionDefinition> Actions { get; set; }
-    }
-
-    public class StatusPack
-    {
-        public string PackId { get; set; }
-        public string Version { get; set; }
-        public List<StatusDefinition> Statuses { get; set; }
     }
 }

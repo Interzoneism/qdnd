@@ -60,7 +60,7 @@ namespace QDND.Data.Parsers
                         if (currentPassive != null)
                         {
                             passives.Add(currentPassive);
-                            _parsedPassives[currentPassive.PassiveId] = currentPassive;
+                            _parsedPassives.TryAdd(currentPassive.PassiveId, currentPassive);
                         }
 
                         // Parse entry name: new entry "PassiveName"
@@ -120,7 +120,7 @@ namespace QDND.Data.Parsers
                 if (currentPassive != null)
                 {
                     passives.Add(currentPassive);
-                    _parsedPassives[currentPassive.PassiveId] = currentPassive;
+                    _parsedPassives.TryAdd(currentPassive.PassiveId, currentPassive);
                 }
             }
             catch (Exception ex)

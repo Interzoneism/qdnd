@@ -2,6 +2,8 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using QDND.Combat.Arena;
+using QDND.Combat.Environment;
 
 namespace QDND.Tools
 {
@@ -1165,18 +1167,13 @@ void fragment() {
         #endregion
     }
 }
-using System.Collections.Generic;
-using Godot;
-using QDND.Combat.Arena;
-using QDND.Combat.Environment;
-
 namespace QDND.Tools
 {
     /// <summary>
     /// Standalone visual sandbox for iterating surface rendering.
     /// Right mouse drag: orbit, middle drag: pan, wheel: zoom.
     /// </summary>
-    public partial class SurfaceTestScene : Node3D
+    public partial class SurfaceVisualSandbox : Node3D
     {
         private readonly List<string> _groundSurfaceIds = new()
         {

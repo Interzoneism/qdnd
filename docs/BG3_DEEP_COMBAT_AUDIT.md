@@ -41,7 +41,7 @@ But `actualDamageDealt` is the return value of `Resources.TakeDamage()` ([Combat
 
 **BG3/5e rule:** The Shield spell specifically states it negates all Magic Missile darts hitting the caster.
 
-**Code behavior:** Magic Missile is defined with no `attackType` ([bg3_mechanics_actions.json](Data/Actions/bg3_mechanics_actions.json#L2028)) and tags `["auto_hit"]`. In [EffectPipeline.cs](Combat/Actions/EffectPipeline.cs#L858), the attack reaction path (`TryTriggerAttackReactions`) only fires when `action.AttackType.HasValue` is true. Auto-hit multi-projectile spells bypass this entirely — Shield's reaction trigger never activates against Magic Missile.
+**Code behavior:** Magic Missile is loaded into `ActionRegistry` with no `attackType` and the `auto_hit` tag (from BG3 raw spell data under `Spell_*.txt`). In [EffectPipeline.cs](Combat/Actions/EffectPipeline.cs#L858), the attack reaction path (`TryTriggerAttackReactions`) only fires when `action.AttackType.HasValue` is true. Auto-hit multi-projectile spells bypass this entirely — Shield's reaction trigger never activates against Magic Missile.
 
 **Fix:** Add a special-case check: if the incoming action has the `auto_hit` tag and the target has a Shield reaction prepared, trigger the Shield reaction to cancel the projectile.
 
@@ -201,7 +201,7 @@ A DC 10 CON save is forced whenever a concentrating caster is knocked prone. Thi
 
 ### VERIFIED OK — Magic Missile Auto-Hit
 
-[bg3_mechanics_actions.json](Data/Actions/bg3_mechanics_actions.json#L2028): Magic Missile has no `attackType` and tag `auto_hit`. EffectPipeline skips attack rolls when `action.AttackType` is null. Multi-projectile path ([line 1660](Combat/Actions/EffectPipeline.cs#L1660)) also skips per-projectile attack rolls when `AttackType` is null. Correct: Magic Missile auto-hits.
+Magic Missile in `ActionRegistry` has no `attackType` and tag `auto_hit` (from BG3 raw spell data). EffectPipeline skips attack rolls when `action.AttackType` is null. Multi-projectile path ([line 1660](Combat/Actions/EffectPipeline.cs#L1660)) also skips per-projectile attack rolls when `AttackType` is null. Correct: Magic Missile auto-hits.
 
 ### VERIFIED OK — Upcast Scaling for Multi-Projectile Spells
 
@@ -288,7 +288,7 @@ When a non-weapon action consumes an action, `ResetAttacks()` zeroes the attack 
 
 **Previous finding (RV-C1):** "Action Surge burns a bonus action instead of being free."
 
-**Current state:** [bg3_mechanics_actions.json](Data/Actions/bg3_mechanics_actions.json#L727-L745) defines Action Surge with:
+**Current state:** ActionRegistry data for Action Surge defines:
 ```json
 "cost": { "resourceCosts": { "action_surge": 1 } }
 ```
@@ -316,7 +316,7 @@ BG3 removes the 5e rule that casting a bonus action spell restricts your action 
 
 | ID | Description | Status |
 |----|-------------|--------|
-| RV-C1 | Action Surge costs bonus action | **FIXED** — verified JSON has no economy cost |
+| RV-C1 | Action Surge costs bonus action | **FIXED** — verified ActionRegistry data has no action/bonus/reaction economy cost |
 | RV-M7 | Frozen missing GrantsAdvantageToAttackers | **FIXED** — [ConditionEffects.cs](Combat/Statuses/ConditionEffects.cs#L281) now has `GrantsAdvantageToAttackers = true` and `MeleeAutocrits = true` |
 | ST-2 | Death saves bypass modifier stack | **STILL OPEN** — confirmed at [TurnLifecycleService.cs](Combat/Services/TurnLifecycleService.cs#L413) |
 | D-1 | Multiple same-type resistances stack multiplicatively | **STILL OPEN** — confirmed in [DamagePipeline.cs](Combat/Rules/DamagePipeline.cs) |
@@ -333,7 +333,7 @@ BG3 removes the 5e rule that casting a bonus action spell restricts your action 
 | M3 | Movement | Allies block movement like enemies | MAJOR | MovementService.cs#L940 | No |
 | M4 | Death | Death saves bypass modifier stack | MAJOR | TurnLifecycleService.cs#L413 | Yes (ST-2) |
 | M5 | Death | No fear source tracking for Frightened | MAJOR | ConditionEffects.cs | No |
-| M6 | Economy | Resolved: Action Surge no longer costs bonus action | RESOLVED | bg3_mechanics_actions.json | Was RV-C1 |
+| M6 | Economy | Resolved: Action Surge no longer costs bonus action | RESOLVED | ActionRegistry (BG3 raw spell data) | Was RV-C1 |
 | m1 | Initiative | No surprise round | MINOR | TurnQueueService.cs | No |
 | m2 | Spells | Prone triggers concentration check | MINOR | ConcentrationSystem.cs#L255 | No |
 | m3 | Spells | Magic Missile darts trigger separate concentration checks | MINOR | EffectPipeline.cs (multi-proj) | No |

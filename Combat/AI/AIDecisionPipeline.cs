@@ -337,15 +337,11 @@ namespace QDND.Combat.AI
 
                 if (!string.IsNullOrEmpty(testAbilityId))
                 {
-                    // Build alias set so we match both internal IDs (ranged_attack) and
-                    // BG3-parsed IDs (Projectile_MainHandAttack) for the same action.
-                    var testAliases = ActionIdResolver.GetCandidateIds(testAbilityId);
-
                     // Match the specific ability ID from the tag
                     // Check both UseAbility (for most abilities) and Attack action types
                     var forcedAbilityAction = candidates.FirstOrDefault(c =>
                         (c.ActionType == AIActionType.UseAbility || c.ActionType == AIActionType.Attack) &&
-                        testAliases.Any(tid => string.Equals(c.ActionId, tid, StringComparison.OrdinalIgnoreCase)));
+                        string.Equals(c.ActionId, testAbilityId, StringComparison.OrdinalIgnoreCase));
                     
                     if (forcedAbilityAction != null)
                     {
@@ -503,7 +499,6 @@ namespace QDND.Combat.AI
 
             // Check if actor is in ability test mode (always generate test ability regardless of action economy)
             string testAbilityId = TestPolicy.GetTestActionId(actor);
-            IReadOnlyList<string> testAliases = testAbilityId != null ? ActionIdResolver.GetCandidateIds(testAbilityId) : null;
             bool isTestMode = testAbilityId != null;
 
             // Movement candidates (skip if remaining movement is too small to be meaningful)
@@ -963,7 +958,6 @@ namespace QDND.Combat.AI
             
             // Check if this actor is marked for ability testing
             string testAbilityId = TestPolicy.GetTestActionId(actor);
-            IReadOnlyList<string> testAliases = testAbilityId != null ? ActionIdResolver.GetCandidateIds(testAbilityId) : null;
             
             var allCombatants = _context?.GetAllCombatants()?.ToList() ?? new List<Combatant>();
             
@@ -972,9 +966,9 @@ namespace QDND.Combat.AI
                 // Skip basic attacks - handled by GenerateAttackCandidates
                 if (BasicAttackIds.All.Contains(actionId)) continue;
                 
-                // Bypass resource checks for test abilities (match against alias set)
-                bool isTestAbility = testAliases != null && 
-                                    testAliases.Any(tid => string.Equals(actionId, tid, StringComparison.OrdinalIgnoreCase));
+                // Bypass resource checks for test abilities
+                bool isTestAbility = !string.IsNullOrEmpty(testAbilityId) && 
+                                    string.Equals(actionId, testAbilityId, StringComparison.OrdinalIgnoreCase);
                 
                 var action = _effectPipeline.GetAction(actionId);
                 if (action == null) continue;
@@ -1245,15 +1239,14 @@ namespace QDND.Combat.AI
             
             // Check if this actor is marked for ability testing
             string testAbilityId = TestPolicy.GetTestActionId(actor);
-            IReadOnlyList<string> testAliases = testAbilityId != null ? ActionIdResolver.GetCandidateIds(testAbilityId) : null;
             
             var allCombatants = _context?.GetAllCombatants()?.ToList() ?? new List<Combatant>();
             
             foreach (var actionId in actor.KnownActions)
             {
-                // Bypass resource checks for test abilities (match against alias set)
-                bool isTestAbility = testAliases != null && 
-                                    testAliases.Any(tid => string.Equals(actionId, tid, StringComparison.OrdinalIgnoreCase));
+                // Bypass resource checks for test abilities
+                bool isTestAbility = !string.IsNullOrEmpty(testAbilityId) && 
+                                    string.Equals(actionId, testAbilityId, StringComparison.OrdinalIgnoreCase);
                 
                 // Check if ability can be used - skip for test abilities
                 if (!isTestAbility)

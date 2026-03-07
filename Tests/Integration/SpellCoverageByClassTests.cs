@@ -5,14 +5,16 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Xunit;
+using QDND.Combat.Actions;
+using QDND.Data.Actions;
 
 namespace QDND.Tests.Integration
 {
     /// <summary>
     /// CI gate: verifies every class's granted cantrips and spells (levels 1-6)
-    /// exist in the curated action JSON registry. Iterates through all 12 BG3 classes,
+    /// exist in the BG3-loaded action registry. Iterates through all 12 BG3 classes,
     /// collects granted abilities from level progressions and subclass progressions,
-    /// and asserts that each ability resolves to an action definition in Data/Actions/.
+    /// and asserts that each ability resolves to an action definition.
     /// </summary>
     public class SpellCoverageByClassTests
     {
@@ -335,154 +337,70 @@ namespace QDND.Tests.Integration
 
         private static HashSet<string> LoadAllActionIds(string repoRoot)
         {
-            var actionIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            var actionsDir = Path.Combine(repoRoot, "Data", "Actions");
-
-            if (!Directory.Exists(actionsDir))
-                return actionIds;
-
-            foreach (var file in Directory.GetFiles(actionsDir, "*.json"))
-            {
-                try
-                {
-                    var json = File.ReadAllText(file);
-                    using var doc = JsonDocument.Parse(json);
-                    var root = doc.RootElement;
-
-                    if (root.TryGetProperty("Actions", out var actions) ||
-                        root.TryGetProperty("actions", out actions))
-                    {
-                        foreach (var action in actions.EnumerateArray())
-                        {
-                            string id = null;
-                            if (action.TryGetProperty("Id", out var idProp))
-                                id = idProp.GetString();
-                            else if (action.TryGetProperty("id", out idProp))
-                                id = idProp.GetString();
-
-                            if (!string.IsNullOrWhiteSpace(id))
-                                actionIds.Add(id.Trim());
-                        }
-                    }
-                }
-                catch { /* skip unparseable files */ }
-            }
-
-            return actionIds;
+            return BuildActionRegistry(repoRoot)
+                .GetAllActionIds()
+                .Where(id => !string.IsNullOrWhiteSpace(id))
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
         }
 
         private static Dictionary<string, ActionDefProxy> LoadAllActionDefinitions(string repoRoot)
         {
             var actionDefs = new Dictionary<string, ActionDefProxy>(StringComparer.OrdinalIgnoreCase);
-            var actionsDir = Path.Combine(repoRoot, "Data", "Actions");
+            var registry = BuildActionRegistry(repoRoot);
 
-            if (!Directory.Exists(actionsDir))
-                return actionDefs;
-
-            foreach (var file in Directory.GetFiles(actionsDir, "*.json"))
+            foreach (var action in registry.GetAllActions())
             {
-                try
+                if (string.IsNullOrWhiteSpace(action.Id))
+                    continue;
+
+                var proxy = new ActionDefProxy
                 {
-                    var json = File.ReadAllText(file);
-                    using var doc = JsonDocument.Parse(json);
-                    var root = doc.RootElement;
+                    Id = action.Id.Trim(),
+                    HasNonEmptyCost = HasNonEmptyCost(action),
+                    TargetType = action.TargetType.ToString(),
+                    TargetFilter = action.TargetFilter.ToString(),
+                    Range = action.Range,
+                    AreaRadius = action.AreaRadius,
+                    ConeAngle = action.ConeAngle,
+                    LineWidth = action.LineWidth,
+                    MaxTargets = action.MaxTargets
+                };
 
-                    if (root.TryGetProperty("Actions", out var actions) ||
-                        root.TryGetProperty("actions", out actions))
+                if (action.Effects != null)
+                {
+                    foreach (var effect in action.Effects)
                     {
-                        foreach (var action in actions.EnumerateArray())
-                        {
-                            string id = null;
-                            if (action.TryGetProperty("Id", out var idProp))
-                                id = idProp.GetString();
-                            else if (action.TryGetProperty("id", out idProp))
-                                id = idProp.GetString();
-
-                            if (string.IsNullOrWhiteSpace(id))
-                                continue;
-
-                            var proxy = new ActionDefProxy { Id = id.Trim() };
-
-                            if (action.TryGetProperty("Cost", out var cost) ||
-                                action.TryGetProperty("cost", out cost))
-                            {
-                                if (cost.ValueKind == JsonValueKind.Object)
-                                    proxy.HasNonEmptyCost = cost.EnumerateObject().Any();
-                            }
-
-                            if (action.TryGetProperty("TargetType", out var targetType) ||
-                                action.TryGetProperty("targetType", out targetType))
-                            {
-                                if (targetType.ValueKind == JsonValueKind.String)
-                                    proxy.TargetType = targetType.GetString()?.Trim();
-                            }
-
-                            if (action.TryGetProperty("TargetFilter", out var targetFilter) ||
-                                action.TryGetProperty("targetFilter", out targetFilter))
-                            {
-                                if (targetFilter.ValueKind == JsonValueKind.String)
-                                    proxy.TargetFilter = targetFilter.GetString()?.Trim();
-                            }
-
-                            if (action.TryGetProperty("Range", out var range) ||
-                                action.TryGetProperty("range", out range))
-                            {
-                                if (range.ValueKind == JsonValueKind.Number && range.TryGetSingle(out float value))
-                                    proxy.Range = value;
-                            }
-
-                            if (action.TryGetProperty("AreaRadius", out var areaRadius) ||
-                                action.TryGetProperty("areaRadius", out areaRadius))
-                            {
-                                if (areaRadius.ValueKind == JsonValueKind.Number && areaRadius.TryGetSingle(out float value))
-                                    proxy.AreaRadius = value;
-                            }
-
-                            if (action.TryGetProperty("ConeAngle", out var coneAngle) ||
-                                action.TryGetProperty("coneAngle", out coneAngle))
-                            {
-                                if (coneAngle.ValueKind == JsonValueKind.Number && coneAngle.TryGetSingle(out float value))
-                                    proxy.ConeAngle = value;
-                            }
-
-                            if (action.TryGetProperty("LineWidth", out var lineWidth) ||
-                                action.TryGetProperty("lineWidth", out lineWidth))
-                            {
-                                if (lineWidth.ValueKind == JsonValueKind.Number && lineWidth.TryGetSingle(out float value))
-                                    proxy.LineWidth = value;
-                            }
-
-                            if (action.TryGetProperty("MaxTargets", out var maxTargets) ||
-                                action.TryGetProperty("maxTargets", out maxTargets))
-                            {
-                                if (maxTargets.ValueKind == JsonValueKind.Number && maxTargets.TryGetInt32(out int value))
-                                    proxy.MaxTargets = value;
-                            }
-
-                            if (action.TryGetProperty("Effects", out var effects) ||
-                                action.TryGetProperty("effects", out effects))
-                            {
-                                foreach (var effect in effects.EnumerateArray())
-                                {
-                                    string type = null;
-                                    if (effect.TryGetProperty("Type", out var typeProp))
-                                        type = typeProp.GetString();
-                                    else if (effect.TryGetProperty("type", out typeProp))
-                                        type = typeProp.GetString();
-
-                                    if (!string.IsNullOrWhiteSpace(type))
-                                        proxy.Effects.Add(new EffectProxy { Type = type.Trim() });
-                                }
-                            }
-
-                            actionDefs[proxy.Id] = proxy;
-                        }
+                        if (!string.IsNullOrWhiteSpace(effect?.Type))
+                            proxy.Effects.Add(new EffectProxy { Type = effect.Type.Trim() });
                     }
                 }
-                catch { /* skip unparseable files */ }
+
+                actionDefs[proxy.Id] = proxy;
             }
 
             return actionDefs;
+        }
+
+        private static ActionRegistry BuildActionRegistry(string repoRoot)
+        {
+            var registry = new ActionRegistry();
+            var bg3DataPath = Path.Combine(repoRoot, "BG3_Data");
+            var init = ActionRegistryInitializer.Initialize(registry, bg3DataPath, verboseLogging: false);
+            if (!init.Success)
+                throw new InvalidOperationException(init.ErrorMessage ?? "Action registry initialization failed");
+            return registry;
+        }
+
+        private static bool HasNonEmptyCost(ActionDefinition action)
+        {
+            if (action?.Cost == null)
+                return false;
+
+            return action.Cost.UsesAction
+                || action.Cost.UsesBonusAction
+                || action.Cost.UsesReaction
+                || action.Cost.MovementCost > 0
+                || (action.Cost.ResourceCosts != null && action.Cost.ResourceCosts.Count > 0);
         }
 
         private static HashSet<string> LoadAllowlist(string repoRoot)

@@ -60,15 +60,18 @@ namespace QDND.Tests.Unit
             _dataRegistry.LoadFromDirectory(DataDir);
 
             _statusRegistry = new StatusRegistry();
-            string statusDir = Path.Combine(BG3DataDir, "Statuses");
-            if (Directory.Exists(statusDir))
-                _statusRegistry.LoadStatuses(statusDir);
+            string sharedStatusDir = BG3SharedStatsDir;
+            string sharedDevStatusDir = BG3SharedDevStatsDir;
+            if (Directory.Exists(sharedStatusDir) || Directory.Exists(sharedDevStatusDir))
+                _statusRegistry.LoadStatuses(sharedStatusDir, sharedDevStatusDir);
         }
 
         public void Dispose() { }
 
         private string DataDir => Path.Combine(_repoRoot, "Data");
         private string BG3DataDir => Path.Combine(_repoRoot, "BG3_Data");
+        private string BG3SharedStatsDir => Path.Combine(BG3DataDir, "Shared", "Public", "Shared", "Stats", "Generated", "Data");
+        private string BG3SharedDevStatsDir => Path.Combine(BG3DataDir, "Shared", "Public", "SharedDev", "Stats", "Generated", "Data");
         private string ScenarioDir => Path.Combine(_repoRoot, "Data", "Scenarios");
 
         // ------------------------------------------------------------------

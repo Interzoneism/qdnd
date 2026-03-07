@@ -196,22 +196,36 @@ namespace QDND.Data.Statuses
         }
 
         /// <summary>
-        /// Load all BG3 status definitions from the data directory.
+        /// Load BG3 status definitions from one or more data directories.
         /// </summary>
-        /// <param name="statusDirectory">Path to BG3_Data/Statuses directory.</param>
+        /// <param name="statusDirectories">Paths to status directories (Shared first, then SharedDev).</param>
         /// <returns>Number of statuses successfully loaded.</returns>
-        public int LoadStatuses(string statusDirectory)
+        public int LoadStatuses(params string[] statusDirectories)
         {
-            if (string.IsNullOrEmpty(statusDirectory))
+            if (statusDirectories == null || statusDirectories.Length == 0)
             {
-                _errors.Add("Status directory path is null or empty");
+                _errors.Add("No status directories provided");
                 return 0;
             }
 
             var parser = new BG3StatusParser();
+            var allStatuses = new List<BG3StatusData>();
 
-            // Parse all Status_*.txt files
-            var statuses = parser.ParseDirectory(statusDirectory, "Status_*.txt");
+            // Parse all Status_*.txt files from each source directory
+            foreach (var statusDirectory in statusDirectories)
+            {
+                if (string.IsNullOrWhiteSpace(statusDirectory))
+                    continue;
+
+                if (!System.IO.Directory.Exists(statusDirectory))
+                {
+                    _warnings.Add($"Status directory not found: {statusDirectory}");
+                    continue;
+                }
+
+                var parsed = parser.ParseDirectory(statusDirectory, "Status_*.txt");
+                allStatuses.AddRange(parsed);
+            }
 
             // Resolve inheritance
             parser.ResolveInheritance();
@@ -222,15 +236,15 @@ namespace QDND.Data.Statuses
 
             // Register all parsed statuses
             int registeredCount = 0;
-            foreach (var status in statuses)
+            foreach (var status in allStatuses)
             {
-                if (RegisterStatus(status, overwrite: true))
+                if (RegisterStatus(status, overwrite: false))
                 {
                     registeredCount++;
                 }
             }
 
-            Console.WriteLine($"[StatusRegistry] Loaded {registeredCount} statuses from {statusDirectory}");
+            Console.WriteLine($"[StatusRegistry] Loaded {registeredCount} statuses from {statusDirectories.Length} source directorie(s)");
             if (_errors.Count > 0)
             {
                 Console.WriteLine($"[StatusRegistry] Encountered {_errors.Count} errors during loading");

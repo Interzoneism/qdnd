@@ -34,14 +34,14 @@ namespace QDND.Combat.Statuses
         }
 
         /// <summary>
-        /// Load BG3 status definitions from the data directory and register them with StatusManager.
+        /// Load BG3 status definitions from one or more data directories and register them with StatusManager.
         /// </summary>
-        /// <param name="statusDirectory">Path to BG3_Data/Statuses directory.</param>
+        /// <param name="statusDirectories">Status data directories (Shared first, then SharedDev).</param>
         /// <returns>Number of statuses successfully loaded and registered.</returns>
-        public int LoadBG3Statuses(string statusDirectory)
+        public int LoadBG3Statuses(params string[] statusDirectories)
         {
             // Load from registry
-            int loadedCount = _statusRegistry.LoadStatuses(statusDirectory);
+            int loadedCount = _statusRegistry.LoadStatuses(statusDirectories);
 
             // Convert and register with StatusManager
             int registeredCount = 0;
@@ -52,7 +52,7 @@ namespace QDND.Combat.Statuses
                 registeredCount++;
             }
 
-            Console.WriteLine($"[BG3StatusIntegration] Registered {registeredCount} BG3 statuses with StatusManager");
+            Console.WriteLine($"[BG3StatusIntegration] Loaded {loadedCount} BG3 statuses and registered {registeredCount} with StatusManager");
             return registeredCount;
         }
 

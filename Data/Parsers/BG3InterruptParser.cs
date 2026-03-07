@@ -72,7 +72,7 @@ namespace QDND.Data.Parsers
                         if (current != null)
                         {
                             interrupts.Add(current);
-                            _parsedInterrupts[current.InterruptId] = current;
+                            _parsedInterrupts.TryAdd(current.InterruptId, current);
                         }
 
                         var entryName = ExtractQuotedValue(line, "new entry");
@@ -131,7 +131,7 @@ namespace QDND.Data.Parsers
                 if (current != null)
                 {
                     interrupts.Add(current);
-                    _parsedInterrupts[current.InterruptId] = current;
+                    _parsedInterrupts.TryAdd(current.InterruptId, current);
                 }
             }
             catch (Exception ex)
