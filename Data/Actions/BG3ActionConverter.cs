@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using QDND.Combat.Actions;
+using QDND.Data.Descriptions;
 using QDND.Data.Spells;
 
 namespace QDND.Data.Actions
@@ -30,6 +31,8 @@ namespace QDND.Data.Actions
                 Id = MapExplicitId(spell.Id),
                 Name = spell.DisplayName ?? spell.Id,
                 Description = spell.Description ?? "",
+                ExtraDescription = spell.ExtraDescription ?? "",
+                DescriptionParams = spell.DescriptionParams,
                 Icon = spell.Icon ?? "",
 
                 // BG3-specific properties
@@ -82,6 +85,17 @@ namespace QDND.Data.Actions
                 VfxId = null,
                 SfxId = spell.SpellSoundMagnitude == "None" ? null : spell.SpellSoundMagnitude
             };
+
+            // Resolve [1], [2] placeholders in description if params exist
+            if (!string.IsNullOrEmpty(spell.DescriptionParams) && !string.IsNullOrEmpty(action.Description))
+                action.Description = DescriptionParamResolver.Resolve(action.Description, spell.DescriptionParams);
+
+            // Use ExtraDescriptionParams for ExtraDescription, falling back to DescriptionParams.
+            var extraParams = !string.IsNullOrEmpty(spell.ExtraDescriptionParams)
+                ? spell.ExtraDescriptionParams
+                : spell.DescriptionParams;
+            if (!string.IsNullOrEmpty(extraParams) && !string.IsNullOrEmpty(action.ExtraDescription))
+                action.ExtraDescription = DescriptionParamResolver.Resolve(action.ExtraDescription, extraParams);
 
             // Wire multi-target counts from BG3 targeting fields.
             if (spell.AmountOfTargetsCount > 1)

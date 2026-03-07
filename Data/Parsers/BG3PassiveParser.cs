@@ -231,6 +231,9 @@ namespace QDND.Data.Parsers
             if (string.IsNullOrEmpty(passive.DescriptionParams) && !string.IsNullOrEmpty(parent.DescriptionParams))
                 passive.DescriptionParams = parent.DescriptionParams;
 
+            if (string.IsNullOrEmpty(passive.ExtraDescriptionParams) && !string.IsNullOrEmpty(parent.ExtraDescriptionParams))
+                passive.ExtraDescriptionParams = parent.ExtraDescriptionParams;
+
             if (string.IsNullOrEmpty(passive.TooltipUseCosts) && !string.IsNullOrEmpty(parent.TooltipUseCosts))
                 passive.TooltipUseCosts = parent.TooltipUseCosts;
 
@@ -301,6 +304,9 @@ namespace QDND.Data.Parsers
                     break;
                 case "DescriptionParams":
                     passive.DescriptionParams = value;
+                    break;
+                case "ExtraDescriptionParams":
+                    passive.ExtraDescriptionParams = value;
                     break;
                 case "TooltipUseCosts":
                     passive.TooltipUseCosts = value;

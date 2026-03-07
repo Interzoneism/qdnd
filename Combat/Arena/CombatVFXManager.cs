@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using QDND.Combat.VFX;
+using QDND.Combat.Services;
 using QDND.Data.CharacterModel;
 using QDND.Tools;
 
@@ -16,6 +17,7 @@ namespace QDND.Combat.Arena
     {
         private readonly Queue<GpuParticles3D> _particlePool = new();
         private readonly List<ActiveEffect> _activeEffects = new();
+        private VfxRecipeFactory _recipeFactory;
 
         private int _initialPoolSize = 12;
         private int _maxActiveEffects = 48;
@@ -37,6 +39,7 @@ namespace QDND.Combat.Arena
 
         public override void _Ready()
         {
+            _recipeFactory = new VfxRecipeFactory();
             for (int i = 0; i < _initialPoolSize; i++)
             {
                 _particlePool.Enqueue(CreateParticleEmitter());
@@ -87,7 +90,7 @@ namespace QDND.Combat.Arena
                         $"[VFX] Spawn projectile recipe={recipe} preset={spec.PresetId} " +
                         $"from={originWorld} to={targetWorld} active={_activeEffects.Count}/{_maxActiveEffects}");
                 }
-                SpawnProjectile(originWorld, targetWorld, duration, color, spec.Preset?.Lifetime ?? 0.8f);
+                SpawnProjectile(originWorld, targetWorld, duration, color, spec.Preset?.Lifetime ?? 0.8f, recipe, spec);
                 return;
             }
 
@@ -124,6 +127,34 @@ namespace QDND.Combat.Arena
             if (_activeEffects.Count >= _maxActiveEffects)
                 return;
 
+            var particle = GetFromPool();
+            if (_recipeFactory != null && _recipeFactory.ConfigureParticles(particle, spec?.Preset, spec))
+            {
+                particle.GlobalPosition = worldPosition + Vector3.Up * 1.0f;
+                particle.Emitting = true;
+
+                float lifetime = spec?.Preset?.Lifetime ?? 0.8f;
+                AnimateDissolve(particle, lifetime, spec?.Preset?.DissolveSpeed ?? 1.0f);
+
+                if (recipe.StartsWith("area_", StringComparison.OrdinalIgnoreCase))
+                    AnimateAoERing(particle, lifetime);
+
+                if (recipe.StartsWith("cast_", StringComparison.OrdinalIgnoreCase))
+                    AnimateCastEffect(particle, lifetime, spec?.Preset?.ScrollSpeed ?? 1.5f);
+
+                if (spec.Phase == VfxEventPhase.Impact || spec.Phase == VfxEventPhase.Area)
+                {
+                    var flashColor = ResolveRecipeColor(recipe, spec);
+                    FlashAtPosition(worldPosition, flashColor, 2.5f, 0.15f);
+                }
+
+                TrackEffect(particle, lifetime + 0.3f);
+                TotalEmittersSpawned++;
+                return;
+            }
+
+            ReturnToPool(particle);
+
             var color = ResolveRecipeColor(recipe, spec);
             switch (recipe.ToLowerInvariant())
             {
@@ -140,6 +171,7 @@ namespace QDND.Combat.Arena
                 case "impact_fire":
                 case "impact_cold":
                 case "impact_lightning":
+                case "impact_thunder":
                 case "impact_poison":
                 case "impact_acid":
                 case "impact_necrotic":
@@ -207,6 +239,7 @@ namespace QDND.Combat.Arena
                 "impact_fire" => new Color(1.0f, 0.42f, 0.0f),
                 "impact_cold" => new Color(0.45f, 0.75f, 0.99f),
                 "impact_lightning" => new Color(1.0f, 0.88f, 0.40f),
+                "impact_thunder" => new Color(0.62f, 0.78f, 1.0f),
                 "impact_poison" => new Color(0.51f, 0.79f, 0.12f),
                 "impact_acid" => new Color(0.66f, 0.89f, 0.29f),
                 "impact_necrotic" => new Color(0.48f, 0.18f, 0.75f),
@@ -235,15 +268,26 @@ namespace QDND.Combat.Arena
             };
         }
 
-        private void SpawnProjectile(Vector3 origin, Vector3 target, float duration, Color color, float lifetime)
+        private void SpawnProjectile(Vector3 origin, Vector3 target, float duration, Color color, float lifetime, string recipe, VfxResolvedSpec spec)
         {
             if (!IsInsideTree() || _activeEffects.Count >= _maxActiveEffects)
                 return;
 
             var particle = GetFromPool();
-            ConfigureProjectileParticles(particle, color);
+            bool shaderConfigured = _recipeFactory != null && _recipeFactory.ConfigureParticles(particle, spec?.Preset, spec);
+            if (!shaderConfigured)
+            {
+                ConfigureProjectileParticles(particle, color);
+            }
+
             particle.GlobalPosition = origin;
             particle.Emitting = true;
+
+            if (shaderConfigured)
+            {
+                float dissolveDuration = Mathf.Max(0.2f, duration);
+                AnimateDissolve(particle, dissolveDuration, spec?.Preset?.DissolveSpeed ?? 1.0f);
+            }
 
             var tween = CreateTween();
             tween.TweenProperty(particle, "global_position", target, duration)
@@ -252,6 +296,15 @@ namespace QDND.Combat.Arena
             tween.TweenCallback(Callable.From(() =>
             {
                 particle.Emitting = false;
+
+                if (shaderConfigured)
+                {
+                    string impactRecipe = ResolveProjectileImpactRecipe(recipe, spec);
+                    var impactSpec = CreateImpactSpecFromProjectile(spec, impactRecipe);
+                    SpawnRecipeAtPoint(impactRecipe, target, impactSpec);
+                    return;
+                }
+
                 SpawnTypedImpact(target, color, velocity: 6.0f);
             }));
 
@@ -279,6 +332,164 @@ namespace QDND.Combat.Arena
             var tween = CreateTween();
             tween.TweenProperty(light, "light_energy", 0.0f, duration);
             tween.TweenCallback(Callable.From(() => light.QueueFree()));
+        }
+
+        private void AnimateDissolve(GpuParticles3D particle, float duration, float dissolveSpeed)
+        {
+            if (particle?.DrawPass1 is not QuadMesh mesh || mesh.Material is not ShaderMaterial shaderMat)
+                return;
+
+            float speed = Mathf.Max(dissolveSpeed, 0.05f);
+            float tweenDuration = Mathf.Max(0.05f, (duration * 0.7f) / speed);
+            float delay = Mathf.Max(0.0f, duration * 0.3f);
+
+            shaderMat.SetShaderParameter("dissolve_progress", 0.0f);
+            var tween = CreateTween();
+            tween.TweenMethod(
+                Callable.From<float>(v => shaderMat.SetShaderParameter("dissolve_progress", v)),
+                0.0f,
+                1.0f,
+                tweenDuration
+            ).SetDelay(delay);
+        }
+
+        private void AnimateAoERing(GpuParticles3D particle, float duration)
+        {
+            if (particle?.DrawPass1 is not QuadMesh mesh || mesh.Material is not ShaderMaterial shaderMat)
+                return;
+
+            shaderMat.SetShaderParameter("ring_progress", 0.0f);
+            var tween = CreateTween();
+            tween.TweenMethod(
+                Callable.From<float>(v => shaderMat.SetShaderParameter("ring_progress", v)),
+                0.0f,
+                1.0f,
+                Mathf.Max(0.08f, duration * 0.85f)
+            );
+        }
+
+        private void AnimateCastEffect(GpuParticles3D particle, float duration, float startScrollSpeed)
+        {
+            if (particle?.DrawPass1 is not QuadMesh mesh || mesh.Material is not ShaderMaterial shaderMat)
+                return;
+
+            float start = Mathf.Max(0.1f, startScrollSpeed);
+            float end = start * 1.8f;
+            shaderMat.SetShaderParameter("scroll_speed", start);
+
+            var tween = CreateTween();
+            tween.TweenMethod(
+                Callable.From<float>(v => shaderMat.SetShaderParameter("scroll_speed", v)),
+                start,
+                end,
+                Mathf.Max(0.1f, duration * 0.8f)
+            );
+        }
+
+        private static string ResolveProjectileImpactRecipe(string projectileRecipe, VfxResolvedSpec spec)
+        {
+            if (spec?.DamageType.HasValue == true)
+                return DamageTypeToImpactRecipe(spec.DamageType.Value);
+
+            return projectileRecipe?.ToLowerInvariant() switch
+            {
+                "proj_fire" => "impact_fire",
+                "proj_lightning" => "impact_lightning",
+                "proj_arcane_generic" => "impact_force",
+                "proj_physical_generic" => "impact_physical",
+                _ => "impact_physical"
+            };
+        }
+
+        private static string DamageTypeToImpactRecipe(DamageType dt)
+        {
+            return dt switch
+            {
+                DamageType.Fire => "impact_fire",
+                DamageType.Cold => "impact_cold",
+                DamageType.Lightning => "impact_lightning",
+                DamageType.Thunder => "impact_thunder",
+                DamageType.Poison => "impact_poison",
+                DamageType.Acid => "impact_acid",
+                DamageType.Necrotic => "impact_necrotic",
+                DamageType.Radiant => "impact_radiant",
+                DamageType.Force => "impact_force",
+                DamageType.Psychic => "impact_psychic",
+                _ => "impact_physical"
+            };
+        }
+
+        private static VfxResolvedSpec CreateImpactSpecFromProjectile(VfxResolvedSpec spec, string impactRecipe)
+        {
+            if (spec == null)
+                return null;
+
+            return new VfxResolvedSpec
+            {
+                PresetId = impactRecipe,
+                Preset = ClonePresetWithRecipe(spec.Preset, impactRecipe),
+                Phase = VfxEventPhase.Impact,
+                Pattern = VfxTargetPattern.Point,
+                DamageType = spec.DamageType,
+                IsCritical = spec.IsCritical,
+                DidKill = spec.DidKill,
+                Magnitude = spec.Magnitude,
+                Seed = spec.Seed,
+                SourcePosition = spec.SourcePosition,
+                TargetPosition = spec.TargetPosition,
+                CastPosition = spec.CastPosition,
+                Direction = spec.Direction,
+                EmissionPoints = spec.EmissionPoints,
+            };
+        }
+
+        private static VfxPresetDefinition ClonePresetWithRecipe(VfxPresetDefinition preset, string particleRecipe)
+        {
+            if (preset == null)
+            {
+                return new VfxPresetDefinition
+                {
+                    Id = particleRecipe,
+                    ParticleRecipe = particleRecipe,
+                    ColorPolicy = "damage_type",
+                    Lifetime = 0.45f,
+                };
+            }
+
+            return new VfxPresetDefinition
+            {
+                Id = preset.Id,
+                Renderer = preset.Renderer,
+                ScenePath = preset.ScenePath,
+                ParticleRecipe = particleRecipe,
+                ShaderCategory = null,
+                PrimaryColor = preset.PrimaryColor,
+                SecondaryColor = preset.SecondaryColor,
+                Intensity = preset.Intensity,
+                NoiseScale = preset.NoiseScale,
+                DissolveSpeed = preset.DissolveSpeed,
+                DistortionAmount = preset.DistortionAmount,
+                FresnelPower = preset.FresnelPower,
+                PulseSpeed = preset.PulseSpeed,
+                ScrollSpeed = preset.ScrollSpeed,
+                ColumnHeight = preset.ColumnHeight,
+                RingWidth = preset.RingWidth,
+                TrailLength = preset.TrailLength,
+                WaveAmplitude = preset.WaveAmplitude,
+                ParticleCount = preset.ParticleCount,
+                ParticleSize = preset.ParticleSize,
+                EmissionVelocity = preset.EmissionVelocity,
+                EmissionSpread = preset.EmissionSpread,
+                Lifetime = preset.Lifetime,
+                PoolKey = preset.PoolKey,
+                FollowMode = preset.FollowMode,
+                ColorPolicy = preset.ColorPolicy,
+                SampleCount = preset.SampleCount,
+                Radius = preset.Radius,
+                ConeAngle = preset.ConeAngle,
+                LineWidth = preset.LineWidth,
+                ProjectileSpeed = preset.ProjectileSpeed,
+            };
         }
 
         private void SpawnMeleeImpact(Vector3 position, Color color)

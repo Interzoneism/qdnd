@@ -9,6 +9,7 @@ using QDND.Data;
 using QDND.Data.Actions;
 using QDND.Data.Passives;
 using QDND.Combat.Statuses;
+using QDND.Combat.UI.Base;
 
 namespace QDND.Combat.Services
 {
@@ -395,60 +396,10 @@ namespace QDND.Combat.Services
         private const string FallbackItemIconPath = "res://assets/Images/Icons General/Generic_Feature_Unfaded_Icon.png";
         private const string FallbackSpecialIconPath = "res://assets/Images/Icons General/Generic_Feature_Unfaded_Icon.png";
 
-        // Ordered list of icon search folders for bare-name lookups.
-        private static readonly string[] IconSearchFolders = new[]
-        {
-            "res://assets/Images/Icons Spells/",
-            "res://assets/Images/Icons Actions/",
-            "res://assets/Images/Icons Weapon Actions/",
-            "res://assets/Images/Icons Passive Features/",
-            "res://assets/Images/Icons Conditions/",
-            "res://assets/Images/Icons General/",
-            "res://assets/Images/Icons Weapons and Other/",
-            "res://assets/Images/Icons Armour/",
-        };
-
         private string ResolveIconPath(string iconName, string category = null)
         {
-            if (!string.IsNullOrWhiteSpace(iconName))
-            {
-                iconName = iconName.Trim();
-                if (iconName.StartsWith("res://", StringComparison.Ordinal))
-                {
-                    if (ResourceLoader.Exists(iconName))
-                    {
-                        return iconName;
-                    }
-
-                    // Recover common data mismatch: icon path references .webp but only .png exists.
-                    if (iconName.EndsWith(".webp", StringComparison.OrdinalIgnoreCase))
-                    {
-                        string pngPath = iconName.Substring(0, iconName.Length - ".webp".Length) + ".png";
-                        if (ResourceLoader.Exists(pngPath))
-                        {
-                            return pngPath;
-                        }
-                    }
-                }
-                else
-                {
-                    // Bare icon name (no res:// prefix): search known icon directories.
-                    // Try both the raw name and the BG3-style _Unfaded_Icon suffix.
-                    string[] candidates = iconName.EndsWith(".png", StringComparison.OrdinalIgnoreCase)
-                        ? new[] { iconName }
-                        : new[] { iconName + "_Unfaded_Icon.png", iconName + ".png" };
-
-                    foreach (var folder in IconSearchFolders)
-                    {
-                        foreach (var candidate in candidates)
-                        {
-                            string fullPath = folder + candidate;
-                            if (ResourceLoader.Exists(fullPath))
-                                return fullPath;
-                        }
-                    }
-                }
-            }
+            if (HudIcons.TryResolveIconPath(iconName, out var resolvedPath))
+                return resolvedPath;
 
             string fallback = category switch
             {

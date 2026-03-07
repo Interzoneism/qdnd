@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Godot;
 using QDND.Combat.Services;
+using QDND.Data;
 using QDND.Data.Icons;
 
 namespace QDND.Combat.UI.Base
@@ -14,6 +15,8 @@ namespace QDND.Combat.UI.Base
     public static class HudIcons
     {
         private const string FallbackPassiveFeatureIcon = "res://assets/Images/Icons General/Generic_Feature_Unfaded_Icon.png";
+        private const string FallbackStatusBuffIcon = "res://assets/Images/Icons General/Generic_Buff_Unfaded_Icon.png";
+        private const string FallbackStatusDebuffIcon = "res://assets/Images/Icons General/Generic_Debuff_Unfaded_Icon.png";
         private const string PassiveFeatureFolder = "res://assets/Images/Icons Passive Features";
 
         private static readonly string[] IconSearchFolders = new[]
@@ -98,6 +101,8 @@ namespace QDND.Combat.UI.Base
         };
 
         private static IconService _iconService;
+
+        public static bool EnableDiagnostics { get; set; }
 
         private static Dictionary<string, string> _passiveIconIndex;
         private static bool _passiveIconIndexBuilt;
@@ -226,6 +231,40 @@ namespace QDND.Combat.UI.Base
                 : string.Empty;
         }
 
+        /// <summary>
+        /// Resolve status icon with fallback behavior.
+        /// Tries explicit icon path/name first, then status-name tokens, then buff/debuff generic icon.
+        /// </summary>
+        public static string ResolveStatusIcon(string iconPath, string statusName, bool isBuff)
+        {
+            if (TryResolveIconPath(iconPath, out var resolved))
+            {
+                LogDiagnostics($"[HudIcons] ResolveStatusIcon resolved '{iconPath}' => '{resolved}' (status='{statusName ?? string.Empty}')");
+                return resolved;
+            }
+
+            foreach (var token in BuildFeatureTokens(statusName, statusName))
+            {
+                if (TryResolveIconPath(token, out resolved))
+                    return resolved;
+            }
+
+            string fallback = isBuff ? FallbackStatusBuffIcon : FallbackStatusDebuffIcon;
+            if (ResourceLoader.Exists(fallback))
+            {
+                LogDiagnostics($"ResolveStatusIcon fallback ({(isBuff ? "buff" : "debuff")}) => {fallback} (status='{statusName ?? string.Empty}')");
+                return fallback;
+            }
+
+            if (ResourceLoader.Exists(FallbackPassiveFeatureIcon))
+            {
+                LogDiagnostics($"ResolveStatusIcon fallback (generic) => {FallbackPassiveFeatureIcon} (status='{statusName ?? string.Empty}')");
+                return FallbackPassiveFeatureIcon;
+            }
+
+            return string.Empty;
+        }
+
         // ── Safe Texture Loading ───────────────────────────────────
 
         /// <summary>
@@ -290,7 +329,7 @@ namespace QDND.Combat.UI.Base
             return unique;
         }
 
-        private static bool TryResolveIconPath(string iconName, out string resolvedPath)
+        public static bool TryResolveIconPath(string iconName, out string resolvedPath)
         {
             resolvedPath = null;
             if (string.IsNullOrWhiteSpace(iconName))
@@ -298,10 +337,22 @@ namespace QDND.Combat.UI.Base
 
             iconName = iconName.Trim();
 
+            if (iconName.StartsWith("atlas://", StringComparison.Ordinal))
+            {
+                string atlasIconName = iconName.Substring("atlas://".Length);
+                if (_iconService != null && _iconService.HasIcon(atlasIconName))
+                {
+                    resolvedPath = iconName;
+                    LogDiagnostics($"TryResolveIconPath atlas-direct => {resolvedPath} (input='{iconName}')");
+                    return true;
+                }
+            }
+
             // Try atlas-based resolution first (BG3 icon names like "Action_Dash", "Spell_Conjuration_MageArmor")
             if (_iconService != null && _iconService.HasIcon(iconName))
             {
                 resolvedPath = $"atlas://{iconName}";
+                LogDiagnostics($"TryResolveIconPath atlas => {resolvedPath} (input='{iconName}')");
                 return true;
             }
 
@@ -310,6 +361,7 @@ namespace QDND.Combat.UI.Base
                 if (ResourceLoader.Exists(iconName))
                 {
                     resolvedPath = iconName;
+                    LogDiagnostics($"TryResolveIconPath direct => {resolvedPath} (input='{iconName}')");
                     return true;
                 }
 
@@ -319,6 +371,7 @@ namespace QDND.Combat.UI.Base
                     if (ResourceLoader.Exists(pngPath))
                     {
                         resolvedPath = pngPath;
+                        LogDiagnostics($"TryResolveIconPath webp->png => {resolvedPath} (input='{iconName}')");
                         return true;
                     }
                 }
@@ -336,6 +389,7 @@ namespace QDND.Combat.UI.Base
                         if (ResourceLoader.Exists(fullPath))
                         {
                             resolvedPath = fullPath;
+                            LogDiagnostics($"TryResolveIconPath search => {resolvedPath} (input='{iconName}')");
                             return true;
                         }
                     }
@@ -481,6 +535,14 @@ namespace QDND.Combat.UI.Base
             }
 
             return sb.ToString();
+        }
+
+        private static void LogDiagnostics(string message)
+        {
+            if (!EnableDiagnostics)
+                return;
+
+            RuntimeSafety.Log($"[DEBUG-HUD-ICONS] {message}");
         }
     }
 }

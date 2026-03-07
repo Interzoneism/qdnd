@@ -89,6 +89,11 @@ namespace QDND.Data.Passives
         public string DescriptionParams { get; set; }
 
         /// <summary>
+        /// Extra description parameter substitutions used for ExtraDescription placeholders.
+        /// </summary>
+        public string ExtraDescriptionParams { get; set; }
+
+        /// <summary>
         /// Resource costs shown in tooltip (e.g., "ReactionActionPoint:1").
         /// </summary>
         public string TooltipUseCosts { get; set; }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using QDND.Data;
+using QDND.Data.Descriptions;
 using QDND.Data.Parsers;
 
 namespace QDND.Data.Passives
@@ -53,6 +54,16 @@ namespace QDND.Data.Passives
                 _errors.Add($"Cannot register passive with null/empty ID: {passive.DisplayName ?? "Unknown"}");
                 return false;
             }
+
+            if (!string.IsNullOrEmpty(passive.DescriptionParams) && !string.IsNullOrEmpty(passive.Description))
+                passive.Description = DescriptionParamResolver.Resolve(passive.Description, passive.DescriptionParams);
+
+            // Use ExtraDescriptionParams for ExtraDescription, falling back to DescriptionParams.
+            var extraParams = !string.IsNullOrEmpty(passive.ExtraDescriptionParams)
+                ? passive.ExtraDescriptionParams
+                : passive.DescriptionParams;
+            if (!string.IsNullOrEmpty(passive.ExtraDescription) && !string.IsNullOrEmpty(extraParams))
+                passive.ExtraDescription = DescriptionParamResolver.Resolve(passive.ExtraDescription, extraParams);
 
             // Check if already exists
             if (_passives.ContainsKey(passive.PassiveId) && !overwrite)

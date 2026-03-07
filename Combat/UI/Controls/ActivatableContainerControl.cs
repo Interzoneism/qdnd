@@ -362,19 +362,6 @@ namespace QDND.Combat.UI.Controls
                    (payload.VariantType == Variant.Type.Bool && !payload.AsBool());
         }
 
-        private static Texture2D LoadIcon(string iconPath)
-        {
-            if (string.IsNullOrWhiteSpace(iconPath) || !iconPath.StartsWith("res://", StringComparison.Ordinal))
-            {
-                return null;
-            }
-
-            if (!ResourceLoader.Exists(iconPath))
-            {
-                return null;
-            }
-
-            return ResourceLoader.Load<Texture2D>(iconPath);
-        }
+        private static Texture2D LoadIcon(string iconPath) => HudIcons.LoadTextureSafe(iconPath);
     }
 }

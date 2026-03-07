@@ -26,6 +26,24 @@ namespace QDND.Combat.VFX
         public string Renderer { get; set; } = "procedural";
         public string ScenePath { get; set; }
         public string ParticleRecipe { get; set; }
+        public string ShaderCategory { get; set; }
+        public string PrimaryColor { get; set; }
+        public string SecondaryColor { get; set; }
+        public float Intensity { get; set; } = 3.0f;
+        public float NoiseScale { get; set; } = 1.5f;
+        public float DissolveSpeed { get; set; } = 1.0f;
+        public float DistortionAmount { get; set; } = 0.1f;
+        public float FresnelPower { get; set; } = 2.0f;
+        public float PulseSpeed { get; set; } = 2.0f;
+        public float ScrollSpeed { get; set; } = 1.5f;
+        public float ColumnHeight { get; set; } = 1.5f;
+        public float RingWidth { get; set; } = 0.1f;
+        public float TrailLength { get; set; } = 0.8f;
+        public float WaveAmplitude { get; set; } = 0.1f;
+        public int ParticleCount { get; set; } = 20;
+        public float ParticleSize { get; set; } = 0.15f;
+        public float EmissionVelocity { get; set; } = 3.0f;
+        public float EmissionSpread { get; set; } = 90.0f;
         public float Lifetime { get; set; } = 0.8f;
         public string PoolKey { get; set; } = "default";
         public string FollowMode { get; set; } = "none";

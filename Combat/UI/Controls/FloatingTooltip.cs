@@ -674,11 +674,11 @@ namespace QDND.Combat.UI.Controls
             _actDesc.Text = "";
             _actDesc.AppendText(action.Description ?? "No description available.");
 
-            if (!string.IsNullOrEmpty(action.IconPath) && action.IconPath.StartsWith("res://"))
+            var tex = HudIcons.LoadTextureSafe(action.IconPath);
+            if (tex != null)
             {
-                var tex = HudIcons.LoadTextureSafe(action.IconPath);
                 _actIcon.Texture = tex;
-                _actIcon.Visible = tex != null;
+                _actIcon.Visible = true;
             }
             else
             {

@@ -978,7 +978,7 @@ void fragment() {
                 .Where(s => s?.Definition != null && StatusPresentationPolicy.ShowInPortraitIndicators(s.Definition))
                 .Select(s => new ConditionIndicator
                 {
-                    IconPath = !string.IsNullOrWhiteSpace(s.Definition.Icon) ? s.Definition.Icon : null,
+                    IconPath = HudIcons.ResolveStatusIcon(s.Definition.Icon, s.Definition.Name, s.Definition.IsBuff),
                     DisplayName = StatusPresentationPolicy.GetDisplayName(s.Definition),
                     Description = s.Definition.Description ?? string.Empty,
                 })
@@ -2579,9 +2579,13 @@ void fragment() {
                     conditionBox.AddThemeConstantOverride("separation", 2);
                     conditionBox.MouseFilter = MouseFilterEnum.Ignore;
 
-                    if (!string.IsNullOrWhiteSpace(status.Definition.Icon))
+                    var resolvedIconPath = HudIcons.ResolveStatusIcon(
+                        status.Definition.Icon,
+                        status.Definition.Name,
+                        status.Definition.IsBuff);
+                    if (!string.IsNullOrWhiteSpace(resolvedIconPath))
                     {
-                        var iconTex = HudIcons.LoadTextureSafe(status.Definition.Icon);
+                        var iconTex = HudIcons.LoadTextureSafe(resolvedIconPath);
                         if (iconTex != null)
                         {
                             var iconRect = new TextureRect();

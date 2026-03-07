@@ -231,6 +231,9 @@ namespace QDND.Data.Parsers
             
             if (string.IsNullOrEmpty(spell.Description) && !string.IsNullOrEmpty(parent.Description))
                 spell.Description = parent.Description;
+
+            if (string.IsNullOrEmpty(spell.ExtraDescription) && !string.IsNullOrEmpty(parent.ExtraDescription))
+                spell.ExtraDescription = parent.ExtraDescription;
             
             if (string.IsNullOrEmpty(spell.Icon) && !string.IsNullOrEmpty(parent.Icon))
                 spell.Icon = parent.Icon;
@@ -318,6 +321,18 @@ namespace QDND.Data.Parsers
             
             if (string.IsNullOrEmpty(spell.Cooldown) && !string.IsNullOrEmpty(parent.Cooldown))
                 spell.Cooldown = parent.Cooldown;
+
+            if (string.IsNullOrEmpty(spell.DescriptionParams) && !string.IsNullOrEmpty(parent.DescriptionParams))
+                spell.DescriptionParams = parent.DescriptionParams;
+
+            if (string.IsNullOrEmpty(spell.ExtraDescriptionParams) && !string.IsNullOrEmpty(parent.ExtraDescriptionParams))
+                spell.ExtraDescriptionParams = parent.ExtraDescriptionParams;
+
+            if (string.IsNullOrEmpty(spell.TooltipUpcastDescription) && !string.IsNullOrEmpty(parent.TooltipUpcastDescription))
+                spell.TooltipUpcastDescription = parent.TooltipUpcastDescription;
+
+            if (string.IsNullOrEmpty(spell.TooltipUpcastDescriptionParams) && !string.IsNullOrEmpty(parent.TooltipUpcastDescriptionParams))
+                spell.TooltipUpcastDescriptionParams = parent.TooltipUpcastDescriptionParams;
             
             // Copy any raw properties not present in child
             foreach (var (key, value) in parent.RawProperties)
@@ -362,6 +377,9 @@ namespace QDND.Data.Parsers
                     break;
                 case "Description":
                     spell.Description = value;
+                    break;
+                case "ExtraDescription":
+                    spell.ExtraDescription = value;
                     break;
                 case "Icon":
                     spell.Icon = value;
@@ -461,6 +479,15 @@ namespace QDND.Data.Parsers
                     break;
                 case "DescriptionParams":
                     spell.DescriptionParams = value;
+                    break;
+                case "ExtraDescriptionParams":
+                    spell.ExtraDescriptionParams = value;
+                    break;
+                case "TooltipUpcastDescription":
+                    spell.TooltipUpcastDescription = value;
+                    break;
+                case "TooltipUpcastDescriptionParams":
+                    spell.TooltipUpcastDescriptionParams = value;
                     break;
                 case "SpellFlags":
                     spell.SpellFlags = value;

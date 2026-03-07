@@ -286,25 +286,27 @@ namespace QDND.Combat.UI.Panels
 
             foreach (var indicator in conditions.Where(c => c != null).Take(MaxVisibleConditionIcons))
             {
-                string iconPath = null;
-                if (!string.IsNullOrWhiteSpace(indicator.IconPath) &&
-                    indicator.IconPath.StartsWith("res://", StringComparison.OrdinalIgnoreCase) &&
-                    ResourceLoader.Exists(indicator.IconPath))
+                Texture2D iconTexture = null;
+                if (!string.IsNullOrWhiteSpace(indicator.IconPath))
                 {
-                    iconPath = indicator.IconPath;
+                    iconTexture = HudIcons.LoadTextureSafe(indicator.IconPath);
                 }
 
-                if (iconPath == null)
-                    iconPath = ResolveConditionIconPath(indicator.DisplayName);
+                if (iconTexture == null)
+                {
+                    var iconPath = ResolveConditionIconPath(indicator.DisplayName);
+                    if (!string.IsNullOrWhiteSpace(iconPath))
+                        iconTexture = HudIcons.LoadTextureSafe(iconPath);
+                }
 
                 string tooltip = BuildConditionTooltip(indicator);
-                if (iconPath != null)
+                if (iconTexture != null)
                 {
                     var icon = new TextureRect();
                     icon.CustomMinimumSize = new Vector2(ConditionIconSize, ConditionIconSize);
                     icon.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
                     icon.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
-                    icon.Texture = GD.Load<Texture2D>(iconPath);
+                    icon.Texture = iconTexture;
                     icon.TooltipText = tooltip;
                     icon.MouseFilter = MouseFilterEnum.Pass;
                     card.ConditionContainer.AddChild(icon);

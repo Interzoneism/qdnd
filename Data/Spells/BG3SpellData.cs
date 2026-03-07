@@ -62,6 +62,9 @@ namespace QDND.Data.Spells
         
         /// <summary>Full spell description.</summary>
         public string Description { get; set; }
+
+        /// <summary>Additional spell description (often used for conditional or variant detail text).</summary>
+        public string ExtraDescription { get; set; }
         
         /// <summary>Icon path (e.g., "res://assets/Images/Icons/...").</summary>
         public string Icon { get; set; }
@@ -186,6 +189,15 @@ namespace QDND.Data.Spells
         
         /// <summary>Description parameter substitutions.</summary>
         public string DescriptionParams { get; set; }
+
+        /// <summary>Extra description parameter substitutions.</summary>
+        public string ExtraDescriptionParams { get; set; }
+
+        /// <summary>Tooltip description shown when upcasting.</summary>
+        public string TooltipUpcastDescription { get; set; }
+
+        /// <summary>Parameter substitutions for <see cref="TooltipUpcastDescription"/>.</summary>
+        public string TooltipUpcastDescriptionParams { get; set; }
         
         // --- Behavior Flags ---
         

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
+using QDND.Data.Descriptions;
 
 namespace QDND.Data.Statuses
 {
@@ -27,11 +28,15 @@ namespace QDND.Data.Statuses
             if (bg3Status == null)
                 throw new ArgumentNullException(nameof(bg3Status));
 
+            var description = bg3Status.Description ?? "";
+            if (!string.IsNullOrEmpty(bg3Status.DescriptionParams) && !string.IsNullOrEmpty(description))
+                description = DescriptionParamResolver.Resolve(description, bg3Status.DescriptionParams);
+
             var statusDef = new StatusDefinition
             {
                 Id = bg3Status.StatusId?.ToLowerInvariant() ?? "unknown",
                 Name = StatusPresentationPolicy.ResolveDisplayName(bg3Status.DisplayName, bg3Status.StatusId),
-                Description = bg3Status.Description ?? "",
+                Description = description,
                 Icon = bg3Status.Icon ?? ""
             };
 

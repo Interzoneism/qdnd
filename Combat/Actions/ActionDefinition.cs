@@ -134,6 +134,16 @@ namespace QDND.Combat.Actions
         public string Description { get; set; }
 
         /// <summary>
+        /// Additional description text for upcast or variant info.
+        /// </summary>
+        public string ExtraDescription { get; set; } = "";
+
+        /// <summary>
+        /// Raw BG3 description parameter string used to resolve [1], [2], ... placeholders.
+        /// </summary>
+        public string DescriptionParams { get; set; }
+
+        /// <summary>
         /// Icon identifier.
         /// </summary>
         public string Icon { get; set; }

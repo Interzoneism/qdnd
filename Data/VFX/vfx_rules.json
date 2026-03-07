@@ -5,9 +5,12 @@
     { "phase": "Start", "attackType": "MeleeSpell", "presetId": "cast_arcane_generic" },
     { "phase": "Start", "attackType": "RangedSpell", "presetId": "cast_arcane_generic" },
     { "phase": "Start", "isSpell": true, "intent": "Healing", "presetId": "cast_divine_generic" },
+    { "phase": "Start", "isSpell": true, "intent": "Buff", "presetId": "cast_divine_generic" },
     { "phase": "Start", "isSpell": true, "presetId": "cast_arcane_generic" },
 
     { "phase": "Projectile", "attackType": "RangedWeapon", "presetId": "proj_physical_generic" },
+    { "phase": "Projectile", "attackType": "RangedSpell", "damageType": "Fire", "presetId": "proj_fire" },
+    { "phase": "Projectile", "attackType": "RangedSpell", "damageType": "Lightning", "presetId": "proj_lightning" },
     { "phase": "Projectile", "attackType": "RangedSpell", "presetId": "proj_arcane_generic" },
     { "phase": "Projectile", "isSpell": true, "presetId": "proj_arcane_generic" },
 
@@ -26,19 +29,67 @@
     { "phase": "Area", "targetType": "Circle", "presetId": "area_circle_blast" },
     { "phase": "Area", "targetType": "Cone", "presetId": "area_cone_sweep" },
     { "phase": "Area", "targetType": "Line", "presetId": "area_line_surge" },
+    { "phase": "Area", "presetId": "area_circle_blast" },
 
     { "phase": "Status", "intent": "Buff", "presetId": "status_buff_apply" },
     { "phase": "Status", "intent": "Debuff", "presetId": "status_debuff_apply" },
+    { "phase": "Status", "intent": "Healing", "presetId": "status_heal" },
     { "phase": "Status", "presetId": "status_debuff_apply" },
     { "phase": "Custom", "isSpell": true, "presetId": "cast_arcane_generic" },
     { "phase": "Heal", "presetId": "status_heal" },
     { "phase": "Death", "presetId": "status_death_burst" }
   ],
   "actionOverrides": [
+    { "actionId": "Projectile_Fireball", "phase": "Start", "presetId": "cast_arcane_generic" },
     { "actionId": "Projectile_Fireball", "phase": "Projectile", "presetId": "proj_fire" },
     { "actionId": "Projectile_Fireball", "phase": "Impact", "presetId": "impact_fire" },
+    { "actionId": "Projectile_Fireball", "phase": "Area", "presetId": "area_circle_blast" },
+
+    { "actionId": "Projectile_LightningBolt", "phase": "Start", "presetId": "cast_arcane_generic" },
     { "actionId": "Projectile_LightningBolt", "phase": "Projectile", "presetId": "proj_lightning" },
     { "actionId": "Projectile_LightningBolt", "phase": "Impact", "presetId": "impact_lightning" },
+    { "actionId": "Projectile_LightningBolt", "phase": "Area", "presetId": "area_line_surge" },
+
+    { "actionId": "Projectile_ConeOfCold", "phase": "Start", "presetId": "cast_arcane_generic" },
+    { "actionId": "Projectile_ConeOfCold", "phase": "Impact", "presetId": "impact_cold" },
+    { "actionId": "Projectile_ConeOfCold", "phase": "Area", "presetId": "area_cone_sweep" },
+
+    { "actionId": "Projectile_BurningHands", "phase": "Start", "presetId": "cast_arcane_generic" },
+    { "actionId": "Projectile_BurningHands", "phase": "Impact", "presetId": "impact_fire" },
+    { "actionId": "Projectile_BurningHands", "phase": "Area", "presetId": "area_cone_sweep" },
+
+    { "actionId": "Projectile_EldritchBlast", "phase": "Start", "presetId": "cast_arcane_generic" },
+    { "actionId": "Projectile_EldritchBlast", "phase": "Projectile", "presetId": "proj_arcane_generic" },
+    { "actionId": "Projectile_EldritchBlast", "phase": "Impact", "presetId": "impact_force" },
+
+    { "actionId": "Projectile_MagicMissile", "phase": "Start", "presetId": "cast_arcane_generic" },
+    { "actionId": "Projectile_MagicMissile", "phase": "Projectile", "presetId": "proj_arcane_generic" },
+    { "actionId": "Projectile_MagicMissile", "phase": "Impact", "presetId": "impact_force" },
+
+    { "actionId": "Target_CureWounds", "phase": "Start", "presetId": "cast_divine_generic" },
+    { "actionId": "Target_CureWounds", "phase": "Heal", "presetId": "status_heal" },
+
+    { "actionId": "Target_SacredFlame", "phase": "Start", "presetId": "cast_divine_generic" },
+    { "actionId": "Target_SacredFlame", "phase": "Impact", "presetId": "impact_radiant" },
+
+    { "actionId": "Target_ShieldOfFaith", "phase": "Start", "presetId": "cast_divine_generic" },
+    { "actionId": "Target_ShieldOfFaith", "phase": "Status", "presetId": "status_buff_apply" },
+
+    { "actionId": "Shout_Bless", "phase": "Start", "presetId": "cast_divine_generic" },
+    { "actionId": "Shout_Bless", "phase": "Status", "presetId": "status_buff_apply" },
+
+    { "actionId": "Target_HoldPerson", "phase": "Start", "presetId": "cast_arcane_generic" },
+    { "actionId": "Target_HoldPerson", "phase": "Impact", "presetId": "impact_psychic" },
+    { "actionId": "Target_HoldPerson", "phase": "Status", "presetId": "status_debuff_apply" },
+
+    { "actionId": "Shout_Thunderwave", "phase": "Start", "presetId": "cast_arcane_generic" },
+    { "actionId": "Shout_Thunderwave", "phase": "Impact", "presetId": "impact_lightning" },
+    { "actionId": "Shout_Thunderwave", "phase": "Area", "presetId": "area_circle_blast" },
+
+    { "actionId": "Projectile_ScorchingRay", "phase": "Start", "presetId": "cast_arcane_generic" },
+    { "actionId": "Projectile_ScorchingRay", "phase": "Projectile", "presetId": "proj_fire" },
+    { "actionId": "Projectile_ScorchingRay", "phase": "Impact", "presetId": "impact_fire" },
+
     { "actionId": "Shout_HealingWord", "phase": "Heal", "presetId": "status_heal" },
     { "actionId": "Shout_HealingWord", "variantId": "mass_heal", "phase": "Area", "presetId": "area_circle_blast" }
   ],

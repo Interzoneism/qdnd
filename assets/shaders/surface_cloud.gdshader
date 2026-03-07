@@ -3,13 +3,15 @@ render_mode blend_mix, cull_disabled, depth_draw_opaque, diffuse_burley, specula
 
 uniform vec4 color_primary : source_color = vec4(0.85, 0.85, 0.85, 1.0);
 uniform vec4 color_secondary : source_color = vec4(0.52, 0.56, 0.6, 1.0);
-uniform float opacity : hint_range(0.0, 1.0, 0.01) = 0.42;
-uniform float wave_height_scale : hint_range(0.0, 0.2, 0.001) = 0.018;
+uniform vec3 surface_center = vec3(0.0);
+uniform float surface_radius : hint_range(0.1, 200.0, 0.1) = 1.0;
+uniform float opacity : hint_range(0.0, 1.0, 0.01) = 0.38;
+uniform float wave_height_scale : hint_range(0.0, 0.2, 0.001) = 0.022;
 uniform float wave_speed : hint_range(0.0, 3.0, 0.01) = 0.45;
 uniform float noise_scale : hint_range(0.1, 12.0, 0.01) = 2.0;
 uniform float noise_speed : hint_range(0.0, 2.0, 0.01) = 0.22;
 uniform float cloud_density : hint_range(0.0, 2.0, 0.01) = 1.0;
-uniform float edge_softness : hint_range(0.01, 0.95, 0.01) = 0.35;
+uniform float edge_softness : hint_range(0.01, 0.95, 0.01) = 0.42;
 uniform float emission_strength : hint_range(0.0, 2.0, 0.01) = 0.08;
 uniform float height_fade : hint_range(0.0, 4.0, 0.01) = 1.25;
 
@@ -70,8 +72,7 @@ void fragment()
     float n2 = fbm(world_uv * 3.2 + vec2(-t * 0.09, t * 0.05));
     float billow = clamp(n0 * 0.5 + n1 * 0.35 + n2 * 0.15, 0.0, 1.0);
 
-    vec2 centered = UV * 2.0 - vec2(1.0);
-    float radial = length(centered);
+    float radial = length(world_pos.xz - surface_center.xz) / max(surface_radius, 0.1);
     float edge = 1.0 - smoothstep(1.0 - edge_softness, 1.0, radial + (billow - 0.5) * 0.16);
 
     float h = clamp(local_pos.y * 3.9 + 0.5, 0.0, 1.0);

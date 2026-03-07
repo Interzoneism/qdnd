@@ -15,16 +15,23 @@ namespace QDND.Combat.Arena
 shader_type spatial;
 render_mode blend_mix, cull_disabled, depth_prepass_alpha, diffuse_burley, specular_schlick_ggx;
 
-uniform vec4 base_color : source_color = vec4(0.5, 0.5, 0.5, 0.6);
+uniform vec4 color_primary : source_color = vec4(0.5, 0.5, 0.5, 1.0);
+uniform vec4 color_secondary : source_color = vec4(0.2, 0.2, 0.2, 1.0);
 uniform vec4 edge_color : source_color = vec4(0.2, 0.2, 0.2, 0.4);
-uniform float wave_amp = 0.008;
+uniform vec3 surface_center = vec3(0.0);
+uniform float surface_radius = 1.0;
+uniform float opacity = 0.6;
+uniform float wave_height_scale = 0.008;
 uniform float wave_speed = 1.0;
 uniform float noise_scale = 2.8;
 uniform float noise_speed = 0.35;
 uniform float emission_strength = 0.12;
-uniform float roughness_value = 0.22;
-uniform float metallic_value = 0.02;
+uniform float roughness = 0.22;
+uniform float metallic = 0.02;
 uniform float edge_softness = 0.25;
+uniform float dissolve_strength = 0.45;
+
+varying vec3 world_pos;
 
 float hash(vec2 p) {
     return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
@@ -42,8 +49,9 @@ float noise(vec2 p) {
 }
 
 void vertex() {
-    float w1 = sin((VERTEX.x * 2.4 + VERTEX.z * 2.8) + TIME * wave_speed) * wave_amp;
-    float w2 = cos((VERTEX.x * 3.6 - VERTEX.z * 2.1) - TIME * wave_speed * 1.3) * wave_amp * 0.55;
+    world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+    float w1 = sin((VERTEX.x * 2.4 + VERTEX.z * 2.8) + TIME * wave_speed) * wave_height_scale;
+    float w2 = cos((VERTEX.x * 3.6 - VERTEX.z * 2.1) - TIME * wave_speed * 1.3) * wave_height_scale * 0.55;
     VERTEX.y += w1 + w2;
 }
 
@@ -51,36 +59,40 @@ void fragment() {
     vec2 uv = UV * noise_scale;
     float n = noise(uv + vec2(TIME * noise_speed, -TIME * noise_speed * 0.68));
 
-    vec2 centered = UV * 2.0 - vec2(1.0);
-    float radial = length(centered);
-    float edgeNoise = (n - 0.5) * 0.22;
+    float radial = length(world_pos.xz - surface_center.xz) / max(surface_radius, 0.1);
+    float edgeNoise = (n - 0.5) * (0.22 + dissolve_strength * 0.35);
     float edge = 1.0 - smoothstep(1.0 - edge_softness, 1.0, radial + edgeNoise);
 
     float bodyMask = clamp(0.62 + n * 0.55, 0.0, 1.0);
-    vec3 bodyColor = mix(edge_color.rgb, base_color.rgb, bodyMask);
+    vec3 bodyColor = mix(color_secondary.rgb, color_primary.rgb, bodyMask);
 
     ALBEDO = bodyColor;
     EMISSION = bodyColor * emission_strength;
-    ROUGHNESS = roughness_value;
-    METALLIC = metallic_value;
+    ROUGHNESS = roughness;
+    METALLIC = metallic;
     SPECULAR = 0.65;
-    ALPHA = clamp(base_color.a * edge * (0.86 + 0.2 * n), 0.0, 1.0);
+    ALPHA = clamp(opacity * edge * (0.86 + 0.2 * n), 0.0, 1.0);
 }";
 
         private const string CLOUD_SURFACE_SHADER_CODE = @"
 shader_type spatial;
 render_mode blend_mix, cull_disabled, depth_prepass_alpha, diffuse_burley, specular_schlick_ggx;
 
-uniform vec4 base_color : source_color = vec4(0.8, 0.85, 0.9, 0.5);
-uniform vec4 edge_color : source_color = vec4(0.35, 0.4, 0.45, 0.25);
-uniform float wave_amp = 0.018;
+uniform vec4 color_primary : source_color = vec4(0.8, 0.85, 0.9, 1.0);
+uniform vec4 color_secondary : source_color = vec4(0.35, 0.4, 0.45, 1.0);
+uniform vec3 surface_center = vec3(0.0);
+uniform float surface_radius = 1.0;
+uniform float opacity = 0.42;
+uniform float wave_height_scale = 0.018;
 uniform float wave_speed = 0.7;
 uniform float noise_scale = 2.2;
 uniform float noise_speed = 0.22;
 uniform float cloud_density = 1.0;
 uniform float emission_strength = 0.08;
-uniform float roughness_value = 0.78;
-uniform float edge_softness = 0.36;
+uniform float roughness = 0.78;
+uniform float edge_softness = 0.42;
+
+varying vec3 world_pos;
 
 float hash(vec2 p) {
     return fract(sin(dot(p, vec2(41.3, 289.1))) * 17391.573);
@@ -98,36 +110,37 @@ float noise(vec2 p) {
 }
 
 void vertex() {
-    float bob = sin((VERTEX.x + VERTEX.z) * 1.8 + TIME * wave_speed) * wave_amp;
+    world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+    float bob = sin((VERTEX.x + VERTEX.z) * 1.8 + TIME * wave_speed) * wave_height_scale;
     VERTEX.y += bob;
 }
 
 void fragment() {
-    vec2 uv = UV * noise_scale;
+    vec2 uv = world_pos.xz * noise_scale;
     float n1 = noise(uv + vec2(TIME * noise_speed, TIME * noise_speed * 0.35));
     float n2 = noise(uv * 2.1 - vec2(TIME * noise_speed * 0.45, TIME * noise_speed * 0.8));
     float puff = clamp(n1 * 0.68 + n2 * 0.32, 0.0, 1.0);
 
-    vec2 centered = UV * 2.0 - vec2(1.0);
-    float radial = length(centered);
+    float radial = length(world_pos.xz - surface_center.xz) / max(surface_radius, 0.1);
     float edge = 1.0 - smoothstep(1.0 - edge_softness, 1.0, radial + (puff - 0.5) * 0.15);
     float volume = smoothstep(0.28, 0.95, puff) * edge;
 
-    vec3 bodyColor = mix(edge_color.rgb, base_color.rgb, clamp(0.45 + puff * 0.55, 0.0, 1.0));
+    vec3 bodyColor = mix(color_secondary.rgb, color_primary.rgb, clamp(0.45 + puff * 0.55, 0.0, 1.0));
 
     ALBEDO = bodyColor;
     EMISSION = bodyColor * emission_strength;
-    ROUGHNESS = roughness_value;
+    ROUGHNESS = roughness;
     METALLIC = 0.0;
     SPECULAR = 0.12;
-    ALPHA = clamp(base_color.a * volume * cloud_density, 0.0, 1.0);
+    ALPHA = clamp(opacity * volume * cloud_density, 0.0, 1.0);
 }";
 
         private static readonly Shader GroundSurfaceShader = new() { Code = GROUND_SURFACE_SHADER_CODE };
         private static readonly Shader CloudSurfaceShader = new() { Code = CLOUD_SURFACE_SHADER_CODE };
-        private static readonly Shader SolidSurfaceShader = GroundSurfaceShader;
         private static readonly Shader FogVolumeShader = null;
         private static Shader _liquidShaderFile;
+        private static Shader _solidShaderFile;
+        private static Shader _cloudShaderFile;
         private static NoiseTexture2D _waveTextureA;
         private static NoiseTexture2D _waveTextureB;
         private static NoiseTexture2D _normalTextureA;
@@ -232,7 +245,7 @@ void fragment() {
             }
 
             _surfaceMesh.Mesh = BuildSurfaceMaskMesh(surface, style);
-            _surfaceMesh.MaterialOverride = BuildMaterial(style);
+            _surfaceMesh.MaterialOverride = BuildMaterial(style, surface);
             _surfaceMesh.Position = Vector3.Zero;
 
             if (style.Shader == ShaderFamily.Cloud && _useFogVolumes && style.UseFogVolume)
@@ -359,6 +372,18 @@ void fragment() {
             return _liquidShaderFile ?? GroundSurfaceShader;
         }
 
+        private static Shader GetSolidShader()
+        {
+            _solidShaderFile ??= GD.Load<Shader>("res://assets/shaders/surface_solid.gdshader");
+            return _solidShaderFile ?? GroundSurfaceShader;
+        }
+
+        private static Shader GetCloudShader()
+        {
+            _cloudShaderFile ??= GD.Load<Shader>("res://assets/shaders/surface_cloud.gdshader");
+            return _cloudShaderFile ?? CloudSurfaceShader;
+        }
+
         private static NoiseTexture2D CreateNoiseTexture(FastNoiseLite noise, bool asNormalMap)
         {
             return new NoiseTexture2D
@@ -410,13 +435,13 @@ void fragment() {
             _normalTextureB = CreateNoiseTexture(normalNoiseB, true);
         }
 
-        private static Material BuildMaterial(VisualStyle style)
+        private static Material BuildMaterial(VisualStyle style, SurfaceInstance surface)
         {
             Shader shader = style.Shader switch
             {
                 ShaderFamily.Liquid => GetLiquidShader(),
-                ShaderFamily.Solid => SolidSurfaceShader,
-                _ => CloudSurfaceShader
+                ShaderFamily.Solid => GetSolidShader(),
+                _ => GetCloudShader()
             };
 
             if (shader == null)
@@ -460,6 +485,8 @@ void fragment() {
                 mat.SetShaderParameter("color_primary", style.ColorShallow);
                 mat.SetShaderParameter("color_secondary", style.ColorDeep);
                 mat.SetShaderParameter("edge_color", style.BorderColor);
+                mat.SetShaderParameter("surface_center", surface.Position);
+                mat.SetShaderParameter("surface_radius", Mathf.Max(surface.Radius, 0.1f));
                 mat.SetShaderParameter("opacity", style.Opacity);
                 mat.SetShaderParameter("metallic", style.Metallic);
                 mat.SetShaderParameter("roughness", style.Roughness);
@@ -475,6 +502,8 @@ void fragment() {
             {
                 mat.SetShaderParameter("color_primary", style.ColorShallow);
                 mat.SetShaderParameter("color_secondary", style.ColorDeep);
+                mat.SetShaderParameter("surface_center", surface.Position);
+                mat.SetShaderParameter("surface_radius", Mathf.Max(surface.Radius, 0.1f));
                 mat.SetShaderParameter("opacity", style.Opacity);
                 mat.SetShaderParameter("wave_height_scale", style.WaveHeightScale);
                 mat.SetShaderParameter("wave_speed", style.WaveSpeed);
@@ -552,7 +581,7 @@ void fragment() {
                 BorderScale = isLiquid ? 1f : 1.35f,
                 WaveHeightScale = surface.Definition.WaveAmplitude > 0f
                     ? surface.Definition.WaveAmplitude
-                    : (isCloud ? 0.018f : (isLiquid ? 0.01f : 0.006f)),
+                    : (isCloud ? 0.022f : (isLiquid ? 0.01f : 0.006f)),
                 WaveScale = isLiquid ? 8f : 1f,
                 WaveHeight = isLiquid ? 0.003f : 0f,
                 WaveSpeed = surface.Definition.WaveSpeed > 0f
@@ -568,22 +597,27 @@ void fragment() {
                 NormalStrength = isLiquid ? 0.15f : 0f,
                 MaxVisibleDepth = isLiquid ? 2f : 0f,
                 EdgeFadeDistance = isLiquid ? 0.3f : 0f,
-                EdgeSoftness = isCloud ? 0.35f : 0.22f,
-                DissolveStrength = 0.35f,
+                EdgeSoftness = isCloud ? 0.42f : 0.22f,
+                DissolveStrength = 0.45f,
                 CloudDensity = isCloud ? 1f : 0f,
                 HeightFade = 1.25f,
                 HeightOffset = isCloud ? 0.18f : 0.012f,
                 CellPaddingMeters = isLiquid
                     ? surface.CellSize * 0.25f
-                    : Mathf.Max(0f, surface.Definition.VisualPaddingCells * surface.CellSize),
+                    : (isCloud
+                        ? Mathf.Max(0f, surface.Definition.VisualPaddingCells * surface.CellSize)
+                        : Mathf.Max(surface.CellSize * 0.18f, Mathf.Max(0f, surface.Definition.VisualPaddingCells * surface.CellSize))),
                 UseFogVolume = isCloud,
-                FogDensity = 0.28f,
+                FogDensity = 0.24f,
                 FogNoiseScale = 2f,
                 FogNoiseSpeed = 0.15f,
-                FogEdgeFade = 0.35f,
-                FogHeightFade = 1.2f,
+                FogEdgeFade = 0.42f,
+                FogHeightFade = 1.35f,
                 FogHeight = 2.2f
             };
+
+            if (isCloud)
+                style.Opacity = Mathf.Clamp(style.Opacity * 0.9f, 0.1f, 0.9f);
 
             ApplySurfaceOverrides(surface.Definition.Id, surface.Definition.Type, style);
             return style;
