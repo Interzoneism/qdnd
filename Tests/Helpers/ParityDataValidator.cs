@@ -174,6 +174,11 @@ namespace QDND.Tests.Helpers
                 .Select(e => e.Definition.Id)
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
+            var actionsById = actionEntries
+                .Where(e => e.Definition != null && !string.IsNullOrWhiteSpace(e.Definition.Id))
+                .GroupBy(e => e.Definition.Id, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => g.First().Definition, StringComparer.OrdinalIgnoreCase);
+
             var statusIds = statusEntries
                 .Where(e => !string.IsNullOrWhiteSpace(e.Definition.Id))
                 .Select(e => e.Definition.Id)
@@ -181,6 +186,7 @@ namespace QDND.Tests.Helpers
 
             ValidateMissingGrantedAbilities(
                 actionIds,
+                actionsById,
                 CollectGrantedAbilityRefs(raceEntries, classEntries, featEntries, beastEntries),
                 allowlist.AllowMissingGrantedAbilities,
                 report);
@@ -778,6 +784,7 @@ namespace QDND.Tests.Helpers
 
         private static void ValidateMissingGrantedAbilities(
             HashSet<string> actionIds,
+            IReadOnlyDictionary<string, ActionDefinition> actionsById,
             IReadOnlyCollection<GrantedAbilityRef> grantedRefs,
             HashSet<string> allowlistedMissing,
             ParityValidationReport report)
@@ -799,11 +806,35 @@ namespace QDND.Tests.Helpers
 
             foreach (var allowed in allowlistedMissing)
             {
-                if (actionIds.Contains(allowed))
+                if (!actionIds.Contains(allowed))
+                    continue;
+
+                if (!actionsById.TryGetValue(allowed, out var action))
                 {
                     report.AddWarning($"Allowlist entry '{allowed}' is stale: action now exists.");
+                    continue;
                 }
+
+                // Keep allowlisted entries for mechanics stubs that still have no usable effects/costs.
+                if (HasImplementedMechanics(action))
+                    report.AddWarning($"Allowlist entry '{allowed}' is stale: action now exists.");
             }
+        }
+
+        private static bool HasImplementedMechanics(ActionDefinition action)
+        {
+            if (action == null)
+                return false;
+
+            bool hasEffects = action.Effects != null && action.Effects.Count > 0;
+            bool hasCost = action.Cost != null &&
+                           (action.Cost.UsesAction ||
+                            action.Cost.UsesBonusAction ||
+                            action.Cost.UsesReaction ||
+                            action.Cost.MovementCost > 0 ||
+                            (action.Cost.ResourceCosts?.Count ?? 0) > 0);
+
+            return hasEffects && hasCost;
         }
 
         private static void ValidateActionStatusLinks(

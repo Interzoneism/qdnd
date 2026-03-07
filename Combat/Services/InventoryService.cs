@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules.Boosts;
 using QDND.Data.CharacterModel;
+using QDND.Data.Items;
 using QDND.Data.Stats;
 
 namespace QDND.Combat.Services
@@ -92,6 +93,21 @@ namespace QDND.Combat.Services
         /// <summary>Gold value of the item.</summary>
         public int Price { get; set; }
 
+        /// <summary>Original BG3 consumable use category for richer tooltips.</summary>
+        public ItemUseCategory UseCategory { get; set; } = ItemUseCategory.None;
+
+        /// <summary>Raw BG3 use-cost string (ActionPoint/BonusActionPoint/etc.).</summary>
+        public string UseCosts { get; set; }
+
+        /// <summary>Linked spell ID for scroll-like consumables.</summary>
+        public string LinkedSpellId { get; set; }
+
+        /// <summary>Linked status ID for potion/consumable effects.</summary>
+        public string LinkedStatusId { get; set; }
+
+        /// <summary>Healing formula when this consumable restores HP.</summary>
+        public string HealingFormula { get; set; }
+
         /// <summary>Enchantment bonus (+1/+2/+3).</summary>
         public int EnchantmentBonus { get; set; }
 
@@ -108,6 +124,35 @@ namespace QDND.Combat.Services
         public string GetStatLine()
         {
             var parts = new List<string>();
+
+            if (IsConsumable)
+            {
+                parts.Add($"Rarity: {FormatRarity(Rarity)}");
+
+                if (!string.IsNullOrWhiteSpace(Description))
+                    parts.Add(Description);
+
+                if (!string.IsNullOrWhiteSpace(HealingFormula))
+                    parts.Add($"Effect: Heals {HealingFormula} HP");
+                else if (!string.IsNullOrWhiteSpace(LinkedSpellId))
+                    parts.Add($"Effect: Casts {HumanizeIdentifier(LinkedSpellId)}");
+                else if (!string.IsNullOrWhiteSpace(LinkedStatusId))
+                    parts.Add($"Effect: Applies {HumanizeIdentifier(LinkedStatusId)}");
+
+                string useCostText = FormatUseCosts(UseCosts);
+                if (!string.IsNullOrWhiteSpace(useCostText))
+                    parts.Add($"Use: {useCostText}");
+
+                string categoryText = UseCategory != ItemUseCategory.None
+                    ? UseCategory.ToString()
+                    : Category.ToString();
+                parts.Add($"Category: {categoryText}");
+
+                if (Weight > 0)
+                    parts.Add($"Weight: {Weight} lb");
+
+                return string.Join("\n", parts);
+            }
 
             if (WeaponDef != null)
             {
@@ -167,6 +212,51 @@ namespace QDND.Combat.Services
                 parts.Add(Description);
 
             return string.Join("\n", parts);
+        }
+
+        private static string FormatRarity(ItemRarity rarity)
+        {
+            return rarity switch
+            {
+                ItemRarity.VeryRare => "Very Rare",
+                _ => rarity.ToString(),
+            };
+        }
+
+        private static string FormatUseCosts(string useCosts)
+        {
+            if (string.IsNullOrWhiteSpace(useCosts))
+                return "Action";
+
+            var parts = useCosts
+                .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(part =>
+                {
+                    if (part.StartsWith("BonusActionPoint", StringComparison.OrdinalIgnoreCase))
+                        return "Bonus Action";
+                    if (part.StartsWith("ActionPoint", StringComparison.OrdinalIgnoreCase))
+                        return "Action";
+                    if (part.StartsWith("ReactionActionPoint", StringComparison.OrdinalIgnoreCase))
+                        return "Reaction";
+                    return null;
+                })
+                .Where(part => !string.IsNullOrWhiteSpace(part))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            return parts.Count > 0 ? string.Join(" + ", parts) : "Action";
+        }
+
+        private static string HumanizeIdentifier(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return string.Empty;
+
+            string text = value.Replace("_", " ").Trim();
+            if (text.Length == 0)
+                return string.Empty;
+
+            return CultureInfo.InvariantCulture.TextInfo.ToTitleCase(text.ToLowerInvariant());
         }
 
         private static string HumanizeBoost(string boost)
@@ -479,6 +569,7 @@ namespace QDND.Combat.Services
         private readonly Dictionary<string, Inventory> _inventories = new();
         private readonly CharacterDataRegistry _charRegistry;
         private readonly StatsRegistry _statsRegistry;
+        private readonly ICombatContext _context;
 
         private readonly List<InventoryTemplate> _bg3WeaponTemplates = new();
         private readonly List<InventoryTemplate> _bg3ArmorTemplates = new();
@@ -491,10 +582,11 @@ namespace QDND.Combat.Services
         /// <summary>Fired when equipment changes (combatantId, slot).</summary>
         public event Action<string, EquipSlot> OnEquipmentChanged;
 
-        public InventoryService(CharacterDataRegistry charRegistry, StatsRegistry statsRegistry = null)
+        public InventoryService(CharacterDataRegistry charRegistry, StatsRegistry statsRegistry = null, ICombatContext context = null)
         {
             _charRegistry = charRegistry;
             _statsRegistry = statsRegistry;
+            _context = context;
         }
 
         /// <summary>Get or create inventory for a combatant.</summary>
@@ -1005,6 +1097,66 @@ namespace QDND.Combat.Services
             };
         }
 
+        public static InventoryItem CreateItemFromDefinition(ItemDefinition definition, int quantity = 1)
+        {
+            if (definition == null)
+                return null;
+
+            var item = new InventoryItem
+            {
+                DefinitionId = definition.Id,
+                Name = string.IsNullOrWhiteSpace(definition.DisplayName) ? definition.Id : definition.DisplayName,
+                Category = MapUseCategoryToInventoryCategory(definition.UseCategory),
+                Quantity = Math.Max(1, quantity),
+                Description = definition.Description ?? string.Empty,
+                Weight = (int)Math.Round(definition.Weight, MidpointRounding.AwayFromZero),
+                IconPath = definition.IconPath,
+                UseActionId = definition.UseActionId,
+                IsConsumable = definition.IsConsumable,
+                MaxStackSize = Math.Max(1, definition.MaxStackSize),
+                Rarity = ParseRarity(definition.Rarity),
+                UseCategory = definition.UseCategory,
+                UseCosts = definition.UseCosts,
+                LinkedSpellId = definition.LinkedSpellId,
+                LinkedStatusId = definition.LinkedStatusId,
+                HealingFormula = definition.HealingFormula,
+                BoostString = MergeBoostStrings(definition.DefaultBoosts, definition.Boosts),
+                Price = ComputeItemPrice(definition.ValueLevel, valueOverride: 0),
+            };
+
+            item.SpecialEffects = BuildConsumableSpecialEffects(definition);
+            return item;
+        }
+
+        public bool GiveItem(Combatant combatant, string bg3ObjectId, int quantity = 1)
+        {
+            if (combatant == null || string.IsNullOrWhiteSpace(bg3ObjectId) || quantity <= 0)
+                return false;
+
+            var itemDefRegistry = ResolveItemDefinitionRegistry();
+            if (itemDefRegistry == null)
+                return false;
+
+            var definition = itemDefRegistry.GetDefinition(bg3ObjectId);
+            if (definition == null)
+                return false;
+
+            int remaining = quantity;
+            int stackSize = Math.Max(1, definition.MaxStackSize);
+
+            while (remaining > 0)
+            {
+                int stackQuantity = Math.Min(remaining, stackSize);
+                var item = CreateItemFromDefinition(definition, stackQuantity);
+                if (item == null || !AddItemToBag(combatant, item))
+                    return false;
+
+                remaining -= stackQuantity;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// Check if an item can be used in combat.
         /// </summary>
@@ -1072,6 +1224,88 @@ namespace QDND.Combat.Services
         {
             bool addedBg3 = includeExtendedStarterGear && AddStarterBagItemsFromBG3(combatant, inv);
 
+            bool coreItemsAddedFromDefinitions = AddCoreStarterConsumablesFromDefinitions(combatant, inv);
+            if (!coreItemsAddedFromDefinitions)
+                AddCoreStarterConsumablesFallback(combatant, inv);
+
+            // Legacy fallback if extended catalog is enabled but unavailable.
+            if (includeExtendedStarterGear && !addedBg3 && _charRegistry != null)
+            {
+                var dagger = _charRegistry.GetWeapon("dagger");
+                if (dagger != null)
+                    inv.AddItem(CreateWeaponItem(dagger));
+
+                bool isMartial = combatant.Tags?.Contains("martial") == true || combatant.Tags?.Contains("melee") == true;
+                if (isMartial)
+                {
+                    var javelin = _charRegistry.GetWeapon("javelin");
+                    if (javelin != null)
+                        inv.AddItem(CreateWeaponItem(javelin));
+                }
+            }
+        }
+
+        private bool AddCoreStarterConsumablesFromDefinitions(Combatant combatant, Inventory inv)
+        {
+            var itemDefRegistry = ResolveItemDefinitionRegistry();
+            if (itemDefRegistry == null)
+                return false;
+
+            bool addedHealingPotion = AddStarterItemFromDefinition(inv, itemDefRegistry, "OBJ_Potion_Healing", 2);
+            if (!addedHealingPotion)
+            {
+                inv.AddItem(CreateConsumableItem(
+                    "potion_healing",
+                    "Potion of Healing",
+                    ItemCategory.Potion,
+                    "Heal 2d4+2 HP",
+                    2,
+                    useActionId: "use_potion_healing",
+                    iconPath: IconGenericHealing));
+            }
+
+            // BG3 object name for Alchemist's Fire is FireBottle in object data.
+            bool addedFireBottle = AddStarterItemFromDefinition(inv, itemDefRegistry, "OBJ_FireBottle", 1)
+                || AddStarterItemFromDefinition(inv, itemDefRegistry, "OBJ_Alchemists_Fire", 1)
+                || AddStarterItemFromDefinition(inv, itemDefRegistry, "OBJ_Alchemist_Fire", 1);
+            if (!addedFireBottle)
+            {
+                inv.AddItem(CreateConsumableItem(
+                    "alchemist_fire",
+                    "Alchemist's Fire",
+                    ItemCategory.Throwable,
+                    "1d4 fire damage, applies Burning",
+                    1,
+                    useActionId: "use_alchemist_fire",
+                    iconPath: IconAlchemistFire));
+            }
+
+            bool isCaster = combatant?.Tags?.Contains("caster") == true;
+            if (isCaster)
+            {
+                bool addedRevivify = AddStarterItemFromDefinition(inv, itemDefRegistry, "OBJ_Scroll_Revivify", 1);
+                if (!addedRevivify)
+                {
+                    inv.AddItem(CreateConsumableItem(
+                        "scroll_revivify",
+                        "Scroll of Revivify",
+                        ItemCategory.Scroll,
+                        "Revive a downed ally with 1 HP",
+                        1,
+                        useActionId: "use_scroll_revivify",
+                        iconPath: "res://assets/Images/Icons Spells/Revivify_Unfaded_Icon.png"));
+                }
+            }
+
+            int level = combatant?.ResolvedCharacter?.Sheet?.TotalLevel ?? 1;
+            if (level >= 5)
+                AddStarterItemFromDefinition(inv, itemDefRegistry, "OBJ_Potion_Healing_Greater", 1);
+
+            return true;
+        }
+
+        private static void AddCoreStarterConsumablesFallback(Combatant combatant, Inventory inv)
+        {
             // Core consumables are guaranteed regardless of data source.
             inv.AddItem(CreateConsumableItem(
                 "potion_healing",
@@ -1091,7 +1325,7 @@ namespace QDND.Combat.Services
                 useActionId: "use_alchemist_fire",
                 iconPath: IconAlchemistFire));
 
-            bool isCaster = combatant.Tags?.Contains("caster") == true;
+            bool isCaster = combatant?.Tags?.Contains("caster") == true;
             if (isCaster)
             {
                 inv.AddItem(CreateConsumableItem(
@@ -1103,22 +1337,70 @@ namespace QDND.Combat.Services
                     useActionId: "use_scroll_revivify",
                     iconPath: "res://assets/Images/Icons Spells/Revivify_Unfaded_Icon.png"));
             }
+        }
 
-            // Legacy fallback if extended catalog is enabled but unavailable.
-            if (includeExtendedStarterGear && !addedBg3 && _charRegistry != null)
+        private static ItemCategory MapUseCategoryToInventoryCategory(ItemUseCategory useCategory)
+        {
+            return useCategory switch
             {
-                var dagger = _charRegistry.GetWeapon("dagger");
-                if (dagger != null)
-                    inv.AddItem(CreateWeaponItem(dagger));
+                ItemUseCategory.Potion => ItemCategory.Potion,
+                ItemUseCategory.Scroll => ItemCategory.Scroll,
+                ItemUseCategory.Throwable => ItemCategory.Throwable,
+                ItemUseCategory.Grenade => ItemCategory.Throwable,
+                ItemUseCategory.Consumable => ItemCategory.Consumable,
+                ItemUseCategory.Arrow => ItemCategory.Misc,
+                _ => ItemCategory.Consumable,
+            };
+        }
 
-                bool isMartial = combatant.Tags?.Contains("martial") == true || combatant.Tags?.Contains("melee") == true;
-                if (isMartial)
-                {
-                    var javelin = _charRegistry.GetWeapon("javelin");
-                    if (javelin != null)
-                        inv.AddItem(CreateWeaponItem(javelin));
-                }
-            }
+        private static string MergeBoostStrings(string first, string second)
+        {
+            if (string.IsNullOrWhiteSpace(first)) return second;
+            if (string.IsNullOrWhiteSpace(second)) return first;
+            return first + ";" + second;
+        }
+
+        private static List<string> BuildConsumableSpecialEffects(ItemDefinition definition)
+        {
+            var effects = new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(definition.HealingFormula))
+                effects.Add($"Heals {definition.HealingFormula} HP");
+
+            if (!string.IsNullOrWhiteSpace(definition.LinkedStatusId))
+                effects.Add($"Applies {HumanizeStatName(definition.LinkedStatusId)}");
+
+            if (!string.IsNullOrWhiteSpace(definition.LinkedSpellId))
+                effects.Add($"Casts {HumanizeStatName(definition.LinkedSpellId)}");
+
+            return effects;
+        }
+
+        private bool AddStarterItemFromDefinition(Inventory inv, ItemDefinitionRegistry registry, string objectId, int quantity)
+        {
+            if (inv == null || registry == null || string.IsNullOrWhiteSpace(objectId) || quantity <= 0)
+                return false;
+
+            var def = registry.GetDefinition(objectId);
+            if (def == null)
+                return false;
+
+            var item = CreateItemFromDefinition(def, quantity);
+            if (item == null)
+                return false;
+
+            return inv.AddItem(item);
+        }
+
+        private ItemDefinitionRegistry ResolveItemDefinitionRegistry()
+        {
+            if (_context == null)
+                return null;
+
+            if (!_context.HasService<ItemDefinitionRegistry>())
+                return null;
+
+            return _context.GetService<ItemDefinitionRegistry>();
         }
 
         private bool AddStarterBagItemsFromBG3(Combatant combatant, Inventory inv)

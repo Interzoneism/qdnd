@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using QDND.Combat.Entities;
 using QDND.Combat.Services;
 using QDND.Data.CharacterModel;
+using QDND.Data.Items;
 using QDND.Data.Stats;
 using QDND.Tests.Helpers;
 using Xunit;
@@ -523,6 +524,133 @@ namespace QDND.Tests.Unit
             Assert.Contains("AC 16 (no DEX bonus)", statLine);
             Assert.Contains("Stealth Disadvantage", statLine);
             Assert.Contains("Requires STR 15", statLine);
+        }
+
+        [Fact]
+        public void CreateItemFromDefinition_CreatesExpectedInventoryItem()
+        {
+            var definition = new ItemDefinition
+            {
+                Id = "OBJ_Potion_Healing",
+                DisplayName = "Potion of Healing",
+                Description = "Heals 2d4+2 hit points",
+                UseCategory = ItemUseCategory.Potion,
+                Weight = 1.6f,
+                ValueLevel = 2,
+                UseCosts = "BonusActionPoint:1",
+                IsConsumable = true,
+                MaxStackSize = 10,
+                UseActionId = "use_potion_healing",
+                LinkedStatusId = "POTION_OF_SPEED",
+                LinkedSpellId = "acid_arrow",
+                HealingFormula = "2d4+2",
+                Rarity = "Rare",
+            };
+
+            var item = InventoryService.CreateItemFromDefinition(definition, quantity: 3);
+
+            Assert.NotNull(item);
+            Assert.Equal("OBJ_Potion_Healing", item.DefinitionId);
+            Assert.Equal("Potion of Healing", item.Name);
+            Assert.Equal(ItemCategory.Potion, item.Category);
+            Assert.Equal(3, item.Quantity);
+            Assert.Equal(2, item.Weight);
+            Assert.Equal("use_potion_healing", item.UseActionId);
+            Assert.True(item.IsConsumable);
+            Assert.Equal(10, item.MaxStackSize);
+            Assert.Equal(ItemUseCategory.Potion, item.UseCategory);
+            Assert.Equal("BonusActionPoint:1", item.UseCosts);
+            Assert.Equal("POTION_OF_SPEED", item.LinkedStatusId);
+            Assert.Equal("acid_arrow", item.LinkedSpellId);
+            Assert.Equal("2d4+2", item.HealingFormula);
+            Assert.Equal(ItemRarity.Rare, item.Rarity);
+            Assert.Contains(item.SpecialEffects, e => e.Contains("Heals 2d4+2 HP", StringComparison.OrdinalIgnoreCase));
+        }
+
+        [Fact]
+        public void ConsumeItem_DecrementsQuantity()
+        {
+            var service = new InventoryService(new CharacterDataRegistry());
+            var actor = CreateCombatant();
+
+            var potion = InventoryService.CreateConsumableItem(
+                "potion_healing",
+                "Potion of Healing",
+                ItemCategory.Potion,
+                "Heals 2d4+2 HP",
+                quantity: 2,
+                useActionId: "use_potion_healing",
+                isConsumable: true,
+                maxStackSize: 10);
+
+            Assert.True(service.AddItemToBag(actor, potion));
+
+            string actionId = service.ConsumeItem(actor, potion.InstanceId);
+
+            Assert.Equal("use_potion_healing", actionId);
+            var inv = service.GetInventory(actor.Id);
+            var remaining = inv.GetItem(potion.InstanceId);
+            Assert.NotNull(remaining);
+            Assert.Equal(1, remaining.Quantity);
+        }
+
+        [Fact]
+        public void ConsumeItem_RemovesItemWhenQuantityReachesZero()
+        {
+            var service = new InventoryService(new CharacterDataRegistry());
+            var actor = CreateCombatant();
+
+            var potion = InventoryService.CreateConsumableItem(
+                "potion_healing",
+                "Potion of Healing",
+                ItemCategory.Potion,
+                "Heals 2d4+2 HP",
+                quantity: 1,
+                useActionId: "use_potion_healing",
+                isConsumable: true,
+                maxStackSize: 10);
+
+            Assert.True(service.AddItemToBag(actor, potion));
+
+            string actionId = service.ConsumeItem(actor, potion.InstanceId);
+
+            Assert.Equal("use_potion_healing", actionId);
+            var inv = service.GetInventory(actor.Id);
+            Assert.Null(inv.GetItem(potion.InstanceId));
+            Assert.Empty(inv.BagItems);
+        }
+
+        [Fact]
+        public void GetUsableItems_ReturnsOnlyItemsWithUseActionAndPositiveQuantity()
+        {
+            var service = new InventoryService(new CharacterDataRegistry());
+            var actor = CreateCombatant();
+
+            var usableA = InventoryService.CreateConsumableItem(
+                "item_a", "Item A", ItemCategory.Consumable, "usable", quantity: 1,
+                useActionId: "use_item_a", isConsumable: true, maxStackSize: 10);
+            var noAction = InventoryService.CreateConsumableItem(
+                "item_b", "Item B", ItemCategory.Consumable, "no action", quantity: 1,
+                useActionId: null, isConsumable: true, maxStackSize: 10);
+            var zeroQuantity = InventoryService.CreateConsumableItem(
+                "item_c", "Item C", ItemCategory.Consumable, "zero qty", quantity: 0,
+                useActionId: "use_item_c", isConsumable: true, maxStackSize: 10);
+            var usableB = InventoryService.CreateConsumableItem(
+                "item_d", "Item D", ItemCategory.Consumable, "usable", quantity: 2,
+                useActionId: "use_item_d", isConsumable: true, maxStackSize: 10);
+
+            Assert.True(service.AddItemToBag(actor, usableA));
+            Assert.True(service.AddItemToBag(actor, noAction));
+            Assert.True(service.AddItemToBag(actor, zeroQuantity));
+            Assert.True(service.AddItemToBag(actor, usableB));
+
+            var usable = service.GetUsableItems(actor.Id);
+
+            Assert.Equal(2, usable.Count);
+            Assert.Contains(usable, i => i.InstanceId == usableA.InstanceId);
+            Assert.Contains(usable, i => i.InstanceId == usableB.InstanceId);
+            Assert.DoesNotContain(usable, i => i.InstanceId == noAction.InstanceId);
+            Assert.DoesNotContain(usable, i => i.InstanceId == zeroQuantity.InstanceId);
         }
 
         private static void AssertValidResIconPath(string iconPath)

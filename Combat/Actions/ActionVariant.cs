@@ -253,6 +253,11 @@ namespace QDND.Combat.Actions
         public Vector3? SecondaryTargetPosition { get; set; }
 
         /// <summary>
+        /// Optional inventory item instance ID when the action originates from a consumable.
+        /// </summary>
+        public string ItemInstanceId { get; set; }
+
+        /// <summary>
         /// Create default options (no variant, no upcast).
         /// </summary>
         public static ActionExecutionOptions Default => new()
@@ -264,7 +269,8 @@ namespace QDND.Combat.Actions
             SkipRangeValidation = false,
             IgnoreReactionBudgetCheck = false,
             SkipReactionBudgetConsumption = false,
-            TriggerContext = null
+            TriggerContext = null,
+            ItemInstanceId = null
         };
     }
 }

@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using QDND.Combat.Actions;
-using QDND.Data;
-using QDND.Data.Actions;
+using QDND.Data.Items;
 
 namespace QDND.Data.Actions
 {
@@ -55,9 +54,6 @@ namespace QDND.Data.Actions
                 // like "pommel_strike", "fireball", "shove" continue to resolve.
                 RegisterAliases(registry);
 
-                // Register consumable item actions that have no BG3 equivalent.
-                RegisterCustomActions(registry);
-
                 stopwatch.Stop();
 
                 // Populate result
@@ -67,6 +63,7 @@ namespace QDND.Data.Actions
                 result.WarningCount = loader.Warnings.Count;
                 result.LoadTimeMs = stopwatch.ElapsedMilliseconds;
                 result.Statistics = registry.GetStatistics();
+                result.Statistics["consumable_actions"] = 0;
 
                 // Copy diagnostics
                 result.Errors.AddRange(loader.Errors);
@@ -136,18 +133,285 @@ namespace QDND.Data.Actions
         }
 
         /// <summary>
-        /// Register actions that have no BG3 equivalent (consumables, custom items, etc.).
+        /// Register consumable-use actions from resolved item definitions.
         /// </summary>
-        private static void RegisterCustomActions(ActionRegistry registry)
+        /// <returns>Number of actions successfully registered.</returns>
+        public static int RegisterConsumableActions(
+            ActionRegistry registry,
+            ItemDefinitionRegistry itemDefinitionRegistry,
+            bool overwrite = false)
         {
-            registry.RegisterAction(new ActionDefinition
+            if (registry == null || itemDefinitionRegistry == null)
+                return 0;
+
+            int registeredCount = 0;
+
+            foreach (var itemDef in itemDefinitionRegistry.GetAllConsumables())
             {
-                Id = "use_potion_healing",
-                Name = "Healing Potion",
-                TargetType = TargetType.SingleUnit,
-                TargetFilter = TargetFilter.Self | TargetFilter.Allies,
-                Cost = new ActionCost { UsesAction = true },
-            }, overwrite: false);
+                if (itemDef == null || string.IsNullOrWhiteSpace(itemDef.UseActionId))
+                    continue;
+
+                if (itemDef.UseCategory == ItemUseCategory.Arrow)
+                    continue;
+
+                var action = CreateConsumableActionDefinition(itemDef, registry);
+                if (action == null)
+                    continue;
+
+                if (registry.RegisterAction(action, overwrite))
+                    registeredCount++;
+            }
+
+            return registeredCount;
+        }
+
+        private static ActionDefinition CreateConsumableActionDefinition(ItemDefinition itemDef, ActionRegistry registry)
+        {
+            if (itemDef.UseCategory == ItemUseCategory.Scroll)
+                return CreateScrollAction(itemDef, registry);
+
+            if (itemDef.UseCategory == ItemUseCategory.Potion)
+                return CreatePotionAction(itemDef);
+
+            return CreateGenericConsumableAction(itemDef);
+        }
+
+        private static ActionDefinition CreateScrollAction(ItemDefinition itemDef, ActionRegistry registry)
+        {
+            if (string.IsNullOrWhiteSpace(itemDef.LinkedSpellId))
+            {
+                Console.WriteLine($"[ActionRegistryInitializer] Warning: skipping scroll '{itemDef.Id}' because linked spell was not resolved");
+                return null;
+            }
+
+            var resolvedSpell = registry.GetAction(itemDef.LinkedSpellId);
+            if (resolvedSpell == null)
+            {
+                Console.WriteLine($"[ActionRegistryInitializer] Warning: skipping scroll '{itemDef.Id}' because action '{itemDef.LinkedSpellId}' is missing");
+                return null;
+            }
+
+            var action = new ActionDefinition
+            {
+                Id = itemDef.UseActionId,
+                Name = itemDef.DisplayName,
+                Description = itemDef.Description,
+                Icon = itemDef.IconPath,
+                TargetType = resolvedSpell.TargetType,
+                TargetFilter = resolvedSpell.TargetFilter,
+                Range = resolvedSpell.Range,
+                AreaRadius = resolvedSpell.AreaRadius,
+                ConeAngle = resolvedSpell.ConeAngle,
+                LineWidth = resolvedSpell.LineWidth,
+                MaxWallLength = resolvedSpell.MaxWallLength,
+                MaxTargets = resolvedSpell.MaxTargets,
+                Cost = ParseUseCosts(itemDef.UseCosts),
+                Effects = CloneEffects(resolvedSpell.Effects),
+                SpellLevel = resolvedSpell.SpellLevel,
+                SaveType = resolvedSpell.SaveType,
+                SaveDC = resolvedSpell.SaveDC,
+                SaveDCBonus = resolvedSpell.SaveDCBonus,
+                HalfDamageOnSave = resolvedSpell.HalfDamageOnSave,
+                AttackType = resolvedSpell.AttackType,
+                RequiresConcentration = resolvedSpell.RequiresConcentration,
+                ConcentrationStatusId = resolvedSpell.ConcentrationStatusId,
+                LinkedSpellId = itemDef.LinkedSpellId,
+                Tags = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    "item", "scroll", "consumable", "spell"
+                },
+            };
+
+            return action;
+        }
+
+        private static ActionDefinition CreatePotionAction(ItemDefinition itemDef)
+        {
+            if (!string.IsNullOrWhiteSpace(itemDef.HealingFormula))
+            {
+                return new ActionDefinition
+                {
+                    Id = itemDef.UseActionId,
+                    Name = itemDef.DisplayName,
+                    Description = itemDef.Description,
+                    Icon = itemDef.IconPath,
+                    TargetType = TargetType.SingleUnit,
+                    TargetFilter = TargetFilter.Self | TargetFilter.Allies,
+                    Range = 1.5f,
+                    Cost = ParseUseCosts(itemDef.UseCosts),
+                    Effects = new List<EffectDefinition>
+                    {
+                        new EffectDefinition
+                        {
+                            Type = "heal",
+                            DiceFormula = itemDef.HealingFormula,
+                        },
+                        new EffectDefinition
+                        {
+                            Type = "remove_status",
+                            StatusId = "BURNING",
+                        }
+                    },
+                    Tags = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        "item", "potion", "consumable", "healing"
+                    },
+                };
+            }
+
+            if (!string.IsNullOrWhiteSpace(itemDef.LinkedStatusId))
+            {
+                return new ActionDefinition
+                {
+                    Id = itemDef.UseActionId,
+                    Name = itemDef.DisplayName,
+                    Description = itemDef.Description,
+                    Icon = itemDef.IconPath,
+                    TargetType = TargetType.Self,
+                    TargetFilter = TargetFilter.Self,
+                    Range = 0f,
+                    Cost = ParseUseCosts(itemDef.UseCosts),
+                    Effects = new List<EffectDefinition>
+                    {
+                        new EffectDefinition
+                        {
+                            Type = "apply_status",
+                            StatusId = itemDef.LinkedStatusId,
+                        }
+                    },
+                    LinkedStatusId = itemDef.LinkedStatusId,
+                    Tags = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                    {
+                        "item", "potion", "consumable"
+                    },
+                };
+            }
+
+            // Missing linkage fallback keeps item actions executable without crashing.
+            return new ActionDefinition
+            {
+                Id = itemDef.UseActionId,
+                Name = itemDef.DisplayName,
+                Description = itemDef.Description,
+                Icon = itemDef.IconPath,
+                TargetType = TargetType.Self,
+                TargetFilter = TargetFilter.Self,
+                Cost = ParseUseCosts(itemDef.UseCosts),
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition
+                    {
+                        Type = "heal",
+                        Value = 0,
+                    }
+                },
+                Tags = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    "item", "potion", "consumable"
+                },
+            };
+        }
+
+        private static ActionDefinition CreateGenericConsumableAction(ItemDefinition itemDef)
+        {
+            bool isThrowable = itemDef.UseCategory is ItemUseCategory.Throwable or ItemUseCategory.Grenade;
+
+            var effects = new List<EffectDefinition>();
+            if (!string.IsNullOrWhiteSpace(itemDef.LinkedStatusId))
+            {
+                effects.Add(new EffectDefinition
+                {
+                    Type = "apply_status",
+                    StatusId = itemDef.LinkedStatusId,
+                });
+            }
+            else
+            {
+                effects.Add(new EffectDefinition
+                {
+                    Type = "heal",
+                    Value = 0,
+                });
+            }
+
+            return new ActionDefinition
+            {
+                Id = itemDef.UseActionId,
+                Name = itemDef.DisplayName,
+                Description = itemDef.Description,
+                Icon = itemDef.IconPath,
+                TargetType = isThrowable ? TargetType.SingleUnit : TargetType.Self,
+                TargetFilter = isThrowable ? TargetFilter.Enemies : TargetFilter.Self,
+                Range = isThrowable ? 18f : 0f,
+                Cost = ParseUseCosts(itemDef.UseCosts),
+                Effects = effects,
+                LinkedStatusId = itemDef.LinkedStatusId,
+                Tags = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    "item", "consumable", itemDef.UseCategory.ToString().ToLowerInvariant()
+                },
+            };
+        }
+
+        private static ActionCost ParseUseCosts(string useCosts)
+        {
+            var cost = new ActionCost();
+            if (string.IsNullOrWhiteSpace(useCosts))
+            {
+                cost.UsesAction = true;
+                return cost;
+            }
+
+            var parts = useCosts.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            foreach (var part in parts)
+            {
+                if (part.StartsWith("BonusActionPoint", StringComparison.OrdinalIgnoreCase))
+                    cost.UsesBonusAction = true;
+                else if (part.StartsWith("ActionPoint", StringComparison.OrdinalIgnoreCase))
+                    cost.UsesAction = true;
+                else if (part.StartsWith("ReactionActionPoint", StringComparison.OrdinalIgnoreCase))
+                    cost.UsesReaction = true;
+            }
+
+            if (!cost.UsesAction && !cost.UsesBonusAction && !cost.UsesReaction)
+                cost.UsesAction = true;
+
+            return cost;
+        }
+
+        private static List<EffectDefinition> CloneEffects(List<EffectDefinition> source)
+        {
+            if (source == null || source.Count == 0)
+                return new List<EffectDefinition>();
+
+            var cloned = new List<EffectDefinition>(source.Count);
+            foreach (var effect in source)
+            {
+                if (effect == null)
+                    continue;
+
+                cloned.Add(new EffectDefinition
+                {
+                    Type = effect.Type,
+                    Value = effect.Value,
+                    DiceFormula = effect.DiceFormula,
+                    DamageType = effect.DamageType,
+                    StatusId = effect.StatusId,
+                    StatusDuration = effect.StatusDuration,
+                    StatusStacks = effect.StatusStacks,
+                    TargetType = effect.TargetType,
+                    Condition = effect.Condition,
+                    SaveTakesHalf = effect.SaveTakesHalf,
+                    Scaling = effect.Scaling != null
+                        ? new Dictionary<string, float>(effect.Scaling)
+                        : new Dictionary<string, float>(),
+                    Parameters = effect.Parameters != null
+                        ? new Dictionary<string, object>(effect.Parameters)
+                        : new Dictionary<string, object>(),
+                });
+            }
+
+            return cloned;
         }
 
         /// <summary>

@@ -10,6 +10,7 @@ using QDND.Combat.Statuses;
 using QDND.Combat.Entities;
 using QDND.Data.Actions;
 using QDND.Data.CharacterModel;
+using QDND.Data.Items;
 using QDND.Data.Interrupts;
 using QDND.Data.Passives;
 using QDND.Data.Stats;
@@ -36,6 +37,7 @@ namespace QDND.Data
             public EffectPipeline EffectPipeline;
             public ActionRegistry ActionRegistry;
             public StatsRegistry StatsRegistry;
+            public ItemDefinitionRegistry ItemDefinitionRegistry;
             public StatusRegistry BG3StatusRegistry;
             public QDND.Combat.Statuses.BG3StatusIntegration BG3StatusIntegration;
             public PassiveRegistry PassiveRegistry;
@@ -156,6 +158,17 @@ namespace QDND.Data
             else
                 log($"BG3 Status Registry: {statusCount} statuses loaded and registered with StatusManager");
             combatContext.RegisterService(r.BG3StatusRegistry);
+
+            // Initialize item definitions from parsed BG3 object data and register item use actions.
+            r.ItemDefinitionRegistry = new ItemDefinitionRegistry();
+            r.ItemDefinitionRegistry.Initialize(r.StatsRegistry, r.ActionRegistry, r.BG3StatusRegistry);
+            int consumableActionsRegistered = ActionRegistryInitializer.RegisterConsumableActions(
+                r.ActionRegistry,
+                r.ItemDefinitionRegistry,
+                overwrite: true);
+            int consumableCount = r.ItemDefinitionRegistry.GetAllConsumables().Count;
+            log($"Item Definition Registry: {r.ItemDefinitionRegistry.Count} items resolved, {consumableCount} consumables, {consumableActionsRegistered} actions registered");
+            combatContext.RegisterService(r.ItemDefinitionRegistry);
 
             // Initialize BG3 Passive Registry
             r.PassiveRegistry = new PassiveRegistry();

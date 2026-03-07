@@ -12,6 +12,16 @@ namespace QDND.Tools
     /// </summary>
     public partial class SurfaceTestScene : Node3D
     {
+        private const float CameraPanSpeed = 10f;
+        private const float CameraRotateSpeed = 60f;
+        private const float WheelZoomStep = 1.5f;
+        private const float WheelPanStep = 1.25f;
+        private const float WheelRotateStep = 9f;
+        private const float MinZoom = 5f;
+        private const float MaxZoom = 30f;
+        private const float MinPitch = 20f;
+        private const float MaxPitch = 80f;
+
         private Camera3D _camera;
         private Node3D _surfaceContainer;
         private SurfaceManager _surfaceManager;
@@ -30,6 +40,10 @@ namespace QDND.Tools
 
         private string _selectedSurfaceId = "water";
         private float _spawnRadius = 2.5f;
+        private Vector3 _cameraLookTarget = Vector3.Zero;
+        private float _cameraPitch = 50f;
+        private float _cameraYaw = 45f;
+        private float _cameraDistance = 25f;
 
         public override void _Ready()
         {
@@ -62,6 +76,7 @@ namespace QDND.Tools
             PopulateSurfaceDropdown();
             SpawnPatternShowcase();
             UpdateInfoLabel();
+            UpdateCameraOrbit();
         }
 
         public override void _ExitTree()
@@ -77,8 +92,21 @@ namespace QDND.Tools
             base._ExitTree();
         }
 
+        public override void _PhysicsProcess(double delta)
+        {
+            ProcessCameraInput((float)delta);
+        }
+
         public override void _UnhandledInput(InputEvent @event)
         {
+            if (@event is InputEventMouseButton wheelEvent &&
+                wheelEvent.Pressed &&
+                (wheelEvent.ButtonIndex == MouseButton.WheelUp || wheelEvent.ButtonIndex == MouseButton.WheelDown))
+            {
+                HandleMouseWheelCameraInput(wheelEvent);
+                return;
+            }
+
             if (@event is InputEventMouseButton mb && mb.Pressed && mb.ButtonIndex == MouseButton.Left)
             {
                 if (TryGetGroundHit(mb.Position, out var hitPoint))
@@ -103,6 +131,100 @@ namespace QDND.Tools
                     UpdateInfoLabel("Cleared all surfaces.");
                 }
             }
+        }
+
+        private void ProcessCameraInput(float delta)
+        {
+            if (_camera == null)
+                return;
+
+            bool cameraChanged = false;
+            Vector3 panDirection = Vector3.Zero;
+
+            if (Input.IsActionPressed("camera_pan_up")) panDirection.Z -= 1f;
+            if (Input.IsActionPressed("camera_pan_down")) panDirection.Z += 1f;
+            if (Input.IsActionPressed("camera_pan_left")) panDirection.X -= 1f;
+            if (Input.IsActionPressed("camera_pan_right")) panDirection.X += 1f;
+
+            if (panDirection != Vector3.Zero)
+            {
+                panDirection = panDirection.Normalized();
+                panDirection = panDirection.Rotated(Vector3.Up, Mathf.DegToRad(_cameraYaw));
+                _cameraLookTarget += panDirection * CameraPanSpeed * delta;
+                cameraChanged = true;
+            }
+
+            if (Input.IsActionPressed("camera_rotate_left"))
+            {
+                _cameraYaw += CameraRotateSpeed * delta;
+                cameraChanged = true;
+            }
+
+            if (Input.IsActionPressed("camera_rotate_right"))
+            {
+                _cameraYaw -= CameraRotateSpeed * delta;
+                cameraChanged = true;
+            }
+
+            if (cameraChanged)
+            {
+                UpdateCameraOrbit();
+            }
+        }
+
+        private void HandleMouseWheelCameraInput(InputEventMouseButton wheelEvent)
+        {
+            if (_camera == null)
+                return;
+
+            float direction = wheelEvent.ButtonIndex == MouseButton.WheelUp ? 1f : -1f;
+            bool cameraChanged = false;
+
+            if (Input.IsKeyPressed(Key.Shift))
+            {
+                _cameraYaw += direction * WheelRotateStep;
+                cameraChanged = true;
+            }
+            else if (Input.IsKeyPressed(Key.Ctrl))
+            {
+                Vector3 forward = new Vector3(0f, 0f, -1f)
+                    .Rotated(Vector3.Up, Mathf.DegToRad(_cameraYaw));
+                _cameraLookTarget += forward * (direction * WheelPanStep);
+                cameraChanged = true;
+            }
+            else
+            {
+                _cameraDistance = Mathf.Clamp(_cameraDistance - direction * WheelZoomStep, MinZoom, MaxZoom);
+                cameraChanged = true;
+            }
+
+            if (cameraChanged)
+            {
+                UpdateCameraOrbit();
+                GetViewport().SetInputAsHandled();
+            }
+        }
+
+        private void UpdateCameraOrbit()
+        {
+            if (_camera == null)
+                return;
+
+            _cameraPitch = Mathf.Clamp(_cameraPitch, MinPitch, MaxPitch);
+            _cameraDistance = Mathf.Clamp(_cameraDistance, MinZoom, MaxZoom);
+
+            float pitchRad = Mathf.DegToRad(_cameraPitch);
+            float yawRad = Mathf.DegToRad(_cameraYaw);
+            float horizontalDist = _cameraDistance * Mathf.Cos(pitchRad);
+            float verticalDist = _cameraDistance * Mathf.Sin(pitchRad);
+
+            Vector3 offset = new Vector3(
+                horizontalDist * Mathf.Sin(yawRad),
+                verticalDist,
+                horizontalDist * Mathf.Cos(yawRad));
+
+            _camera.GlobalPosition = _cameraLookTarget + offset;
+            _camera.LookAt(_cameraLookTarget, Vector3.Up);
         }
 
         private void BuildUi()
