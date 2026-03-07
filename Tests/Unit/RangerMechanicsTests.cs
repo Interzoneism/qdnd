@@ -86,7 +86,8 @@ namespace QDND.Tests.Unit
             var action = registry.GetAction("hail_of_thorns");
 
             Assert.NotNull(action);
-            Assert.True(action.RequiresConcentration);
+            // BG3 Hail of Thorns is not concentration (unlike PHB 5e)
+            Assert.False(action.RequiresConcentration);
         }
 
         [Fact]
@@ -96,7 +97,8 @@ namespace QDND.Tests.Unit
             var action = registry.GetAction("primeval_awareness");
 
             Assert.NotNull(action);
-            Assert.Equal("primeval_awareness", action.Id);
+            // Canonical BG3 ID is the full normalized name
+            Assert.Equal("primeval_awareness_sense_creatures", action.Id);
         }
 
         [Fact]

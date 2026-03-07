@@ -272,7 +272,7 @@ namespace QDND.Combat.Environment
                         bool isFog = SurfaceHasTag(surface, "fog");
                         bool sourceInside = surface.ContainsPosition(from);
                         bool targetInside = surface.ContainsPosition(to);
-                        bool intersectsLine = IsPointNearLine(eyeFrom, eyeTo, surface.Position, surface.Radius);
+                        bool intersectsLine = LineIntersectsSurface(eyeFrom, eyeTo, surface);
 
                         if (sourceInside)
                         {
@@ -485,28 +485,28 @@ namespace QDND.Combat.Environment
         }
 
         /// <summary>
-        /// Check if a sphere (surface area) is close enough to a line segment to obscure it.
-        /// Uses point-to-line-segment distance calculation.
+        /// Samples the LOS segment against the authoritative surface cell mask.
         /// </summary>
-        private bool IsPointNearLine(Vector3 lineStart, Vector3 lineEnd, Vector3 point, float radius)
+        private static bool LineIntersectsSurface(Vector3 lineStart, Vector3 lineEnd, SurfaceInstance surface)
         {
-            var line = lineEnd - lineStart;
-            float lineLength = line.Length();
-            if (lineLength < 0.001f) return false;
+            if (surface == null || surface.CellCount == 0)
+                return false;
 
-            var lineDir = line / lineLength;
-            var toPoint = point - lineStart;
-            float projection = toPoint.Dot(lineDir);
+            float lineLength = lineStart.DistanceTo(lineEnd);
+            if (lineLength < 0.001f)
+                return surface.ContainsPosition(lineStart);
 
-            // Check if projection falls within line segment
-            if (projection < -radius || projection > lineLength + radius) return false;
+            float step = Math.Max(0.1f, surface.CellSize * 0.5f);
+            int samples = Math.Max(1, Mathf.CeilToInt(lineLength / step));
+            for (int i = 0; i <= samples; i++)
+            {
+                float t = i / (float)samples;
+                var sample = lineStart.Lerp(lineEnd, t);
+                if (surface.ContainsPosition(sample))
+                    return true;
+            }
 
-            // Clamp projection to line segment
-            projection = Math.Clamp(projection, 0, lineLength);
-            var closestPoint = lineStart + lineDir * projection;
-            float distance = closestPoint.DistanceTo(point);
-
-            return distance <= radius;
+            return false;
         }
 
         private static bool SurfaceHasTag(SurfaceInstance surface, string tag)

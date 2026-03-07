@@ -933,6 +933,15 @@ namespace QDND.Data.Actions
                 };
             }
 
+            // Kill() — instantly kills the target (used by e.g. Power Word Kill)
+            if (TryGetFunctorArguments(functor, "Kill", out _))
+            {
+                return new EffectDefinition
+                {
+                    Type = "kill"
+                };
+            }
+
             // Resurrect([hp][, ...])
             // Supports 2-arg forms while preserving default behavior.
             if (TryGetFunctorArguments(functor, "Resurrect", out var resurrectArgs))
@@ -1716,6 +1725,7 @@ namespace QDND.Data.Actions
                 "stabilize" => true,
                 "resurrect" => true,
                 "removestatusbygroup" => true,
+                "kill" => true,
                 "counterspell" => true,
                 "setadvantage" => true,
                 "setdisadvantage" => true,

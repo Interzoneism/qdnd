@@ -8,6 +8,12 @@ namespace QDND.Combat.Persistence
         public float Radius { get; set; }
     }
 
+    public class SurfaceCellSnapshot
+    {
+        public int X { get; set; }
+        public int Z { get; set; }
+    }
+
     /// <summary>
     /// Snapshot of a surface/field effect.
     /// </summary>
@@ -43,12 +49,18 @@ namespace QDND.Combat.Persistence
         // --- Area ---
 
         /// <summary>
-        /// Radius of the surface effect.
+        /// Approximate enclosing radius of the surface effect.
         /// </summary>
         public float Radius { get; set; }
 
         /// <summary>
-        /// Optional detailed blob geometry.
+        /// Authoritative occupied surface cells.
+        /// </summary>
+        public System.Collections.Generic.List<SurfaceCellSnapshot> Cells { get; set; } = new();
+
+        /// <summary>
+        /// Legacy blob geometry format used by older saves.
+        /// Kept for backward compatibility when importing old snapshots.
         /// </summary>
         public System.Collections.Generic.List<SurfaceBlobSnapshot> Blobs { get; set; } = new();
 

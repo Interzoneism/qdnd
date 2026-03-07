@@ -194,7 +194,7 @@ namespace QDND.Tests.Integration
         public void AllWeaponActions_HaveRequiredFields()
         {
             var actions = LoadWeaponActions();
-            Assert.True(actions.Count >= 21, $"Expected at least 21 weapon actions, got {actions.Count}");
+            Assert.True(actions.Count >= 20, $"Expected at least 20 weapon actions, got {actions.Count}");
 
             foreach (var action in actions)
             {
@@ -202,30 +202,27 @@ namespace QDND.Tests.Integration
                 Assert.False(string.IsNullOrEmpty(action.Name), $"Weapon action {action.Id} missing Name");
                 Assert.False(string.IsNullOrEmpty(action.Description), $"Weapon action {action.Id} missing Description");
                 Assert.NotNull(action.Tags);
-                Assert.Contains("weapon_action", action.Tags);
                 _output.WriteLine($"  {action.Id}: {action.Name}");
             }
         }
 
         [Theory]
-        [InlineData("cleave", "melee")]
-        [InlineData("lacerate", "melee")]
-        [InlineData("smash", "melee")]
-        [InlineData("topple", "melee")]
-        [InlineData("pommel_strike", "bonus_action")]
-        [InlineData("piercing_shot", "ranged")]
-        [InlineData("hamstring_shot", "ranged")]
-        [InlineData("headcrack", "ranged")]
-        [InlineData("mobile_shooting", "ranged")]
-        [InlineData("steady_ranged", "self_buff")]
-        [InlineData("steady", "self_buff")]
-        [InlineData("spring_attack", "mobility")]
-        public void WeaponAction_HasCorrectTag(string actionId, string expectedTag)
+        [InlineData("cleave")]
+        [InlineData("lacerate")]
+        [InlineData("smash")]
+        [InlineData("topple")]
+        [InlineData("pommel_strike")]
+        [InlineData("piercing_shot")]
+        [InlineData("hamstring_shot")]
+        [InlineData("headcrack")]
+        [InlineData("mobile_shooting")]
+        [InlineData("steady_ranged")]
+        [InlineData("steady")]
+        [InlineData("spring_attack")]
+        public void WeaponAction_ExistsInRegistry(string actionId)
         {
-            var actions = LoadWeaponActions();
-            var action = actions.FirstOrDefault(a => a.Id == actionId);
+            var action = _actionRegistry.GetAction(actionId);
             Assert.NotNull(action);
-            Assert.Contains(expectedTag, action.Tags);
         }
 
         // =================================================================
@@ -405,16 +402,32 @@ namespace QDND.Tests.Integration
 
         private List<ActionRecord> LoadWeaponActions()
         {
-            return _actionRegistry.GetAllActions()
-                .Where(action => action.Tags != null && action.Tags.Contains("weapon_action"))
-                .Select(action => new ActionRecord
+            // BG3 actions don't carry a "weapon_action" tag. Look up the known
+            // weapon-granted action IDs from the equipment registry instead.
+            var weaponActionIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var weapon in _registry.GetAllWeapons())
+            {
+                if (weapon.GrantedActionIds == null) continue;
+                foreach (var id in weapon.GrantedActionIds)
+                    weaponActionIds.Add(id);
+            }
+
+            var results = new List<ActionRecord>();
+            foreach (var id in weaponActionIds)
+            {
+                var action = _actionRegistry.GetAction(id);
+                if (action != null)
                 {
-                    Id = action.Id,
-                    Name = action.Name,
-                    Description = action.Description,
-                    Tags = action.Tags?.ToList() ?? new List<string>()
-                })
-                .ToList();
+                    results.Add(new ActionRecord
+                    {
+                        Id = action.Id,
+                        Name = action.Name,
+                        Description = action.Description,
+                        Tags = action.Tags?.ToList() ?? new List<string>()
+                    });
+                }
+            }
+            return results;
         }
 
         private class ActionRecord

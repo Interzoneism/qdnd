@@ -79,8 +79,8 @@ namespace QDND.Data.Actions
 
                 // Animation/VFX hooks
                 AnimationId = spell.SpellAnimation,
-                VfxId = spell.SpellType.ToString().ToLowerInvariant(),
-                SfxId = spell.SpellSoundMagnitude
+                VfxId = null,
+                SfxId = spell.SpellSoundMagnitude == "None" ? null : spell.SpellSoundMagnitude
             };
 
             // Wire multi-target counts from BG3 targeting fields.

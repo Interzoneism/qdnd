@@ -36,6 +36,18 @@ namespace QDND.Combat.Environment
     }
 
     /// <summary>
+    /// Occupancy pattern used when rasterizing this surface on the gameplay grid.
+    /// </summary>
+    public enum SurfacePattern
+    {
+        SolidDisc,
+        NoisyDisc,
+        PatchyDisc,
+        Ring,
+        Wispy
+    }
+
+    /// <summary>
     /// When surface effects trigger.
     /// </summary>
     public enum SurfaceTrigger
@@ -169,6 +181,9 @@ namespace QDND.Combat.Environment
         public float VisualOpacity { get; set; } = 0.55f;
         public float WaveAmplitude { get; set; } = 0.01f;
         public float WaveSpeed { get; set; } = 1f;
+        public SurfacePattern Pattern { get; set; } = SurfacePattern.SolidDisc;
+        public float PatternNoise { get; set; } = 0.2f;
+        public float VisualPaddingCells { get; set; } = 0.14f;
 
         /// <summary>
         /// What this surface transforms into when interacting with other surfaces.

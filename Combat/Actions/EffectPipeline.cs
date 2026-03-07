@@ -262,6 +262,7 @@ namespace QDND.Combat.Actions
             RegisterEffect(new GainTempHPEffect());
             RegisterEffect(new CreateExplosionEffect());
             RegisterEffect(new StabilizeEffect());
+            RegisterEffect(new KillEffect());
             RegisterEffect(new ResurrectEffect());
 
             // Phase 2 parity handlers — fully implemented

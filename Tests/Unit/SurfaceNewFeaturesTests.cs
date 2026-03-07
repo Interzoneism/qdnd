@@ -346,11 +346,11 @@ namespace QDND.Tests.Unit
             var mgr = CreateManager();
             // Fire has no GrowStep configured
             var surface = mgr.CreateSurface("fire", new Vector3(0, 0, 0), 2f);
-            float initialRadius = surface.Radius;
+            int initialCells = surface.CellCount;
 
             mgr.ProcessRoundEnd();
 
-            Assert.Equal(initialRadius, surface.Radius);
+            Assert.Equal(initialCells, surface.CellCount);
         }
 
         [Fact]
@@ -370,12 +370,12 @@ namespace QDND.Tests.Unit
             };
             mgr.RegisterSurface(def);
             var surface = mgr.CreateSurface("test_grow", new Vector3(0, 0, 0), 1f);
-            float initialRadius = surface.Radius;
+            int initialCells = surface.CellCount;
 
             mgr.ProcessRoundEnd();
 
-            Assert.True(surface.Radius > initialRadius,
-                $"Expected radius > {initialRadius} after growth, got {surface.Radius}");
+            Assert.True(surface.CellCount > initialCells,
+                $"Expected cell count > {initialCells} after growth, got {surface.CellCount}");
         }
 
         [Fact]
@@ -395,23 +395,23 @@ namespace QDND.Tests.Unit
             };
             mgr.RegisterSurface(def);
             var surface = mgr.CreateSurface("test_grow_interval", new Vector3(0, 0, 0), 1f);
-            float initialRadius = surface.Radius;
+            int initialCells = surface.CellCount;
 
             // Round 1: should NOT grow (interval is 3)
             mgr.ProcessRoundEnd();
-            float afterRound1 = surface.Radius;
-            Assert.Equal(initialRadius, afterRound1);
+            int afterRound1 = surface.CellCount;
+            Assert.Equal(initialCells, afterRound1);
 
             // Round 2: should NOT grow
             mgr.ProcessRoundEnd();
-            float afterRound2 = surface.Radius;
-            Assert.Equal(initialRadius, afterRound2);
+            int afterRound2 = surface.CellCount;
+            Assert.Equal(initialCells, afterRound2);
 
             // Round 3: should grow
             mgr.ProcessRoundEnd();
-            float afterRound3 = surface.Radius;
-            Assert.True(afterRound3 > initialRadius,
-                $"Expected growth at interval 3, radius was {afterRound3} (initial {initialRadius})");
+            int afterRound3 = surface.CellCount;
+            Assert.True(afterRound3 > initialCells,
+                $"Expected growth at interval 3, cells were {afterRound3} (initial {initialCells})");
         }
 
         [Fact]
@@ -436,12 +436,8 @@ namespace QDND.Tests.Unit
             for (int i = 0; i < 10; i++)
                 mgr.ProcessRoundEnd();
 
-            // Each blob's radius should not exceed GrowMaxRadius
-            foreach (var blob in surface.Blobs)
-            {
-                Assert.True(blob.Radius <= 3f + 0.01f,
-                    $"Blob radius {blob.Radius} exceeded max {3f}");
-            }
+            Assert.True(surface.Radius <= 3f + surface.CellSize + 0.05f,
+                $"Surface radius {surface.Radius} exceeded capped radius 3");
         }
 
         [Fact]
@@ -480,7 +476,7 @@ namespace QDND.Tests.Unit
 
             Assert.NotNull(puddle);
             Assert.Equal("water", puddle.Definition.Id);
-            Assert.True(puddle.Blobs.Count >= 3, $"Expected at least 3 blobs, got {puddle.Blobs.Count}");
+            Assert.True(puddle.CellCount >= 20, $"Expected at least 20 cells, got {puddle.CellCount}");
         }
 
         [Fact]
@@ -521,7 +517,8 @@ namespace QDND.Tests.Unit
         {
             var mgr = CreateManager();
             // Create an existing water surface
-            mgr.CreateSurface("water", new Vector3(0, 0, 0), 2f);
+            var existing = mgr.CreateSurface("water", new Vector3(0, 0, 0), 2f);
+            int initialCells = existing.CellCount;
 
             // Create a puddle at the same location — should merge
             var puddle = mgr.CreatePuddle("water", new Vector3(0, 0, 0), 40);
@@ -532,9 +529,9 @@ namespace QDND.Tests.Unit
                 .Where(s => s.Definition.Id == "water")
                 .ToList();
             Assert.Single(allWater);
-            // The merged surface should have more blobs than a single-blob surface
-            Assert.True(allWater[0].Blobs.Count >= 2,
-                $"Expected merged surface with multiple blobs, got {allWater[0].Blobs.Count}");
+            // The merged surface should have more occupied cells than the original single cast.
+            Assert.True(allWater[0].CellCount > initialCells,
+                $"Expected merged surface to grow beyond {initialCells} cells, got {allWater[0].CellCount}");
         }
 
         // =================================================================

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 using QDND.Combat.Environment;
@@ -152,6 +153,7 @@ void fragment() {
             public float CloudDensity { get; set; }
             public float HeightFade { get; set; }
             public float HeightOffset { get; set; }
+            public float CellPaddingMeters { get; set; }
             public bool UseFogVolume { get; set; }
             public float FogDensity { get; set; }
             public float FogNoiseScale { get; set; }
@@ -161,23 +163,8 @@ void fragment() {
             public float FogHeight { get; set; }
         }
 
-        private static readonly CylinderMesh GroundBlobMesh = new()
-        {
-            TopRadius = 1f,
-            BottomRadius = 1f,
-            Height = 0.035f,
-            RadialSegments = 28
-        };
-        private static readonly CylinderMesh CloudBlobMesh = new()
-        {
-            TopRadius = 1f,
-            BottomRadius = 1f,
-            Height = 0.26f,
-            RadialSegments = 36
-        };
-
-        private readonly List<MeshInstance3D> _blobMeshes = new();
-        private readonly List<FogVolume> _fogVolumes = new();
+        private MeshInstance3D _surfaceMesh;
+        private FogVolume _fogVolume;
         private bool _useFogVolumes = true;
         private string _surfaceId;
         private string _surfaceDefinitionId;
@@ -187,17 +174,11 @@ void fragment() {
 
         public override void _ExitTree()
         {
-            foreach (var mesh in _blobMeshes)
-            {
-                mesh?.QueueFree();
-            }
-            _blobMeshes.Clear();
+            _surfaceMesh?.QueueFree();
+            _surfaceMesh = null;
 
-            foreach (var fog in _fogVolumes)
-            {
-                fog?.QueueFree();
-            }
-            _fogVolumes.Clear();
+            _fogVolume?.QueueFree();
+            _fogVolume = null;
 
             base._ExitTree();
         }
@@ -224,49 +205,153 @@ void fragment() {
             Position = surface.Position;
 
             var style = GetSurfaceStyle(surface);
-            RebuildBlobMeshes(surface, style);
+            RebuildGridMesh(surface, style);
         }
 
-        private void RebuildBlobMeshes(SurfaceInstance surface, VisualStyle style)
+        private void RebuildGridMesh(SurfaceInstance surface, VisualStyle style)
         {
-            foreach (var mesh in _blobMeshes)
+            if (_surfaceMesh == null)
             {
-                mesh?.QueueFree();
-            }
-            _blobMeshes.Clear();
-
-            foreach (var fog in _fogVolumes)
-            {
-                fog?.QueueFree();
-            }
-            _fogVolumes.Clear();
-
-            foreach (var blob in surface.Blobs)
-            {
-                Mesh meshTemplate = style.Shader == ShaderFamily.Cloud ? CloudBlobMesh : GroundBlobMesh;
-                var mesh = new MeshInstance3D
+                _surfaceMesh = new MeshInstance3D
                 {
-                    Mesh = meshTemplate,
-                    Position = (blob.Center - surface.Position) + new Vector3(0f, style.HeightOffset, 0f),
-                    Scale = new Vector3(blob.Radius, 1f, blob.Radius),
-                    MaterialOverride = BuildMaterial(style)
+                    Name = "SurfaceMesh",
+                    CastShadow = GeometryInstance3D.ShadowCastingSetting.Off
                 };
-                mesh.CastShadow = GeometryInstance3D.ShadowCastingSetting.Off;
-                AddChild(mesh);
-                _blobMeshes.Add(mesh);
+                AddChild(_surfaceMesh);
+            }
 
-                if (style.Shader == ShaderFamily.Cloud && _useFogVolumes && style.UseFogVolume)
+            _surfaceMesh.Mesh = BuildSurfaceMaskMesh(surface, style);
+            _surfaceMesh.MaterialOverride = BuildMaterial(style);
+            _surfaceMesh.Position = Vector3.Zero;
+
+            if (style.Shader == ShaderFamily.Cloud && _useFogVolumes && style.UseFogVolume)
+            {
+                if (_fogVolume == null)
                 {
-                    var fog = new FogVolume
-                    {
-                        Position = (blob.Center - surface.Position) + new Vector3(0f, style.HeightOffset + style.FogHeight * 0.5f, 0f),
-                        Size = new Vector3(blob.Radius * 2f, style.FogHeight, blob.Radius * 2f),
-                        Material = BuildFogMaterial(style)
-                    };
-
-                    AddChild(fog);
-                    _fogVolumes.Add(fog);
+                    _fogVolume = new FogVolume { Name = "SurfaceFogVolume" };
+                    AddChild(_fogVolume);
                 }
+
+                int minX = int.MaxValue;
+                int minZ = int.MaxValue;
+                int maxX = int.MinValue;
+                int maxZ = int.MinValue;
+                foreach (var cell in surface.Cells)
+                {
+                    if (cell.X < minX) minX = cell.X;
+                    if (cell.Z < minZ) minZ = cell.Z;
+                    if (cell.X > maxX) maxX = cell.X;
+                    if (cell.Z > maxZ) maxZ = cell.Z;
+                }
+
+                if (surface.CellCount > 0)
+                {
+                    float sizeX = (maxX - minX + 1) * surface.CellSize;
+                    float sizeZ = (maxZ - minZ + 1) * surface.CellSize;
+                    float cx = ((minX + maxX + 1) * 0.5f) * surface.CellSize;
+                    float cz = ((minZ + maxZ + 1) * 0.5f) * surface.CellSize;
+                    _fogVolume.Position = new Vector3(
+                        cx - surface.Position.X,
+                        style.HeightOffset + style.FogHeight * 0.5f,
+                        cz - surface.Position.Z);
+                    _fogVolume.Size = new Vector3(
+                        sizeX + style.CellPaddingMeters * 2f,
+                        style.FogHeight,
+                        sizeZ + style.CellPaddingMeters * 2f);
+                }
+
+                _fogVolume.Material = BuildFogMaterial(style);
+            }
+            else if (_fogVolume != null)
+            {
+                _fogVolume.QueueFree();
+                _fogVolume = null;
+            }
+        }
+
+        private static ArrayMesh BuildSurfaceMaskMesh(SurfaceInstance surface, VisualStyle style)
+        {
+            var mesh = new ArrayMesh();
+            if (surface == null || surface.CellCount == 0)
+                return mesh;
+
+            int minX = int.MaxValue;
+            int minZ = int.MaxValue;
+            int maxX = int.MinValue;
+            int maxZ = int.MinValue;
+            foreach (var cell in surface.Cells)
+            {
+                if (cell.X < minX) minX = cell.X;
+                if (cell.Z < minZ) minZ = cell.Z;
+                if (cell.X > maxX) maxX = cell.X;
+                if (cell.Z > maxZ) maxZ = cell.Z;
+            }
+
+            int spanX = Math.Max(1, maxX - minX + 1);
+            int spanZ = Math.Max(1, maxZ - minZ + 1);
+
+            var vertices = new List<Vector3>();
+            var normals = new List<Vector3>();
+            var uvs = new List<Vector2>();
+            var indices = new List<int>();
+
+            foreach (var cell in surface.Cells)
+            {
+                var world = surface.CellToWorld(cell);
+                var local = world - surface.Position;
+                float padNoise = (CellHash(cell.X, cell.Z) - 0.5f) * surface.CellSize * 0.08f;
+                float half = surface.CellSize * 0.5f + style.CellPaddingMeters + padNoise;
+                float y = style.HeightOffset;
+
+                float u0 = (cell.X - minX) / (float)spanX;
+                float u1 = (cell.X - minX + 1f) / spanX;
+                float v0 = (cell.Z - minZ) / (float)spanZ;
+                float v1 = (cell.Z - minZ + 1f) / spanZ;
+
+                int start = vertices.Count;
+                vertices.Add(new Vector3(local.X - half, y, local.Z - half));
+                vertices.Add(new Vector3(local.X + half, y, local.Z - half));
+                vertices.Add(new Vector3(local.X + half, y, local.Z + half));
+                vertices.Add(new Vector3(local.X - half, y, local.Z + half));
+
+                normals.Add(Vector3.Up);
+                normals.Add(Vector3.Up);
+                normals.Add(Vector3.Up);
+                normals.Add(Vector3.Up);
+
+                uvs.Add(new Vector2(u0, v0));
+                uvs.Add(new Vector2(u1, v0));
+                uvs.Add(new Vector2(u1, v1));
+                uvs.Add(new Vector2(u0, v1));
+
+                indices.Add(start + 0);
+                indices.Add(start + 1);
+                indices.Add(start + 2);
+                indices.Add(start + 0);
+                indices.Add(start + 2);
+                indices.Add(start + 3);
+            }
+
+            var arrays = new Godot.Collections.Array();
+            arrays.Resize((int)Mesh.ArrayType.Max);
+            arrays[(int)Mesh.ArrayType.Vertex] = vertices.ToArray();
+            arrays[(int)Mesh.ArrayType.Normal] = normals.ToArray();
+            arrays[(int)Mesh.ArrayType.TexUV] = uvs.ToArray();
+            arrays[(int)Mesh.ArrayType.Index] = indices.ToArray();
+            mesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, arrays);
+            return mesh;
+        }
+
+        private static float CellHash(int x, int z)
+        {
+            unchecked
+            {
+                int h = x * 73856093 ^ z * 19349663;
+                h ^= h >> 13;
+                h *= 1274126177;
+                h ^= h >> 16;
+                uint u = (uint)h;
+                return (u & 0x00FFFFFF) / 16777215f;
             }
         }
 
@@ -417,6 +502,7 @@ void fragment() {
                 CloudDensity = isCloud ? 1f : 0f,
                 HeightFade = 1.25f,
                 HeightOffset = isCloud ? 0.18f : 0.012f,
+                CellPaddingMeters = Mathf.Max(0f, surface.Definition.VisualPaddingCells * surface.CellSize),
                 UseFogVolume = isCloud,
                 FogDensity = 0.28f,
                 FogNoiseScale = 2f,

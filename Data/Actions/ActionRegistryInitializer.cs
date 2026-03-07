@@ -123,31 +123,16 @@ namespace QDND.Data.Actions
         /// </summary>
         private static void RegisterAliases(ActionRegistry registry)
         {
-            // 1. Explicit remaps from ActionIdResolver (BG3Id → snakeCaseId).
-            //    Register the snake_case form as an alias pointing to the canonical BG3 ID.
-            foreach (var kvp in ActionIdResolver.ExplicitRemaps)
-            {
-                // kvp.Key   = BG3 ID  (e.g. "Target_Shove")
-                // kvp.Value = alias   (e.g. "shove")
-                registry.RegisterAlias(kvp.Value, kvp.Key);
-            }
+            // Manual aliases where BG3 entry name normalizes to something different
+            // than what equipment_data.json or class JSONs expect.
+            registry.RegisterAlias("lacerate", "slash_new");                      // BG3 Target_Slash_New → slash_new; equipment uses "lacerate"
+            registry.RegisterAlias("steady_crossbow", "steady_ranged_crossbow");  // BG3 Shout_SteadyRangedCrossbow → steady_ranged_crossbow
+            registry.RegisterAlias("primeval_awareness", "primeval_awareness_sense_creatures"); // BG3 Shout_PrimevalAwareness_SenseCreatures
 
-            // 2. Auto-generate snake_case aliases for every registered BG3 action that
-            //    wasn't already covered by the explicit remaps above.
-            //    Strip the BG3 prefix then convert to snake_case.
-            foreach (var action in registry.GetAllActions())
-            {
-                var stripped = ActionIdResolver.StripKnownPrefix(action.Id);
-                if (string.IsNullOrEmpty(stripped) || stripped == action.Id)
-                    continue; // ID had no recognized prefix — skip
-
-                var snakeAlias = ActionIdResolver.ToSnakeCase(stripped);
-                if (!string.IsNullOrEmpty(snakeAlias))
-                    registry.RegisterAlias(snakeAlias, action.Id); // TryAdd — first registration wins
-            }
-
-            // 3. Special cases where the auto-generated alias doesn't match conventions.
-            registry.RegisterAlias("primeval_awareness", "Shout_PrimevalAwareness_SenseCreatures");
+            // Rogue cunning action aliases: class JSON uses legacy names, BG3 normalizes differently
+            registry.RegisterAlias("cunning_action_dash", "dash_cunning_action");         // Shout_Dash_CunningAction → dash_cunning_action
+            registry.RegisterAlias("cunning_action_disengage", "disengage_cunning_action"); // Shout_Disengage_CunningAction → disengage_cunning_action
+            registry.RegisterAlias("cunning_action_hide", "hide_bonus_action");           // Shout_Hide_BonusAction → hide_bonus_action
         }
 
         /// <summary>

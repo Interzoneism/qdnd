@@ -2442,6 +2442,7 @@ void fragment() {
                 ? "Duration: Permanent"
                 : $"Duration: {surface.RemainingDuration} round(s)");
             lines.Add($"Radius: {surface.Radius:0.0}m");
+            lines.Add($"Cells: {surface.CellCount}");
 
             if (definition.DamagePerTrigger > 0f)
             {

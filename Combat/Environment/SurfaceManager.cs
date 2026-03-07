@@ -110,6 +110,10 @@ namespace QDND.Combat.Environment
         private readonly RuleEventBus _events;
         private readonly StatusManager _statuses;
         private readonly Random _random = new();
+        private readonly float _cellSize;
+
+        public const float DEFAULT_SURFACE_CELL_SIZE = 0.5f;
+        public float CellSize => _cellSize;
 
         public RulesEngine Rules { get; set; }
         public Func<IEnumerable<Combatant>> ResolveCombatants { get; set; }
@@ -120,10 +124,11 @@ namespace QDND.Combat.Environment
         public event Action<SurfaceInstance, Combatant, SurfaceTrigger> OnSurfaceTriggered;
         public event Action<SurfaceInstance> OnSurfaceGeometryChanged;
 
-        public SurfaceManager(RuleEventBus events = null, StatusManager statuses = null)
+        public SurfaceManager(RuleEventBus events = null, StatusManager statuses = null, float cellSize = DEFAULT_SURFACE_CELL_SIZE)
         {
             _events = events;
             _statuses = statuses;
+            _cellSize = Mathf.Max(0.1f, cellSize);
             RegisterDefaultSurfaces();
         }
 
@@ -165,12 +170,23 @@ namespace QDND.Combat.Environment
             }
 
             int resolvedDuration = ResolveDuration(def, duration);
-            var incoming = new SurfaceInstance(def)
+            float resolvedRadius = Mathf.Max(_cellSize * 0.5f, radius);
+            var incomingCells = RasterizePatternedCells(
+                position,
+                resolvedRadius,
+                def.Pattern,
+                def.PatternNoise,
+                surfaceIdSeed: StableHash(resolvedSurfaceId));
+            if (incomingCells.Count == 0)
+                return null;
+
+            var incoming = new SurfaceInstance(def, _cellSize)
             {
                 CreatorId = creatorId,
                 RemainingDuration = resolvedDuration
             };
-            incoming.InitializeGeometry(position, Mathf.Max(0.25f, radius));
+            incoming.SetVerticalPosition(position.Y);
+            incoming.SetCells(incomingCells);
 
             var mergeTarget = FindMergeTarget(incoming);
             if (mergeTarget != null)
@@ -199,8 +215,7 @@ namespace QDND.Combat.Environment
                     s != incoming &&
                     s.Definition.Id == incoming.Definition.Id &&
                     s.Definition.Layer == incoming.Definition.Layer &&
-                    (s.Overlaps(incoming) ||
-                     s.Position.DistanceTo(incoming.Position) <= Mathf.Max(1.0f, incoming.Radius * 0.3f)));
+                    OverlapsOrNear(s, incoming));
 
                 if (postMergeTarget != null)
                 {
@@ -230,8 +245,7 @@ namespace QDND.Combat.Environment
             return _activeSurfaces.FirstOrDefault(surface =>
                 surface.Definition.Id == incoming.Definition.Id &&
                 surface.Definition.Layer == incoming.Definition.Layer &&
-                (surface.Overlaps(incoming) ||
-                 surface.Position.DistanceTo(incoming.Position) <= Mathf.Max(1.0f, incoming.Radius * 0.3f)));
+                OverlapsOrNear(surface, incoming));
         }
 
         private static int ResolveDuration(SurfaceDefinition definition, int? overrideDuration)
@@ -264,7 +278,17 @@ namespace QDND.Combat.Environment
             if (surface == null)
                 return false;
 
-            surface.AddBlob(position, Mathf.Max(0.25f, radius));
+            int previousCount = surface.CellCount;
+            var addedCells = RasterizePatternedCells(
+                position,
+                Mathf.Max(_cellSize * 0.5f, radius),
+                surface.Definition.Pattern,
+                surface.Definition.PatternNoise,
+                StableHash(surface.Definition.Id));
+            surface.AddCells(addedCells);
+            if (surface.CellCount == previousCount)
+                return false;
+
             OnSurfaceGeometryChanged?.Invoke(surface);
             DispatchSurfaceGeometryChanged(surface);
             ResolveContactInteractionsFor(surface);
@@ -299,7 +323,7 @@ namespace QDND.Combat.Environment
             if (string.IsNullOrWhiteSpace(normalized))
                 return 0;
 
-            radius = Mathf.Max(0.25f, radius);
+            radius = Mathf.Max(_cellSize * 0.5f, radius);
             int affected = 0;
 
             var candidates = _activeSurfaces
@@ -631,40 +655,16 @@ namespace QDND.Combat.Environment
                 return null;
             }
 
-            // Convert totalCells (0.5m each) to approximate area, then to blob count
-            // Each cell = 0.25 m², so totalCells cells ≈ totalCells * 0.25 m² total area
-            float totalArea = totalCells * 0.25f;
-
-            // Create 3-8 overlapping blobs of varying size to make an irregular shape
-            int blobCount = Math.Clamp(totalCells / 20 + 2, 3, 8);
-            float avgBlobRadius = Mathf.Sqrt(totalArea / (blobCount * Mathf.Pi));
-
             int resolvedDuration = ResolveDuration(def, duration);
-            var instance = new SurfaceInstance(def)
+            var instance = new SurfaceInstance(def, _cellSize)
             {
                 CreatorId = creatorId,
                 RemainingDuration = resolvedDuration
             };
-
-            for (int i = 0; i < blobCount; i++)
-            {
-                // Randomize blob positions around origin
-                float angle = (float)(_random.NextDouble() * Mathf.Tau);
-                float dist = (float)(_random.NextDouble() * avgBlobRadius * 1.5f);
-                float blobRadius = avgBlobRadius * (0.6f + (float)_random.NextDouble() * 0.8f);
-                blobRadius = Mathf.Max(0.25f, blobRadius);
-
-                var blobCenter = origin + new Vector3(
-                    Mathf.Cos(angle) * dist,
-                    0f,
-                    Mathf.Sin(angle) * dist
-                );
-
-                if (i == 0)
-                    instance.InitializeGeometry(blobCenter, blobRadius);
-                else
-                    instance.AddBlob(blobCenter, blobRadius);
-            }
+            instance.SetVerticalPosition(origin.Y);
+            instance.SetCells(GeneratePuddleCells(origin, totalCells, def.PatternNoise, StableHash(resolvedSurfaceId)));
+            if (instance.IsDepleted)
+                return null;
 
             // Check for merge with existing same-type surface
             var mergeTarget = FindMergeTarget(instance);
@@ -1175,31 +1175,25 @@ namespace QDND.Combat.Environment
             if (index < 0)
                 return null;
 
-            var newSurface = new SurfaceInstance(newDef)
+            var newSurface = new SurfaceInstance(newDef, _cellSize)
             {
                 CreatorId = surface.CreatorId,
                 RemainingDuration = ResolveTransformedDuration(surface, newDef)
             };
+            newSurface.SetVerticalPosition(surface.Position.Y);
 
-            bool initialized = false;
-            foreach (var blob in surface.Blobs)
+            var scaledCells = ScaleCells(surface.Cells, surface.Position, radiusScale);
+            if (scaledCells.Count == 0)
             {
-                float scaledRadius = Mathf.Max(0.15f, blob.Radius * radiusScale);
-                if (!initialized)
-                {
-                    newSurface.InitializeGeometry(blob.Center, scaledRadius);
-                    initialized = true;
-                }
-                else
-                {
-                    newSurface.AddBlob(blob.Center, scaledRadius);
-                }
+                scaledCells = RasterizePatternedCells(
+                    surface.Position,
+                    Mathf.Max(_cellSize * 0.5f, surface.Radius * radiusScale),
+                    newDef.Pattern,
+                    newDef.PatternNoise,
+                    StableHash(newSurfaceId));
             }
 
-            if (!initialized)
-            {
-                newSurface.InitializeGeometry(surface.Position, Mathf.Max(0.15f, surface.Radius * radiusScale));
-            }
+            newSurface.SetCells(scaledCells);
 
             _activeSurfaces[index] = newSurface;
 
@@ -1273,14 +1267,12 @@ namespace QDND.Combat.Environment
                     RoundsSinceLastGrowth = surface.RoundsSinceLastGrowth
                 };
 
-                foreach (var blob in surface.Blobs)
+                foreach (var cell in surface.Cells)
                 {
-                    snapshot.Blobs.Add(new Persistence.SurfaceBlobSnapshot
+                    snapshot.Cells.Add(new Persistence.SurfaceCellSnapshot
                     {
-                        CenterX = blob.Center.X,
-                        CenterY = blob.Center.Y,
-                        CenterZ = blob.Center.Z,
-                        Radius = blob.Radius
+                        X = cell.X,
+                        Z = cell.Z
                     });
                 }
 
@@ -1339,38 +1331,44 @@ namespace QDND.Combat.Environment
                 return;
             }
 
-            var instance = new SurfaceInstance(def)
+            var instance = new SurfaceInstance(def, _cellSize)
             {
                 CreatorId = snapshot.OwnerCombatantId,
                 RemainingDuration = ResolveDuration(def, snapshot.RemainingDuration),
                 RoundsSinceLastGrowth = snapshot.RoundsSinceLastGrowth
             };
+            instance.SetVerticalPosition(snapshot.PositionY);
 
-            if (snapshot.Blobs != null && snapshot.Blobs.Count > 0)
+            if (snapshot.Cells != null && snapshot.Cells.Count > 0)
             {
-                bool initialized = false;
+                instance.SetCells(snapshot.Cells.Select(c => new SurfaceCell(c.X, c.Z)));
+            }
+            else if (snapshot.Blobs != null && snapshot.Blobs.Count > 0)
+            {
+                var importedCells = new HashSet<SurfaceCell>();
                 foreach (var blob in snapshot.Blobs)
                 {
                     var center = new Vector3(blob.CenterX, blob.CenterY, blob.CenterZ);
-                    if (!initialized)
-                    {
-                        instance.InitializeGeometry(center, blob.Radius);
-                        initialized = true;
-                    }
-                    else
-                    {
-                        instance.AddBlob(center, blob.Radius);
-                    }
+                    foreach (var cell in instance.EnumerateCellsInCircle(center, blob.Radius))
+                        importedCells.Add(cell);
                 }
+                instance.SetCells(importedCells);
             }
             else
             {
-                instance.InitializeGeometry(
-                    new Vector3(snapshot.PositionX, snapshot.PositionY, snapshot.PositionZ),
-                    snapshot.Radius);
+                var center = new Vector3(snapshot.PositionX, snapshot.PositionY, snapshot.PositionZ);
+                instance.SetCells(RasterizePatternedCells(
+                    center,
+                    Mathf.Max(_cellSize * 0.5f, snapshot.Radius),
+                    def.Pattern,
+                    def.PatternNoise,
+                    StableHash(resolvedSurfaceId)));
             }
 
-            _activeSurfaces.Add(instance);
+            if (!instance.IsDepleted)
+            {
+                _activeSurfaces.Add(instance);
+            }
         }
 
         private string ResolveSurfaceId(string surfaceId)
@@ -1413,6 +1411,7 @@ namespace QDND.Combat.Environment
                     { "instanceId", instance.InstanceId },
                     { "position", instance.Position },
                     { "radius", instance.Radius },
+                    { "cellCount", instance.CellCount },
                     { "layer", instance.Definition.Layer.ToString() }
                 }
             });
@@ -1431,9 +1430,296 @@ namespace QDND.Combat.Environment
                     { "surfaceId", surface.Definition.Id },
                     { "position", surface.Position },
                     { "radius", surface.Radius },
-                    { "blobCount", surface.Blobs.Count }
+                    { "cellCount", surface.CellCount }
                 }
             });
+        }
+
+        private bool OverlapsOrNear(SurfaceInstance a, SurfaceInstance b)
+        {
+            if (a == null || b == null)
+                return false;
+
+            if (a.Overlaps(b))
+                return true;
+
+            // Allow near-cell merges so multiple casts naturally fuse.
+            return a.Position.DistanceTo(b.Position) <= Mathf.Max(_cellSize * 2f, a.Radius * 0.25f);
+        }
+
+        private static SurfacePattern ResolveDefaultPattern(SurfaceType type, SurfaceLayer layer, bool isLiquid)
+        {
+            if (layer == SurfaceLayer.Cloud)
+            {
+                return SurfacePattern.Wispy;
+            }
+
+            if (type == SurfaceType.Fire || type == SurfaceType.BlackPowder || type == SurfaceType.Lava)
+            {
+                return SurfacePattern.PatchyDisc;
+            }
+
+            if (type == SurfaceType.Blessed || type == SurfaceType.Cursed)
+            {
+                return SurfacePattern.Ring;
+            }
+
+            if (isLiquid)
+            {
+                return SurfacePattern.NoisyDisc;
+            }
+
+            return SurfacePattern.SolidDisc;
+        }
+
+        private static float ResolveDefaultPatternNoise(SurfaceType type, SurfaceLayer layer, bool isLiquid)
+        {
+            if (layer == SurfaceLayer.Cloud)
+                return 0.55f;
+            if (type == SurfaceType.Fire || type == SurfaceType.BlackPowder || type == SurfaceType.Lava)
+                return 0.45f;
+            if (isLiquid)
+                return 0.28f;
+            return 0.2f;
+        }
+
+        private HashSet<SurfaceCell> RasterizePatternedCells(
+            Vector3 center,
+            float radius,
+            SurfacePattern pattern,
+            float patternNoise,
+            int surfaceIdSeed)
+        {
+            var baseCells = RasterizeCircleCells(center, radius);
+            if (baseCells.Count == 0)
+            {
+                return baseCells;
+            }
+
+            var filtered = new HashSet<SurfaceCell>();
+            float invRadius = 1f / Mathf.Max(0.001f, radius);
+            int cx = Mathf.RoundToInt(center.X * 100f);
+            int cz = Mathf.RoundToInt(center.Z * 100f);
+            int seed = surfaceIdSeed ^ (cx * 73856093) ^ (cz * 19349663);
+            foreach (var cell in baseCells)
+            {
+                var world = CellToWorld(cell, center.Y);
+                float distNorm = world.DistanceTo(center) * invRadius;
+                float n0 = Hash01(cell, seed);
+                float n1 = Hash01(cell, seed ^ unchecked((int)0x9E3779B9u));
+
+                bool keep = pattern switch
+                {
+                    SurfacePattern.SolidDisc => true,
+                    SurfacePattern.NoisyDisc => distNorm <= 0.88f ||
+                                                n0 > Mathf.Lerp(0.22f, 0.92f, Mathf.Clamp((distNorm - 0.88f) / 0.18f, 0f, 1f)),
+                    SurfacePattern.PatchyDisc => distNorm <= 0.8f ||
+                                                 n0 > Mathf.Lerp(0.3f, 0.96f, Mathf.Clamp((distNorm - 0.8f) / 0.24f, 0f, 1f)),
+                    SurfacePattern.Ring => distNorm >= Mathf.Clamp(0.4f - patternNoise * 0.18f, 0.22f, 0.68f) &&
+                                           distNorm <= 1.03f &&
+                                           n0 > Mathf.Lerp(0.12f, 0.72f, Mathf.Clamp((distNorm - 0.4f) * 1.6f, 0f, 1f)),
+                    SurfacePattern.Wispy => (n0 * 0.65f + n1 * 0.35f) >
+                                            Mathf.Lerp(0.24f, 0.92f, Mathf.Clamp(distNorm * (0.95f + patternNoise * 0.8f), 0f, 1f)),
+                    _ => true
+                };
+
+                if (keep)
+                {
+                    filtered.Add(cell);
+                }
+            }
+
+            // Never produce an empty surface mask.
+            var centerCell = WorldToCell(center);
+            if (!filtered.Contains(centerCell))
+            {
+                filtered.Add(centerCell);
+            }
+
+            if (pattern == SurfacePattern.Wispy || pattern == SurfacePattern.PatchyDisc)
+            {
+                // Keep disconnected islands for these patterns.
+                return filtered;
+            }
+
+            // Remove isolated single-cell artifacts for cleaner masks.
+            var cleaned = new HashSet<SurfaceCell>();
+            foreach (var cell in filtered)
+            {
+                if (HasNeighbor(filtered, cell) || cell == centerCell)
+                {
+                    cleaned.Add(cell);
+                }
+            }
+
+            if (cleaned.Count == 0)
+            {
+                cleaned.Add(centerCell);
+            }
+
+            return cleaned;
+        }
+
+        private HashSet<SurfaceCell> GeneratePuddleCells(Vector3 origin, int totalCells, float patternNoise, int surfaceIdSeed)
+        {
+            int target = Math.Max(1, totalCells);
+            var cells = new HashSet<SurfaceCell>();
+            var frontier = new List<SurfaceCell>();
+            var start = WorldToCell(origin);
+            cells.Add(start);
+            frontier.Add(start);
+
+            var dirs = new[]
+            {
+                new SurfaceCell(1, 0),
+                new SurfaceCell(-1, 0),
+                new SurfaceCell(0, 1),
+                new SurfaceCell(0, -1),
+                new SurfaceCell(1, 1),
+                new SurfaceCell(1, -1),
+                new SurfaceCell(-1, 1),
+                new SurfaceCell(-1, -1)
+            };
+
+            int attempts = 0;
+            int maxAttempts = target * 48;
+            while (cells.Count < target && attempts < maxAttempts)
+            {
+                attempts++;
+                var seedCell = frontier[_random.Next(frontier.Count)];
+                var dir = dirs[_random.Next(dirs.Length)];
+                var candidate = new SurfaceCell(seedCell.X + dir.X, seedCell.Z + dir.Z);
+                if (cells.Contains(candidate))
+                    continue;
+
+                float noise = Hash01(candidate, surfaceIdSeed);
+                float acceptance = 0.82f - patternNoise * 0.3f;
+                if (noise > acceptance && cells.Count > 1)
+                    continue;
+
+                cells.Add(candidate);
+                frontier.Add(candidate);
+
+                // Bias frontier toward the perimeter to keep natural puddle jaggedness.
+                if (frontier.Count > 16 && _random.NextDouble() < 0.24)
+                {
+                    frontier.RemoveAt(_random.Next(frontier.Count));
+                }
+            }
+
+            return cells;
+        }
+
+        private HashSet<SurfaceCell> ScaleCells(IEnumerable<SurfaceCell> cells, Vector3 center, float radiusScale)
+        {
+            var scaled = new HashSet<SurfaceCell>();
+            foreach (var cell in cells)
+            {
+                var world = CellToWorld(cell, center.Y);
+                var offset = world - center;
+                var scaledWorld = new Vector3(
+                    center.X + offset.X * radiusScale,
+                    center.Y,
+                    center.Z + offset.Z * radiusScale);
+                scaled.Add(WorldToCell(scaledWorld));
+            }
+
+            if (radiusScale > 1.02f)
+            {
+                var expanded = new HashSet<SurfaceCell>(scaled);
+                foreach (var cell in scaled)
+                {
+                    expanded.Add(new SurfaceCell(cell.X + 1, cell.Z));
+                    expanded.Add(new SurfaceCell(cell.X - 1, cell.Z));
+                    expanded.Add(new SurfaceCell(cell.X, cell.Z + 1));
+                    expanded.Add(new SurfaceCell(cell.X, cell.Z - 1));
+                }
+                return expanded;
+            }
+
+            return scaled;
+        }
+
+        private HashSet<SurfaceCell> RasterizeCircleCells(Vector3 center, float radius)
+        {
+            var cells = new HashSet<SurfaceCell>();
+            if (radius <= 0f)
+                return cells;
+
+            int minX = Mathf.FloorToInt((center.X - radius) / _cellSize);
+            int maxX = Mathf.FloorToInt((center.X + radius) / _cellSize);
+            int minZ = Mathf.FloorToInt((center.Z - radius) / _cellSize);
+            int maxZ = Mathf.FloorToInt((center.Z + radius) / _cellSize);
+            float radiusSq = radius * radius;
+
+            for (int x = minX; x <= maxX; x++)
+            {
+                for (int z = minZ; z <= maxZ; z++)
+                {
+                    float cx = (x + 0.5f) * _cellSize;
+                    float cz = (z + 0.5f) * _cellSize;
+                    float dx = cx - center.X;
+                    float dz = cz - center.Z;
+                    if (dx * dx + dz * dz <= radiusSq)
+                    {
+                        cells.Add(new SurfaceCell(x, z));
+                    }
+                }
+            }
+
+            return cells;
+        }
+
+        private SurfaceCell WorldToCell(Vector3 worldPosition)
+        {
+            int x = Mathf.FloorToInt(worldPosition.X / _cellSize);
+            int z = Mathf.FloorToInt(worldPosition.Z / _cellSize);
+            return new SurfaceCell(x, z);
+        }
+
+        private Vector3 CellToWorld(SurfaceCell cell, float y)
+        {
+            return new Vector3((cell.X + 0.5f) * _cellSize, y, (cell.Z + 0.5f) * _cellSize);
+        }
+
+        private static bool HasNeighbor(HashSet<SurfaceCell> cells, SurfaceCell cell)
+        {
+            return cells.Contains(new SurfaceCell(cell.X + 1, cell.Z)) ||
+                   cells.Contains(new SurfaceCell(cell.X - 1, cell.Z)) ||
+                   cells.Contains(new SurfaceCell(cell.X, cell.Z + 1)) ||
+                   cells.Contains(new SurfaceCell(cell.X, cell.Z - 1)) ||
+                   cells.Contains(new SurfaceCell(cell.X + 1, cell.Z + 1)) ||
+                   cells.Contains(new SurfaceCell(cell.X + 1, cell.Z - 1)) ||
+                   cells.Contains(new SurfaceCell(cell.X - 1, cell.Z + 1)) ||
+                   cells.Contains(new SurfaceCell(cell.X - 1, cell.Z - 1));
+        }
+
+        private static float Hash01(SurfaceCell cell, int seed)
+        {
+            unchecked
+            {
+                int h = seed;
+                h ^= cell.X * 374761393;
+                h ^= cell.Z * 668265263;
+                h = (h ^ (h >> 13)) * 1274126177;
+                h ^= h >> 16;
+                uint u = (uint)h;
+                return (u & 0x00FFFFFF) / 16777215f;
+            }
+        }
+
+        private static int StableHash(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return 0;
+
+            unchecked
+            {
+                int hash = 23;
+                foreach (char c in text)
+                    hash = hash * 31 + c;
+                return hash;
+            }
         }
 
         /// <summary>
@@ -1451,7 +1737,10 @@ namespace QDND.Combat.Environment
                     DefaultDuration = dur,
                     ColorHex = color,
                     VisualOpacity = alpha,
-                    IsLiquidVisual = liquid
+                    IsLiquidVisual = liquid,
+                    Pattern = ResolveDefaultPattern(type, layer, liquid),
+                    PatternNoise = ResolveDefaultPatternNoise(type, layer, liquid),
+                    VisualPaddingCells = layer == SurfaceLayer.Cloud ? 0.24f : 0.14f
                 };
 
             void Add(SurfaceDefinition d) => RegisterSurface(d);
@@ -1497,6 +1786,7 @@ namespace QDND.Combat.Environment
             Add(poison);
 
             var oil = Def("oil", "Oil Slick", SurfaceType.Oil, SurfaceLayer.Ground, 0, "#7D5A2A", 0.6f);
+            oil.Pattern = SurfacePattern.SolidDisc;
             oil.MovementCostMultiplier = 1.5f;
             oil.Tags = new HashSet<string> { "oil", "flammable", "slippery" };
             oil.Interactions = new Dictionary<string, string> { ["fire"] = "fire" };
@@ -1508,6 +1798,7 @@ namespace QDND.Combat.Environment
             Add(oil);
 
             var grease = Def("grease", "Grease", SurfaceType.Oil, SurfaceLayer.Ground, 10, "#A98633", 0.6f);
+            grease.Pattern = SurfacePattern.SolidDisc;
             grease.MovementCostMultiplier = 2f;
             grease.AppliesStatusId = "prone";
             grease.SaveAbility = AbilityType.Dexterity;
@@ -1522,6 +1813,7 @@ namespace QDND.Combat.Environment
             Add(grease);
 
             var ice = Def("ice", "Ice", SurfaceType.Ice, SurfaceLayer.Ground, 5, "#9EDDF6", 0.58f);
+            ice.Pattern = SurfacePattern.SolidDisc;
             ice.MovementCostMultiplier = 2f;
             ice.AppliesStatusId = "prone";
             ice.SaveAbility = AbilityType.Dexterity;

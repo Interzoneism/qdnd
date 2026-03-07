@@ -6,30 +6,31 @@ This project now includes a BG3-style surface runtime centered on `SurfaceManage
 
 - `SurfaceDefinition` supports:
   - Layering (`Ground`, `Cloud`)
+  - Spawn pattern metadata (`Pattern`, `PatternNoise`, `VisualPaddingCells`)
   - Contact reactions (`ContactReactions`)
   - Event reactions (`EventReactions`)
   - Visual metadata (`ColorHex`, `VisualOpacity`, `IsLiquidVisual`, wave params)
   - Terrain/status metadata (tags, movement multiplier, status application)
-- `SurfaceInstance` supports multi-blob geometry:
-  - `InitializeGeometry(center, radius)`
-  - `AddBlob(center, radius)` (grow)
-  - `SubtractArea(center, radius)` (carve/remove)
-  - `MergeGeometryFrom(other)` (merge overlapping same-surface areas)
+- `SurfaceInstance` is now **cell-authoritative**:
+  - Occupancy is tracked as `HashSet<SurfaceCell>` (0.5m grid)
+  - `ContainsPosition`, overlap checks, movement traversal, and status/damage triggers all query cell occupancy
+  - `Position`/`Radius` are derived convenience values (centroid + approximate bounds), not primary truth
 
 ## Runtime behavior
 
 - `CreateSurface`:
-  - Creates blob geometry
+  - Rasterizes a patterned cell mask from radius and surface definition
   - Normalizes common BG3 raw surface tokens/aliases (for example `WaterFrozen`, `FogCloud`, `DarknessCloud`, `SpikeGrowth`, `Vines`)
-  - Merges same-type/layer overlaps
+  - Merges same-type/layer overlaps based on cell overlap/adjacency
   - Resolves overlap/contact reactions with existing surfaces
 - `ApplySurfaceEvent(eventId, position, radius, sourceId)`:
   - Applies event reactions (for example: `ignite`, `freeze`, `electrify`, `douse`, `melt`)
   - Supports additional BG3 event aliases such as `DestroyWater`/`destroy_water`
   - Supports global daylight cleanup of darkness-style surfaces
   - Supports fallback transforms for common BG3-style interactions
-- `AddSurfaceArea` and `SubtractSurfaceArea` allow dynamic growth/carving at runtime.
+- `AddSurfaceArea` and `SubtractSurfaceArea` add/remove occupied cells at runtime.
 - `ResolveCombatants` hook enables reaction explosions/status application to nearby units.
+- `CreatePuddle` generates irregular puddles from random-walk cell growth (explicit `totalCells` semantics).
 
 ## Extended surface IDs
 
@@ -51,9 +52,9 @@ Alongside the original core set, runtime definitions now include:
 
 ## Visuals
 
-- `SurfaceVisual` renders one shallow mesh per blob.
-- Liquid surfaces use an animated shader-based material.
-- Non-liquid surfaces use translucent flat materials.
+- `SurfaceVisual` builds a dynamic tile mesh directly from occupied grid cells.
+- Mesh generation uses per-cell quads plus configurable padding (`VisualPaddingCells`) to avoid visible seams.
+- Liquid/cloud/solid shaders are still selected per surface category.
 - `CombatArena` listens for:
   - `OnSurfaceCreated`
   - `OnSurfaceTransformed`
