@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using QDND.Combat.Actions;
 using QDND.Data.Descriptions;
+using QDND.Data.Parsers;
 using QDND.Data.Spells;
 
 namespace QDND.Data.Actions
@@ -25,13 +26,18 @@ namespace QDND.Data.Actions
             if (spell == null)
                 throw new ArgumentNullException(nameof(spell));
 
+            var resolvedName = BG3DisplayNameResolver.Resolve(spell.DisplayName, spell.Id);
+            var resolvedDescription = BG3DisplayNameResolver.IsLocalizationHandle(spell.Description)
+                ? ""
+                : (spell.Description ?? "");
+
             var action = new ActionDefinition
             {
                 // Core identity
                 Id = MapExplicitId(spell.Id),
-                Name = spell.DisplayName ?? spell.Id,
-                Description = spell.Description ?? "",
-                ExtraDescription = spell.ExtraDescription ?? "",
+                Name = resolvedName,
+                Description = resolvedDescription,
+                ExtraDescription = BG3DisplayNameResolver.IsLocalizationHandle(spell.ExtraDescription) ? "" : (spell.ExtraDescription ?? ""),
                 DescriptionParams = spell.DescriptionParams,
                 Icon = spell.Icon ?? "",
 

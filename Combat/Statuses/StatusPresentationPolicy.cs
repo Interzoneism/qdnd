@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using QDND.Data.Parsers;
 
 namespace QDND.Combat.Statuses
 {
@@ -72,7 +73,10 @@ namespace QDND.Combat.Statuses
                 return true;
 
             string trimmed = value.Trim();
-            return trimmed.StartsWith("%%%", StringComparison.Ordinal);
+            if (trimmed.StartsWith("%%%", StringComparison.Ordinal))
+                return true;
+
+            return BG3DisplayNameResolver.IsLocalizationHandle(trimmed);
         }
 
         private static string HumanizeStatusId(string statusId)

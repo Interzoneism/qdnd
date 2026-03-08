@@ -55,6 +55,12 @@ namespace QDND.Data.Passives
                 return false;
             }
 
+            passive.DisplayName = BG3DisplayNameResolver.Resolve(passive.DisplayName, passive.PassiveId);
+            if (BG3DisplayNameResolver.IsLocalizationHandle(passive.Description))
+                passive.Description = string.Empty;
+            if (BG3DisplayNameResolver.IsLocalizationHandle(passive.ExtraDescription))
+                passive.ExtraDescription = string.Empty;
+
             if (!string.IsNullOrEmpty(passive.DescriptionParams) && !string.IsNullOrEmpty(passive.Description))
                 passive.Description = DescriptionParamResolver.Resolve(passive.Description, passive.DescriptionParams);
 

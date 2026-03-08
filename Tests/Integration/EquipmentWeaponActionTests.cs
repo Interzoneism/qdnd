@@ -200,7 +200,8 @@ namespace QDND.Tests.Integration
             {
                 Assert.False(string.IsNullOrEmpty(action.Id), "Weapon action missing ID");
                 Assert.False(string.IsNullOrEmpty(action.Name), $"Weapon action {action.Id} missing Name");
-                Assert.False(string.IsNullOrEmpty(action.Description), $"Weapon action {action.Id} missing Description");
+                Assert.NotNull(action.Description);
+                Assert.NotNull(action.ExtraDescription);
                 Assert.NotNull(action.Tags);
                 _output.WriteLine($"  {action.Id}: {action.Name}");
             }
@@ -423,6 +424,7 @@ namespace QDND.Tests.Integration
                         Id = action.Id,
                         Name = action.Name,
                         Description = action.Description,
+                        ExtraDescription = action.ExtraDescription,
                         Tags = action.Tags?.ToList() ?? new List<string>()
                     });
                 }
@@ -435,6 +437,7 @@ namespace QDND.Tests.Integration
             public string Id { get; set; }
             public string Name { get; set; }
             public string Description { get; set; }
+            public string ExtraDescription { get; set; }
             public List<string> Tags { get; set; }
         }
     }

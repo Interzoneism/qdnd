@@ -29,6 +29,9 @@ uniform float normal_strength : hint_range(0.0, 1.0, 0.01) = 0.15;
 
 uniform float max_visible_depth : hint_range(0.1, 10.0, 0.1) = 2.0;
 uniform float edge_fade_distance : hint_range(0.0, 2.0, 0.01) = 0.3;
+uniform vec3 surface_center = vec3(0.0);
+uniform float surface_radius : hint_range(0.1, 200.0, 0.1) = 1.0;
+uniform float edge_softness : hint_range(0.01, 0.95, 0.01) = 0.35;
 
 uniform vec4 border_color : source_color = vec4(1.0, 1.0, 1.0, 1.0);
 uniform float border_scale : hint_range(0.0, 5.0, 0.01) = 1.0;
@@ -58,6 +61,36 @@ float sample_wave_height(vec2 uv_a, vec2 uv_b)
     float h1 = texture(wave_texture_a, uv_a).r;
     float h2 = texture(wave_texture_b, uv_b).r;
     return ((h1 + h2) * 0.5) * 2.0 - 1.0;
+}
+
+float hash_e(vec2 p)
+{
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+float noise_e(vec2 p)
+{
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    float a = hash_e(i);
+    float b = hash_e(i + vec2(1.0, 0.0));
+    float c = hash_e(i + vec2(0.0, 1.0));
+    float d = hash_e(i + vec2(1.0, 1.0));
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+}
+
+float fbm_e(vec2 p)
+{
+    float s = 0.0;
+    float a = 0.5;
+    for (int i = 0; i < 4; i++)
+    {
+        s += noise_e(p) * a;
+        p *= 2.17;
+        a *= 0.5;
+    }
+    return s;
 }
 
 void vertex()
@@ -119,15 +152,26 @@ void fragment()
     float depth_visibility = clamp(depth_distance / max(max_visible_depth, 0.001), 0.0, 1.0);
 
     vec3 screen_color = texture(SCREEN_TEXTURE, refract_uv).rgb;
-    vec3 water_tint = mix(color_shallow.rgb, color_deep.rgb, depth_visibility);
-    vec3 blended = mix(screen_color, water_tint, mix(0.3, 0.95, depth_visibility));
+    vec3 water_tint = mix(color_shallow.rgb, color_deep.rgb, depth_visibility * 0.7);
+    vec3 blended = mix(screen_color, water_tint, mix(0.5, 0.95, depth_visibility));
 
     float foam = border_scale > 0.0 ? 1.0 - smoothstep(0.0, border_scale, border_diff) : 0.0;
     vec3 final_color = mix(blended, border_color.rgb, foam * 0.7);
 
-    float edge_alpha = edge_fade_distance > 0.0
+    // World-space radial edge fading (always works, gives smooth organic edges).
+    float radial = length(world_pos.xz - surface_center.xz) / max(surface_radius, 0.1);
+    float edge_noise = (fbm_e(world_pos.xz * 3.5 + TIME * 0.03) - 0.5) * 0.35;
+    float radial_edge = 1.0 - smoothstep(1.0 - edge_softness, 1.0, radial + edge_noise);
+
+    // Depth-based edge fade (bonus when ground geometry exists).
+    float depth_edge = edge_fade_distance > 0.0
         ? clamp(border_diff / edge_fade_distance, 0.0, 1.0)
         : 1.0;
+
+    // Noise-based alpha variation to break up cell grid patterns.
+    float grid_break = fbm_e(world_pos.xz * 2.2 + TIME * 0.015) * 0.2 + 0.8;
+
+    float combined_edge = radial_edge * depth_edge * grid_break;
 
     ALBEDO = final_color;
     EMISSION = final_color * emission_strength;
@@ -136,5 +180,5 @@ void fragment()
     SPECULAR = 0.6;
     NORMAL_MAP = blended_normal * 0.5 + 0.5;
     NORMAL_MAP_DEPTH = normal_strength;
-    ALPHA = clamp(edge_alpha * transparency, 0.0, 1.0);
+    ALPHA = clamp(combined_edge * transparency, 0.0, 1.0);
 }

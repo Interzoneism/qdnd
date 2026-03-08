@@ -473,6 +473,9 @@ void fragment() {
                 mat.SetShaderParameter("normal_strength", style.NormalStrength);
                 mat.SetShaderParameter("max_visible_depth", style.MaxVisibleDepth);
                 mat.SetShaderParameter("edge_fade_distance", style.EdgeFadeDistance);
+                mat.SetShaderParameter("surface_center", surface.Position);
+                mat.SetShaderParameter("surface_radius", Mathf.Max(surface.Radius, 0.1f));
+                mat.SetShaderParameter("edge_softness", style.EdgeSoftness);
                 mat.SetShaderParameter("emission_strength", style.EmissionStrength);
                 mat.SetShaderParameter("border_color", style.BorderColor);
                 mat.SetShaderParameter("border_scale", style.BorderScale);
@@ -576,7 +579,7 @@ void fragment() {
                 ColorDeep = color.Darkened(0.45f),
                 BorderColor = color.Lightened(0.35f),
                 Opacity = opacity,
-                Transparency = isLiquid ? 0.6f : 0.5f,
+                Transparency = isLiquid ? 0.7f : 0.5f,
                 RefractionIntensity = isCloud ? 0f : (isLiquid ? 0.05f : 0.2f),
                 BorderScale = isLiquid ? 1f : 1.35f,
                 WaveHeightScale = surface.Definition.WaveAmplitude > 0f
@@ -589,7 +592,7 @@ void fragment() {
                     : (isCloud ? 0.45f : (isLiquid ? 0.08f : 1f)),
                 Roughness = isCloud ? 0.86f : (isLiquid ? 0.16f : 0.55f),
                 Metallic = surface.Definition.Type == SurfaceType.Ice ? 0.1f : 0.02f,
-                EmissionStrength = isCloud ? 0.08f : 0.14f,
+                EmissionStrength = isCloud ? 0.08f : (isLiquid ? 0.18f : 0.14f),
                 NoiseScale = isCloud ? 2f : (isLiquid ? 3.2f : 4.6f),
                 NoiseSpeed = isCloud ? 0.22f : (isLiquid ? 0.4f : 0.9f),
                 NormalScale = isLiquid ? 0.08f : 0f,
@@ -597,13 +600,13 @@ void fragment() {
                 NormalStrength = isLiquid ? 0.15f : 0f,
                 MaxVisibleDepth = isLiquid ? 2f : 0f,
                 EdgeFadeDistance = isLiquid ? 0.3f : 0f,
-                EdgeSoftness = isCloud ? 0.42f : 0.22f,
+                EdgeSoftness = isCloud ? 0.42f : (isLiquid ? 0.4f : 0.22f),
                 DissolveStrength = 0.45f,
                 CloudDensity = isCloud ? 1f : 0f,
                 HeightFade = 1.25f,
                 HeightOffset = isCloud ? 0.18f : 0.012f,
                 CellPaddingMeters = isLiquid
-                    ? surface.CellSize * 0.25f
+                    ? surface.CellSize * 0.38f
                     : (isCloud
                         ? Mathf.Max(0f, surface.Definition.VisualPaddingCells * surface.CellSize)
                         : Mathf.Max(surface.CellSize * 0.18f, Mathf.Max(0f, surface.Definition.VisualPaddingCells * surface.CellSize))),
@@ -630,34 +633,42 @@ void fragment() {
             switch (id)
             {
                 case "water":
-                    style.ColorShallow = new Color(0.01f, 0.2f, 0.3f);
-                    style.ColorDeep = new Color(0.05f, 0.15f, 0.35f);
-                    style.Transparency = 0.6f;
-                    style.RefractionIntensity = 0.05f;
+                    style.ColorShallow = new Color(0.18f, 0.48f, 0.78f);
+                    style.ColorDeep = new Color(0.06f, 0.22f, 0.52f);
+                    style.Transparency = 0.7f;
+                    style.RefractionIntensity = 0.04f;
                     style.WaveHeight = 0.003f;
+                    style.WaveSpeed = 0.08f;
                     style.Roughness = 0.15f;
-                    style.BorderColor = new Color(1f, 1f, 1f, 1f);
+                    style.EmissionStrength = 0.18f;
+                    style.BorderColor = new Color(0.7f, 0.88f, 1f, 1f);
+                    style.EdgeSoftness = 0.4f;
                     break;
 
                 case "ice":
-                    style.ColorShallow = new Color(0.7f, 0.88f, 0.96f);
-                    style.ColorDeep = new Color(0.3f, 0.55f, 0.75f);
-                    style.Transparency = 0.25f;
-                    style.RefractionIntensity = 0.15f;
+                    style.ColorShallow = new Color(0.78f, 0.92f, 1f);
+                    style.ColorDeep = new Color(0.42f, 0.68f, 0.88f);
+                    style.Transparency = 0.35f;
+                    style.RefractionIntensity = 0.12f;
                     style.WaveHeightScale = 0f;
                     style.WaveHeight = 0f;
-                    style.Roughness = 0.05f;
-                    style.Metallic = 0.12f;
-                    style.BorderColor = new Color(0.92f, 0.98f, 1f, 1f);
+                    style.Roughness = 0.04f;
+                    style.Metallic = 0.2f;
+                    style.EmissionStrength = 0.15f;
+                    style.BorderColor = new Color(0.92f, 0.97f, 1f, 1f);
+                    style.EdgeSoftness = 0.28f;
                     break;
 
                 case "acid":
-                    style.ColorShallow = new Color(0.4f, 0.75f, 0.05f);
-                    style.ColorDeep = new Color(0.15f, 0.35f, 0f);
-                    style.Transparency = 0.5f;
+                    style.ColorShallow = new Color(0.55f, 0.88f, 0.15f);
+                    style.ColorDeep = new Color(0.28f, 0.55f, 0.05f);
+                    style.Transparency = 0.62f;
                     style.WaveSpeed = 0.12f;
+                    style.WaveHeight = 0.004f;
                     style.Roughness = 0.2f;
-                    style.EmissionStrength = 0.15f;
+                    style.EmissionStrength = 0.35f;
+                    style.EdgeSoftness = 0.35f;
+                    style.BorderColor = new Color(0.65f, 0.92f, 0.2f, 1f);
                     break;
 
                 case "fire":
@@ -676,56 +687,161 @@ void fragment() {
                     break;
 
                 case "oil":
-                    style.ColorShallow = new Color(0.05f, 0.05f, 0.05f);
-                    style.ColorDeep = new Color(0.01f, 0.01f, 0.01f);
-                    style.Transparency = 0.3f;
-                    style.Metallic = 0.1f;
+                    style.ColorShallow = new Color(0.12f, 0.1f, 0.07f);
+                    style.ColorDeep = new Color(0.04f, 0.03f, 0.02f);
+                    style.Transparency = 0.72f;
+                    style.Metallic = 0.25f;
                     style.Roughness = 0.02f;
                     style.WaveHeight = 0.001f;
-                    style.BorderColor = new Color(0.2f, 0.2f, 0.2f, 1f);
-                    style.BorderScale = 0f;
+                    style.BorderColor = new Color(0.2f, 0.16f, 0.1f, 1f);
+                    style.BorderScale = 0.3f;
+                    style.EmissionStrength = 0.04f;
+                    style.EdgeSoftness = 0.3f;
                     break;
 
                 case "blood":
-                    style.ColorShallow = new Color(0.4f, 0.05f, 0.08f);
-                    style.ColorDeep = new Color(0.15f, 0.02f, 0.04f);
-                    style.Transparency = 0.35f;
+                    style.ColorShallow = new Color(0.62f, 0.08f, 0.12f);
+                    style.ColorDeep = new Color(0.32f, 0.03f, 0.06f);
+                    style.Transparency = 0.68f;
                     style.WaveHeight = 0.001f;
-                    style.Roughness = 0.3f;
+                    style.Roughness = 0.08f;
+                    style.EmissionStrength = 0.12f;
+                    style.EdgeSoftness = 0.32f;
+                    style.BorderColor = new Color(0.72f, 0.12f, 0.15f, 1f);
                     break;
 
                 case "mud":
-                    style.ColorShallow = new Color(0.35f, 0.22f, 0.1f);
-                    style.ColorDeep = new Color(0.15f, 0.1f, 0.05f);
-                    style.Transparency = 0.15f;
+                    style.ColorShallow = new Color(0.45f, 0.32f, 0.16f);
+                    style.ColorDeep = new Color(0.25f, 0.18f, 0.1f);
+                    style.Transparency = 0.75f;
                     style.WaveHeight = 0.0005f;
-                    style.Roughness = 0.8f;
+                    style.Roughness = 0.85f;
+                    style.EmissionStrength = 0.06f;
+                    style.EdgeSoftness = 0.32f;
+                    style.BorderColor = new Color(0.52f, 0.38f, 0.22f, 1f);
                     break;
 
                 case "electrified_water":
-                    style.ColorShallow = new Color(0.22f, 0.42f, 0.85f);
-                    style.ColorDeep = new Color(0.04f, 0.2f, 0.42f);
-                    style.Transparency = 0.6f;
+                    style.ColorShallow = new Color(0.35f, 0.55f, 0.95f);
+                    style.ColorDeep = new Color(0.12f, 0.3f, 0.65f);
+                    style.Transparency = 0.68f;
                     style.RefractionIntensity = 0.05f;
-                    style.WaveHeight = 0.003f;
-                    style.Roughness = 0.15f;
-                    style.BorderColor = new Color(1f, 1f, 1f, 1f);
-                    style.EmissionStrength = 0.25f;
+                    style.WaveHeight = 0.004f;
+                    style.WaveSpeed = 0.12f;
+                    style.Roughness = 0.12f;
+                    style.BorderColor = new Color(0.85f, 0.92f, 1f, 1f);
+                    style.EmissionStrength = 0.4f;
                     break;
 
                 case "deep_water":
-                    style.ColorShallow = new Color(0.02f, 0.12f, 0.25f);
-                    style.ColorDeep = new Color(0.01f, 0.06f, 0.15f);
-                    style.Transparency = 0.45f;
+                    style.ColorShallow = new Color(0.08f, 0.22f, 0.45f);
+                    style.ColorDeep = new Color(0.03f, 0.1f, 0.28f);
+                    style.Transparency = 0.78f;
                     style.WaveHeight = 0.003f;
                     style.Roughness = 0.15f;
+                    style.EmissionStrength = 0.1f;
+                    style.BorderColor = new Color(0.3f, 0.5f, 0.7f, 1f);
                     break;
 
                 case "grease":
-                    // Grease is viscous, not a rippling liquid
                     style.Shader = ShaderFamily.Solid;
-                    style.WaveHeightScale = 0f;
-                    style.CellPaddingMeters = 0f;
+                    style.ColorShallow = new Color(0.65f, 0.5f, 0.2f);
+                    style.ColorDeep = new Color(0.35f, 0.25f, 0.1f);
+                    style.BorderColor = new Color(0.72f, 0.58f, 0.3f, 1f);
+                    style.Opacity = 0.68f;
+                    style.WaveHeightScale = 0.002f;
+                    style.NoiseScale = 3.8f;
+                    style.NoiseSpeed = 0.12f;
+                    style.EdgeSoftness = 0.32f;
+                    style.DissolveStrength = 0.38f;
+                    style.EmissionStrength = 0.1f;
+                    style.Roughness = 0.15f;
+                    style.Metallic = 0.08f;
+                    break;
+
+                case "spike_growth":
+                    style.Shader = ShaderFamily.Solid;
+                    style.ColorShallow = new Color(0.52f, 0.38f, 0.22f);
+                    style.ColorDeep = new Color(0.28f, 0.18f, 0.1f);
+                    style.BorderColor = new Color(0.62f, 0.48f, 0.3f, 1f);
+                    style.Opacity = 0.78f;
+                    style.EmissionStrength = 0.14f;
+                    style.WaveHeightScale = 0.007f;
+                    style.WaveSpeed = 0.3f;
+                    style.NoiseScale = 7.2f;
+                    style.NoiseSpeed = 0.2f;
+                    style.EdgeSoftness = 0.26f;
+                    style.DissolveStrength = 0.62f;
+                    break;
+
+                case "plant_growth":
+                    style.Shader = ShaderFamily.Solid;
+                    style.ColorShallow = new Color(0.28f, 0.62f, 0.2f);
+                    style.ColorDeep = new Color(0.12f, 0.35f, 0.08f);
+                    style.BorderColor = new Color(0.42f, 0.7f, 0.3f, 1f);
+                    style.Opacity = 0.72f;
+                    style.EmissionStrength = 0.1f;
+                    style.WaveHeightScale = 0.004f;
+                    style.WaveSpeed = 0.18f;
+                    style.NoiseScale = 7f;
+                    style.NoiseSpeed = 0.12f;
+                    style.EdgeSoftness = 0.38f;
+                    style.DissolveStrength = 0.5f;
+                    break;
+
+                case "web":
+                    style.Shader = ShaderFamily.Solid;
+                    style.ColorShallow = new Color(0.88f, 0.85f, 0.78f);
+                    style.ColorDeep = new Color(0.58f, 0.55f, 0.48f);
+                    style.BorderColor = new Color(0.95f, 0.92f, 0.88f, 1f);
+                    style.Opacity = 0.6f;
+                    style.EmissionStrength = 0.08f;
+                    style.WaveHeightScale = 0.001f;
+                    style.WaveSpeed = 0.05f;
+                    style.NoiseScale = 8f;
+                    style.NoiseSpeed = 0.05f;
+                    style.EdgeSoftness = 0.48f;
+                    style.DissolveStrength = 0.68f;
+                    break;
+
+                case "ground_poison":
+                    style.ColorShallow = new Color(0.3f, 0.7f, 0.35f);
+                    style.ColorDeep = new Color(0.12f, 0.38f, 0.15f);
+                    style.BorderColor = new Color(0.45f, 0.82f, 0.4f, 1f);
+                    style.EmissionStrength = 0.28f;
+                    style.WaveSpeed = 0.06f;
+                    style.WaveHeight = 0.002f;
+                    style.Transparency = 0.65f;
+                    break;
+
+                case "entangle":
+                    style.Shader = ShaderFamily.Solid;
+                    style.ColorShallow = new Color(0.32f, 0.55f, 0.16f);
+                    style.ColorDeep = new Color(0.14f, 0.28f, 0.08f);
+                    style.BorderColor = new Color(0.48f, 0.65f, 0.25f, 1f);
+                    style.Opacity = 0.74f;
+                    style.EmissionStrength = 0.08f;
+                    style.WaveHeightScale = 0.006f;
+                    style.WaveSpeed = 0.28f;
+                    style.NoiseScale = 5.5f;
+                    style.NoiseSpeed = 0.18f;
+                    style.EdgeSoftness = 0.35f;
+                    style.DissolveStrength = 0.48f;
+                    break;
+
+                case "lava":
+                    style.Shader = ShaderFamily.Solid;
+                    style.ColorShallow = new Color(1f, 0.31f, 0.03f);
+                    style.ColorDeep = new Color(0.23f, 0.03f, 0.01f);
+                    style.BorderColor = new Color(1f, 0.72f, 0.35f, 1f);
+                    style.Opacity = 0.82f;
+                    style.EmissionStrength = 0.72f;
+                    style.WaveHeightScale = 0.015f;
+                    style.WaveSpeed = 1.8f;
+                    style.NoiseScale = 4.2f;
+                    style.NoiseSpeed = 1.05f;
+                    style.EdgeSoftness = 0.25f;
+                    style.DissolveStrength = 0.4f;
                     break;
 
                 case "fog":
@@ -749,6 +865,27 @@ void fragment() {
                     style.FogNoiseSpeed = 0.1f;
                     style.FogEdgeFade = 0.45f;
                     style.FogHeightFade = 1.9f;
+                    break;
+
+                case "hunger_of_hadar":
+                    style.ColorShallow = new Color(0.15f, 0.08f, 0.22f);
+                    style.ColorDeep = new Color(0.04f, 0.02f, 0.08f);
+                    style.Opacity = 0.78f;
+                    style.CloudDensity = 1.4f;
+                    style.EmissionStrength = 0.01f;
+                    style.FogDensity = 0.85f;
+                    style.FogNoiseScale = 2.5f;
+                    style.FogNoiseSpeed = 0.08f;
+                    style.FogEdgeFade = 0.5f;
+                    style.FogHeightFade = 2.0f;
+                    break;
+
+                case "daggers":
+                    style.ColorShallow = new Color(0.72f, 0.77f, 0.85f);
+                    style.ColorDeep = new Color(0.4f, 0.45f, 0.55f);
+                    style.Opacity = 0.52f;
+                    style.CloudDensity = 0.9f;
+                    style.FogDensity = 0.2f;
                     break;
 
                 case "stinking_cloud":

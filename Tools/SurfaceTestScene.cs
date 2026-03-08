@@ -914,7 +914,8 @@ namespace QDND.Tools
             var preferredOrder = new[]
             {
                 "water", "fire", "acid", "oil", "grease", "ice", "blood", "ground_poison",
-                "steam", "fog", "darkness", "stinking_cloud", "cloudkill", "spike_growth", "lava"
+                "steam", "fog", "darkness", "stinking_cloud", "cloudkill", "spike_growth", "lava",
+                "mud", "web", "plant_growth", "entangle", "electrified_water", "deep_water"
             };
 
             var allDefs = preferredOrder

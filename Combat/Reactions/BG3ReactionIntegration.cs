@@ -7,6 +7,7 @@ using QDND.Data.CharacterModel;
 using QDND.Combat.Rules;
 using QDND.Combat.Rules.Boosts;
 using QDND.Data.Interrupts;
+using QDND.Data.Parsers;
 
 namespace QDND.Combat.Reactions
 {
@@ -273,8 +274,11 @@ namespace QDND.Combat.Reactions
             var definition = new ReactionDefinition
             {
                 Id = OpportunityAttackId,
-                Name = bg3Data?.DisplayName ?? "Opportunity Attack",
-                Description = bg3Data?.Description ?? "Attack an enemy moving out of your reach.",
+                Name = (bg3Data?.DisplayName is string dn && !BG3DisplayNameResolver.IsLocalizationHandle(dn))
+                    ? dn : "Opportunity Attack",
+                Description = (bg3Data?.Description != null && !BG3DisplayNameResolver.IsLocalizationHandle(bg3Data.Description))
+                    ? bg3Data.Description
+                    : "Attack an enemy moving out of your reach.",
                 Triggers = new List<ReactionTriggerType> { ReactionTriggerType.EnemyLeavesReach },
                 Priority = 10,
                 Range = CombatRules.OpportunityAttackRangeMeters,
@@ -306,8 +310,11 @@ namespace QDND.Combat.Reactions
             var definition = new ReactionDefinition
             {
                 Id = ShieldId,
-                Name = bg3Data?.DisplayName ?? "Shield",
-                Description = bg3Data?.Description ?? "When you are about to be hit, increase your AC by 5. Lasts until your next turn.",
+                Name = (bg3Data?.DisplayName is string dn && !BG3DisplayNameResolver.IsLocalizationHandle(dn))
+                    ? dn : "Shield",
+                Description = (bg3Data?.Description != null && !BG3DisplayNameResolver.IsLocalizationHandle(bg3Data.Description))
+                    ? bg3Data.Description
+                    : "When you are about to be hit, increase your AC by 5. Lasts until your next turn.",
                 Triggers = new List<ReactionTriggerType> { ReactionTriggerType.YouAreAttacked },
                 Priority = 20,
                 Range = 0f,
@@ -346,8 +353,11 @@ namespace QDND.Combat.Reactions
             var definition = new ReactionDefinition
             {
                 Id = CounterspellId,
-                Name = bg3Data?.DisplayName ?? "Counterspell",
-                Description = bg3Data?.Description ?? "Stop a spell from being cast.",
+                Name = (bg3Data?.DisplayName is string dn && !BG3DisplayNameResolver.IsLocalizationHandle(dn))
+                    ? dn : "Counterspell",
+                Description = (bg3Data?.Description != null && !BG3DisplayNameResolver.IsLocalizationHandle(bg3Data.Description))
+                    ? bg3Data.Description
+                    : "Stop a spell from being cast.",
                 Triggers = new List<ReactionTriggerType> { ReactionTriggerType.SpellCastNearby },
                 Priority = 5, // Highest priority — must resolve before the spell lands
                 Range = CombatRules.CounterspellRangeMeters,
@@ -700,8 +710,10 @@ namespace QDND.Combat.Reactions
             var definition = new ReactionDefinition
             {
                 Id = $"BG3_{interrupt.InterruptId}",
-                Name = interrupt.DisplayName ?? interrupt.InterruptId,
-                Description = interrupt.Description ?? string.Empty,
+                Name = BG3DisplayNameResolver.Resolve(interrupt.DisplayName, interrupt.InterruptId),
+                Description = BG3DisplayNameResolver.IsLocalizationHandle(interrupt.Description)
+                    ? string.Empty
+                    : (interrupt.Description ?? string.Empty),
                 Triggers = triggers,
                 Priority = GetDefaultPriority(interrupt.InterruptContext),
                 Range = interrupt.InterruptContextScope == BG3InterruptContextScope.Nearby ? 18f : 0f,
