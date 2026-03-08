@@ -11,6 +11,7 @@ using QDND.Combat.Environment;
 using QDND.Data;
 using QDND.Combat.Targeting;
 using QDND.Combat.Rules;
+using QDND.Combat.Rules.Boosts;
 using QDND.Combat.Actions;
 using QDND.Combat.Reactions;
 using QDND.Combat.Statuses;
@@ -910,6 +911,12 @@ namespace QDND.Combat.AI
 
             foreach (var enemy in enemies)
             {
+                if (!BoostEvaluator.CanHarm(actor, enemy, _statusSystem))
+                    continue;
+
+                if (_statusSystem != null && _statusSystem.HasStatus(enemy.Id, "sanctuary"))
+                    continue;
+
                 float distance = actor.Position.DistanceTo(enemy.Position);
                 
                 // Already in melee range - can attack immediately
@@ -1391,60 +1398,10 @@ namespace QDND.Combat.AI
         /// </summary>
         private List<AIAction> GenerateShoveCandidates(Combatant actor)
         {
-            var candidates = new List<AIAction>();
-            var enemies = GetEnemies(actor);
-
-            foreach (var enemy in enemies)
-            {
-                // Check horizontal distance only (vertical doesn't matter for shove range)
-                var horizontalDistance = new Vector3(
-                    actor.Position.X - enemy.Position.X,
-                    0,
-                    actor.Position.Z - enemy.Position.Z
-                ).Length();
-                if (horizontalDistance > 2.25f) continue; // 1.5m melee range + tolerance
-
-                // Shove size restriction: cannot shove target more than one size larger.
-                if (!TargetValidator.IsValidShoveSize(actor, enemy))
-                    continue;
-
-                // Calculate push direction (away from actor)
-                var pushDir = (enemy.Position - actor.Position).Normalized();
-                if (pushDir.LengthSquared() < 0.001f)
-                {
-                    pushDir = new Vector3(1, 0, 0);
-                }
-
-                // Always consider shove-prone for melee control value.
-                candidates.Add(new AIAction
-                {
-                    ActionType = AIActionType.Shove,
-                    ActionId = "shove",
-                    VariantId = "shove_prone",
-                    TargetId = enemy.Id,
-                    PushDirection = pushDir,
-                    ShoveExpectedFallDamage = 0f
-                });
-
-                // Consider shove-push when terrain creates tactical value (near ledge, hazard, etc.)
-                bool nearLedge = IsNearLedge(enemy.Position, pushDir);
-                float potentialFallDamage = CalculatePotentialFallDamage(enemy.Position, pushDir);
-
-                if (nearLedge || potentialFallDamage > 0)
-                {
-                    candidates.Add(new AIAction
-                    {
-                        ActionType = AIActionType.Shove,
-                        ActionId = "shove",
-                        VariantId = "shove_push",
-                        TargetId = enemy.Id,
-                        PushDirection = pushDir,
-                        ShoveExpectedFallDamage = potentialFallDamage
-                    });
-                }
-            }
-
-            return candidates;
+            // Shove execution is not yet implemented in UIAwareAIController/CombatArena.
+            // Generating candidates wastes AI turns on unexecutable actions.
+            // TODO: Re-enable when Shove execution is implemented.
+            return new List<AIAction>();
         }
 
         /// <summary>

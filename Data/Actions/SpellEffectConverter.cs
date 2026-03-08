@@ -455,7 +455,8 @@ namespace QDND.Data.Actions
                 // Slot qualifiers that may appear as first arg
                 var slotQualifiers = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                     { "MainHand", "OffHand", "OffhandWeapon", "Armor", "Helmet",
-                      "Gloves", "Boots", "Amulet", "Ring", "Ring1", "Ring2", "Melee", "Ranged" };
+                      "Gloves", "Boots", "Amulet", "Ring", "Ring1", "Ring2", "Melee", "Ranged",
+                      "Breast", "Cloak", "MusicalInstrument", "VanityBody", "VanityBoots", "Underwear" };
 
                 int statusArgIdx = 0;
                 if (applyEquipStatusArgs.Count > 1 && slotQualifiers.Contains(NormalizeFunctorToken(applyEquipStatusArgs[0])))

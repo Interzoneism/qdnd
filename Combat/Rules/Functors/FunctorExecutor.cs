@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using QDND.Combat.Entities;
@@ -121,6 +122,10 @@ namespace QDND.Combat.Rules.Functors
 
                 case FunctorType.RestoreResource:
                     ExecuteRestoreResource(functor, effectiveTarget);
+                    break;
+
+                case FunctorType.UseActionResource:
+                    ExecuteUseActionResource(functor, effectiveTarget);
                     break;
 
                 case FunctorType.BreakConcentration:
@@ -374,6 +379,213 @@ namespace QDND.Combat.Rules.Functors
                 $"[FunctorExecutor] RestoreResource: restored {amount} {resourceName} (level {level}) on {targetId}");
         }
 
+        /// <summary>
+        /// Handle UseActionResource(resourceName, amount [, level] [, clamp]).
+        /// Supports Movement as flat or percent of MaxMovement.
+        /// </summary>
+        private void ExecuteUseActionResource(FunctorDefinition functor, string targetId)
+        {
+            if (functor.Parameters.Length < 2)
+            {
+                Console.Error.WriteLine($"[FunctorExecutor] UseActionResource missing parameters: {functor.RawString}");
+                return;
+            }
+
+            string resourceName = functor.Parameters[0];
+            string amountToken = functor.Parameters[1];
+
+            int level = 0;
+            bool clamp = false;
+
+            if (functor.Parameters.Length >= 3)
+            {
+                if (int.TryParse(functor.Parameters[2], out int parsedLevel))
+                    level = parsedLevel;
+                else if (bool.TryParse(functor.Parameters[2], out bool parsedClamp))
+                    clamp = parsedClamp;
+            }
+
+            if (functor.Parameters.Length >= 4 && bool.TryParse(functor.Parameters[3], out bool parsedClamp4))
+                clamp = parsedClamp4;
+
+            var target = ResolveCombatant?.Invoke(targetId);
+            if (target == null)
+            {
+                Console.Error.WriteLine($"[FunctorExecutor] UseActionResource: cannot resolve target '{targetId}'");
+                return;
+            }
+
+            if (resourceName.Equals("Movement", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!TryParseResourceAmount(amountToken, target.ActionBudget.MaxMovement, out float requested))
+                {
+                    Console.Error.WriteLine(
+                        $"[FunctorExecutor] UseActionResource: cannot parse amount '{amountToken}' for Movement");
+                    return;
+                }
+
+                if (requested < 0f)
+                {
+                    Console.Error.WriteLine(
+                        $"[FunctorExecutor] UseActionResource: negative amount '{amountToken}' is invalid");
+                    return;
+                }
+
+                float before = target.ActionBudget.RemainingMovement;
+                float toConsume = clamp ? Math.Min(requested, before) : requested;
+                bool success = target.ActionBudget.ConsumeMovement(toConsume);
+
+                if (!success)
+                {
+                    Console.WriteLine(
+                        $"[FunctorExecutor] UseActionResource: failed to consume {toConsume:F2} Movement on {targetId} " +
+                        $"(remaining={before:F2}, clamp={clamp})");
+                    return;
+                }
+
+                Console.WriteLine(
+                    $"[FunctorExecutor] UseActionResource: consumed {toConsume:F2} Movement on {targetId} " +
+                    $"(remaining={target.ActionBudget.RemainingMovement:F2}, clamp={clamp})");
+                return;
+            }
+
+            if (!TryParseResourceAmount(amountToken, 1f, out float requestedAmount))
+            {
+                Console.Error.WriteLine(
+                    $"[FunctorExecutor] UseActionResource: cannot parse amount '{amountToken}' for {resourceName}");
+                return;
+            }
+
+            if (requestedAmount < 0f)
+            {
+                Console.Error.WriteLine(
+                    $"[FunctorExecutor] UseActionResource: negative amount '{amountToken}' is invalid");
+                return;
+            }
+
+            int discreteAmount = ToDiscreteResourceAmount(requestedAmount);
+            switch (resourceName.ToLowerInvariant())
+            {
+                case "actionpoint":
+                {
+                    int available = target.ActionBudget.ActionCharges;
+                    int toConsume = clamp ? Math.Min(discreteAmount, available) : discreteAmount;
+                    if (!clamp && toConsume > available)
+                    {
+                        Console.WriteLine(
+                            $"[FunctorExecutor] UseActionResource: failed consuming ActionPoint x{toConsume} on {targetId} " +
+                            $"(remaining={available}, clamp={clamp})");
+                        return;
+                    }
+
+                    int consumed = 0;
+                    for (int i = 0; i < toConsume; i++)
+                    {
+                        if (!target.ActionBudget.ConsumeAction())
+                            break;
+
+                        consumed++;
+                    }
+
+                    Console.WriteLine(
+                        $"[FunctorExecutor] UseActionResource: consumed ActionPoint x{consumed} on {targetId} " +
+                        $"(remaining={target.ActionBudget.ActionCharges}, clamp={clamp})");
+                    return;
+                }
+
+                case "bonusactionpoint":
+                {
+                    int available = target.ActionBudget.BonusActionCharges;
+                    int toConsume = clamp ? Math.Min(discreteAmount, available) : discreteAmount;
+                    if (!clamp && toConsume > available)
+                    {
+                        Console.WriteLine(
+                            $"[FunctorExecutor] UseActionResource: failed consuming BonusActionPoint x{toConsume} on {targetId} " +
+                            $"(remaining={available}, clamp={clamp})");
+                        return;
+                    }
+
+                    int consumed = 0;
+                    for (int i = 0; i < toConsume; i++)
+                    {
+                        if (!target.ActionBudget.ConsumeBonusAction())
+                            break;
+
+                        consumed++;
+                    }
+
+                    Console.WriteLine(
+                        $"[FunctorExecutor] UseActionResource: consumed BonusActionPoint x{consumed} on {targetId} " +
+                        $"(remaining={target.ActionBudget.BonusActionCharges}, clamp={clamp})");
+                    return;
+                }
+
+                case "reactionactionpoint":
+                {
+                    int available = target.ActionBudget.ReactionCharges;
+                    int toConsume = clamp ? Math.Min(discreteAmount, available) : discreteAmount;
+                    if (!clamp && toConsume > available)
+                    {
+                        Console.WriteLine(
+                            $"[FunctorExecutor] UseActionResource: failed consuming ReactionActionPoint x{toConsume} on {targetId} " +
+                            $"(remaining={available}, clamp={clamp})");
+                        return;
+                    }
+
+                    int consumed = 0;
+                    for (int i = 0; i < toConsume; i++)
+                    {
+                        if (!target.ActionBudget.ConsumeReaction())
+                            break;
+
+                        consumed++;
+                    }
+
+                    Console.WriteLine(
+                        $"[FunctorExecutor] UseActionResource: consumed ReactionActionPoint x{consumed} on {targetId} " +
+                        $"(remaining={target.ActionBudget.ReactionCharges}, clamp={clamp})");
+                    return;
+                }
+
+                default:
+                {
+                    if (!target.ActionResources.HasResource(resourceName))
+                    {
+                        Console.WriteLine(
+                            $"[FunctorExecutor] UseActionResource: target '{targetId}' has no resource '{resourceName}'");
+                        return;
+                    }
+
+                    int maxForPercent = target.ActionResources.GetMax(resourceName, level);
+                    if (amountToken.TrimEnd().EndsWith("%", StringComparison.Ordinal) &&
+                        !TryParseResourceAmount(amountToken, maxForPercent, out requestedAmount))
+                    {
+                        Console.Error.WriteLine(
+                            $"[FunctorExecutor] UseActionResource: cannot parse percent amount '{amountToken}' for {resourceName}");
+                        return;
+                    }
+
+                    int requestedUnits = ToDiscreteResourceAmount(requestedAmount);
+                    int available = target.ActionResources.GetCurrent(resourceName, level);
+                    int toConsume = clamp ? Math.Min(requestedUnits, available) : requestedUnits;
+
+                    bool success = target.ActionResources.Consume(resourceName, toConsume, level);
+                    if (!success)
+                    {
+                        Console.WriteLine(
+                            $"[FunctorExecutor] UseActionResource: failed consuming {resourceName} x{toConsume} on {targetId} " +
+                            $"(level={level}, remaining={available}, clamp={clamp})");
+                        return;
+                    }
+
+                    Console.WriteLine(
+                        $"[FunctorExecutor] UseActionResource: consumed {resourceName} x{toConsume} on {targetId} " +
+                        $"(level={level}, remaining={target.ActionResources.GetCurrent(resourceName, level)}, clamp={clamp})");
+                    return;
+                }
+            }
+        }
+
         // ─── Helpers ─────────────────────────────────────────────────────
 
         /// <summary>
@@ -592,6 +804,38 @@ namespace QDND.Combat.Rules.Functors
             int bonus = match.Groups[3].Success ? int.Parse(match.Groups[3].Value) : 0;
 
             return Math.Max(0, _rulesEngine.Dice.Roll(count, sides, bonus));
+        }
+
+        private static bool TryParseResourceAmount(string amountText, float maxForPercent, out float amount)
+        {
+            amount = 0f;
+            if (string.IsNullOrWhiteSpace(amountText))
+                return false;
+
+            string trimmed = amountText.Trim();
+            if (trimmed.EndsWith("%", StringComparison.Ordinal))
+            {
+                string numberPart = trimmed[..^1].Trim();
+                if (!float.TryParse(numberPart, NumberStyles.Float, CultureInfo.InvariantCulture, out float percent))
+                    return false;
+
+                amount = maxForPercent * (percent / 100f);
+                if (percent > 0f && maxForPercent > 0f && amount > 0f && amount < 1f)
+                    amount = 1f;
+
+                return true;
+            }
+
+            return float.TryParse(trimmed, NumberStyles.Float, CultureInfo.InvariantCulture, out amount);
+        }
+
+        private static int ToDiscreteResourceAmount(float amount)
+        {
+            if (amount <= 0f)
+                return 0;
+
+            int floored = (int)Math.Floor(amount);
+            return Math.Max(1, floored);
         }
 
         /// <summary>

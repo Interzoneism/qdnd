@@ -231,12 +231,27 @@ namespace QDND.Combat.Targeting
             return allCombatants
                 .Where(c => IsTargetStateAllowed(action, c))
                 .Where(c => IsValidFaction(action.TargetFilter, source, c))
+                .Where(c => CanHarmTarget(source, c))
                 .Where(c => HasRequiredTags(action, c))
                 .Where(c => PassesTargetCondition(action, source, c))
                 .Where(c => !IsShoveAction(action) || IsValidShoveSize(source, c))
                 .Where(c => HasLineOfSight(source, c))
                 .Where(c => IsInAbilityRange(source, c, action.Range))
                 .ToList();
+        }
+
+        private bool CanHarmTarget(Combatant source, Combatant target)
+        {
+            if (source.Id == target.Id || source.Faction == target.Faction)
+                return true;
+
+            if (!BoostEvaluator.CanHarm(source, target, Statuses))
+                return false;
+
+            if (Statuses != null && Statuses.HasStatus(target.Id, "sanctuary"))
+                return false;
+
+            return true;
         }
 
         /// <summary>

@@ -1467,8 +1467,7 @@ void fragment() {
                 for (int i = 0; i < action.Variants.Count; i++)
                     _variantPopup.AddItem(action.Variants[i].DisplayName ?? action.Variants[i].VariantId, i);
 
-                // Position near mouse
-                _variantPopup.Position = (Vector2I)GetGlobalMousePosition();
+                _variantPopup.Position = ClampedPopupPosition();
                 _variantPopup.Popup();
             }
             else if (action.CanUpcast && action.SpellLevel > 0)
@@ -1499,7 +1498,7 @@ void fragment() {
                         int slots = combatant.ActionResources.GetCurrent("SpellSlot", lvl);
                         _variantPopup.AddItem($"Level {lvl} ({slots} slot{(slots == 1 ? "" : "s")})", lvl);
                     }
-                    _variantPopup.Position = (Vector2I)GetGlobalMousePosition();
+                    _variantPopup.Position = ClampedPopupPosition();
                     _variantPopup.Popup();
                 }
                 else
@@ -1531,6 +1530,16 @@ void fragment() {
                     Arena.SelectAction(action.Id);
                 }
             }
+        }
+
+        private Vector2I ClampedPopupPosition()
+        {
+            var mousePos = GetGlobalMousePosition();
+            var windowSize = GetViewport()?.GetWindow()?.Size ?? new Vector2I(1920, 1080);
+            return new Vector2I(
+                Math.Clamp((int)mousePos.X, 0, Math.Max(windowSize.X - 1, 0)),
+                Math.Clamp((int)mousePos.Y, 0, Math.Max(windowSize.Y - 1, 0))
+            );
         }
 
         private void OnVariantSelected(long id)

@@ -38,9 +38,9 @@ float fresnel(float power, vec3 normal, vec3 view) {
 }
 
 float linear_depth(float depth, vec2 suv) {
-	vec4 ndc = vec4(suv * 2.0 - 1.0, depth, 1.0);
-	vec4 view_pos = INV_PROJECTION_MATRIX * ndc;
-	return -view_pos.z / max(view_pos.w, 0.0001);
+	// Projection matrix builtins unavailable in GpuParticles3D draw pass.
+	// Raw depth is sufficient for relative soft-particle comparisons.
+	return depth;
 }
 
 vec3 sample_gradient(float t) {

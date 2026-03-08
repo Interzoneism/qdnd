@@ -43,6 +43,13 @@ namespace QDND.Combat.Rules.Functors
         /// </summary>
         RestoreResource,
 
+        /// <summary>
+        /// Consume an action resource (movement, action, bonus action, reaction, spell slots, etc.).
+        /// Parameters: resourceName, amount [, level] [, clamp].
+        /// Example: UseActionResource(Movement,50%,0,true)
+        /// </summary>
+        UseActionResource,
+
         // --- Stubs (logged with warning, not executed) ---
 
         /// <summary>Break the caster's concentration.</summary>

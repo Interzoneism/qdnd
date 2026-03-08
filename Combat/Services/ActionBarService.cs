@@ -421,6 +421,31 @@ namespace QDND.Combat.Services
                 return;
             }
 
+            // Preserve the originally requested known-action IDs (including aliases)
+            // so AI/UI lookups can match action-bar entries while deduping by canonical ID.
+            var requestedKnownActionIdsByCanonicalId = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            if (combatant.KnownActions != null)
+            {
+                foreach (var requestedActionId in combatant.KnownActions)
+                {
+                    if (string.IsNullOrWhiteSpace(requestedActionId))
+                    {
+                        continue;
+                    }
+
+                    var resolvedAction = _actionRegistry?.GetAction(requestedActionId);
+                    if (resolvedAction == null || string.IsNullOrWhiteSpace(resolvedAction.Id))
+                    {
+                        continue;
+                    }
+
+                    if (!requestedKnownActionIdsByCanonicalId.ContainsKey(resolvedAction.Id))
+                    {
+                        requestedKnownActionIdsByCanonicalId[resolvedAction.Id] = requestedActionId;
+                    }
+                }
+            }
+
             var actionDefs = GetActionsForCombatant(combatantId);
             RuntimeSafety.Log($"[DEBUG-ABILITIES] {combatant.Name} ({combatantId}) known={string.Join(", ", combatant.KnownActions ?? new List<string>())} resolved={string.Join(", ", actionDefs.Select(a => a.Id))}");
             var commonActions = GetCommonActions();
@@ -510,10 +535,14 @@ namespace QDND.Combat.Services
                 int itemCharges = isItem && itemQuantityByActionId.TryGetValue(def.Id, out int qty)
                     ? qty
                     : 0;
+                string entryActionId = requestedKnownActionIdsByCanonicalId.TryGetValue(def.Id, out var requestedActionId)
+                    && !string.IsNullOrWhiteSpace(requestedActionId)
+                    ? requestedActionId
+                    : def.Id;
 
                 var entry = new ActionBarEntry
                 {
-                    ActionId = def.Id,
+                    ActionId = entryActionId,
                     DisplayName = def.Name,
                     Description = isItem ? BuildItemActionDescription(def, itemInstance, itemCharges) : def.Description,
                     IconPath = isItem && !string.IsNullOrWhiteSpace(itemInstance.IconPath)
@@ -593,6 +622,15 @@ namespace QDND.Combat.Services
                 {
                     var concentratedEntry = entries.FirstOrDefault(e =>
                         string.Equals(e.ActionId, concentratedActionId, StringComparison.OrdinalIgnoreCase));
+
+                    if (concentratedEntry == null
+                        && requestedKnownActionIdsByCanonicalId.TryGetValue(concentratedActionId, out var requestedConcentratedActionId)
+                        && !string.IsNullOrWhiteSpace(requestedConcentratedActionId))
+                    {
+                        concentratedEntry = entries.FirstOrDefault(e =>
+                            string.Equals(e.ActionId, requestedConcentratedActionId, StringComparison.OrdinalIgnoreCase));
+                    }
+
                     if (concentratedEntry != null)
                         concentratedEntry.IsConcentrationActive = true;
                 }

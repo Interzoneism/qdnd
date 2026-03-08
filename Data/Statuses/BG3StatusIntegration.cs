@@ -263,21 +263,30 @@ namespace QDND.Data.Statuses
                     @"Advantage\s*\(\s*(\w+)(?:\s*,\s*(\w+))?\s*\)", RegexOptions.IgnoreCase);
                 if (advantageMatch.Success)
                 {
-                    var target = ParseModifierTarget(advantageMatch.Groups[1].Value);
-                    if (target.HasValue)
+                    var rawTarget = advantageMatch.Groups[1].Value;
+                    if (IsAttackTargetVariant(rawTarget))
                     {
-                        var mod = new StatusModifier
-                        {
-                            Target = target.Value,
-                            Type = ModifierType.Advantage
-                        };
-                        if (advantageMatch.Groups[2].Success)
-                            mod.Condition = $"ability:{advantageMatch.Groups[2].Value.ToLowerInvariant()}";
-                        statusDef.Modifiers.Add(mod);
+                        // AttackTarget means "attacks against me" in BG3; preserve as a status tag.
+                        statusDef.Tags.Add("advantage:attacktarget");
                     }
                     else
                     {
-                        Console.WriteLine($"[BG3StatusIntegration] Advantage: unresolved target '{advantageMatch.Groups[1].Value}' in: {trimmed}");
+                        var target = ParseModifierTarget(rawTarget);
+                        if (target.HasValue)
+                        {
+                            var mod = new StatusModifier
+                            {
+                                Target = target.Value,
+                                Type = ModifierType.Advantage
+                            };
+                            if (advantageMatch.Groups[2].Success)
+                                mod.Condition = $"ability:{advantageMatch.Groups[2].Value.ToLowerInvariant()}";
+                            statusDef.Modifiers.Add(mod);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"[BG3StatusIntegration] Advantage: unresolved target '{rawTarget}' in: {trimmed}");
+                        }
                     }
                     continue;
                 }
@@ -287,21 +296,30 @@ namespace QDND.Data.Statuses
                     @"Disadvantage\s*\(\s*(\w+)(?:\s*,\s*(\w+))?\s*\)", RegexOptions.IgnoreCase);
                 if (disadvantageMatch.Success)
                 {
-                    var target = ParseModifierTarget(disadvantageMatch.Groups[1].Value);
-                    if (target.HasValue)
+                    var rawTarget = disadvantageMatch.Groups[1].Value;
+                    if (IsAttackTargetVariant(rawTarget))
                     {
-                        var mod = new StatusModifier
-                        {
-                            Target = target.Value,
-                            Type = ModifierType.Disadvantage
-                        };
-                        if (disadvantageMatch.Groups[2].Success)
-                            mod.Condition = $"ability:{disadvantageMatch.Groups[2].Value.ToLowerInvariant()}";
-                        statusDef.Modifiers.Add(mod);
+                        // AttackTarget means "attacks against me" in BG3; preserve as a status tag.
+                        statusDef.Tags.Add("disadvantage:attacktarget");
                     }
                     else
                     {
-                        Console.WriteLine($"[BG3StatusIntegration] Disadvantage: unresolved target '{disadvantageMatch.Groups[1].Value}' in: {trimmed}");
+                        var target = ParseModifierTarget(rawTarget);
+                        if (target.HasValue)
+                        {
+                            var mod = new StatusModifier
+                            {
+                                Target = target.Value,
+                                Type = ModifierType.Disadvantage
+                            };
+                            if (disadvantageMatch.Groups[2].Success)
+                                mod.Condition = $"ability:{disadvantageMatch.Groups[2].Value.ToLowerInvariant()}";
+                            statusDef.Modifiers.Add(mod);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"[BG3StatusIntegration] Disadvantage: unresolved target '{rawTarget}' in: {trimmed}");
+                        }
                     }
                     continue;
                 }
@@ -311,8 +329,78 @@ namespace QDND.Data.Statuses
                 if (resistanceMatch.Success)
                 {
                     var damageType = resistanceMatch.Groups[1].Value.ToLowerInvariant();
-                    var resistType = resistanceMatch.Groups[2].Value.ToLowerInvariant();
                     statusDef.Tags.Add($"resistance:{damageType}");
+                    continue;
+                }
+
+                // CriticalHit(target, Success|Never, ...)
+                var criticalHitMatch = Regex.Match(trimmed,
+                    @"CriticalHit\s*\(\s*([^,\)]+)\s*,\s*(Success|Never)(?:\s*,\s*[^,\)]*(?:\s*,\s*([^,\)]+))?)?\s*\)",
+                    RegexOptions.IgnoreCase);
+                if (criticalHitMatch.Success)
+                {
+                    var target = NormalizeBoostTargetToken(criticalHitMatch.Groups[1].Value);
+                    var mode = criticalHitMatch.Groups[2].Value.ToLowerInvariant();
+                    var range = criticalHitMatch.Groups[3].Success
+                        ? criticalHitMatch.Groups[3].Value.Trim()
+                        : "";
+                    var tag = string.IsNullOrEmpty(range)
+                        ? $"critical_hit:{target}:{mode}"
+                        : $"critical_hit:{target}:{mode}:{range}";
+                    statusDef.Tags.Add(tag);
+                    continue;
+                }
+
+                // Attribute(Name)
+                var attributeMatch = Regex.Match(trimmed, @"Attribute\s*\(\s*([^\)]+)\s*\)", RegexOptions.IgnoreCase);
+                if (attributeMatch.Success)
+                {
+                    var attributeName = attributeMatch.Groups[1].Value.Trim().ToLowerInvariant();
+                    if (!string.IsNullOrEmpty(attributeName))
+                    {
+                        statusDef.Tags.Add($"attribute:{attributeName}");
+                    }
+                    continue;
+                }
+
+                // StatusImmunity(StatusId)
+                var statusImmunityMatch = Regex.Match(trimmed, @"StatusImmunity\s*\(\s*([^\)]+)\s*\)", RegexOptions.IgnoreCase);
+                if (statusImmunityMatch.Success)
+                {
+                    var statusId = statusImmunityMatch.Groups[1].Value.Trim().ToLowerInvariant();
+                    if (!string.IsNullOrEmpty(statusId))
+                    {
+                        statusDef.Tags.Add($"status_immunity:{statusId}");
+                    }
+                    continue;
+                }
+
+                // MovementSpeedLimit(Mode)
+                var movementSpeedLimitMatch = Regex.Match(trimmed, @"MovementSpeedLimit\s*\(\s*([^\)]+)\s*\)", RegexOptions.IgnoreCase);
+                if (movementSpeedLimitMatch.Success)
+                {
+                    var movementMode = movementSpeedLimitMatch.Groups[1].Value.Trim().ToLowerInvariant();
+                    if (!string.IsNullOrEmpty(movementMode))
+                    {
+                        statusDef.Tags.Add($"movement_speed_limit:{movementMode}");
+                    }
+                    continue;
+                }
+
+                // DarkvisionRangeMin(N)
+                var darkvisionRangeMinMatch = Regex.Match(trimmed, @"DarkvisionRangeMin\s*\(\s*(-?\d+)\s*\)", RegexOptions.IgnoreCase);
+                if (darkvisionRangeMinMatch.Success)
+                {
+                    int.TryParse(darkvisionRangeMinMatch.Groups[1].Value, out var range);
+                    statusDef.Tags.Add($"darkvision_range_min:{range}");
+                    continue;
+                }
+
+                // Invisibility()
+                var invisibilityMatch = Regex.Match(trimmed, @"Invisibility\s*\(\s*\)", RegexOptions.IgnoreCase);
+                if (invisibilityMatch.Success)
+                {
+                    statusDef.Tags.Add("attribute:invisibility");
                     continue;
                 }
 
@@ -413,6 +501,7 @@ namespace QDND.Data.Statuses
 
             return targetStr.ToLowerInvariant() switch
             {
+                "attack" => ModifierTarget.AttackRoll,
                 "attackroll" => ModifierTarget.AttackRoll,
                 "savingthrow" => ModifierTarget.SavingThrow,
                 "ability" => ModifierTarget.SkillCheck,
@@ -425,6 +514,19 @@ namespace QDND.Data.Statuses
                 "allabilitycheck" => ModifierTarget.SkillCheck,
                 _ => null
             };
+        }
+
+        private static bool IsAttackTargetVariant(string targetStr)
+        {
+            return string.Equals(targetStr?.Trim(), "AttackTarget", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static string NormalizeBoostTargetToken(string targetToken)
+        {
+            if (string.IsNullOrWhiteSpace(targetToken))
+                return "attack";
+
+            return targetToken.Trim().ToLowerInvariant();
         }
 
         /// <summary>

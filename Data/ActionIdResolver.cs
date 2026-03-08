@@ -61,6 +61,7 @@ namespace QDND.Data
             ["Projectile_MainHandAttack"] = "ranged_attack",
             ["Projectile_RayOfFrost"] = "ray_of_frost",
             ["Projectile_ScorchingRay"] = "scorching_ray",
+            ["lacerate"] = "slash_new",
             ["Shout_ActionSurge"] = "action_surge",
             ["Shout_Dodge"] = "dodge_action",
             ["Shout_Dash_CunningAction"] = "cunning_action_dash",

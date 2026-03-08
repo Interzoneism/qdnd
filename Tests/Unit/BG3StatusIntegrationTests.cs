@@ -351,6 +351,62 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
+        public void ConvertToStatusDefinition_AttackTargetAdvantage_PreservesTargetSideSemanticsAsTag()
+        {
+            var bg3Status = new BG3StatusData
+            {
+                StatusId = "TARGET_ADVANTAGE",
+                StatusType = BG3StatusType.BOOST,
+                DisplayName = "Target Advantage",
+                Boosts = "Advantage(AttackTarget);Advantage(Attack)"
+            };
+
+            var statusDef = DataBG3StatusIntegration.ConvertToStatusDefinition(bg3Status);
+
+            Assert.NotNull(statusDef);
+            Assert.Contains("advantage:attacktarget", statusDef.Tags);
+            Assert.Contains(statusDef.Modifiers, m => m.Type == ModifierType.Advantage && m.Target == ModifierTarget.AttackRoll);
+        }
+
+        [Fact]
+        public void ConvertToStatusDefinition_CriticalHitAttributeAndImmunityBoosts_AddExpectedTags()
+        {
+            var bg3Status = new BG3StatusData
+            {
+                StatusId = "CRIT_ATTR_IMMUNITY",
+                StatusType = BG3StatusType.BOOST,
+                DisplayName = "Crit Attr Immunity",
+                Boosts = "CriticalHit(AttackTarget,Success,Always,3);Attribute(Grounded);StatusImmunity(SG_Prone)"
+            };
+
+            var statusDef = DataBG3StatusIntegration.ConvertToStatusDefinition(bg3Status);
+
+            Assert.NotNull(statusDef);
+            Assert.Contains("critical_hit:attacktarget:success:3", statusDef.Tags);
+            Assert.Contains("attribute:grounded", statusDef.Tags);
+            Assert.Contains("status_immunity:sg_prone", statusDef.Tags);
+        }
+
+        [Fact]
+        public void ConvertToStatusDefinition_MovementAndVisionBoosts_AddExpectedTags()
+        {
+            var bg3Status = new BG3StatusData
+            {
+                StatusId = "MOVE_VISION",
+                StatusType = BG3StatusType.BOOST,
+                DisplayName = "Move Vision",
+                Boosts = "MovementSpeedLimit(Walk);DarkvisionRangeMin(12);Invisibility()"
+            };
+
+            var statusDef = DataBG3StatusIntegration.ConvertToStatusDefinition(bg3Status);
+
+            Assert.NotNull(statusDef);
+            Assert.Contains("movement_speed_limit:walk", statusDef.Tags);
+            Assert.Contains("darkvision_range_min:12", statusDef.Tags);
+            Assert.Contains("attribute:invisibility", statusDef.Tags);
+        }
+
+        [Fact]
         public void StatusManager_OnApplyOnTickOnRemove_FunctorsExecuteAcrossLifecycle()
         {
             // Arrange

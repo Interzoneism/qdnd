@@ -91,6 +91,21 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
+        public void ParseUseActionResource_Success()
+        {
+            var result = FunctorParser.ParseFunctors("UseActionResource(Movement,50%,0,true)");
+
+            Assert.Single(result);
+            var action = result[0];
+            Assert.Equal(FunctorType.UseActionResource, action.Type);
+            Assert.Equal(4, action.Parameters.Length);
+            Assert.Equal("Movement", action.Parameters[0]);
+            Assert.Equal("50%", action.Parameters[1]);
+            Assert.Equal("0", action.Parameters[2]);
+            Assert.Equal("true", action.Parameters[3]);
+        }
+
+        [Fact]
         public void ParseMultipleFunctors_Success()
         {
             // BG3 example: multiple functors separated by semicolons

@@ -42,6 +42,7 @@ namespace QDND.Combat.Statuses
         {
             // Load from registry
             int loadedCount = _statusRegistry.LoadStatuses(statusDirectories);
+            int runtimeStatusCount = RegisterRuntimeStatuses();
 
             // Convert and register with StatusManager
             int registeredCount = 0;
@@ -52,8 +53,34 @@ namespace QDND.Combat.Statuses
                 registeredCount++;
             }
 
-            Console.WriteLine($"[BG3StatusIntegration] Loaded {loadedCount} BG3 statuses and registered {registeredCount} with StatusManager");
+            Console.WriteLine($"[BG3StatusIntegration] Loaded {loadedCount} BG3 statuses, registered {runtimeStatusCount} runtime statuses, and registered {registeredCount} with StatusManager");
             return registeredCount;
+        }
+
+        private int RegisterRuntimeStatuses()
+        {
+            int registered = 0;
+
+            var threatened = new BG3StatusData
+            {
+                StatusId = "threatened",
+                DisplayName = "Threatened",
+                Description = "Runtime helper marker for opportunity-attack adjacency.",
+                StatusType = BG3StatusType.BOOST,
+                Duration = 0,
+                StackType = "Overwrite",
+                StatusGroups = "SG_Helper;SG_Runtime",
+                StatusPropertyFlags = string.Join(
+                    ';',
+                    StatusPresentationPolicy.FlagDisableCombatLog,
+                    StatusPresentationPolicy.FlagDisableOverhead,
+                    StatusPresentationPolicy.FlagDisablePortraitIndicator)
+            };
+
+            if (_statusRegistry.RegisterStatus(threatened, overwrite: false))
+                registered++;
+
+            return registered;
         }
 
         /// <summary>

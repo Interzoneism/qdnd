@@ -38,9 +38,9 @@ float fresnel(float power, vec3 normal, vec3 view) {
 }
 
 float linear_depth(float depth, vec2 suv) {
-	vec4 ndc = vec4(suv * 2.0 - 1.0, depth, 1.0);
-	vec4 view_pos = INV_PROJECTION_MATRIX * ndc;
-	return -view_pos.z / max(view_pos.w, 0.0001);
+	// Projection matrix builtins unavailable in GpuParticles3D draw pass.
+	// Raw depth is sufficient for relative soft-particle comparisons.
+	return depth;
 }
 
 vec3 sample_gradient(float t) {
@@ -53,7 +53,7 @@ vec3 sample_gradient(float t) {
 void vertex() {
 	mat4 billboard = mat4(INV_VIEW_MATRIX[0], INV_VIEW_MATRIX[1], INV_VIEW_MATRIX[2], MODEL_MATRIX[3]);
 	float angle = INSTANCE_CUSTOM.x * 6.28318530718;
-	mat2 spin = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
+	mat2 spin = mat2(vec2(cos(angle), sin(angle)), vec2(-sin(angle), cos(angle)));
 	VERTEX.xy = spin * VERTEX.xy;
 	MODELVIEW_MATRIX = VIEW_MATRIX * billboard;
 	NORMAL = vec3(0.0, 0.0, 1.0);

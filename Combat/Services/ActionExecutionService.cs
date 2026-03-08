@@ -1099,7 +1099,11 @@ namespace QDND.Combat.Services
 
             if (currentCombatant == null)
             {
-                _stateMachine.TryTransition(CombatState.TurnEnd, "No current combatant - advancing");
+                _checkAndEndCombat();
+                if (_stateMachine.CurrentState != CombatState.CombatEnd)
+                {
+                    _stateMachine.TryTransition(CombatState.TurnEnd, "No current combatant - advancing");
+                }
                 return;
             }
 
