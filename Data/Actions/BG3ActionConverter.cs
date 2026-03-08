@@ -92,6 +92,11 @@ namespace QDND.Data.Actions
                 SfxId = spell.SpellSoundMagnitude == "None" ? null : spell.SpellSoundMagnitude
             };
 
+            if (spell.HasAIFlag("CanNotUse"))
+            {
+                action.Tags.Add("ai_no_use");
+            }
+
             // Resolve [1], [2] placeholders in description if params exist
             if (!string.IsNullOrEmpty(spell.DescriptionParams) && !string.IsNullOrEmpty(action.Description))
                 action.Description = DescriptionParamResolver.Resolve(action.Description, spell.DescriptionParams);
@@ -310,6 +315,9 @@ namespace QDND.Data.Actions
         private static TargetFilter DetermineTargetFilter(BG3SpellData spell)
         {
             var filter = TargetFilter.None;
+            bool hasExplicitEnemyTargeting = ContainsConditionToken(spell.TargetConditions, "Enemy()")
+                                            || ContainsConditionToken(spell.TargetConditions, "not Ally()");
+            bool allowsSelfTargeting = !ContainsConditionToken(spell.TargetConditions, "not Self()");
 
             // Check spell flags for targeting hints
             if (spell.HasFlag("IsHarmful"))
@@ -320,11 +328,18 @@ namespace QDND.Data.Actions
             {
                 filter |= TargetFilter.Allies | TargetFilter.Self;
             }
-            else
+
+            filter |= InferTargetFilterFromConditions(spell.TargetConditions, allowsSelfTargeting);
+
+            if (filter == TargetFilter.None)
             {
                 // Default to enemies for damage, allies for utility
-                if (spell.VerbalIntent == "Damage")
+                if (spell.VerbalIntent == "Damage" || spell.VerbalIntent == "Debuff" || spell.VerbalIntent == "Control")
                     filter |= TargetFilter.Enemies;
+                else if (spell.VerbalIntent == "Utility"
+                         && LooksLikeFriendlyUtilitySpell(spell)
+                         && !hasExplicitEnemyTargeting)
+                    filter |= TargetFilter.Allies | (allowsSelfTargeting ? TargetFilter.Self : TargetFilter.None);
                 else
                     filter |= TargetFilter.All;
             }
@@ -336,6 +351,69 @@ namespace QDND.Data.Actions
             }
 
             return filter != TargetFilter.None ? filter : TargetFilter.Enemies;
+        }
+
+        private static TargetFilter InferTargetFilterFromConditions(string targetConditions, bool allowsSelfTargeting)
+        {
+            if (string.IsNullOrWhiteSpace(targetConditions))
+                return TargetFilter.None;
+
+            var filter = TargetFilter.None;
+
+            bool targetsSelf = ContainsConditionToken(targetConditions, "Self()");
+            bool targetsAllies = ContainsConditionToken(targetConditions, "Ally()");
+            bool targetsEnemies = ContainsConditionToken(targetConditions, "Enemy()")
+                                  || ContainsConditionToken(targetConditions, "not Ally()");
+            bool targetsCharacters = ContainsConditionToken(targetConditions, "Character()");
+
+            if (targetsEnemies)
+                filter |= TargetFilter.Enemies;
+
+            if (targetsAllies)
+            {
+                filter |= TargetFilter.Allies;
+                if (allowsSelfTargeting)
+                    filter |= TargetFilter.Self;
+            }
+
+            if (targetsSelf && allowsSelfTargeting)
+                filter |= TargetFilter.Self;
+
+            if (targetsCharacters && filter == TargetFilter.None)
+            {
+                filter |= TargetFilter.Allies;
+                if (allowsSelfTargeting)
+                    filter |= TargetFilter.Self;
+            }
+
+            return filter;
+        }
+
+        private static bool LooksLikeFriendlyUtilitySpell(BG3SpellData spell)
+        {
+            if (!string.Equals(spell.VerbalIntent, "Utility", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            if (spell.HasFlag("IsHarmful"))
+                return false;
+
+            bool appliesStatus = !string.IsNullOrEmpty(spell.SpellProperties)
+                                 && spell.SpellProperties.Contains("ApplyStatus(", StringComparison.OrdinalIgnoreCase);
+            if (!appliesStatus)
+                return false;
+
+            if (string.IsNullOrWhiteSpace(spell.TargetConditions))
+                return true;
+
+            return ContainsConditionToken(spell.TargetConditions, "Character()")
+                   || ContainsConditionToken(spell.TargetConditions, "Ally()")
+                   || ContainsConditionToken(spell.TargetConditions, "Self()");
+        }
+
+        private static bool ContainsConditionToken(string targetConditions, string token)
+        {
+            return !string.IsNullOrEmpty(targetConditions)
+                && targetConditions.IndexOf(token, StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         #endregion

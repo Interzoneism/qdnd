@@ -203,6 +203,9 @@ namespace QDND.Data.Spells
         
         /// <summary>Spell flags (IsAttack, IsMelee, IsHarmful, etc - semicolon-separated).</summary>
         public string SpellFlags { get; set; }
+
+        /// <summary>AI behavior flags from BG3 data (e.g., CanNotUse).</summary>
+        public string AIFlags { get; set; }
         
         /// <summary>Weapon types this spell applies to (Melee, Ammunition, etc).</summary>
         public string WeaponTypes { get; set; }
@@ -273,6 +276,40 @@ namespace QDND.Data.Spells
                 return new List<string>();
             
             var flags = SpellFlags.Split(';', System.StringSplitOptions.RemoveEmptyEntries);
+            var result = new List<string>();
+            foreach (var flag in flags)
+            {
+                var trimmed = flag.Trim();
+                if (!string.IsNullOrEmpty(trimmed))
+                    result.Add(trimmed);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns true if this spell has a specific AI flag.
+        /// </summary>
+        public bool HasAIFlag(string flag)
+        {
+            if (string.IsNullOrEmpty(AIFlags)) return false;
+            var flags = AIFlags.Split(';', System.StringSplitOptions.RemoveEmptyEntries);
+            foreach (var f in flags)
+            {
+                if (f.Trim().Equals(flag, System.StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns all AI flags as a list.
+        /// </summary>
+        public List<string> GetAIFlags()
+        {
+            if (string.IsNullOrEmpty(AIFlags))
+                return new List<string>();
+
+            var flags = AIFlags.Split(';', System.StringSplitOptions.RemoveEmptyEntries);
             var result = new List<string>();
             foreach (var flag in flags)
             {

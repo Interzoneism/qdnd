@@ -206,6 +206,6 @@ dotnet test Tests/QDND.Tests.csproj
 - **BG3StatusIntegration**: exists in both `Combat/Statuses/` and `Data/Statuses/` with different roles — data-layer conversion vs runtime integration.
 - **PROJECT_STATUS.md**: Does not exist. Do not reference it. Use AGENTS.md as the governance doc.
 - **Functor stubs**: 10+ functor types in `FunctorExecutor` are stubs that log warnings but do nothing (SpawnSurface, Teleport, UseSpell, Resurrect, Counterspell, etc.). Check before assuming a functor works.
-- **ConditionEvaluator fail-open**: Unknown BG3 condition functions return `true` with a warning. This means conditions may silently pass when they shouldn't — verify condition strings are actually evaluated.
+- **ConditionEvaluator fail-closed**: Unknown BG3 condition functions return `false` with a warning. This means conditions with unrecognised functions deny the boost/passive — check logs for `[ConditionEvaluator] Unknown function` warnings if an effect is not applying.
 - **Reaction budget**: Reactions set `SkipRangeValidation=true` and `IgnoreReactionBudgetCheck=true` during execution because eligibility is checked at prompt time, not execution time.
 - **Phase references**: Code comments refer to "Phase A/B/C" from an earlier implementation plan. Phase C (surfaces, movement validation) is largely incomplete. Don't assume phase labels indicate current status.

@@ -49,14 +49,9 @@ namespace QDND.Data.Statuses
                     {
                         EffectType = effect.Type,
                         DamageType = effect.DamageType?.ToLowerInvariant(),
+                        DiceFormula = effect.DiceFormula,
                         Tags = new HashSet<string>()
                     };
-
-                    // Store dice formula as a tag for later evaluation
-                    if (!string.IsNullOrEmpty(effect.DiceFormula))
-                    {
-                        tickEffect.Tags.Add(effect.DiceFormula);
-                    }
 
                     // Use Value if specified
                     if (effect.Value > 0)

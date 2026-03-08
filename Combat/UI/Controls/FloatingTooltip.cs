@@ -671,8 +671,17 @@ namespace QDND.Combat.UI.Controls
             if (action.MovementCost > 0) costParts.Add($"{action.MovementCost}m Movement");
             _actCost.Text = costParts.Count > 0 ? string.Join(" \u00B7 ", costParts) : "Free";
 
+            string descriptionText = action.Description?.Trim();
             _actDesc.Text = "";
-            _actDesc.AppendText(action.Description ?? "No description available.");
+            if (!string.IsNullOrWhiteSpace(descriptionText))
+            {
+                _actDesc.AppendText(descriptionText);
+                _actDesc.Visible = true;
+            }
+            else
+            {
+                _actDesc.Visible = false;
+            }
 
             var tex = HudIcons.LoadTextureSafe(action.IconPath);
             if (tex != null)

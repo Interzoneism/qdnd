@@ -205,6 +205,8 @@ namespace QDND.Combat.Services
                     combatant.Resources.Heal(healAmount);
                 }
             }
+
+            combatant.RelentlessEnduranceUsed = false;
         }
     }
 }

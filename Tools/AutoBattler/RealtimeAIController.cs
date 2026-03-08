@@ -18,6 +18,7 @@ namespace QDND.Tools.AutoBattler
         public string ActorId { get; set; }
         public string ActionType { get; set; }
         public string ActionId { get; set; }
+        public string VariantId { get; set; }
         public string TargetId { get; set; }
         public Vector3? TargetPosition { get; set; }
         public float Score { get; set; }
@@ -280,6 +281,7 @@ namespace QDND.Tools.AutoBattler
                     ActorId = actor.Id,
                     ActionType = action.ActionType.ToString(),
                     ActionId = action.ActionId,
+                    VariantId = action.VariantId,
                     TargetId = action.TargetId,
                     TargetPosition = action.TargetPosition,
                     Score = action.Score

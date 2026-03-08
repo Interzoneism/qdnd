@@ -206,6 +206,7 @@ namespace QDND.Tests.Unit
             Assert.NotEmpty(statusDef.TickEffects);
             Assert.Equal("damage", statusDef.TickEffects[0].EffectType);
             Assert.Equal("fire", statusDef.TickEffects[0].DamageType);
+            Assert.Equal("1d4", statusDef.TickEffects[0].DiceFormula);
         }
 
         [Fact]

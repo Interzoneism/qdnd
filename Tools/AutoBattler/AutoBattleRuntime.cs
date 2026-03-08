@@ -37,6 +37,8 @@ namespace QDND.Tools.AutoBattler
         private int _roundNumber;
         private int _lastSnapshotTurn;
         private readonly HashSet<string> _deadUnits = new();
+        private readonly Dictionary<string, AIDecisionResult> _latestPipelineDecisionByActor =
+            new(StringComparer.OrdinalIgnoreCase);
         private volatile string _cachedAIWaitReason = "not_connected";
         private double _emptyArenaDurationSeconds;
         private bool _emptyArenaFatalLogged;
@@ -357,9 +359,27 @@ namespace QDND.Tools.AutoBattler
             }
 
             string actorId = actor?.Id ?? "unknown";
-            var chosen = decision.ChosenAction;
-            _watchdog.FeedAction(actorId, chosen.ActionType.ToString(), chosen.TargetId, chosen.TargetPosition, chosen.ActionId);
-            _logger.LogDecision(actorId, decision);
+            _latestPipelineDecisionByActor[actorId] = decision;
+        }
+
+        private void OnControllerDecisionMade(RealtimeAIDecision decision)
+        {
+            if (_completed || decision == null)
+            {
+                return;
+            }
+
+            string actorId = decision.ActorId ?? "unknown";
+            string actionType = string.IsNullOrWhiteSpace(decision.ActionType)
+                ? AIActionType.EndTurn.ToString()
+                : decision.ActionType;
+
+            _watchdog.FeedAction(actorId, actionType, decision.TargetId, decision.TargetPosition, decision.ActionId);
+
+            _latestPipelineDecisionByActor.TryGetValue(actorId, out var pipelineDecision);
+            _latestPipelineDecisionByActor.Remove(actorId);
+            var finalDecision = DecisionLoggingMapper.ComposeDecisionForLogging(pipelineDecision, decision);
+            _logger.LogDecision(actorId, finalDecision);
         }
 
         private void OnStateChanged(StateTransitionEvent evt)
@@ -398,6 +418,7 @@ namespace QDND.Tools.AutoBattler
             
             if (uiAware != null)
             {
+                uiAware.OnDecisionMade += OnControllerDecisionMade;
                 uiAware.OnActionExecuted += OnActionExecuted;
                 uiAware.OnTurnStarted += OnAITurnStarted;
                 uiAware.OnTurnEnded += OnAITurnEnded;
@@ -406,6 +427,7 @@ namespace QDND.Tools.AutoBattler
             }
             else if (realtime != null)
             {
+                realtime.OnDecisionMade += OnControllerDecisionMade;
                 realtime.OnActionExecuted += OnActionExecuted;
                 realtime.OnTurnStarted += OnAITurnStarted;
                 realtime.OnTurnEnded += OnAITurnEnded;
@@ -421,6 +443,7 @@ namespace QDND.Tools.AutoBattler
                     var realtimeLate = _arena.GetNodeOrNull<RealtimeAIController>("RealtimeAIController");
                     if (uiAwareLate != null)
                     {
+                        uiAwareLate.OnDecisionMade += OnControllerDecisionMade;
                         uiAwareLate.OnActionExecuted += OnActionExecuted;
                         uiAwareLate.OnTurnStarted += OnAITurnStarted;
                         uiAwareLate.OnTurnEnded += OnAITurnEnded;
@@ -429,6 +452,7 @@ namespace QDND.Tools.AutoBattler
                     }
                     else if (realtimeLate != null)
                     {
+                        realtimeLate.OnDecisionMade += OnControllerDecisionMade;
                         realtimeLate.OnActionExecuted += OnActionExecuted;
                         realtimeLate.OnTurnStarted += OnAITurnStarted;
                         realtimeLate.OnTurnEnded += OnAITurnEnded;

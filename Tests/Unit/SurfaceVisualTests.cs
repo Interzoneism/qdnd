@@ -1,4 +1,5 @@
 using Xunit;
+using System.Reflection;
 using QDND.Combat.Arena;
 using QDND.Combat.Environment;
 using Godot;
@@ -15,7 +16,7 @@ namespace QDND.Tests.Unit
         public void GetSurfaceColor_Fire_ReturnsOrange()
         {
             // Arrange & Act
-            var color = SurfaceVisualTestHelpers.GetSurfaceColor(SurfaceType.Fire);
+            var color = GetProductionSurfaceColor("fire");
 
             // Assert
             Assert.True(color.R > 0.8f, "Fire should have high red component");
@@ -27,7 +28,7 @@ namespace QDND.Tests.Unit
         public void GetSurfaceColor_Ice_ReturnsBlue()
         {
             // Arrange & Act
-            var color = SurfaceVisualTestHelpers.GetSurfaceColor(SurfaceType.Ice);
+            var color = GetProductionSurfaceColor("ice");
 
             // Assert
             Assert.True(color.B > 0.7f, "Ice should have high blue component");
@@ -38,7 +39,7 @@ namespace QDND.Tests.Unit
         public void GetSurfaceColor_Poison_ReturnsGreen()
         {
             // Arrange & Act
-            var color = SurfaceVisualTestHelpers.GetSurfaceColor(SurfaceType.Poison);
+            var color = GetProductionSurfaceColor("poison");
 
             // Assert
             Assert.True(color.G > 0.6f, "Poison should have high green component");
@@ -46,25 +47,39 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
-        public void GetSurfaceColor_Oil_ReturnsYellowBrown()
+        public void GetSurfaceColor_Oil_UsesProductionOverrideColor()
         {
             // Arrange & Act
-            var color = SurfaceVisualTestHelpers.GetSurfaceColor(SurfaceType.Oil);
+            var color = GetProductionSurfaceColor("oil");
 
-            // Assert  
-            Assert.True(color.R > 0.5f, "Oil should have moderate-high red component");
-            Assert.True(color.G > 0.4f, "Oil should have moderate green component");
+            // Assert
+            Assert.True(Mathf.IsEqualApprox(color.R, 0.09f), "Oil style should use production shallow red override");
+            Assert.True(Mathf.IsEqualApprox(color.G, 0.08f), "Oil style should use production shallow green override");
+            Assert.True(Mathf.IsEqualApprox(color.B, 0.06f), "Oil style should use production shallow blue override");
         }
 
         [Fact]
-        public void GetSurfaceColor_Water_ReturnsCyan()
+        public void GetSurfaceColor_Water_UsesProductionOverrideColor()
         {
             // Arrange & Act
-            var color = SurfaceVisualTestHelpers.GetSurfaceColor(SurfaceType.Water);
+            var color = GetProductionSurfaceColor("water");
 
             // Assert
-            Assert.True(color.B > 0.6f, "Water should have high blue component");
-            Assert.True(color.G > 0.5f, "Water should have moderate-high green component");
+            Assert.True(Mathf.IsEqualApprox(color.R, 0.14f), "Water style should use production shallow red override");
+            Assert.True(Mathf.IsEqualApprox(color.G, 0.46f), "Water style should use production shallow green override");
+            Assert.True(Mathf.IsEqualApprox(color.B, 0.76f), "Water style should use production shallow blue override");
+        }
+
+        [Fact]
+        public void GetSurfaceColor_Blood_UsesProductionOverrideColor()
+        {
+            // Arrange & Act
+            var color = GetProductionSurfaceColor("blood");
+
+            // Assert
+            Assert.True(Mathf.IsEqualApprox(color.R, 0.72f), "Blood style should use production shallow red override");
+            Assert.True(Mathf.IsEqualApprox(color.G, 0.06f), "Blood style should use production shallow green override");
+            Assert.True(Mathf.IsEqualApprox(color.B, 0.08f), "Blood style should use production shallow blue override");
         }
 
         [Fact]
@@ -126,29 +141,24 @@ namespace QDND.Tests.Unit
             Assert.Equal("oil", oldSurface.Definition.Id);
             Assert.Equal("fire", newSurface.Definition.Id);
         }
-    }
 
-    /// <summary>
-    /// Static helpers for surface visual functionality.
-    /// Extracted to allow testing without Node3D dependencies.
-    /// </summary>
-    public static class SurfaceVisualTestHelpers
-    {
-        public static Color GetSurfaceColor(SurfaceType type)
+        private static Color GetProductionSurfaceColor(string surfaceId)
         {
-            return type switch
-            {
-                SurfaceType.Fire => new Color(1.0f, 0.5f, 0.0f), // Orange
-                SurfaceType.Ice => new Color(0.7f, 0.9f, 1.0f), // Light blue/cyan
-                SurfaceType.Poison => new Color(0.2f, 0.8f, 0.2f), // Green
-                SurfaceType.Oil => new Color(0.6f, 0.5f, 0.2f), // Yellow-brown
-                SurfaceType.Water => new Color(0.2f, 0.6f, 0.9f), // Blue
-                SurfaceType.Acid => new Color(0.8f, 1.0f, 0.2f), // Yellow-green
-                SurfaceType.Lightning => new Color(0.9f, 0.9f, 1.0f), // White-blue
-                SurfaceType.Blessed => new Color(1.0f, 1.0f, 0.7f), // Golden
-                SurfaceType.Cursed => new Color(0.5f, 0.2f, 0.5f), // Purple
-                _ => new Color(0.5f, 0.5f, 0.5f) // Gray default
-            };
+            var manager = new SurfaceManager();
+            var surface = manager.CreateSurface(surfaceId, Vector3.Zero, 1.2f);
+            Assert.NotNull(surface);
+
+            var getSurfaceStyle = typeof(SurfaceVisual).GetMethod("GetSurfaceStyle", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.NotNull(getSurfaceStyle);
+
+            var style = getSurfaceStyle.Invoke(null, new object[] { surface });
+            Assert.NotNull(style);
+
+            var colorProperty = style.GetType().GetProperty("ColorShallow", BindingFlags.Public | BindingFlags.Instance);
+            Assert.NotNull(colorProperty);
+
+            var colorValue = colorProperty.GetValue(style);
+            return Assert.IsType<Color>(colorValue);
         }
     }
 }

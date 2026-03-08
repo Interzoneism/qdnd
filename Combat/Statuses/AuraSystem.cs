@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using QDND.Combat.Entities;
+using QDND.Combat.Rules;
 using QDND.Data;
 
 namespace QDND.Combat.Statuses
@@ -46,6 +47,8 @@ namespace QDND.Combat.Statuses
     /// </summary>
     public class AuraSystem
     {
+        private const string AuraOfProtectionBuffPrefix = "aura_of_protection_buff_";
+
         private readonly StatusManager _statusManager;
         private readonly Func<IEnumerable<Combatant>> _getCombatants;
         private readonly Func<string, Combatant> _resolveCombatant;
@@ -82,8 +85,9 @@ namespace QDND.Combat.Statuses
 
             foreach (var auraSource in allCombatants)
             {
-                if (auraSource.Id == combatantId) continue; // Don't aura yourself
-                if (auraSource.LifeState == CombatantLifeState.Dead) continue;
+                if (auraSource.LifeState == CombatantLifeState.Dead
+                    || auraSource.LifeState == CombatantLifeState.Unconscious)
+                    continue;
 
                 // Snapshot to list so LINQ doesn't re-evaluate during iteration
                 var auraStatuses = _statusManager.GetStatuses(auraSource.Id)
@@ -129,8 +133,9 @@ namespace QDND.Combat.Statuses
 
             foreach (var auraSource in allCombatants)
             {
-                if (auraSource.Id == combatantId) continue; // Don't aura yourself
-                if (auraSource.LifeState == CombatantLifeState.Dead) continue;
+                if (auraSource.LifeState == CombatantLifeState.Dead
+                    || auraSource.LifeState == CombatantLifeState.Unconscious)
+                    continue;
 
                 var auraStatuses = _statusManager.GetStatuses(auraSource.Id)
                     .Where(s => s.Definition.AuraRadius > 0f
@@ -165,13 +170,36 @@ namespace QDND.Combat.Statuses
                     isEnemy = false;
             }
 
+            // Preserve historical behavior (no self-aura) for non-ally-only effects.
+            // Ally-only auras (e.g. Paladin Aura of Protection) include self.
+            bool isSelf = string.Equals(target.Id, auraSource.Id, StringComparison.OrdinalIgnoreCase);
+            if (isSelf && !auraStatus.Definition.AuraAffectsAlliesOnly)
+                return;
+
             if (auraStatus.Definition.AuraAffectsEnemiesOnly && !isEnemy)
                 return; // Skip allies and self
 
+            if (auraStatus.Definition.AuraAffectsAlliesOnly && isEnemy)
+                return; // Skip enemies for ally-only auras
+
             bool hasChildStatus = _statusManager.HasStatus(target.Id, childStatusId);
+
+            if (inRange && hasChildStatus)
+            {
+                // Keep Aura of Protection active while in range by refreshing duration.
+                if (childStatusId.StartsWith(AuraOfProtectionBuffPrefix, StringComparison.OrdinalIgnoreCase))
+                {
+                    _statusManager.ApplyStatus(childStatusId, auraSource.Id, target.Id, duration: childDuration);
+                }
+                return;
+            }
 
             if (inRange && !hasChildStatus)
             {
+                // Aura of Protection does not stack from multiple paladins; keep only the strongest bonus.
+                if (!CanApplyAuraOfProtection(target, childStatusId, childDef))
+                    return;
+
                 // Bug 5: For turn-start auras, skip targets already damaged this round
                 // to prevent double-damage (e.g. entered aura + turn-start both firing).
                 if (roundTracked)
@@ -232,6 +260,49 @@ namespace QDND.Combat.Statuses
                 RuntimeSafety.Log($"[AuraSystem] Removed '{childStatusId}' from {target.Id} " +
                     $"(left aura range of {auraSource.Id})");
             }
+        }
+
+        private bool CanApplyAuraOfProtection(Combatant target, string childStatusId, StatusDefinition childDefinition)
+        {
+            if (childDefinition == null ||
+                !childStatusId.StartsWith(AuraOfProtectionBuffPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            int incomingBonus = GetSavingThrowFlatBonus(childDefinition);
+            var existingAuraStatuses = _statusManager.GetStatuses(target.Id)
+                .Where(s => s.Definition.Id.StartsWith(AuraOfProtectionBuffPrefix, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            int strongestExistingBonus = existingAuraStatuses
+                .Select(s => GetSavingThrowFlatBonus(s.Definition))
+                .DefaultIfEmpty(int.MinValue)
+                .Max();
+
+            if (strongestExistingBonus > incomingBonus)
+                return false;
+
+            foreach (var existing in existingAuraStatuses)
+            {
+                if (GetSavingThrowFlatBonus(existing.Definition) <= incomingBonus)
+                    _statusManager.RemoveStatusInstance(existing);
+            }
+
+            return true;
+        }
+
+        private static int GetSavingThrowFlatBonus(StatusDefinition definition)
+        {
+            if (definition == null)
+                return 0;
+
+            var modifier = definition.Modifiers.FirstOrDefault(m =>
+                m.Target == ModifierTarget.SavingThrow && m.Type == ModifierType.Flat);
+            if (modifier == null)
+                return 0;
+
+            return (int)MathF.Floor(modifier.Value);
         }
 
         // ──────────────────────────────────────────────

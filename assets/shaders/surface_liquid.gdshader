@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode blend_mix, depth_draw_always, cull_disabled, diffuse_burley, specular_schlick_ggx;
+render_mode blend_mix, cull_disabled, diffuse_burley, specular_schlick_ggx;
 
 uniform sampler2D SCREEN_TEXTURE : hint_screen_texture, filter_linear_mipmap;
 uniform sampler2D DEPTH_TEXTURE : hint_depth_texture, filter_nearest;
@@ -40,6 +40,8 @@ uniform float border_far = 100.0;
 
 uniform float refraction_intensity : hint_range(0.0, 0.5, 0.01) = 0.05;
 uniform float emission_strength : hint_range(0.0, 2.0, 0.01) = 0.0;
+uniform float tint_strength_min : hint_range(0.0, 1.0, 0.01) = 0.74;
+uniform float tint_strength_max : hint_range(0.0, 1.0, 0.01) = 0.94;
 
 varying vec3 world_pos;
 varying vec2 world_uv;
@@ -133,10 +135,6 @@ void fragment()
     vec2 refract_uv = SCREEN_UV + normal_offset * refraction_intensity;
     refract_uv = clamp(refract_uv, vec2(0.001), vec2(0.999));
 
-    vec3 n1_decoded = n1 * 2.0 - 1.0;
-    vec3 n2_decoded = n2 * 2.0 - 1.0;
-    vec3 blended_normal = normalize(vec3(n1_decoded.xy + n2_decoded.xy, n1_decoded.z * n2_decoded.z));
-
     float scene_depth_raw = texture(DEPTH_TEXTURE, SCREEN_UV).r;
     float refract_depth_raw = texture(DEPTH_TEXTURE, refract_uv).r;
     float surface_depth_raw = FRAGCOORD.z;
@@ -150,13 +148,23 @@ void fragment()
     vec3 surface_view_pos = get_view_position_from_uv(SCREEN_UV, surface_depth_raw);
     float depth_distance = length(surface_view_pos - scene_view_pos);
     float depth_visibility = clamp(depth_distance / max(max_visible_depth, 0.001), 0.0, 1.0);
+    depth_visibility = pow(depth_visibility, 0.75);
 
     vec3 screen_color = texture(SCREEN_TEXTURE, refract_uv).rgb;
-    vec3 water_tint = mix(color_shallow.rgb, color_deep.rgb, depth_visibility * 0.7);
-    vec3 blended = mix(screen_color, water_tint, mix(0.5, 0.95, depth_visibility));
+    vec3 water_tint = mix(color_shallow.rgb, color_deep.rgb, clamp(depth_visibility * 0.95, 0.0, 1.0));
+    float tint_strength = mix(tint_strength_min, tint_strength_max, depth_visibility);
+    vec3 blended = mix(screen_color, water_tint, clamp(tint_strength, 0.0, 1.0));
 
-    float foam = border_scale > 0.0 ? 1.0 - smoothstep(0.0, border_scale, border_diff) : 0.0;
-    vec3 final_color = mix(blended, border_color.rgb, foam * 0.7);
+    float foam = 0.0;
+    if (border_scale > 0.0)
+    {
+        float near_band = smoothstep(0.004, 0.018, border_diff);
+        float far_band = 1.0 - smoothstep(0.018, max(0.03, border_scale * 0.13), border_diff);
+        foam = near_band * far_band;
+    }
+
+    vec3 foam_tint = mix(water_tint, border_color.rgb, 0.45);
+    vec3 final_color = mix(blended, foam_tint, foam * 0.35);
 
     // World-space radial edge fading (always works, gives smooth organic edges).
     float radial = length(world_pos.xz - surface_center.xz) / max(surface_radius, 0.1);
@@ -165,11 +173,11 @@ void fragment()
 
     // Depth-based edge fade (bonus when ground geometry exists).
     float depth_edge = edge_fade_distance > 0.0
-        ? clamp(border_diff / edge_fade_distance, 0.0, 1.0)
+        ? mix(0.72, 1.0, clamp(border_diff / edge_fade_distance, 0.0, 1.0))
         : 1.0;
 
     // Noise-based alpha variation to break up cell grid patterns.
-    float grid_break = fbm_e(world_pos.xz * 2.2 + TIME * 0.015) * 0.2 + 0.8;
+    float grid_break = fbm_e(world_pos.xz * 1.9 + TIME * 0.015) * 0.1 + 0.9;
 
     float combined_edge = radial_edge * depth_edge * grid_break;
 
@@ -178,7 +186,5 @@ void fragment()
     METALLIC = metallic;
     ROUGHNESS = roughness;
     SPECULAR = 0.6;
-    NORMAL_MAP = blended_normal * 0.5 + 0.5;
-    NORMAL_MAP_DEPTH = normal_strength;
-    ALPHA = clamp(combined_edge * transparency, 0.0, 1.0);
+    ALPHA = clamp(combined_edge * transparency * COLOR.a, 0.0, 1.0);
 }

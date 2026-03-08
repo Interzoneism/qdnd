@@ -200,6 +200,11 @@ namespace QDND.Combat.Statuses
         public bool AuraAffectsEnemiesOnly { get; set; } = true;
 
         /// <summary>
+        /// When true, the aura child status applies only to allies (same faction), not enemies.
+        /// </summary>
+        public bool AuraAffectsAlliesOnly { get; set; }
+
+        /// <summary>
         /// If true, this aura's child status is applied at the START of each affected combatant's
         /// turn rather than the end. Used by Spirit Guardians (BG3: damage at turn start).
         /// Default: false (most auras process at turn end, e.g. Flaming Sphere).

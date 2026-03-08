@@ -42,7 +42,6 @@ namespace QDND.Combat.AI
     {
         private readonly Dictionary<Vector3I, ThreatCell> _cells = new();
         private readonly float _cellSize;
-        private readonly float _meleeRange = CombatRules.DefaultMeleeReachMeters;
         private readonly float _rangedRange = 30f;
 
         public ThreatMap(float cellSize = 5f)
@@ -107,7 +106,7 @@ namespace QDND.Combat.AI
                 if (distance < info.NearestEnemyDistance)
                     info.NearestEnemyDistance = distance;
 
-                if (distance <= _meleeRange)
+                if (distance <= CombatRules.GetMeleeReach(enemy))
                 {
                     info.MeleeThreats++;
                     info.IsInMeleeRange = true;

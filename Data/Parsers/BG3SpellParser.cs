@@ -299,6 +299,24 @@ namespace QDND.Data.Parsers
                     spell.SpellFlags = string.Join(";", merged.OrderBy(f => f, StringComparer.OrdinalIgnoreCase));
                 }
             }
+
+            // Merge AI flags across inheritance the same way as spell flags.
+            if (!string.IsNullOrEmpty(parent.AIFlags))
+            {
+                if (string.IsNullOrEmpty(spell.AIFlags))
+                {
+                    spell.AIFlags = parent.AIFlags;
+                }
+                else
+                {
+                    var mergedAiFlags = new HashSet<string>(
+                        spell.AIFlags.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+                        StringComparer.OrdinalIgnoreCase);
+                    foreach (var flag in parent.AIFlags.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                        mergedAiFlags.Add(flag);
+                    spell.AIFlags = string.Join(";", mergedAiFlags.OrderBy(f => f, StringComparer.OrdinalIgnoreCase));
+                }
+            }
             
             // Step 2.7: RootSpellId and MaximumTargets inherit from parent (PowerLevel is variant-specific — does not inherit)
             if (string.IsNullOrEmpty(spell.RootSpellId) && !string.IsNullOrEmpty(parent.RootSpellId))
@@ -491,6 +509,9 @@ namespace QDND.Data.Parsers
                     break;
                 case "SpellFlags":
                     spell.SpellFlags = value;
+                    break;
+                case "AIFlags":
+                    spell.AIFlags = value;
                     break;
                 case "WeaponTypes":
                     spell.WeaponTypes = value;

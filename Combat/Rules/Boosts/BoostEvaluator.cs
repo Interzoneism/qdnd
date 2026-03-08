@@ -279,6 +279,23 @@ namespace QDND.Combat.Rules.Boosts
         }
 
         /// <summary>
+        /// Checks whether the combatant is invulnerable to damage.
+        /// Supports both Invulnerable() and Attribute(Invulnerable) forms.
+        /// </summary>
+        public static bool IsInvulnerable(Combatant combatant)
+        {
+            if (combatant == null)
+                return false;
+
+            var query = new BoostQuery(BoostType.Invulnerable);
+            var relevantBoosts = QueryBoosts(combatant, query);
+            if (relevantBoosts.Any())
+                return true;
+
+            return HasAttribute(combatant, "Invulnerable");
+        }
+
+        /// <summary>
         /// Gets all status IDs that the combatant is immune to.
         /// </summary>
         /// <param name="combatant">The combatant to check</param>
@@ -359,6 +376,34 @@ namespace QDND.Combat.Rules.Boosts
                 {
                     var mult = boost.Definition.GetFloatParameter(1, 1.0f);
                     multiplier *= mult;
+                }
+            }
+
+            return multiplier;
+        }
+
+        /// <summary>
+        /// Gets the effective consumption multiplier for a specific action resource.
+        /// Values above 1.0 increase cost (slower movement); below 1.0 reduce cost.
+        /// Multipliers stack multiplicatively.
+        /// </summary>
+        public static float GetResourceConsumeMultiplier(Combatant combatant, string resourceName)
+        {
+            if (combatant == null || string.IsNullOrEmpty(resourceName))
+                return 1.0f;
+
+            var query = new BoostQuery(BoostType.ActionResourceConsumeMultiplier);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            float multiplier = 1.0f;
+            foreach (var boost in relevantBoosts)
+            {
+                // ActionResourceConsumeMultiplier(ResourceType, multiplier, base)
+                var resourceType = boost.Definition.GetStringParameter(0, "");
+
+                if (resourceType.Equals(resourceName, StringComparison.OrdinalIgnoreCase))
+                {
+                    multiplier *= boost.Definition.GetFloatParameter(1, 1.0f);
                 }
             }
 
@@ -732,6 +777,51 @@ namespace QDND.Combat.Rules.Boosts
         }
 
         /// <summary>
+        /// Gets the combined jump-distance multiplier from JumpMaxDistanceMultiplier boosts.
+        /// </summary>
+        public static float GetJumpDistanceMultiplier(Combatant combatant)
+        {
+            if (combatant == null) return 1.0f;
+
+            var query = new BoostQuery(BoostType.JumpMaxDistanceMultiplier);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            float multiplier = 1.0f;
+            foreach (var boost in relevantBoosts)
+            {
+                multiplier *= boost.Definition.GetFloatParameter(0, 1.0f);
+            }
+
+            return multiplier;
+        }
+
+        /// <summary>
+        /// Checks whether healing is maximized for a direction.
+        /// BG3 syntax: MaximizeHealing(Incoming|Outgoing|All)
+        /// </summary>
+        public static bool IsHealingMaximized(Combatant combatant, string direction)
+        {
+            if (combatant == null)
+                return false;
+
+            var requestedDirection = string.IsNullOrWhiteSpace(direction) ? "Incoming" : direction;
+            var query = new BoostQuery(BoostType.MaximizeHealing);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            foreach (var boost in relevantBoosts)
+            {
+                var boostDirection = boost.Definition.GetStringParameter(0, "Incoming");
+                if (boostDirection.Equals("All", StringComparison.OrdinalIgnoreCase) ||
+                    boostDirection.Equals(requestedDirection, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Gets tags granted by Tag boosts.
         /// </summary>
         public static HashSet<string> GetGrantedTags(Combatant combatant)
@@ -946,6 +1036,31 @@ namespace QDND.Combat.Rules.Boosts
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Gets the resistance level from WeaponDamageResistance boosts for physical weapon damage types.
+        /// This does not apply to non-weapon damage; callers should gate this check by damage source.
+        /// </summary>
+        public static ResistanceLevel GetWeaponDamageResistanceLevel(Combatant combatant, DamageType damageType)
+        {
+            if (combatant == null) return ResistanceLevel.Normal;
+
+            var query = new BoostQuery(BoostType.WeaponDamageResistance);
+            var relevantBoosts = QueryBoosts(combatant, query);
+
+            foreach (var boost in relevantBoosts)
+            {
+                var token = boost.Definition.GetStringParameter(0, "");
+                if (token.Equals("All", StringComparison.OrdinalIgnoreCase) ||
+                    token.Equals("Physical", StringComparison.OrdinalIgnoreCase) ||
+                    token.Equals(damageType.ToString(), StringComparison.OrdinalIgnoreCase))
+                {
+                    return ResistanceLevel.Resistant;
+                }
+            }
+
+            return ResistanceLevel.Normal;
         }
 
         /// <summary>

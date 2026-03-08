@@ -61,6 +61,9 @@ namespace QDND.Combat.Reactions
         /// <summary>Well-known reaction ID for Sentinel OA enhancement.</summary>
         public const string SentinelOAId = "BG3_Sentinel_OA";
 
+        /// <summary>Well-known reaction ID for Polearm Master enter-reach attack.</summary>
+        public const string PolearmMasterEnterReachId = "BG3_PolearmMaster_EnterReach";
+
         /// <summary>Well-known reaction ID for Sentinel ally-defense variant.</summary>
         public const string SentinelAllyDefenseId = "BG3_Sentinel_AllyDefense";
 
@@ -124,6 +127,7 @@ namespace QDND.Combat.Reactions
             RegisterHellishRebuke();
             RegisterCuttingWords();
             RegisterSentinelOA();
+            RegisterPolearmMasterEnterReach();
             RegisterSentinelAllyDefense();
             RegisterMageSlayer();
             RegisterWarCaster();
@@ -218,6 +222,16 @@ namespace QDND.Combat.Reactions
                 _reactions.GrantReaction(combatant.Id, SentinelAllyDefenseId);
             }
 
+            bool hasPolearmMaster =
+                combatant.PassiveIds?.Any(p =>
+                    p.Contains("polearm_master", StringComparison.OrdinalIgnoreCase)) == true ||
+                combatant.Tags?.Any(t =>
+                    string.Equals(t, "polearm_master", StringComparison.OrdinalIgnoreCase)) == true;
+            if (hasPolearmMaster)
+            {
+                _reactions.GrantReaction(combatant.Id, PolearmMasterEnterReachId);
+            }
+
             if (hasMageSlayer)
                 _reactions.GrantReaction(combatant.Id, MageSlayerId);
 
@@ -281,7 +295,7 @@ namespace QDND.Combat.Reactions
                     : "Attack an enemy moving out of your reach.",
                 Triggers = new List<ReactionTriggerType> { ReactionTriggerType.EnemyLeavesReach },
                 Priority = 10,
-                Range = CombatRules.OpportunityAttackRangeMeters,
+                Range = CombatRules.ReachWeaponMeters,
                 CanCancel = false,
                 CanModify = false,
                 Tags = new HashSet<string> { "opportunity_attack", "melee", "bg3" },
@@ -530,7 +544,7 @@ namespace QDND.Combat.Reactions
                 Description = "Your opportunity attacks reduce the target's speed to 0.",
                 Triggers = new List<ReactionTriggerType> { ReactionTriggerType.EnemyLeavesReach },
                 Priority = 9, // Before normal OA
-                Range = CombatRules.OpportunityAttackRangeMeters,
+                Range = CombatRules.ReachWeaponMeters,
                 CanCancel = false,
                 CanModify = false,
                 Tags = new HashSet<string> { "sentinel", "oa_enhancement", "feat", "melee", "bg3" },
@@ -546,6 +560,33 @@ namespace QDND.Combat.Reactions
                 context.Data["executeAttack"] = true;
                 context.Data["attackType"] = "melee";
                 context.Data["interruptId"] = "Sentinel_OA";
+            };
+        }
+
+        private void RegisterPolearmMasterEnterReach()
+        {
+            var definition = new ReactionDefinition
+            {
+                Id = PolearmMasterEnterReachId,
+                Name = "Polearm Master",
+                Description = "When an enemy enters your reach, make a reaction melee attack.",
+                Triggers = new List<ReactionTriggerType> { ReactionTriggerType.EnemyEntersReach },
+                Priority = 9,
+                Range = CombatRules.ReachWeaponMeters,
+                CanCancel = false,
+                CanModify = false,
+                Tags = new HashSet<string> { "polearm_master", "feat", "melee", "bg3" },
+                AIPolicy = ReactionAIPolicy.Always,
+                ActionId = "main_hand_attack"
+            };
+
+            _reactions.RegisterReaction(definition);
+
+            _effectHandlers[PolearmMasterEnterReachId] = (reactor, context) =>
+            {
+                context.Data["executeAttack"] = true;
+                context.Data["attackType"] = "melee";
+                context.Data["interruptId"] = "PolearmMaster_EnterReach";
             };
         }
 

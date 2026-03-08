@@ -675,16 +675,47 @@ namespace QDND.Combat.Rules
                 return 0;
 
             formula = formula.Trim();
+            if (int.TryParse(formula, out int flatValue))
+                return flatValue;
+
             bool isNegative = formula.StartsWith("-");
-            if (isNegative) formula = formula.Substring(1);
+            if (isNegative || formula.StartsWith("+"))
+                formula = formula.Substring(1);
 
             var parts = formula.ToLowerInvariant().Split('d');
             if (parts.Length != 2) return 0;
-            if (!int.TryParse(parts[0], out int count) || !int.TryParse(parts[1], out int sides))
+
+            if (!int.TryParse(parts[0], out int count) || count <= 0)
+                return 0;
+
+            string sidesPart = parts[1];
+            int flatModifier = 0;
+
+            int plusIndex = sidesPart.IndexOf('+');
+            int minusIndex = sidesPart.IndexOf('-');
+            int modifierStart = -1;
+            if (plusIndex >= 0 && minusIndex >= 0)
+                modifierStart = Math.Min(plusIndex, minusIndex);
+            else if (plusIndex >= 0)
+                modifierStart = plusIndex;
+            else if (minusIndex >= 0)
+                modifierStart = minusIndex;
+
+            if (modifierStart > 0)
+            {
+                if (!int.TryParse(sidesPart.Substring(modifierStart), out flatModifier))
+                    return 0;
+                sidesPart = sidesPart.Substring(0, modifierStart);
+            }
+
+            if (!int.TryParse(sidesPart, out int sides) || sides <= 0)
                 return 0;
 
             int result = _dice.Roll(count, sides);
-            return isNegative ? -result : result;
+            if (isNegative)
+                result = -result;
+
+            return result + flatModifier;
         }
 
         /// <summary>
@@ -719,6 +750,33 @@ namespace QDND.Combat.Rules
                     ability = parsedAbility;
             }
 
+            // Fallback: extract ability from "save:wisdom" tag.
+            if (ability == null)
+            {
+                var saveTag = input.Tags?.FirstOrDefault(t => t.StartsWith("save:", StringComparison.OrdinalIgnoreCase));
+                if (saveTag != null)
+                {
+                    var saveAbility = saveTag.Substring(5);
+                    if (Enum.TryParse<AbilityType>(saveAbility, ignoreCase: true, out var tagAbility))
+                    {
+                        ability = tagAbility;
+                    }
+                    else
+                    {
+                        ability = saveAbility.Trim().ToLowerInvariant() switch
+                        {
+                            "str" => AbilityType.Strength,
+                            "dex" => AbilityType.Dexterity,
+                            "con" => AbilityType.Constitution,
+                            "int" => AbilityType.Intelligence,
+                            "wis" => AbilityType.Wisdom,
+                            "cha" => AbilityType.Charisma,
+                            _ => null
+                        };
+                    }
+                }
+            }
+
             if (input.Target != null)
             {
                 if (BoostEvaluator.HasAdvantage(input.Target, RollType.SavingThrow, ability))
@@ -729,6 +787,36 @@ namespace QDND.Combat.Rules
                 {
                     allDisSources.Add("Boost");
                 }
+            }
+
+            // Racial advantage on saving throws.
+            bool HasTargetTag(string expectedTag) =>
+                input.Target?.Tags?.Any(t => string.Equals(t, expectedTag, StringComparison.OrdinalIgnoreCase)) == true;
+            bool HasInputTag(string expectedTag) =>
+                input.Tags?.Any(t => string.Equals(t, expectedTag, StringComparison.OrdinalIgnoreCase)) == true;
+
+            if (HasTargetTag("advantage_vs_charmed") && HasInputTag("inflicts:charmed"))
+                allAdvSources.Add("Racial:AdvVsCharmed");
+
+            if (HasTargetTag("advantage_vs_frightened") && HasInputTag("inflicts:frightened"))
+                allAdvSources.Add("Racial:AdvVsFrightened");
+
+            if (HasTargetTag("advantage_vs_poison") && HasInputTag("inflicts:poisoned"))
+                allAdvSources.Add("Racial:AdvVsPoisoned");
+
+            if (HasTargetTag("advantage_vs_paralyzed") && HasInputTag("inflicts:paralyzed"))
+                allAdvSources.Add("Racial:AdvVsParalyzed");
+
+            if (HasTargetTag("advantage_vs_illusion") && HasInputTag("school:illusion"))
+                allAdvSources.Add("Racial:AdvVsIllusion");
+
+            if (HasTargetTag("gnome_cunning") &&
+                ability.HasValue &&
+                (ability.Value == AbilityType.Intelligence ||
+                 ability.Value == AbilityType.Wisdom ||
+                 ability.Value == AbilityType.Charisma))
+            {
+                allAdvSources.Add("Racial:GnomeCunning");
             }
 
             // Condition-based save modifiers from active statuses (D&D 5e conditions)
@@ -1169,6 +1257,24 @@ namespace QDND.Combat.Rules
             // Extract damage type from tags
             DamageType damageType = ExtractDamageTypeFromTags(input.Tags);
 
+            // Invulnerable targets take 0 damage from all sources.
+            if (input.Target != null && BoostEvaluator.IsInvulnerable(input.Target))
+            {
+                return new QueryResult
+                {
+                    Input = input,
+                    BaseValue = (int)input.BaseValue,
+                    FinalValue = 0,
+                    AppliedModifiers = allModifiers,
+                    IsSuccess = true
+                };
+            }
+
+            bool isWeaponAttack = input.Tags != null &&
+                                  (input.Tags.Contains("melee_attack") ||
+                                   input.Tags.Contains("ranged_attack") ||
+                                   input.Tags.Contains("weapon_attack"));
+
             // Apply boost-based damage bonus from attacker
             int baseDamage = (int)input.BaseValue;
             int damageBonus = 0;
@@ -1241,6 +1347,13 @@ namespace QDND.Combat.Rules
             if (input.Target != null)
             {
                 ResistanceLevel resistanceLevel = BoostEvaluator.GetResistanceLevel(input.Target, damageType);
+                if (isWeaponAttack)
+                {
+                    ResistanceLevel weaponResistanceLevel =
+                        BoostEvaluator.GetWeaponDamageResistanceLevel(input.Target, damageType);
+                    resistanceLevel = GetMoreProtectiveResistanceLevel(resistanceLevel, weaponResistanceLevel);
+                }
+
                 int damageBeforeResistance = finalDamage;
 
                 // Elemental Adept: source's chosen element bypasses resistance
@@ -1327,6 +1440,25 @@ namespace QDND.Combat.Rules
             }
 
             return DamageType.Force; // Default to Force if no damage type found
+        }
+
+        private static ResistanceLevel GetMoreProtectiveResistanceLevel(ResistanceLevel left, ResistanceLevel right)
+        {
+            return GetResistanceProtectionRank(right) > GetResistanceProtectionRank(left)
+                ? right
+                : left;
+        }
+
+        private static int GetResistanceProtectionRank(ResistanceLevel level)
+        {
+            return level switch
+            {
+                ResistanceLevel.Immune => 3,
+                ResistanceLevel.Resistant => 2,
+                ResistanceLevel.Normal => 1,
+                ResistanceLevel.Vulnerable => 0,
+                _ => 1
+            };
         }
 
         /// <summary>

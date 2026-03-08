@@ -544,7 +544,7 @@ namespace QDND.Combat.Services
                 {
                     ActionId = entryActionId,
                     DisplayName = def.Name,
-                    Description = isItem ? BuildItemActionDescription(def, itemInstance, itemCharges) : def.Description,
+                    Description = isItem ? BuildItemActionDescription(def, itemInstance, itemCharges) : BuildActionDescription(def, combatant),
                     IconPath = isItem && !string.IsNullOrWhiteSpace(itemInstance.IconPath)
                         ? itemInstance.IconPath
                         : ResolveIconPath(def.Icon, category),
@@ -791,6 +791,42 @@ namespace QDND.Combat.Services
             RefreshUsability(combatantId);
         }
 
+        public void AssignItemToSlot(string combatantId, string itemInstanceId, int targetSlot)
+        {
+            if (string.IsNullOrWhiteSpace(combatantId) || string.IsNullOrWhiteSpace(itemInstanceId) || targetSlot < 0)
+            {
+                return;
+            }
+
+            if (_combatContext == null || !_combatContext.TryGetService<InventoryService>(out var inventoryService))
+            {
+                return;
+            }
+
+            var item = inventoryService.GetUsableItems(combatantId)
+                .FirstOrDefault(i => i != null && string.Equals(i.InstanceId, itemInstanceId, StringComparison.Ordinal));
+
+            if (item == null || string.IsNullOrWhiteSpace(item.UseActionId))
+            {
+                return;
+            }
+
+            var itemAction = _actionRegistry?.GetAction(item.UseActionId);
+            if (itemAction == null || string.IsNullOrWhiteSpace(itemAction.Id))
+            {
+                return;
+            }
+
+            if (!_actionBarSlotOverrides.TryGetValue(combatantId, out var overrideMap))
+            {
+                overrideMap = new Dictionary<int, string>();
+                _actionBarSlotOverrides[combatantId] = overrideMap;
+            }
+
+            overrideMap[targetSlot] = itemAction.Id;
+            Populate(combatantId);
+        }
+
         private static string ClassifyActionCategory(ActionDefinition action)
         {
             if (action == null)
@@ -950,6 +986,56 @@ namespace QDND.Combat.Services
             return isResourceFailure ? ActionUsability.NoResources : ActionUsability.Disabled;
         }
 
+        private string BuildActionDescription(ActionDefinition action, Combatant combatant)
+        {
+            if (action == null)
+            {
+                return string.Empty;
+            }
+
+            if (!string.IsNullOrWhiteSpace(action.Description))
+            {
+                return action.Description;
+            }
+
+            var sentences = new List<string>();
+            if (IsSpellAction(action) && action.School != SpellSchool.None)
+            {
+                sentences.Add($"{action.School} spell.");
+            }
+
+            string damage = BuildDamageSummary(action, combatant);
+            string healing = BuildHealingSummary(action, combatant);
+
+            if (!string.IsNullOrWhiteSpace(damage) && !string.IsNullOrWhiteSpace(healing))
+            {
+                sentences.Add($"Deals {damage} damage and heals {healing} hit points.");
+            }
+            else if (!string.IsNullOrWhiteSpace(damage))
+            {
+                sentences.Add($"Deals {damage} damage.");
+            }
+            else if (!string.IsNullOrWhiteSpace(healing))
+            {
+                sentences.Add($"Heals {healing} hit points.");
+            }
+            else
+            {
+                string intentSentence = action.Intent switch
+                {
+                    VerbalIntent.Buff => "Applies a beneficial effect.",
+                    VerbalIntent.Healing => "Applies a beneficial effect.",
+                    VerbalIntent.Debuff => "Applies a harmful effect.",
+                    VerbalIntent.Control => "Applies a control effect.",
+                    _ => "Applies a control effect."
+                };
+
+                sentences.Add(intentSentence);
+            }
+
+            return string.Join(" ", sentences).Trim();
+        }
+
         private int ComputeTooltipSaveDC(ActionDefinition action, int proficiencyBonus, Combatant combatant)
         {
             if (action.SaveDC.HasValue)
@@ -1009,6 +1095,36 @@ namespace QDND.Combat.Services
             if (!string.IsNullOrEmpty(formula))
                 return formula;
             return null;
+        }
+
+        private static string BuildHealingSummary(ActionDefinition action, Combatant combatant = null)
+        {
+            var healEffect = action?.Effects?.FirstOrDefault(e =>
+                string.Equals(e.Type, "heal", StringComparison.OrdinalIgnoreCase));
+            if (healEffect == null)
+            {
+                return null;
+            }
+
+            string formula = healEffect.DiceFormula ?? "";
+            if (combatant != null)
+            {
+                formula = SpellEffectConverter.ResolveDynamicFormula(formula, combatant);
+            }
+
+            if (!string.IsNullOrWhiteSpace(formula))
+            {
+                return formula;
+            }
+
+            if (healEffect.Value <= 0)
+            {
+                return null;
+            }
+
+            return Math.Abs(healEffect.Value - MathF.Round(healEffect.Value)) < 0.001f
+                ? MathF.Round(healEffect.Value).ToString()
+                : healEffect.Value.ToString("0.#");
         }
 
         private static string BuildItemActionDescription(ActionDefinition action, InventoryItem item, int quantity)

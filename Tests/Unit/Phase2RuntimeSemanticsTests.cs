@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using QDND.Combat.Actions;
 using QDND.Combat.Actions.Effects;
@@ -7,6 +8,7 @@ using QDND.Combat.Entities;
 using QDND.Combat.Rules;
 using QDND.Combat.Statuses;
 using QDND.Data.Actions;
+using QDND.Data.Parsers;
 using QDND.Data.Spells;
 using Xunit;
 
@@ -242,6 +244,69 @@ namespace QDND.Tests.Unit
             var failEffect = action.Effects.First(e => e.Type == "apply_status" && e.StatusId == "chilled");
 
             Assert.Equal("on_save_success", failEffect.Condition);
+        }
+
+        [Fact]
+        public void BG3SpellParser_AIFlags_AreParsedFromSpellData()
+        {
+            string tempFile = Path.GetTempFileName();
+            try
+            {
+                File.WriteAllText(tempFile,
+                    "new entry \"Test_AIFlags\"\n" +
+                    "type \"SpellData\"\n" +
+                    "data \"SpellType\" \"Target\"\n" +
+                    "data \"AIFlags\" \"CanNotUse;UseAsSupportingActionOnly\"\n");
+
+                var parser = new BG3SpellParser();
+                var spells = parser.ParseFile(tempFile);
+
+                var spell = Assert.Single(spells);
+                Assert.Equal("Test_AIFlags", spell.Id);
+                Assert.Equal("CanNotUse;UseAsSupportingActionOnly", spell.AIFlags);
+                Assert.True(spell.HasAIFlag("CanNotUse"));
+            }
+            finally
+            {
+                File.Delete(tempFile);
+            }
+        }
+
+        [Fact]
+        public void BG3ActionConverter_CanNotUseAIFlag_AddsAiNoUseTag()
+        {
+            var spell = new BG3SpellData
+            {
+                Id = "Target_Darkvision_Test",
+                SpellType = BG3SpellType.Target,
+                AIFlags = "CanNotUse",
+                VerbalIntent = "Utility",
+                SpellProperties = "ApplyStatus(DARKVISION,100,-1)",
+                TargetConditions = "Character() and Ally()"
+            };
+
+            var action = BG3ActionConverter.ConvertToAction(spell);
+
+            Assert.Contains("ai_no_use", action.Tags, StringComparer.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public void BG3ActionConverter_UtilityCharacterSpell_TargetsAlliesAndSelf_NotAll()
+        {
+            var spell = new BG3SpellData
+            {
+                Id = "Target_Longstrider_Test",
+                SpellType = BG3SpellType.Target,
+                VerbalIntent = "Utility",
+                SpellProperties = "ApplyStatus(LONGSTRIDER,100,-1)",
+                TargetConditions = "Character()"
+            };
+
+            var action = BG3ActionConverter.ConvertToAction(spell);
+
+            Assert.True(action.TargetFilter.HasFlag(TargetFilter.Allies));
+            Assert.True(action.TargetFilter.HasFlag(TargetFilter.Self));
+            Assert.False(action.TargetFilter.HasFlag(TargetFilter.Enemies));
         }
     }
 }

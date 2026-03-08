@@ -9,6 +9,7 @@ using QDND.Combat.Arena;
 using QDND.Combat.Entities;
 using QDND.Combat.Environment;
 using QDND.Combat.Movement;
+using QDND.Combat.Rules;
 using QDND.Combat.Rules.Boosts;
 using QDND.Combat.Statuses;
 using QDND.Data;
@@ -339,12 +340,73 @@ namespace QDND.Combat.Services
 
                     foreach (var passiveId in c.PassiveIds)
                     {
+                        if (string.Equals(passiveId, "aura_of_protection", StringComparison.OrdinalIgnoreCase))
+                            continue;
+
                         if (c.PassiveManager.GrantPassive(passiveRegistry, passiveId))
                             totalPassivesGranted++;
                     }
                 }
                 if (totalPassivesGranted > 0)
                     _log($"Granted {totalPassivesGranted} BG3 passives across {Combatants.Count} combatants");
+            }
+
+            // Paladin Aura of Protection: register per-paladin aura status definitions at combat start.
+            if (statusManager != null)
+            {
+                foreach (var c in Combatants)
+                {
+                    bool hasAuraOfProtection = c.PassiveIds?.Any(p =>
+                        string.Equals(p, "aura_of_protection", StringComparison.OrdinalIgnoreCase)) == true;
+                    if (!hasAuraOfProtection)
+                        continue;
+
+                    int chaMod = Math.Max(1, c.GetAbilityModifier(AbilityType.Charisma));
+                    int paladinLevel = c.ResolvedCharacter?.Sheet?.ClassLevels?.Count(cl =>
+                        string.Equals(cl.ClassId, "paladin", StringComparison.OrdinalIgnoreCase)) ?? 0;
+                    float auraRadius = paladinLevel >= 18 ? 9f : 3f;
+
+                    string buffId = $"aura_of_protection_buff_{c.Id}";
+                    string auraId = $"aura_of_protection_{c.Id}";
+
+                    var buffDef = new StatusDefinition
+                    {
+                        Id = buffId,
+                        Name = "Aura of Protection",
+                        Description = $"Saving throw bonus +{chaMod} from Paladin's Aura of Protection.",
+                        IsBuff = true,
+                        DefaultDuration = 1,
+                        DurationType = DurationType.Turns,
+                        Stacking = StackingBehavior.Refresh,
+                    };
+                    buffDef.Modifiers.Add(new StatusModifier
+                    {
+                        Target = ModifierTarget.SavingThrow,
+                        Type = ModifierType.Flat,
+                        Value = chaMod
+                    });
+
+                    var auraDef = new StatusDefinition
+                    {
+                        Id = auraId,
+                        Name = "Aura of Protection (Source)",
+                        IsBuff = true,
+                        DefaultDuration = 0,
+                        DurationType = DurationType.Permanent,
+                        Stacking = StackingBehavior.Unique,
+                        AuraRadius = auraRadius,
+                        AuraStatusId = buffId,
+                        AuraAffectsEnemiesOnly = false,
+                        AuraAffectsAlliesOnly = true,
+                    };
+
+                    statusManager.RegisterStatus(buffDef);
+                    statusManager.RegisterStatus(auraDef);
+                    statusManager.ApplyStatus(auraId, c.Id, c.Id, duration: 0);
+
+                    // Apply self-buff so the paladin benefits immediately.
+                    statusManager.ApplyStatus(buffId, c.Id, c.Id, duration: 0);
+                }
             }
 
             // Grant metamagic options from passive IDs to sorcerer combatants

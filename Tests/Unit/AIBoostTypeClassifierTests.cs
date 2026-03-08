@@ -334,7 +334,7 @@ namespace QDND.Tests.Unit
 
             Assert.Single(results);
             Assert.Equal("Movement", results[0].boostType);
-            Assert.Equal(bg3.MultiplierBoostMovement, results[0].multiplier);
+            Assert.Equal(bg3.MultiplierBoostMovement * 0.35f, results[0].multiplier, 5);
         }
 
         [Fact]
@@ -356,7 +356,29 @@ namespace QDND.Tests.Unit
 
             Assert.Single(results);
             Assert.Equal("Movement", results[0].boostType);
-            Assert.Equal(bg3.MultiplierBoostMovement, results[0].multiplier);
+            Assert.Equal(bg3.MultiplierBoostMovement * 0.35f, results[0].multiplier, 5);
+        }
+
+        [Fact]
+        public void ClassifyBoosts_DarkvisionRangeMin_ReturnsNearZeroUtilityMultiplier()
+        {
+            var bg3 = CreateDefaultProfile();
+            var results = AIBoostTypeClassifier.ClassifyBoosts("DarkvisionRangeMin(12)", bg3);
+
+            Assert.Single(results);
+            Assert.Equal("Darkvision", results[0].boostType);
+            Assert.Equal(bg3.MultiplierBoostSightRange * 0.06f, results[0].multiplier, 5);
+        }
+
+        [Fact]
+        public void ClassifyBoosts_GameplayLight_ReturnsNearZeroUtilityMultiplier()
+        {
+            var bg3 = CreateDefaultProfile();
+            var results = AIBoostTypeClassifier.ClassifyBoosts("GameplayLight(9,false,0.1)", bg3);
+
+            Assert.Single(results);
+            Assert.Equal("LightUtility", results[0].boostType);
+            Assert.Equal(bg3.MultiplierBoostSightRange * 0.05f, results[0].multiplier, 5);
         }
 
         // ──────────────────────────────────────────────

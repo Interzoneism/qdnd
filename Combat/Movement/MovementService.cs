@@ -329,6 +329,9 @@ namespace QDND.Combat.Movement
             // Update position
             combatant.Position = destination;
 
+            // Fire enter-reach reactions after movement resolves at the destination.
+            TriggerEnemyEntersReachReactions(combatant, startPos, destination);
+
             // Process distance-based movement-through hazards (e.g. Spike Growth).
             _surfaces?.ProcessMovement(combatant, startPos, destination);
 
@@ -400,7 +403,7 @@ namespace QDND.Combat.Movement
                 float distanceAfterMove = enemy.Position.DistanceTo(destination);
 
                 // If destination is outside their melee range, this is a potential opportunity attack
-                if (distanceAfterMove > MELEE_RANGE)
+                if (distanceAfterMove > CombatRules.GetMeleeReach(enemy))
                 {
                     // Create trigger context
                     var context = new ReactionTriggerContext
@@ -436,6 +439,82 @@ namespace QDND.Combat.Movement
             return result;
         }
 
+        private void TriggerEnemyEntersReachReactions(Combatant mover, Vector3 startPos, Vector3 destination)
+        {
+            if (_reactionSystem == null || GetCombatants == null)
+                return;
+
+            var allCombatants = GetCombatants().ToList();
+
+            foreach (var potentialReactor in allCombatants)
+            {
+                if (potentialReactor.Id == mover.Id)
+                    continue;
+
+                if (!potentialReactor.IsActive)
+                    continue;
+
+                if (potentialReactor.Faction == mover.Faction)
+                    continue;
+
+                float reactorReach = CombatRules.GetMeleeReach(potentialReactor);
+
+                var enterReachRanges = _reactionSystem.GetReactions(potentialReactor.Id)
+                    .Where(r => r.Triggers.Contains(ReactionTriggerType.EnemyEntersReach))
+                    .Select(r => r.Range > 0f ? r.Range : CombatRules.DefaultMeleeReachMeters)
+                    .ToList();
+                if (enterReachRanges.Count > 0)
+                {
+                    reactorReach = Math.Max(reactorReach, enterReachRanges.Max());
+                }
+
+                float distanceBefore = potentialReactor.Position.DistanceTo(startPos);
+                float distanceAfter = potentialReactor.Position.DistanceTo(destination);
+
+                // Trigger only when moving from outside reach to inside reach.
+                if (distanceBefore <= reactorReach || distanceAfter > reactorReach)
+                    continue;
+
+                var context = new ReactionTriggerContext
+                {
+                    TriggerType = ReactionTriggerType.EnemyEntersReach,
+                    TriggerSourceId = mover.Id,
+                    AffectedId = potentialReactor.Id,
+                    Position = destination,
+                    IsCancellable = false,
+                    Data = new Dictionary<string, object>
+                    {
+                        { "startX", startPos.X },
+                        { "startY", startPos.Y },
+                        { "startZ", startPos.Z },
+                        { "endX", destination.X },
+                        { "endY", destination.Y },
+                        { "endZ", destination.Z }
+                    }
+                };
+
+                if (ReactionResolver != null)
+                {
+                    ReactionResolver.ResolveTrigger(
+                        context,
+                        new[] { potentialReactor },
+                        new ReactionResolutionOptions
+                        {
+                            ActionLabel = "movement:enters_reach",
+                            AllowPromptDeferral = true
+                        });
+                }
+                else
+                {
+                    var eligibleReactors = _reactionSystem.GetEligibleReactors(context, new[] { potentialReactor });
+                    foreach (var (combatantId, reaction) in eligibleReactors)
+                    {
+                        _reactionSystem.CreatePrompt(combatantId, reaction, context);
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Get enemies that are within melee range of a position.
         /// </summary>
@@ -459,7 +538,7 @@ namespace QDND.Combat.Movement
 
                 // Check if within melee range
                 float distance = other.Position.DistanceTo(position);
-                if (distance <= MELEE_RANGE)
+                if (distance <= CombatRules.GetMeleeReach(other))
                 {
                     enemies.Add(other);
                 }

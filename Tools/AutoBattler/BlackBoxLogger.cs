@@ -512,9 +512,10 @@ namespace QDND.Tools.AutoBattler
                     : null
             };
 
+            Dictionary<string, object> details = null;
             if (candidateSummary?.Count > 0)
             {
-                entry.Details = new Dictionary<string, object>
+                details = new Dictionary<string, object>
                 {
                     ["candidates"] = candidateSummary,
                     ["total_candidates"] = decision.AllCandidates.Count,
@@ -523,7 +524,22 @@ namespace QDND.Tools.AutoBattler
                 };
 
                 if (decision.TurnPlan != null)
-                    entry.Details["turn_plan_steps"] = decision.TurnPlan.PlannedActions?.Count ?? 0;
+                    details["turn_plan_steps"] = decision.TurnPlan.PlannedActions?.Count ?? 0;
+            }
+
+            if (decision.PrimaryAction != null && !ReferenceEquals(decision.PrimaryAction, chosen))
+            {
+                details ??= new Dictionary<string, object>();
+                details["primary_action"] = decision.PrimaryAction.ActionType.ToString();
+                details["primary_action_id"] = decision.PrimaryAction.ActionId ?? string.Empty;
+                details["primary_variant_id"] = decision.PrimaryAction.VariantId ?? string.Empty;
+                details["primary_target"] = decision.PrimaryAction.TargetId ?? decision.PrimaryAction.TargetPosition?.ToString() ?? string.Empty;
+                details["primary_score"] = Math.Round(decision.PrimaryAction.Score, 2);
+            }
+
+            if (details != null)
+            {
+                entry.Details = details;
             }
 
             Write(entry);

@@ -97,6 +97,12 @@ namespace QDND.Combat.Rules.Boosts
         /// </summary>
         Ability,
 
+        /// <summary>
+        /// Makes the combatant immune to all incoming damage.
+        /// Syntax: Invulnerable()
+        /// </summary>
+        Invulnerable,
+
         // ============================================================
         // TIER 2: ACTION ECONOMY
         // ============================================================
@@ -135,6 +141,13 @@ namespace QDND.Combat.Rules.Boosts
         /// - ActionResource(Movement, -10, 0) - reduce movement by 10ft
         /// </summary>
         ActionResource,
+
+        /// <summary>
+        /// Multiplies jump distance.
+        /// Syntax: JumpMaxDistanceMultiplier(multiplier)
+        /// Example: JumpMaxDistanceMultiplier(3)
+        /// </summary>
+        JumpMaxDistanceMultiplier,
 
         // ============================================================
         // TIER 3: ADVANCED MECHANICS
@@ -309,6 +322,13 @@ namespace QDND.Combat.Rules.Boosts
         /// </summary>
         TemporaryHP,
 
+        /// <summary>
+        /// Maximizes healing roll values for the specified direction.
+        /// Syntax: MaximizeHealing(Incoming|Outgoing|All)
+        /// Example: MaximizeHealing(Incoming)
+        /// </summary>
+        MaximizeHealing,
+
         // ============================================================
         // TIER 5: ADVANCED COMBAT MECHANICS
         // ============================================================
@@ -319,6 +339,13 @@ namespace QDND.Combat.Rules.Boosts
         /// Example: CharacterWeaponDamage(LevelMapValue(RageDamage)) — Barbarian Rage bonus damage
         /// </summary>
         CharacterWeaponDamage,
+
+        /// <summary>
+        /// Grants resistance to weapon damage of the specified physical damage type.
+        /// Syntax: WeaponDamageResistance(DamageType)
+        /// Example: WeaponDamageResistance(Bludgeoning)
+        /// </summary>
+        WeaponDamageResistance,
 
         /// <summary>
         /// Forces re-roll of dice that fall below the minimum value.

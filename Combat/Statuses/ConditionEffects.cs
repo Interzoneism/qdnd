@@ -350,6 +350,14 @@ namespace QDND.Combat.Statuses
         }
 
         /// <summary>
+        /// Maps a status ID (e.g. "charmed", "frightened") to its ConditionType if recognized.
+        /// </summary>
+        public static ConditionType? IdentifyConditionType(string statusId)
+        {
+            return GetConditionType(statusId);
+        }
+
+        /// <summary>
         /// Get the full mechanical effects for a status ID. Returns null if not a condition.
         /// </summary>
         public static ConditionMechanics GetConditionMechanics(string statusId)

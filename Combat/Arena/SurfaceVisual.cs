@@ -302,14 +302,21 @@ void fragment() {
             var vertices = new List<Vector3>();
             var normals = new List<Vector3>();
             var uvs = new List<Vector2>();
+            var colors = new List<Color>();
             var indices = new List<int>();
+
+            bool isLiquid = style.Shader == ShaderFamily.Liquid;
+            HashSet<SurfaceCell> occupiedCells = isLiquid ? new HashSet<SurfaceCell>(surface.Cells) : null;
+            float edgeFadeWidth = surface.CellSize * 0.24f;
+            float skirtOutset = surface.CellSize * 0.1f;
+            float skirtDepth = Mathf.Max(0.035f, surface.CellSize * 0.12f);
 
             foreach (var cell in surface.Cells)
             {
                 var world = surface.CellToWorld(cell);
                 var local = world - surface.Position;
                 float padNoise = style.Shader == ShaderFamily.Liquid
-                    ? 0f
+                    ? (CellHash(cell.X, cell.Z) - 0.5f) * surface.CellSize * 0.045f
                     : (CellHash(cell.X, cell.Z) - 0.5f) * surface.CellSize * 0.08f;
                 float half = surface.CellSize * 0.5f + style.CellPaddingMeters + padNoise;
                 float y = style.HeightOffset;
@@ -319,28 +326,44 @@ void fragment() {
                 float z0 = world.Z - half;
                 float z1 = world.Z + half;
 
-                int start = vertices.Count;
-                vertices.Add(new Vector3(local.X - half, y, local.Z - half));
-                vertices.Add(new Vector3(local.X + half, y, local.Z - half));
-                vertices.Add(new Vector3(local.X + half, y, local.Z + half));
-                vertices.Add(new Vector3(local.X - half, y, local.Z + half));
+                AddQuad(
+                    vertices,
+                    normals,
+                    uvs,
+                    colors,
+                    indices,
+                    new Vector3(local.X - half, y, local.Z - half),
+                    new Vector3(local.X + half, y, local.Z - half),
+                    new Vector3(local.X + half, y, local.Z + half),
+                    new Vector3(local.X - half, y, local.Z + half),
+                    Vector3.Up,
+                    new Vector2(x0, z0),
+                    new Vector2(x1, z0),
+                    new Vector2(x1, z1),
+                    new Vector2(x0, z1),
+                    Colors.White,
+                    Colors.White,
+                    Colors.White,
+                    Colors.White);
 
-                normals.Add(Vector3.Up);
-                normals.Add(Vector3.Up);
-                normals.Add(Vector3.Up);
-                normals.Add(Vector3.Up);
-
-                uvs.Add(new Vector2(x0, z0));
-                uvs.Add(new Vector2(x1, z0));
-                uvs.Add(new Vector2(x1, z1));
-                uvs.Add(new Vector2(x0, z1));
-
-                indices.Add(start + 0);
-                indices.Add(start + 1);
-                indices.Add(start + 2);
-                indices.Add(start + 0);
-                indices.Add(start + 2);
-                indices.Add(start + 3);
+                if (isLiquid)
+                {
+                    AddLiquidPerimeterGeometry(
+                        cell,
+                        occupiedCells,
+                        local,
+                        world,
+                        half,
+                        y,
+                        edgeFadeWidth,
+                        skirtOutset,
+                        skirtDepth,
+                        vertices,
+                        normals,
+                        uvs,
+                        colors,
+                        indices);
+                }
             }
 
             var arrays = new Godot.Collections.Array();
@@ -348,9 +371,256 @@ void fragment() {
             arrays[(int)Mesh.ArrayType.Vertex] = vertices.ToArray();
             arrays[(int)Mesh.ArrayType.Normal] = normals.ToArray();
             arrays[(int)Mesh.ArrayType.TexUV] = uvs.ToArray();
+            arrays[(int)Mesh.ArrayType.Color] = colors.ToArray();
             arrays[(int)Mesh.ArrayType.Index] = indices.ToArray();
             mesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, arrays);
             return mesh;
+        }
+
+        private static void AddQuad(
+            List<Vector3> vertices,
+            List<Vector3> normals,
+            List<Vector2> uvs,
+            List<Color> colors,
+            List<int> indices,
+            Vector3 v0,
+            Vector3 v1,
+            Vector3 v2,
+            Vector3 v3,
+            Vector3 normal,
+            Vector2 uv0,
+            Vector2 uv1,
+            Vector2 uv2,
+            Vector2 uv3,
+            Color c0,
+            Color c1,
+            Color c2,
+            Color c3)
+        {
+            int start = vertices.Count;
+
+            vertices.Add(v0);
+            vertices.Add(v1);
+            vertices.Add(v2);
+            vertices.Add(v3);
+
+            normals.Add(normal);
+            normals.Add(normal);
+            normals.Add(normal);
+            normals.Add(normal);
+
+            uvs.Add(uv0);
+            uvs.Add(uv1);
+            uvs.Add(uv2);
+            uvs.Add(uv3);
+
+            colors.Add(c0);
+            colors.Add(c1);
+            colors.Add(c2);
+            colors.Add(c3);
+
+            indices.Add(start + 0);
+            indices.Add(start + 1);
+            indices.Add(start + 2);
+            indices.Add(start + 0);
+            indices.Add(start + 2);
+            indices.Add(start + 3);
+        }
+
+        private static void AddLiquidPerimeterGeometry(
+            SurfaceCell cell,
+            HashSet<SurfaceCell> occupiedCells,
+            Vector3 localCenter,
+            Vector3 worldCenter,
+            float half,
+            float y,
+            float edgeFadeWidth,
+            float skirtOutset,
+            float skirtDepth,
+            List<Vector3> vertices,
+            List<Vector3> normals,
+            List<Vector2> uvs,
+            List<Color> colors,
+            List<int> indices)
+        {
+            if (occupiedCells == null)
+                return;
+
+            bool northOpen = !occupiedCells.Contains(new SurfaceCell(cell.X, cell.Z - 1));
+            bool southOpen = !occupiedCells.Contains(new SurfaceCell(cell.X, cell.Z + 1));
+            bool westOpen = !occupiedCells.Contains(new SurfaceCell(cell.X - 1, cell.Z));
+            bool eastOpen = !occupiedCells.Contains(new SurfaceCell(cell.X + 1, cell.Z));
+
+            float x0l = localCenter.X - half;
+            float x1l = localCenter.X + half;
+            float z0l = localCenter.Z - half;
+            float z1l = localCenter.Z + half;
+
+            float x0w = worldCenter.X - half;
+            float x1w = worldCenter.X + half;
+            float z0w = worldCenter.Z - half;
+            float z1w = worldCenter.Z + half;
+
+            Color innerTop = new Color(1f, 1f, 1f, 0.92f);
+            Color outerTop = new Color(1f, 1f, 1f, 0f);
+            Color sideTop = new Color(1f, 1f, 1f, 0.6f);
+            Color sideBottom = new Color(1f, 1f, 1f, 0.05f);
+
+            if (northOpen)
+            {
+                float zOuterL = z0l - edgeFadeWidth;
+                float zOuterW = z0w - edgeFadeWidth;
+                AddQuad(
+                    vertices, normals, uvs, colors, indices,
+                    new Vector3(x0l, y, z0l),
+                    new Vector3(x1l, y, z0l),
+                    new Vector3(x1l, y, zOuterL),
+                    new Vector3(x0l, y, zOuterL),
+                    Vector3.Up,
+                    new Vector2(x0w, z0w),
+                    new Vector2(x1w, z0w),
+                    new Vector2(x1w, zOuterW),
+                    new Vector2(x0w, zOuterW),
+                    innerTop,
+                    innerTop,
+                    outerTop,
+                    outerTop);
+
+                float skirtZL = zOuterL - skirtOutset;
+                float skirtZW = zOuterW - skirtOutset;
+                AddQuad(
+                    vertices, normals, uvs, colors, indices,
+                    new Vector3(x0l, y, zOuterL),
+                    new Vector3(x1l, y, zOuterL),
+                    new Vector3(x1l, y - skirtDepth, skirtZL),
+                    new Vector3(x0l, y - skirtDepth, skirtZL),
+                    new Vector3(0f, 0.35f, -1f).Normalized(),
+                    new Vector2(x0w, zOuterW),
+                    new Vector2(x1w, zOuterW),
+                    new Vector2(x1w, skirtZW),
+                    new Vector2(x0w, skirtZW),
+                    sideTop,
+                    sideTop,
+                    sideBottom,
+                    sideBottom);
+            }
+
+            if (southOpen)
+            {
+                float zOuterL = z1l + edgeFadeWidth;
+                float zOuterW = z1w + edgeFadeWidth;
+                AddQuad(
+                    vertices, normals, uvs, colors, indices,
+                    new Vector3(x1l, y, z1l),
+                    new Vector3(x0l, y, z1l),
+                    new Vector3(x0l, y, zOuterL),
+                    new Vector3(x1l, y, zOuterL),
+                    Vector3.Up,
+                    new Vector2(x1w, z1w),
+                    new Vector2(x0w, z1w),
+                    new Vector2(x0w, zOuterW),
+                    new Vector2(x1w, zOuterW),
+                    innerTop,
+                    innerTop,
+                    outerTop,
+                    outerTop);
+
+                float skirtZL = zOuterL + skirtOutset;
+                float skirtZW = zOuterW + skirtOutset;
+                AddQuad(
+                    vertices, normals, uvs, colors, indices,
+                    new Vector3(x1l, y, zOuterL),
+                    new Vector3(x0l, y, zOuterL),
+                    new Vector3(x0l, y - skirtDepth, skirtZL),
+                    new Vector3(x1l, y - skirtDepth, skirtZL),
+                    new Vector3(0f, 0.35f, 1f).Normalized(),
+                    new Vector2(x1w, zOuterW),
+                    new Vector2(x0w, zOuterW),
+                    new Vector2(x0w, skirtZW),
+                    new Vector2(x1w, skirtZW),
+                    sideTop,
+                    sideTop,
+                    sideBottom,
+                    sideBottom);
+            }
+
+            if (westOpen)
+            {
+                float xOuterL = x0l - edgeFadeWidth;
+                float xOuterW = x0w - edgeFadeWidth;
+                AddQuad(
+                    vertices, normals, uvs, colors, indices,
+                    new Vector3(x0l, y, z1l),
+                    new Vector3(x0l, y, z0l),
+                    new Vector3(xOuterL, y, z0l),
+                    new Vector3(xOuterL, y, z1l),
+                    Vector3.Up,
+                    new Vector2(x0w, z1w),
+                    new Vector2(x0w, z0w),
+                    new Vector2(xOuterW, z0w),
+                    new Vector2(xOuterW, z1w),
+                    innerTop,
+                    innerTop,
+                    outerTop,
+                    outerTop);
+
+                float skirtXL = xOuterL - skirtOutset;
+                float skirtXW = xOuterW - skirtOutset;
+                AddQuad(
+                    vertices, normals, uvs, colors, indices,
+                    new Vector3(xOuterL, y, z1l),
+                    new Vector3(xOuterL, y, z0l),
+                    new Vector3(skirtXL, y - skirtDepth, z0l),
+                    new Vector3(skirtXL, y - skirtDepth, z1l),
+                    new Vector3(-1f, 0.35f, 0f).Normalized(),
+                    new Vector2(xOuterW, z1w),
+                    new Vector2(xOuterW, z0w),
+                    new Vector2(skirtXW, z0w),
+                    new Vector2(skirtXW, z1w),
+                    sideTop,
+                    sideTop,
+                    sideBottom,
+                    sideBottom);
+            }
+
+            if (eastOpen)
+            {
+                float xOuterL = x1l + edgeFadeWidth;
+                float xOuterW = x1w + edgeFadeWidth;
+                AddQuad(
+                    vertices, normals, uvs, colors, indices,
+                    new Vector3(x1l, y, z0l),
+                    new Vector3(x1l, y, z1l),
+                    new Vector3(xOuterL, y, z1l),
+                    new Vector3(xOuterL, y, z0l),
+                    Vector3.Up,
+                    new Vector2(x1w, z0w),
+                    new Vector2(x1w, z1w),
+                    new Vector2(xOuterW, z1w),
+                    new Vector2(xOuterW, z0w),
+                    innerTop,
+                    innerTop,
+                    outerTop,
+                    outerTop);
+
+                float skirtXL = xOuterL + skirtOutset;
+                float skirtXW = xOuterW + skirtOutset;
+                AddQuad(
+                    vertices, normals, uvs, colors, indices,
+                    new Vector3(xOuterL, y, z0l),
+                    new Vector3(xOuterL, y, z1l),
+                    new Vector3(skirtXL, y - skirtDepth, z1l),
+                    new Vector3(skirtXL, y - skirtDepth, z0l),
+                    new Vector3(1f, 0.35f, 0f).Normalized(),
+                    new Vector2(xOuterW, z0w),
+                    new Vector2(xOuterW, z1w),
+                    new Vector2(skirtXW, z1w),
+                    new Vector2(skirtXW, z0w),
+                    sideTop,
+                    sideTop,
+                    sideBottom,
+                    sideBottom);
+            }
         }
 
         private static float CellHash(int x, int z)
@@ -480,6 +750,8 @@ void fragment() {
                 mat.SetShaderParameter("border_color", style.BorderColor);
                 mat.SetShaderParameter("border_scale", style.BorderScale);
                 mat.SetShaderParameter("refraction_intensity", style.RefractionIntensity);
+                mat.SetShaderParameter("tint_strength_min", style.Transparency >= 0.85f ? 0.84f : 0.74f);
+                mat.SetShaderParameter("tint_strength_max", 0.96f);
                 mat.SetShaderParameter("border_near", 0.5f);
                 mat.SetShaderParameter("border_far", 100f);
             }
@@ -579,34 +851,34 @@ void fragment() {
                 ColorDeep = color.Darkened(0.45f),
                 BorderColor = color.Lightened(0.35f),
                 Opacity = opacity,
-                Transparency = isLiquid ? 0.7f : 0.5f,
-                RefractionIntensity = isCloud ? 0f : (isLiquid ? 0.05f : 0.2f),
-                BorderScale = isLiquid ? 1f : 1.35f,
+                Transparency = isLiquid ? 0.8f : 0.5f,
+                RefractionIntensity = isCloud ? 0f : (isLiquid ? 0.028f : 0.2f),
+                BorderScale = isLiquid ? 0.62f : 1.35f,
                 WaveHeightScale = surface.Definition.WaveAmplitude > 0f
                     ? surface.Definition.WaveAmplitude
                     : (isCloud ? 0.022f : (isLiquid ? 0.01f : 0.006f)),
                 WaveScale = isLiquid ? 8f : 1f,
-                WaveHeight = isLiquid ? 0.003f : 0f,
+                WaveHeight = isLiquid ? 0.0028f : 0f,
                 WaveSpeed = surface.Definition.WaveSpeed > 0f
                     ? surface.Definition.WaveSpeed
                     : (isCloud ? 0.45f : (isLiquid ? 0.08f : 1f)),
-                Roughness = isCloud ? 0.86f : (isLiquid ? 0.16f : 0.55f),
+                Roughness = isCloud ? 0.86f : (isLiquid ? 0.2f : 0.55f),
                 Metallic = surface.Definition.Type == SurfaceType.Ice ? 0.1f : 0.02f,
-                EmissionStrength = isCloud ? 0.08f : (isLiquid ? 0.18f : 0.14f),
+                EmissionStrength = isCloud ? 0.08f : (isLiquid ? 0.1f : 0.14f),
                 NoiseScale = isCloud ? 2f : (isLiquid ? 3.2f : 4.6f),
                 NoiseSpeed = isCloud ? 0.22f : (isLiquid ? 0.4f : 0.9f),
                 NormalScale = isLiquid ? 0.08f : 0f,
                 NormalSpeed = isLiquid ? 0.04f : 0f,
                 NormalStrength = isLiquid ? 0.15f : 0f,
-                MaxVisibleDepth = isLiquid ? 2f : 0f,
-                EdgeFadeDistance = isLiquid ? 0.3f : 0f,
-                EdgeSoftness = isCloud ? 0.42f : (isLiquid ? 0.4f : 0.22f),
+                MaxVisibleDepth = isLiquid ? 3f : 0f,
+                EdgeFadeDistance = isLiquid ? 0.22f : 0f,
+                EdgeSoftness = isCloud ? 0.42f : (isLiquid ? 0.56f : 0.22f),
                 DissolveStrength = 0.45f,
                 CloudDensity = isCloud ? 1f : 0f,
                 HeightFade = 1.25f,
-                HeightOffset = isCloud ? 0.18f : 0.012f,
+                HeightOffset = isCloud ? 0.18f : (isLiquid ? 0.01f : 0.012f),
                 CellPaddingMeters = isLiquid
-                    ? surface.CellSize * 0.38f
+                    ? Mathf.Max(surface.CellSize * 0.22f, Mathf.Max(0f, surface.Definition.VisualPaddingCells * surface.CellSize))
                     : (isCloud
                         ? Mathf.Max(0f, surface.Definition.VisualPaddingCells * surface.CellSize)
                         : Mathf.Max(surface.CellSize * 0.18f, Mathf.Max(0f, surface.Definition.VisualPaddingCells * surface.CellSize))),
@@ -633,16 +905,17 @@ void fragment() {
             switch (id)
             {
                 case "water":
-                    style.ColorShallow = new Color(0.18f, 0.48f, 0.78f);
-                    style.ColorDeep = new Color(0.06f, 0.22f, 0.52f);
-                    style.Transparency = 0.7f;
-                    style.RefractionIntensity = 0.04f;
-                    style.WaveHeight = 0.003f;
+                    style.ColorShallow = new Color(0.14f, 0.46f, 0.76f);
+                    style.ColorDeep = new Color(0.03f, 0.18f, 0.46f);
+                    style.Transparency = 0.82f;
+                    style.RefractionIntensity = 0.028f;
+                    style.WaveHeight = 0.0028f;
                     style.WaveSpeed = 0.08f;
-                    style.Roughness = 0.15f;
-                    style.EmissionStrength = 0.18f;
-                    style.BorderColor = new Color(0.7f, 0.88f, 1f, 1f);
-                    style.EdgeSoftness = 0.4f;
+                    style.Roughness = 0.14f;
+                    style.EmissionStrength = 0.08f;
+                    style.BorderColor = new Color(0.24f, 0.52f, 0.82f, 1f);
+                    style.EdgeSoftness = 0.62f;
+                    style.MaxVisibleDepth = 3.8f;
                     break;
 
                 case "ice":
@@ -660,15 +933,15 @@ void fragment() {
                     break;
 
                 case "acid":
-                    style.ColorShallow = new Color(0.55f, 0.88f, 0.15f);
-                    style.ColorDeep = new Color(0.28f, 0.55f, 0.05f);
-                    style.Transparency = 0.62f;
+                    style.ColorShallow = new Color(0.66f, 0.92f, 0.2f);
+                    style.ColorDeep = new Color(0.35f, 0.62f, 0.08f);
+                    style.Transparency = 0.81f;
                     style.WaveSpeed = 0.12f;
                     style.WaveHeight = 0.004f;
-                    style.Roughness = 0.2f;
-                    style.EmissionStrength = 0.35f;
-                    style.EdgeSoftness = 0.35f;
-                    style.BorderColor = new Color(0.65f, 0.92f, 0.2f, 1f);
+                    style.Roughness = 0.24f;
+                    style.EmissionStrength = 0.2f;
+                    style.EdgeSoftness = 0.52f;
+                    style.BorderColor = new Color(0.58f, 0.86f, 0.22f, 1f);
                     break;
 
                 case "fire":
@@ -687,38 +960,41 @@ void fragment() {
                     break;
 
                 case "oil":
-                    style.ColorShallow = new Color(0.12f, 0.1f, 0.07f);
-                    style.ColorDeep = new Color(0.04f, 0.03f, 0.02f);
-                    style.Transparency = 0.72f;
-                    style.Metallic = 0.25f;
-                    style.Roughness = 0.02f;
+                    style.ColorShallow = new Color(0.09f, 0.08f, 0.06f);
+                    style.ColorDeep = new Color(0.02f, 0.02f, 0.015f);
+                    style.Transparency = 0.9f;
+                    style.Metallic = 0.2f;
+                    style.Roughness = 0.04f;
                     style.WaveHeight = 0.001f;
-                    style.BorderColor = new Color(0.2f, 0.16f, 0.1f, 1f);
-                    style.BorderScale = 0.3f;
-                    style.EmissionStrength = 0.04f;
-                    style.EdgeSoftness = 0.3f;
+                    style.BorderColor = new Color(0.15f, 0.13f, 0.09f, 1f);
+                    style.BorderScale = 0.24f;
+                    style.EmissionStrength = 0.02f;
+                    style.EdgeSoftness = 0.48f;
                     break;
 
                 case "blood":
-                    style.ColorShallow = new Color(0.62f, 0.08f, 0.12f);
-                    style.ColorDeep = new Color(0.32f, 0.03f, 0.06f);
-                    style.Transparency = 0.68f;
-                    style.WaveHeight = 0.001f;
-                    style.Roughness = 0.08f;
-                    style.EmissionStrength = 0.12f;
-                    style.EdgeSoftness = 0.32f;
-                    style.BorderColor = new Color(0.72f, 0.12f, 0.15f, 1f);
+                    style.ColorShallow = new Color(0.72f, 0.06f, 0.08f);
+                    style.ColorDeep = new Color(0.38f, 0.015f, 0.03f);
+                    style.Transparency = 0.92f;
+                    style.RefractionIntensity = 0.008f;
+                    style.WaveHeight = 0.0007f;
+                    style.Roughness = 0.26f;
+                    style.EmissionStrength = 0.02f;
+                    style.EdgeSoftness = 0.5f;
+                    style.BorderColor = new Color(0.5f, 0.04f, 0.06f, 1f);
+                    style.BorderScale = 0.2f;
+                    style.MaxVisibleDepth = 2.5f;
                     break;
 
                 case "mud":
                     style.ColorShallow = new Color(0.45f, 0.32f, 0.16f);
                     style.ColorDeep = new Color(0.25f, 0.18f, 0.1f);
-                    style.Transparency = 0.75f;
+                    style.Transparency = 0.88f;
                     style.WaveHeight = 0.0005f;
                     style.Roughness = 0.85f;
                     style.EmissionStrength = 0.06f;
-                    style.EdgeSoftness = 0.32f;
-                    style.BorderColor = new Color(0.52f, 0.38f, 0.22f, 1f);
+                    style.EdgeSoftness = 0.5f;
+                    style.BorderColor = new Color(0.42f, 0.31f, 0.18f, 1f);
                     break;
 
                 case "electrified_water":
@@ -805,13 +1081,15 @@ void fragment() {
                     break;
 
                 case "ground_poison":
+                case "poison":
                     style.ColorShallow = new Color(0.3f, 0.7f, 0.35f);
-                    style.ColorDeep = new Color(0.12f, 0.38f, 0.15f);
-                    style.BorderColor = new Color(0.45f, 0.82f, 0.4f, 1f);
-                    style.EmissionStrength = 0.28f;
+                    style.ColorDeep = new Color(0.1f, 0.3f, 0.12f);
+                    style.BorderColor = new Color(0.35f, 0.78f, 0.34f, 1f);
+                    style.EmissionStrength = 0.18f;
                     style.WaveSpeed = 0.06f;
                     style.WaveHeight = 0.002f;
-                    style.Transparency = 0.65f;
+                    style.Transparency = 0.82f;
+                    style.EdgeSoftness = 0.54f;
                     break;
 
                 case "entangle":
@@ -936,6 +1214,18 @@ void fragment() {
                     style.FogDensity = 0.25f;
                     style.FogNoiseScale = 1.75f;
                     break;
+            }
+
+            if (id.StartsWith("blood"))
+            {
+                style.ColorShallow = new Color(0.72f, 0.06f, 0.08f);
+                style.ColorDeep = new Color(0.38f, 0.015f, 0.03f);
+                style.Transparency = 0.92f;
+                style.RefractionIntensity = 0.008f;
+                style.Roughness = 0.26f;
+                style.EmissionStrength = 0.02f;
+                style.BorderColor = new Color(0.5f, 0.04f, 0.06f, 1f);
+                style.BorderScale = 0.2f;
             }
 
             if (surfaceType == SurfaceType.Lightning && id != "electrified_water")

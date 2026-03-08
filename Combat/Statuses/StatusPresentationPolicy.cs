@@ -59,13 +59,24 @@ namespace QDND.Combat.Statuses
         }
 
         public static bool ShowInOverhead(StatusDefinition definition)
-            => definition != null && !definition.HasStatusPropertyFlag(FlagDisableOverhead);
+            => definition != null
+                && !IsTechnicalStatusId(definition.Id)
+                && !definition.HasStatusPropertyFlag(FlagDisableOverhead);
 
         public static bool ShowInPortraitIndicators(StatusDefinition definition)
-            => definition != null && !definition.HasStatusPropertyFlag(FlagDisablePortraitIndicator);
+            => definition != null
+                && !IsTechnicalStatusId(definition.Id)
+                && !definition.HasStatusPropertyFlag(FlagDisablePortraitIndicator);
 
         public static bool ShowInCombatLog(StatusDefinition definition)
-            => definition != null && !definition.HasStatusPropertyFlag(FlagDisableCombatLog);
+            => definition != null
+                && !IsTechnicalStatusId(definition.Id)
+                && !definition.HasStatusPropertyFlag(FlagDisableCombatLog);
+
+        private static bool IsTechnicalStatusId(string statusId)
+            => !string.IsNullOrWhiteSpace(statusId)
+                && (statusId.Contains("_TECHNICAL", StringComparison.OrdinalIgnoreCase)
+                    || statusId.Equals("TECHNICAL", StringComparison.OrdinalIgnoreCase));
 
         private static bool IsPlaceholderDisplayName(string value)
         {

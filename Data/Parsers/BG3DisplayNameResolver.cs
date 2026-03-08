@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace QDND.Data.Parsers
@@ -12,6 +13,33 @@ namespace QDND.Data.Parsers
         private static readonly Regex HandlePattern = new(
             @"^h[0-9a-f]{8}g[0-9a-f]{4}g[0-9a-f]{4}g[0-9a-f]{4}g[0-9a-f]{12};\d+$",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        private static readonly string[] SpellPrefixes =
+        {
+            "Projectile_",
+            "Target_",
+            "Zone_",
+            "Shout_",
+            "Rush_",
+            "Teleportation_",
+            "Throw_",
+            "Wall_",
+            "ProjectileStrike_"
+        };
+
+        private static readonly string[] ArtifactSuffixes =
+        {
+            "_New",
+            "_2",
+            "_3",
+            "_Copy"
+        };
+
+        private static readonly Dictionary<string, string> NameOverrides = new(StringComparer.OrdinalIgnoreCase)
+        {
+            // BG3 weapon action "Target_Slash_New" is the Lacerate action.
+            ["slash_new"] = "Lacerate"
+        };
 
         public static bool IsLocalizationHandle(string value)
         {
@@ -37,28 +65,15 @@ namespace QDND.Data.Parsers
             if (string.IsNullOrWhiteSpace(entryId))
                 return "Unknown";
 
-            string[] spellPrefixes =
-            {
-                "Projectile_",
-                "Target_",
-                "Zone_",
-                "Shout_",
-                "Rush_",
-                "Teleportation_",
-                "Throw_",
-                "Wall_",
-                "ProjectileStrike_"
-            };
+            string stripped = StripPrefix(entryId.Trim());
 
-            string stripped = entryId;
-            foreach (var prefix in spellPrefixes)
-            {
-                if (stripped.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                {
-                    stripped = stripped.Substring(prefix.Length);
-                    break;
-                }
-            }
+            if (TryGetOverride(entryId, stripped, out string overrideName))
+                return overrideName;
+
+            stripped = StripArtifactSuffixes(stripped);
+
+            if (string.IsNullOrWhiteSpace(stripped))
+                return "Unknown";
 
             stripped = stripped.Replace('_', ' ');
             stripped = Regex.Replace(stripped, @"(?<=[a-z0-9])([A-Z])", " $1");
@@ -75,6 +90,55 @@ namespace QDND.Data.Parsers
             }
 
             return string.Join(" ", words);
+        }
+
+        private static string StripPrefix(string entryId)
+        {
+            foreach (var prefix in SpellPrefixes)
+            {
+                if (entryId.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                    return entryId.Substring(prefix.Length);
+            }
+
+            return entryId;
+        }
+
+        private static string StripArtifactSuffixes(string value)
+        {
+            string stripped = value;
+            bool removed;
+
+            do
+            {
+                removed = false;
+                foreach (var suffix in ArtifactSuffixes)
+                {
+                    if (stripped.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+                    {
+                        stripped = stripped.Substring(0, stripped.Length - suffix.Length);
+                        removed = true;
+                        break;
+                    }
+                }
+            } while (removed && stripped.Length > 0);
+
+            return stripped;
+        }
+
+        private static bool TryGetOverride(string rawEntryId, string strippedEntryId, out string displayName)
+        {
+            if (NameOverrides.TryGetValue(NormalizeKey(rawEntryId), out displayName))
+                return true;
+
+            return NameOverrides.TryGetValue(NormalizeKey(strippedEntryId), out displayName);
+        }
+
+        private static string NormalizeKey(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return string.Empty;
+
+            return value.Trim().Replace(' ', '_').ToLowerInvariant();
         }
     }
 }

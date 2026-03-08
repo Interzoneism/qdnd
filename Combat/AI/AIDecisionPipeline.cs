@@ -67,6 +67,11 @@ namespace QDND.Combat.AI
     public class AIDecisionResult
     {
         public AIAction ChosenAction { get; set; }
+        /// <summary>
+        /// Primary tactical action selected by scoring before turn-plan reordering.
+        /// May differ from <see cref="ChosenAction"/> when a move/bonus step must execute first.
+        /// </summary>
+        public AIAction PrimaryAction { get; set; }
         public List<AIAction> AllCandidates { get; set; } = new();
         public long DecisionTimeMs { get; set; }
         public bool TimedOut { get; set; }
@@ -347,6 +352,7 @@ namespace QDND.Combat.AI
                     if (forcedAbilityAction != null)
                     {
                         result.ChosenAction = forcedAbilityAction;
+                        result.PrimaryAction = forcedAbilityAction;
                         result.IsForcedByTest = true;
                         if (DebugLogging)
                         {
@@ -405,6 +411,7 @@ namespace QDND.Combat.AI
                 // Step 5: Select best action
                 bool forceOptimal = randomFactorOverride.HasValue && randomFactorOverride.Value <= 0.001f;
                 result.ChosenAction = SelectBest(candidates, profile, forceOptimal);
+                result.PrimaryAction = result.ChosenAction;
 
                 // Anti-exploit: detect degenerate patterns
                 if (result.ChosenAction.ActionType == AIActionType.EndTurn &&
@@ -441,22 +448,18 @@ namespace QDND.Combat.AI
                 _currentPlan = BuildTurnPlan(actor, candidates, result.ChosenAction, profile);
                 result.TurnPlan = _currentPlan;
 
-                // If the plan prepended actions before the primary (e.g. Move before Attack
-                // because NeedsMovementFirst was true), we must return the FIRST plan action
-                // so the movement executes before the attack.
-                if (_currentPlan.PlannedActions.Count > 0 &&
-                    !ReferenceEquals(_currentPlan.PlannedActions[0], result.ChosenAction))
+                // Restore plan execution ordering: execute the first planned step now,
+                // while preserving PrimaryAction for tactical-intent logging.
+                if (_currentPlan.PlannedActions.Count > 0)
                 {
-                    // The plan starts with a prepended action (e.g. Move). Return it first.
-                    result.ChosenAction = _currentPlan.PlannedActions[0];
-                    _currentPlan.CurrentActionIndex = 1; // Next call returns second action
-                    
-                    if (DebugLogging)
-                        debugLog.AppendLine($"Plan reordered: returning {result.ChosenAction.ActionType} first (plan has {_currentPlan.PlannedActions.Count} actions)");
-                }
-                else
-                {
-                    // Primary action IS the first action - advance past it
+                    if (!ReferenceEquals(_currentPlan.PlannedActions[0], result.ChosenAction))
+                    {
+                        result.ChosenAction = _currentPlan.PlannedActions[0];
+
+                        if (DebugLogging)
+                            debugLog.AppendLine($"Plan reordered: executing {result.ChosenAction.ActionType} before primary {result.PrimaryAction?.ActionType}");
+                    }
+
                     for (int i = 0; i < _currentPlan.PlannedActions.Count; i++)
                     {
                         if (ReferenceEquals(_currentPlan.PlannedActions[i], result.ChosenAction))
@@ -621,6 +624,8 @@ namespace QDND.Combat.AI
                 : 1f;
 
             var enemies = GetEnemies(actor);
+            if (enemies.Count == 0)
+                return candidates;
 
             // BG3: Cap throwable candidates evaluated
             int throwableCount = 0;
@@ -649,7 +654,7 @@ namespace QDND.Combat.AI
                 switch (item.Category)
                 {
                     case ItemCategory.Potion:
-                        if (item.DefinitionId?.Contains("healing") == true)
+                        if (IsHealingItem(item))
                         {
                             // Healing potions: only consider when HP < 75%
                             if (hpPercent >= 0.75f) continue;
@@ -979,6 +984,9 @@ namespace QDND.Combat.AI
                 
                 var action = _effectPipeline.GetAction(actionId);
                 if (action == null) continue;
+
+                if (!isTestAbility && action.Tags?.Any(tag => string.Equals(tag, "ai_no_use", StringComparison.OrdinalIgnoreCase)) == true)
+                    continue;
                 
                 // Skip passive/placeholder abilities with no effects and no meaningful cost
                 // (e.g., wizard_cantrip_choice, racial passives)
@@ -1398,10 +1406,75 @@ namespace QDND.Combat.AI
         /// </summary>
         private List<AIAction> GenerateShoveCandidates(Combatant actor)
         {
-            // Shove execution is not yet implemented in UIAwareAIController/CombatArena.
-            // Generating candidates wastes AI turns on unexecutable actions.
-            // TODO: Re-enable when Shove execution is implemented.
-            return new List<AIAction>();
+            var candidates = new List<AIAction>();
+
+            if (actor?.ActionBudget?.HasBonusAction != true || _effectPipeline == null)
+                return candidates;
+
+            string shoveActionId = ResolveCommonActionId("shove", "Target_Shove");
+            if (string.IsNullOrEmpty(shoveActionId))
+                return candidates;
+
+            var shoveAction = _effectPipeline.GetAction(shoveActionId);
+            if (shoveAction == null)
+                return candidates;
+
+            var enemies = GetEnemies(actor);
+            if (enemies.Count == 0)
+                return candidates;
+
+            float shoveRange = shoveAction.Range > 0f ? shoveAction.Range : 2.25f;
+
+            IEnumerable<Combatant> shoveTargets;
+            if (_targetValidator != null && _context != null)
+            {
+                var allCombatants = _context.GetAllCombatants()?.ToList() ?? new List<Combatant>();
+                shoveTargets = _targetValidator
+                    .GetValidTargets(shoveAction, actor, allCombatants)
+                    .Where(t => t != null && t.IsActive && t.Faction != actor.Faction);
+            }
+            else
+            {
+                shoveTargets = enemies
+                    .Where(target => target.IsActive && actor.Position.DistanceTo(target.Position) <= shoveRange + 0.5f);
+            }
+
+            foreach (var target in shoveTargets)
+            {
+                if (!TargetValidator.IsValidShoveSize(actor, target))
+                    continue;
+
+                var pushDirection = (target.Position - actor.Position).Normalized();
+                if (pushDirection.LengthSquared() < 0.0001f)
+                    pushDirection = new Vector3(1, 0, 0);
+
+                if (shoveAction.Variants != null && shoveAction.Variants.Count > 0)
+                {
+                    foreach (var variant in shoveAction.Variants)
+                    {
+                        candidates.Add(new AIAction
+                        {
+                            ActionType = AIActionType.Shove,
+                            ActionId = shoveActionId,
+                            TargetId = target.Id,
+                            VariantId = variant.VariantId,
+                            PushDirection = pushDirection
+                        });
+                    }
+                }
+                else
+                {
+                    candidates.Add(new AIAction
+                    {
+                        ActionType = AIActionType.Shove,
+                        ActionId = shoveActionId,
+                        TargetId = target.Id,
+                        PushDirection = pushDirection
+                    });
+                }
+            }
+
+            return candidates;
         }
 
         /// <summary>
@@ -1484,6 +1557,80 @@ namespace QDND.Combat.AI
             {
                 if (string.Equals(actionId, alias, StringComparison.OrdinalIgnoreCase)) return true;
             }
+            return false;
+        }
+
+        private static bool IsPureSelfTargeting(ActionDefinition actionDef)
+        {
+            if (actionDef == null)
+                return false;
+
+            if (actionDef.TargetType == TargetType.Self)
+                return true;
+
+            if (!actionDef.TargetFilter.HasFlag(TargetFilter.Self))
+                return false;
+
+            return !actionDef.TargetFilter.HasFlag(TargetFilter.Enemies)
+                && !actionDef.TargetFilter.HasFlag(TargetFilter.Neutrals);
+        }
+
+        private static bool IsSelfUtilityStatusSuppressionCandidate(ActionDefinition actionDef, Combatant actor, Combatant target)
+        {
+            if (actionDef == null || actor == null || target == null)
+                return false;
+
+            if (!string.Equals(actor.Id, target.Id, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            return actionDef.Intent == VerbalIntent.Utility && IsPureSelfTargeting(actionDef);
+        }
+
+        private static bool IsPureStatusOnlyAbility(ActionDefinition actionDef)
+        {
+            if (actionDef?.Effects == null || actionDef.Effects.Count == 0)
+                return false;
+
+            bool hasStatus = actionDef.Effects.Any(e => string.Equals(e.Type, "apply_status", StringComparison.OrdinalIgnoreCase));
+            bool hasDamage = actionDef.Effects.Any(e =>
+                string.Equals(e.Type, "damage", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(e.Type, "deal_damage", StringComparison.OrdinalIgnoreCase));
+
+            return hasStatus && !hasDamage;
+        }
+
+        private static bool IsCharmControlAbility(ActionDefinition actionDef)
+        {
+            if (actionDef == null)
+                return false;
+
+            if (actionDef.Id?.Contains("crown_of_madness", StringComparison.OrdinalIgnoreCase) == true ||
+                actionDef.Id?.Contains("charm", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                return true;
+            }
+
+            foreach (var effect in actionDef.Effects)
+            {
+                if (!string.Equals(effect.Type, "apply_status", StringComparison.OrdinalIgnoreCase) ||
+                    string.IsNullOrWhiteSpace(effect.StatusId))
+                {
+                    continue;
+                }
+
+                if (effect.StatusId.Contains("charm", StringComparison.OrdinalIgnoreCase) ||
+                    effect.StatusId.Contains("crown_of_madness", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+
+                var condition = ConditionEffects.GetConditionType(effect.StatusId);
+                if (condition == ConditionType.Charmed)
+                {
+                    return true;
+                }
+            }
+
             return false;
         }
 
@@ -2017,7 +2164,7 @@ namespace QDND.Combat.AI
             if (_context != null && _context.TryGetService<InventoryService>(out var invSvc))
             {
                 item = invSvc.GetUsableItems(actor.Id)
-                    .FirstOrDefault(i => i.DefinitionId == itemDefId);
+                    .FirstOrDefault(i => string.Equals(i.DefinitionId, itemDefId, StringComparison.OrdinalIgnoreCase));
             }
 
             float hpPercent = actor.Resources != null && actor.Resources.MaxHP > 0
@@ -2038,7 +2185,7 @@ namespace QDND.Combat.AI
                 switch (item.Category)
                 {
                     case ItemCategory.Potion:
-                        if (item.DefinitionId?.Contains("healing") == true)
+                        if (IsHealingItem(item))
                             score = (1.0f - hpPercent) * 8.0f;
                         else
                             score = 3.0f;
@@ -2088,6 +2235,14 @@ namespace QDND.Combat.AI
             }
 
             action.AddScore("item_use", score);
+        }
+
+        private static bool IsHealingItem(InventoryItem item)
+        {
+            if (item == null || string.IsNullOrWhiteSpace(item.DefinitionId))
+                return false;
+
+            return item.DefinitionId.IndexOf("healing", StringComparison.OrdinalIgnoreCase) >= 0;
         }
 
         /// <summary>
@@ -2226,6 +2381,9 @@ namespace QDND.Combat.AI
             if (action.TargetId != null && profile.FocusFire)
             {
                 var teamState = GetTeamState(actor.Faction);
+                var actionDef = action.ActionType == AIActionType.UseAbility && _effectPipeline != null
+                    ? _effectPipeline.GetAction(action.ActionId)
+                    : null;
                 var focusTarget = GetCombatant(action.TargetId);
                 if (focusTarget != null && focusTarget.Faction != actor.Faction)
                 {
@@ -2243,7 +2401,15 @@ namespace QDND.Combat.AI
                         float focusBonus = teamState.GetFocusFireBonus(action.TargetId);
                         if (focusBonus > 0)
                         {
-                            action.AddScore("team_focus_fire", focusBonus * GetEffectiveWeight(profile, "kill_potential"));
+                            float focusWeight = GetEffectiveWeight(profile, "kill_potential");
+                            if (IsPureStatusOnlyAbility(actionDef))
+                            {
+                                action.AddScore("team_focus_fire_status_only", focusBonus * focusWeight * 0.2f);
+                            }
+                            else
+                            {
+                                action.AddScore("team_focus_fire", focusBonus * focusWeight);
+                            }
                         }
                     }
                 }
@@ -2251,7 +2417,6 @@ namespace QDND.Combat.AI
                 // Avoid redundant CC (applies to all targets including enemies)
                 if (action.ActionType == AIActionType.UseAbility && teamState.IsAlreadyCCd(action.TargetId))
                 {
-                    var actionDef = _effectPipeline?.GetAction(action.ActionId);
                     bool isCC = actionDef?.Effects?.Any(e => e.Type == "apply_status") ?? false;
                     if (isCC)
                     {
@@ -2476,8 +2641,9 @@ namespace QDND.Combat.AI
                     {
                         float currentDist = actor.Position.DistanceTo(enemy.Position);
                         float newDist = targetPos.DistanceTo(enemy.Position);
+                        float enemyReach = CombatRules.GetMeleeReach(enemy);
                         // OA triggers when leaving reach (currently in reach, moving out)
-                        bool leavingReach = currentDist <= 5f && newDist > 5f;
+                        bool leavingReach = currentDist <= enemyReach && newDist > enemyReach;
                         if (leavingReach)
                         {
                             float reactionRisk = 2f * GetEffectiveWeight(profile, "self_preservation");
@@ -2944,16 +3110,59 @@ namespace QDND.Combat.AI
             }
             else if (isStatus && target != null)
             {
+                bool selfUtilityStatus = IsSelfUtilityStatusSuppressionCandidate(actionDef, actor, target);
+                bool isCharmControl = IsCharmControlAbility(actionDef);
+
                 // Score status effect
                 var statusEffect = actionDef.Effects.FirstOrDefault(e => e.Type == "apply_status");
                 string effectType = statusEffect?.StatusId ?? "unknown";
                 _scorer.ScoreStatusEffect(action, actor, target, effectType, profile);
 
                 // Spell level bonus — leveled spells should be favoured over cantrips
-                if (actionDef.SpellLevel > 0)
+                if (actionDef.SpellLevel > 0 && !selfUtilityStatus)
                 {
                     float spellLevelBonus = actionDef.SpellLevel * 1.5f;
                     action.AddScore("spell_level_value", spellLevelBonus);
+                }
+
+                if (selfUtilityStatus)
+                {
+                    var enemies = GetEnemies(actor);
+                    float nearestEnemyDistance = enemies
+                        .Select(e => actor.Position.DistanceTo(e.Position))
+                        .DefaultIfEmpty(float.MaxValue)
+                        .Min();
+
+                    bool inMeleeThreat = enemies
+                        .Any(e => actor.Position.DistanceTo(e.Position) <= CombatRules.GetMeleeReach(e) + 0.5f);
+                    bool threatened = inMeleeThreat || nearestEnemyDistance <= 9f;
+
+                    if (threatened)
+                    {
+                        float engagementPenalty = inMeleeThreat
+                            ? 5f * GetEffectiveWeight(profile, "damage")
+                            : 2.5f * GetEffectiveWeight(profile, "damage");
+                        action.AddScore("self_buff_threatened_penalty", -engagementPenalty);
+                    }
+                }
+
+                if (isCharmControl)
+                {
+                    if (_statusSystem != null &&
+                        (_statusSystem.HasStatus(target.Id, "saved_against_hostile_spell_charm") ||
+                         _statusSystem.HasStatus(target.Id, "saved_against_hostile_spell_charm_subtle")))
+                    {
+                        action.AddScore("charm_control_saved_marker", -18f);
+                    }
+
+                    int thirdPartyCount = (_context?.GetAllCombatants() ?? Enumerable.Empty<Combatant>())
+                        .Count(c => c.IsActive && c.Resources?.CurrentHP > 0 &&
+                                    !string.Equals(c.Id, actor.Id, StringComparison.OrdinalIgnoreCase) &&
+                                    !string.Equals(c.Id, target.Id, StringComparison.OrdinalIgnoreCase));
+                    if (thirdPartyCount == 0)
+                    {
+                        action.AddScore("behavior_control_no_third_party", -12f);
+                    }
                 }
             }
             else if (isStatus && actionDef.TargetType == TargetType.All)
@@ -2985,13 +3194,6 @@ namespace QDND.Combat.AI
                         // Self-buff
                         float buffValue = 4f * GetEffectiveWeight(profile, "status_value");
                         action.AddScore("self_buff", buffValue);
-
-                        // Spell level bonus for leveled self-buff spells
-                        if (actionDef.SpellLevel > 0)
-                        {
-                            float spellLevelBonus = actionDef.SpellLevel * 1.5f;
-                            action.AddScore("spell_level_value", spellLevelBonus);
-                        }
 
                         // Early-combat buff bonus — casting protective spells in first 3 rounds is tactically smart
                         int currentRound = _context?.GetService<QDND.Combat.Services.TurnQueueService>()?.CurrentRound ?? 1;

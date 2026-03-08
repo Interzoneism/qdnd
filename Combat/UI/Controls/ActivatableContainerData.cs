@@ -22,6 +22,7 @@ namespace QDND.Combat.UI.Controls
         public string IconPath { get; set; }
         public string HotkeyText { get; set; }
         public string CostText { get; set; }
+        public string QuantityText { get; set; }
         public bool IsAvailable { get; set; } = true;
         public bool IsSelected { get; set; }
         public bool IsSpinning { get; set; }

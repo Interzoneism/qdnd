@@ -291,6 +291,82 @@ namespace QDND.Tests.Unit
         }
 
         /// <summary>
+        /// Test that invulnerability negates all incoming damage before resistance/reduction processing.
+        /// </summary>
+        [Fact]
+        public void RollDamage_WithInvulnerableTarget_NegatesDamage()
+        {
+            // Arrange
+            var engine = new RulesEngine(seed: 88888);
+            var attacker = CreateTestCombatant("Attacker", 10);
+            var defender = CreateTestCombatant("Defender", 15);
+
+            var invulnerableBoost = new BoostDefinition
+            {
+                Type = BoostType.Invulnerable,
+                Parameters = new object[] { },
+                RawBoost = "Invulnerable()"
+            };
+            defender.Boosts.AddBoost(invulnerableBoost, "Status", "invulnerable_test");
+
+            // Act
+            var result = engine.RollDamage(new QueryInput
+            {
+                Type = QueryType.DamageRoll,
+                Source = attacker,
+                Target = defender,
+                BaseValue = 42,
+                Tags = new HashSet<string> { "damage:fire" }
+            });
+
+            // Assert
+            Assert.Equal(0, result.FinalValue);
+        }
+
+        /// <summary>
+        /// Test that WeaponDamageResistance applies to weapon attacks only, not spell damage.
+        /// </summary>
+        [Fact]
+        public void RollDamage_WithWeaponDamageResistance_AffectsWeaponDamageOnly()
+        {
+            // Arrange
+            var engine = new RulesEngine(seed: 99999);
+            var attacker = CreateTestCombatant("Attacker", 10);
+            var defender = CreateTestCombatant("Defender", 15);
+
+            var weaponResistanceBoost = new BoostDefinition
+            {
+                Type = BoostType.WeaponDamageResistance,
+                Parameters = new object[] { "Bludgeoning" },
+                RawBoost = "WeaponDamageResistance(Bludgeoning)"
+            };
+            defender.Boosts.AddBoost(weaponResistanceBoost, "Status", "rage_like_resistance");
+
+            // Act
+            var weaponResult = engine.RollDamage(new QueryInput
+            {
+                Type = QueryType.DamageRoll,
+                Source = attacker,
+                Target = defender,
+                BaseValue = 20,
+                Tags = new HashSet<string> { "damage:bludgeoning", "melee_attack" }
+            });
+
+            var spellResult = engine.RollDamage(new QueryInput
+            {
+                Type = QueryType.DamageRoll,
+                Source = attacker,
+                Target = defender,
+                BaseValue = 20,
+                Tags = new HashSet<string> { "damage:bludgeoning", "spell_attack" }
+            });
+
+            // Assert
+            Assert.Equal(10, weaponResult.FinalValue);
+            Assert.Equal(20, spellResult.FinalValue);
+        }
+
+        /// <summary>
         /// Test combining damage bonus with resistance.
         /// </summary>
         [Fact]

@@ -22,6 +22,10 @@ namespace QDND.Combat.Rules.Boosts
     /// </summary>
     public class BoostParser
     {
+        private static readonly Dictionary<string, BoostType> BoostTypeAliases = new(StringComparer.OrdinalIgnoreCase)
+        {
+        };
+
         /// <summary>
         /// Parses a boost string into a list of BoostDefinition objects.
         /// Handles semicolon-delimited boost lists and IF() conditions.
@@ -108,7 +112,7 @@ namespace QDND.Combat.Rules.Boosts
                 throw new BoostParseException($"Boost missing function name: {boostText}");
 
             // Parse boost type — return null for unknown types so caller can skip gracefully
-            if (!Enum.TryParse<BoostType>(functionName, ignoreCase: true, out var boostType))
+            if (!TryParseBoostType(functionName, out var boostType))
             {
                 RuntimeSafety.LogWarning($"[BoostParser] Unknown boost type '{functionName}' — boost skipped. Raw: {boostText}");
                 return null;
@@ -132,6 +136,14 @@ namespace QDND.Combat.Rules.Boosts
                 Condition = condition,
                 RawBoost = boostText
             };
+        }
+
+        private static bool TryParseBoostType(string functionName, out BoostType boostType)
+        {
+            if (Enum.TryParse(functionName, ignoreCase: true, out boostType))
+                return true;
+
+            return BoostTypeAliases.TryGetValue(functionName, out boostType);
         }
 
         /// <summary>

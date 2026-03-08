@@ -10,6 +10,10 @@ namespace QDND.Combat.AI
     /// </summary>
     public static class AIBoostTypeClassifier
     {
+        private const float VisionUtilityCombatScale = 0.06f;
+        private const float LightUtilityCombatScale = 0.05f;
+        private const float MovementUtilityCombatScale = 0.35f;
+
         /// <summary>
         /// Parses a semicolon-separated boosts string and returns (boostType, multiplierValue) pairs
         /// for each segment that maps to a known BG3ArchetypeProfile boost parameter.
@@ -99,7 +103,7 @@ namespace QDND.Combat.AI
             // ActionResource(Movement,...) → movement boost; must precede generic ActionResource
             if (segment.StartsWith("ActionResource(Movement", StringComparison.OrdinalIgnoreCase))
             {
-                results.Add(("Movement", bg3.MultiplierBoostMovement));
+                results.Add(("Movement", bg3.MultiplierBoostMovement * MovementUtilityCombatScale));
                 return;
             }
 
@@ -179,6 +183,19 @@ namespace QDND.Combat.AI
                 return;
             }
 
+            if (segment.StartsWith("DarkvisionRange", StringComparison.OrdinalIgnoreCase))
+            {
+                results.Add(("Darkvision", bg3.MultiplierBoostSightRange * VisionUtilityCombatScale));
+                return;
+            }
+
+            if (segment.StartsWith("GameplayLight(", StringComparison.OrdinalIgnoreCase) ||
+                segment.StartsWith("ActiveCharacterLight(", StringComparison.OrdinalIgnoreCase))
+            {
+                results.Add(("LightUtility", bg3.MultiplierBoostSightRange * LightUtilityCombatScale));
+                return;
+            }
+
             if (segment.StartsWith("Resistance(", StringComparison.OrdinalIgnoreCase))
             {
                 results.Add(("Resistance", bg3.MultiplierBoostResistance));
@@ -187,7 +204,7 @@ namespace QDND.Combat.AI
 
             if (segment.StartsWith("MovementSpeedLimit(", StringComparison.OrdinalIgnoreCase))
             {
-                results.Add(("Movement", bg3.MultiplierBoostMovement));
+                results.Add(("Movement", bg3.MultiplierBoostMovement * MovementUtilityCombatScale));
                 return;
             }
 

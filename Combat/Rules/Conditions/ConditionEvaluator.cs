@@ -22,8 +22,8 @@ namespace QDND.Combat.Rules.Conditions
     /// <item>Built-in BG3 condition functions (see <see cref="EvaluateFunction"/>)</item>
     /// </list>
     ///
-    /// Functions that are not yet implemented return <c>true</c> with a warning so
-    /// boosts are not silently dropped.
+    /// Functions that are not yet implemented return <c>false</c> with a warning
+    /// (fail-closed) so invalid conditions do not erroneously grant effects.
     /// </summary>
     public class ConditionEvaluator
     {
@@ -371,8 +371,8 @@ namespace QDND.Combat.Rules.Conditions
 
         /// <summary>
         /// Evaluates a BG3 condition function by name.
-        /// Implements the most common ~15 functions; unrecognised functions return <c>true</c>
-        /// with a warning (fail-open so boosts aren't silently lost).
+        /// Implements the most common ~97 functions; unrecognised functions return <c>false</c>
+        /// with a warning (fail-closed so invalid conditions do not grant effects).
         /// </summary>
         /// <param name="name">Function name (may be qualified, e.g. <c>"context.Source"</c>).</param>
         /// <param name="args">Evaluated argument values.</param>

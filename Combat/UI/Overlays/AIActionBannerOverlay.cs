@@ -71,9 +71,12 @@ namespace QDND.Combat.UI.Overlays
             // Load icon
             _icon.Texture = null;
             _icon.Visible = false;
-            if (!string.IsNullOrWhiteSpace(iconPath) && iconPath.StartsWith("res://") && ResourceLoader.Exists(iconPath))
+            if (!string.IsNullOrWhiteSpace(iconPath))
             {
-                _icon.Texture = ResourceLoader.Load<Texture2D>(iconPath);
+                if (HudIcons.TryResolveIconPath(iconPath, out var resolved))
+                    _icon.Texture = HudIcons.LoadTextureSafe(resolved);
+                else
+                    _icon.Texture = null;
                 _icon.Visible = _icon.Texture != null;
             }
 

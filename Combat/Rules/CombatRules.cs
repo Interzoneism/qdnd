@@ -1,4 +1,5 @@
 using System;
+using QDND.Combat.Entities;
 
 namespace QDND.Combat.Rules
 {
@@ -11,6 +12,9 @@ namespace QDND.Combat.Rules
         /// Default melee reach for baseline weapon attacks.
         /// </summary>
         public const float DefaultMeleeReachMeters = 1.5f;
+
+        /// <summary>Melee reach with a Reach-property weapon (10ft = 3m).</summary>
+        public const float ReachWeaponMeters = 3.0f;
 
         /// <summary>
         /// Opportunity attack trigger range.
@@ -43,6 +47,12 @@ namespace QDND.Combat.Rules
         /// Values above this are treated as feet and converted to meters.
         /// </summary>
         public const float LegacyFeetHeuristicThreshold = 15.0f;
+
+        /// <summary>
+        /// Returns effective melee reach for the combatant, accounting for Reach weapons.
+        /// </summary>
+        public static float GetMeleeReach(Combatant combatant)
+            => combatant?.MainHandWeapon?.HasReach == true ? ReachWeaponMeters : DefaultMeleeReachMeters;
 
         public static float ConvertFeetToMeters(float feet)
         {

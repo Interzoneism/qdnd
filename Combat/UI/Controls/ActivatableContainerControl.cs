@@ -34,6 +34,8 @@ namespace QDND.Combat.UI.Controls
         private PanelContainer _spinnerOutline;
         private Label _hotkeyLabel;
         private Label _costLabel;
+        private Label _quantityLabel;
+        private PanelContainer _quantityBadge;
 
         private ActivatableContainerData _data;
         private bool _isHovered;
@@ -95,6 +97,12 @@ namespace QDND.Combat.UI.Controls
             _costLabel.Modulate = isAvailable
                 ? Colors.White
                 : new Color(0.8f, 0.8f, 0.8f, 0.85f);
+
+            _quantityLabel.Text = _data?.QuantityText ?? string.Empty;
+            _quantityLabel.Modulate = isAvailable
+                ? HudTheme.WarmWhite
+                : new Color(0.8f, 0.8f, 0.8f, 0.85f);
+            _quantityBadge.Visible = !string.IsNullOrWhiteSpace(_quantityLabel.Text);
 
             UpdateVisualState();
         }
@@ -240,11 +248,40 @@ namespace QDND.Combat.UI.Controls
             spacer.SizeFlagsVertical = SizeFlags.ExpandFill;
             labelOverlay.AddChild(spacer);
 
+            var bottomRow = new HBoxContainer();
+            bottomRow.MouseFilter = MouseFilterEnum.Ignore;
+            bottomRow.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            labelOverlay.AddChild(bottomRow);
+
+            _quantityBadge = new PanelContainer();
+            _quantityBadge.MouseFilter = MouseFilterEnum.Ignore;
+            _quantityBadge.AddThemeStyleboxOverride(
+                "panel",
+                HudTheme.CreatePanelStyle(
+                    new Color(0.05f, 0.05f, 0.05f, 0.62f),
+                    new Color(0.95f, 0.85f, 0.45f, 0.8f),
+                    cornerRadius: 3,
+                    borderWidth: 1,
+                    contentMargin: 2));
+            _quantityBadge.Visible = false;
+            bottomRow.AddChild(_quantityBadge);
+
+            _quantityLabel = new Label();
+            _quantityLabel.HorizontalAlignment = HorizontalAlignment.Left;
+            _quantityLabel.MouseFilter = MouseFilterEnum.Ignore;
+            HudTheme.StyleLabel(_quantityLabel, HudTheme.FontTiny, HudTheme.WarmWhite);
+            _quantityBadge.AddChild(_quantityLabel);
+
+            var bottomSpacer = new Control();
+            bottomSpacer.MouseFilter = MouseFilterEnum.Ignore;
+            bottomSpacer.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            bottomRow.AddChild(bottomSpacer);
+
             _hotkeyLabel = new Label();
             _hotkeyLabel.HorizontalAlignment = HorizontalAlignment.Right;
             _hotkeyLabel.MouseFilter = MouseFilterEnum.Ignore;
             HudTheme.StyleLabel(_hotkeyLabel, HudTheme.FontTiny, HudTheme.TextDim);
-            labelOverlay.AddChild(_hotkeyLabel);
+            bottomRow.AddChild(_hotkeyLabel);
 
             AddThemeStyleboxOverride("panel", HudTheme.CreateSlotInsetStyle());
         }

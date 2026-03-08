@@ -31,6 +31,24 @@ namespace QDND.Combat.UI.Base
             "res://assets/Images/Icons Armour/",
         };
 
+        private static readonly string[] Bg3IconPrefixes = new[]
+        {
+            "Spell_Evocation_",
+            "Spell_Abjuration_",
+            "Spell_Conjuration_",
+            "Spell_Divination_",
+            "Spell_Enchantment_",
+            "Spell_Illusion_",
+            "Spell_Necromancy_",
+            "Spell_Transmutation_",
+            "Action_",
+            "PassiveFeature_",
+            "Passive_",
+            "Skill_",
+            "Race_",
+            "Status_",
+        };
+
         private static readonly string[] PassiveFeatureSuffixes = new[]
         {
             "_unfaded_icon",
@@ -421,6 +439,29 @@ namespace QDND.Combat.UI.Base
             if (string.IsNullOrWhiteSpace(iconToken))
                 yield break;
 
+            var emitted = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var candidate in BuildIconFilenameCandidatesForToken(iconToken))
+            {
+                if (emitted.Add(candidate))
+                    yield return candidate;
+            }
+
+            foreach (var stripped in StripKnownBg3Prefixes(iconToken))
+            {
+                foreach (var candidate in BuildIconFilenameCandidatesForToken(stripped))
+                {
+                    if (emitted.Add(candidate))
+                        yield return candidate;
+                }
+            }
+        }
+
+        private static IEnumerable<string> BuildIconFilenameCandidatesForToken(string iconToken)
+        {
+            if (string.IsNullOrWhiteSpace(iconToken))
+                yield break;
+
             if (iconToken.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
             {
                 yield return iconToken;
@@ -430,6 +471,22 @@ namespace QDND.Combat.UI.Base
             yield return iconToken + "_Unfaded_Icon.png";
             yield return iconToken + "_passive_feature_Unfaded_Icon.png";
             yield return iconToken + ".png";
+        }
+
+        private static IEnumerable<string> StripKnownBg3Prefixes(string iconToken)
+        {
+            if (string.IsNullOrWhiteSpace(iconToken))
+                yield break;
+
+            foreach (var prefix in Bg3IconPrefixes)
+            {
+                if (!iconToken.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                string stripped = iconToken[prefix.Length..];
+                if (!string.IsNullOrWhiteSpace(stripped))
+                    yield return stripped;
+            }
         }
 
         private static bool TryResolvePassiveIconFromIndex(string token, out string path)

@@ -11,6 +11,7 @@ using QDND.Combat.Rules.Boosts;
 using QDND.Combat.States;
 using QDND.Combat.Statuses;
 using QDND.Combat.UI;
+using QDND.Data.CharacterModel;
 using QDND.Data.Stats;
 using QDND.Data.Statuses;
 using QDND.Tools;
@@ -166,6 +167,20 @@ namespace QDND.Combat.Services
                     if (combatant != null)
                         _resourceManager.InitializeResources(combatant);
                 }
+            }
+
+            // Apply initiative boosts from passives before queue ordering.
+            foreach (var combatant in _getCombatants())
+            {
+                if (combatant == null)
+                    continue;
+
+                int boostBonus = BoostEvaluator.GetInitiativeModifier(combatant);
+                if (boostBonus != 0)
+                    combatant.Initiative += boostBonus;
+
+                if (combatant.InitiativeTiebreaker == 0)
+                    combatant.InitiativeTiebreaker = combatant.GetAbilityScore(AbilityType.Dexterity);
             }
 
             _stateMachine.TryTransition(CombatState.CombatStart, "Combat initiated");
@@ -793,7 +808,6 @@ namespace QDND.Combat.Services
             if (combatants == null || combatants.Count == 0)
                 return;
 
-            const float threatenedRange = CombatRules.DefaultMeleeReachMeters;
             var activeCombatants = combatants.Where(c => c != null && c.IsActive).ToList();
 
             foreach (var combatant in activeCombatants)
@@ -801,7 +815,7 @@ namespace QDND.Combat.Services
                 var threatSource = activeCombatants.FirstOrDefault(other =>
                     other.Id != combatant.Id &&
                     other.Faction != combatant.Faction &&
-                    other.Position.DistanceTo(combatant.Position) <= threatenedRange);
+                    other.Position.DistanceTo(combatant.Position) <= CombatRules.GetMeleeReach(other));
 
                 bool hasThreatened = _statusManager.HasStatus(combatant.Id, "threatened");
                 if (threatSource != null && !hasThreatened)

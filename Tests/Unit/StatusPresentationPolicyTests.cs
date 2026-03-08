@@ -47,6 +47,38 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
+        public void ShowInOverhead_ReturnsFalse_ForTechnicalStatusId_EvenWithNoFlags()
+        {
+            var def = new StatusDefinition { Id = "CALL_LIGHTNING_TECHNICAL", Name = "Technical" };
+
+            Assert.False(StatusPresentationPolicy.ShowInOverhead(def));
+        }
+
+        [Fact]
+        public void ShowInOverhead_ReturnsFalse_ForBaseTechnicalStatus()
+        {
+            var def = new StatusDefinition { Id = "TECHNICAL", Name = "Technical" };
+
+            Assert.False(StatusPresentationPolicy.ShowInOverhead(def));
+        }
+
+        [Fact]
+        public void ShowInPortraitIndicators_ReturnsFalse_ForTechnicalStatusId()
+        {
+            var def = new StatusDefinition { Id = "CALL_LIGHTNING_TECHNICAL", Name = "Technical" };
+
+            Assert.False(StatusPresentationPolicy.ShowInPortraitIndicators(def));
+        }
+
+        [Fact]
+        public void ShowInCombatLog_ReturnsFalse_ForTechnicalStatusId()
+        {
+            var def = new StatusDefinition { Id = "CALL_LIGHTNING_TECHNICAL", Name = "Technical" };
+
+            Assert.False(StatusPresentationPolicy.ShowInCombatLog(def));
+        }
+
+        [Fact]
         public void ConvertToStatusDefinition_CarriesFlagsAndResolvedName()
         {
             var bg3 = new BG3StatusData

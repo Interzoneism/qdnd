@@ -5,6 +5,7 @@ using System.IO;
 using System.Collections.Generic;
 using QDND.Combat.Entities;
 using QDND.Combat.Environment;
+using QDND.Combat.Statuses;
 
 namespace QDND.Combat.Arena
 {
@@ -440,9 +441,10 @@ namespace QDND.Combat.Arena
 
                 if (instance != null)
                 {
-                    Arena.GetVisual(target.Id)?.ShowStatusApplied(statusId);
-                    _infoLabel.Text = $"Applied {statusId} to {target.Name}";
-                    GD.Print($"[Debug] Applied {statusId} to {target.Name}");
+                    string statusName = StatusPresentationPolicy.GetDisplayName(instance.Definition);
+                    Arena.GetVisual(target.Id)?.ShowStatusApplied(statusName);
+                    _infoLabel.Text = $"Applied {statusName} ({statusId}) to {target.Name}";
+                    GD.Print($"[Debug] Applied {statusName} ({statusId}) to {target.Name}");
                 }
                 else
                 {

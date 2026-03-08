@@ -424,10 +424,18 @@ namespace QDND.Tools.AutoBattler
                 
                 // Hard gate: verify action budget before executing any action-consuming ability
                 // This catches edge cases where the turn plan returns stale cached actions
-                if ((action.ActionType == AIActionType.Attack || action.ActionType == AIActionType.Shove) 
-                    && actor.ActionBudget?.HasAction == false)
+                if (action.ActionType == AIActionType.Attack && actor.ActionBudget?.HasAction == false)
                 {
                     Log($"Budget gate: {actor.Name} has no action for {action.ActionType}, invalidating plan and ending turn");
+                    aiPipeline.InvalidateCurrentPlan();
+                    OnTurnEnded?.Invoke(actor.Id);
+                    CallEndTurn();
+                    return;
+                }
+
+                if (action.ActionType == AIActionType.Shove && actor.ActionBudget?.HasBonusAction == false)
+                {
+                    Log($"Budget gate: {actor.Name} has no bonus action for {action.ActionType}, invalidating plan and ending turn");
                     aiPipeline.InvalidateCurrentPlan();
                     OnTurnEnded?.Invoke(actor.Id);
                     CallEndTurn();
@@ -436,7 +444,7 @@ namespace QDND.Tools.AutoBattler
                 
                 // Verify ability is available in action bar (UI-aware check)
                 // Skip validation for forced test abilities
-                if ((action.ActionType == AIActionType.Attack || action.ActionType == AIActionType.UseAbility) &&
+                if ((action.ActionType == AIActionType.Attack || action.ActionType == AIActionType.UseAbility || action.ActionType == AIActionType.Shove) &&
                     !decision.IsForcedByTest)
                 {
                     if (!string.IsNullOrEmpty(action.ActionId))
@@ -563,6 +571,7 @@ namespace QDND.Tools.AutoBattler
                     ActorId = actor.Id,
                     ActionType = action.ActionType.ToString(),
                     ActionId = action.ActionId,
+                    VariantId = action.VariantId,
                     TargetId = action.TargetId,
                     TargetPosition = action.TargetPosition,
                     Score = action.Score
@@ -591,6 +600,20 @@ namespace QDND.Tools.AutoBattler
                         else
                         {
                             OnActionExecuted?.Invoke(actor.Id, $"{FormatActionDescription(action)} - invalid params", false);
+                        }
+                        break;
+
+                    case AIActionType.Shove:
+                        actionSucceeded = TryExecuteShoveAction(actor, action);
+                        if (actionSucceeded)
+                        {
+                            _arena.RequestActionBarRefresh(actor.Id);
+                            _actionBarRejectionsThisTurn.Clear();
+                            OnActionExecuted?.Invoke(actor.Id, $"Shove({action.VariantId ?? "auto"})->{action.TargetId}", true);
+                        }
+                        else
+                        {
+                            OnActionExecuted?.Invoke(actor.Id, $"Shove({action.VariantId ?? "auto"})->{action.TargetId} - invalid params", false);
                         }
                         break;
                     
@@ -827,6 +850,23 @@ namespace QDND.Tools.AutoBattler
                            actionDef.TargetType == TargetType.Self ||
                            actionDef.TargetType == TargetType.None;
 
+                case AIActionType.Shove:
+                    string shoveActionId = !string.IsNullOrEmpty(action.ActionId) ? action.ActionId : "shove";
+                    if (string.IsNullOrEmpty(action.TargetId))
+                    {
+                        return false;
+                    }
+
+                    var shovePipeline = _arena?.Context?.GetService<EffectPipeline>();
+                    var shoveActionDef = shovePipeline?.GetAction(shoveActionId);
+                    if (shoveActionDef == null)
+                    {
+                        return false;
+                    }
+
+                    var (canUseShove, _) = shovePipeline.CanUseAbility(shoveActionId, actor);
+                    return canUseShove;
+
                 case AIActionType.Move:
                 case AIActionType.Jump:
                     return action.TargetPosition.HasValue;
@@ -1001,6 +1041,48 @@ namespace QDND.Tools.AutoBattler
             }
 
             _arena.ExecuteAction(actor.Id, action.ActionId, nearest.Id);
+            return true;
+        }
+
+        private bool TryExecuteShoveAction(Combatant actor, AIAction action)
+        {
+            string shoveActionId = !string.IsNullOrEmpty(action.ActionId) ? action.ActionId : "shove";
+            if (string.IsNullOrEmpty(shoveActionId) || string.IsNullOrEmpty(action.TargetId))
+            {
+                return false;
+            }
+
+            var effectPipeline = _arena.Context?.GetService<EffectPipeline>();
+            var targetValidator = _arena.Context?.GetService<QDND.Combat.Targeting.TargetValidator>();
+            var shoveActionDef = effectPipeline?.GetAction(shoveActionId);
+            if (shoveActionDef == null)
+            {
+                return false;
+            }
+
+            var (canUse, _) = effectPipeline.CanUseAbility(shoveActionId, actor);
+            if (!canUse)
+            {
+                return false;
+            }
+
+            var target = _arena.GetCombatants().FirstOrDefault(c => c.Id == action.TargetId);
+            if (target == null)
+            {
+                return false;
+            }
+
+            if (targetValidator != null)
+            {
+                var validation = targetValidator.ValidateSingleTarget(shoveActionDef, actor, target);
+                if (!validation.IsValid)
+                {
+                    return false;
+                }
+            }
+
+            var shoveOptions = new ActionExecutionOptions { VariantId = action.VariantId };
+            _arena.ExecuteAction(actor.Id, shoveActionId, target.Id, shoveOptions);
             return true;
         }
 

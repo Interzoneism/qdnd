@@ -1037,6 +1037,19 @@ namespace QDND.Combat.Services
 
             _refreshActionBarUsability(actor.Id);
 
+            // Headless/non-full-fidelity path: resolve combat end immediately to avoid
+            // SkipAnimations timeline race conditions.
+            if (DebugFlags.SkipAnimations)
+            {
+                _checkAndEndCombat();
+                if (_stateMachine.CurrentState == CombatState.CombatEnd)
+                {
+                    _executingActionId = -1;
+                    _clearSelection();
+                    return;
+                }
+            }
+
             // PRESENTATION SEQUENCING (timeline-driven)
             var primaryResult = allResults[0];
             var presentationTarget = targets.FirstOrDefault() ?? actor;
@@ -1056,9 +1069,6 @@ namespace QDND.Combat.Services
             }
 
             _clearSelection();
-
-            // Check for combat end
-            _checkAndEndCombat();
         }
 
         // ────────────────────────────────────────────────────────────────────
@@ -1088,12 +1098,24 @@ namespace QDND.Combat.Services
 
             if (_stateMachine.CurrentState != CombatState.ActionExecution)
             {
+                if (_stateMachine.CurrentState == CombatState.CombatEnd)
+                {
+                    return;
+                }
+
                 _log($"[WARNING] ResumeDecisionStateIfExecuting: state is {_stateMachine.CurrentState}, expected ActionExecution - {reason}");
                 return;
             }
 
             // Clear the executing action ID
             _executingActionId = -1;
+
+            // Full-fidelity path: combat end is evaluated after timeline presentation completes.
+            _checkAndEndCombat();
+            if (_stateMachine.CurrentState == CombatState.CombatEnd)
+            {
+                return;
+            }
 
             var currentCombatant = _turnQueue.CurrentCombatant;
 

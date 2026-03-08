@@ -1130,6 +1130,39 @@ namespace QDND.Combat.Actions
                     };
                     saveQuery.Tags.Add($"save:{action.SaveType}");
 
+                    // Propagate spell/magic context for racial advantage checks.
+                    if (effectiveTags != null &&
+                        (effectiveTags.Contains("isspell") || effectiveTags.Contains("spell") || effectiveTags.Contains("magic")))
+                    {
+                        saveQuery.Tags.Add("spell");
+                    }
+
+                    if (action.School == SpellSchool.Illusion)
+                    {
+                        saveQuery.Tags.Add("school:illusion");
+                    }
+
+                    // Identify conditions this effect would inflict (for racial save advantages).
+                    if (effectiveEffects != null)
+                    {
+                        foreach (var effect in effectiveEffects)
+                        {
+                            if (!string.Equals(effect.Type, "apply_status", StringComparison.OrdinalIgnoreCase))
+                                continue;
+                            if (string.IsNullOrWhiteSpace(effect.StatusId))
+                                continue;
+
+                            var condType = ConditionEffects.IdentifyConditionType(effect.StatusId);
+                            if (condType.HasValue)
+                            {
+                                saveQuery.Tags.Add($"inflicts:{condType.Value.ToString().ToLowerInvariant()}");
+                            }
+                        }
+                    }
+
+                    var saveAbility = ParseAbilityType(action.SaveType);
+                    saveQuery.Parameters["ability"] = saveAbility.HasValue ? saveAbility.Value : action.SaveType;
+
                     var beforeSaveContext = new RuleEventContext
                     {
                         Source = source,
@@ -2559,8 +2592,6 @@ namespace QDND.Combat.Actions
             if (GetCombatants == null)
                 return false;
 
-            const float meleeRange = CombatRules.DefaultMeleeReachMeters;
-
             foreach (var other in GetCombatants())
             {
                 // Skip self
@@ -2573,7 +2604,7 @@ namespace QDND.Combat.Actions
 
                 // Check distance
                 float dist = combatant.Position.DistanceTo(other.Position);
-                if (dist <= meleeRange)
+                if (dist <= CombatRules.GetMeleeReach(other))
                     return true;
             }
 
@@ -3025,6 +3056,54 @@ namespace QDND.Combat.Actions
             }
 
             return args;
+        }
+
+        /// <summary>
+        /// Fires AllyDowned reactions for allies of a combatant reduced to 0 HP.
+        /// </summary>
+        public void TryTriggerAllyDownedReactions(Combatant killer, Combatant downed)
+        {
+            if (downed == null || Reactions == null || GetCombatants == null)
+                return;
+
+            var context = new ReactionTriggerContext
+            {
+                TriggerType = ReactionTriggerType.AllyDowned,
+                TriggerSourceId = killer?.Id ?? string.Empty,
+                AffectedId = downed.Id,
+                Position = downed.Position,
+                IsCancellable = false,
+                Data = new Dictionary<string, object>
+                {
+                    { "downedFaction", downed.Faction.ToString() }
+                }
+            };
+
+            var allies = GetCombatants()
+                .Where(c => c.Id != downed.Id && c.Faction == downed.Faction && c.IsActive)
+                .ToList();
+
+            if (allies.Count == 0)
+                return;
+
+            if (ReactionResolver != null)
+            {
+                ReactionResolver.ResolveTrigger(
+                    context,
+                    allies,
+                    new ReactionResolutionOptions
+                    {
+                        ActionLabel = $"ally_downed:{downed.Id}",
+                        AllowPromptDeferral = false
+                    });
+                return;
+            }
+
+            var eligibleReactors = Reactions.GetEligibleReactors(context, allies);
+            foreach (var (combatantId, reaction) in eligibleReactors)
+            {
+                Reactions.CreatePrompt(combatantId, reaction, context);
+            }
         }
 
         /// <summary>

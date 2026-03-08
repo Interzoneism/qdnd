@@ -1,12 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Godot;
 using Xunit;
 using QDND.Combat.Actions;
 using QDND.Combat.AI;
 using QDND.Combat.Entities;
+using QDND.Combat.Rules;
 using QDND.Combat.Services;
+using QDND.Combat.Statuses;
 using QDND.Data.CharacterModel;
 
 namespace QDND.Tests.Unit
@@ -199,7 +202,8 @@ namespace QDND.Tests.Unit
         /// Build a minimal pipeline with InventoryService + EffectPipeline wired up,
         /// plus one combatant with a healing potion in their bag.
         /// </summary>
-        private (AIDecisionPipeline pipeline, TestCombatContext ctx, Combatant actor) BuildItemTestPipeline()
+        private (AIDecisionPipeline pipeline, TestCombatContext ctx, Combatant actor) BuildItemTestPipeline(
+            string itemDefinitionId = "potion_healing")
         {
             var ctx = new TestCombatContext();
 
@@ -218,7 +222,7 @@ namespace QDND.Tests.Unit
             var inv = invService.GetInventory(actor.Id);
             inv.AddItem(new InventoryItem
             {
-                DefinitionId = "potion_healing",
+                DefinitionId = itemDefinitionId,
                 Name = "Potion of Healing",
                 Category = ItemCategory.Potion,
                 Quantity = 2,
@@ -460,6 +464,469 @@ namespace QDND.Tests.Unit
             var healingCandidate = itemCandidates.First();
             Assert.Equal("potion_healing", healingCandidate.ActionId);
             Assert.True(healingCandidate.Score > 0f, "Legacy item score should be positive");
+        }
+
+        [Fact]
+        public void HealingPotionDetection_IsCaseInsensitive_ForItemDefinitionId()
+        {
+            var (pipeline, _, actor) = BuildItemTestPipeline("OBJ_Potion_Healing");
+
+            var profile = new AIProfile
+            {
+                Id = "test_healing_case_insensitive",
+                Difficulty = AIDifficulty.Nightmare
+            };
+
+            var result = pipeline.MakeDecision(actor, profile);
+            var healingItems = result.AllCandidates
+                .Where(c => c.ActionType == AIActionType.UseItem && c.ActionId == "OBJ_Potion_Healing")
+                .ToList();
+
+            Assert.NotEmpty(healingItems);
+        }
+
+        [Fact]
+        public void GenerateItemCandidates_NoLivingEnemies_DoesNotGenerateItemCandidates()
+        {
+            var (pipeline, ctx, actor) = BuildItemTestPipeline();
+            var enemy = ctx.GetCombatant("enemy1");
+            Assert.NotNull(enemy);
+
+            enemy.Resources.TakeDamage(enemy.Resources.CurrentHP);
+
+            var profile = new AIProfile
+            {
+                Id = "test_no_enemies_items",
+                Difficulty = AIDifficulty.Nightmare
+            };
+
+            var result = pipeline.MakeDecision(actor, profile);
+            var itemCandidates = result.AllCandidates
+                .Where(c => c.ActionType == AIActionType.UseItem)
+                .ToList();
+
+            Assert.Empty(itemCandidates);
+        }
+
+        [Fact]
+        public void ScoreAbility_SelfTargetedStatusSpell_DoesNotAddSpellLevelValue()
+        {
+            var ctx = new TestCombatContext();
+            var actor = CreateTestCombatant("hero", Faction.Player, hp: 50);
+            var enemy = CreateTestCombatant("enemy", Faction.Hostile, hp: 50);
+            enemy.Position = new Vector3(6f, 0f, 0f);
+            ctx.RegisterCombatant(actor);
+            ctx.RegisterCombatant(enemy);
+
+            var effectPipeline = new EffectPipeline();
+            effectPipeline.RegisterAction(new ActionDefinition
+            {
+                Id = "Target_Darkvision",
+                Name = "Darkvision",
+                TargetType = TargetType.Self,
+                TargetFilter = TargetFilter.Self,
+                Intent = VerbalIntent.Utility,
+                SpellLevel = 2,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "apply_status", StatusId = "DARKVISION" }
+                }
+            });
+            ctx.RegisterService(effectPipeline);
+
+            var pipeline = new AIDecisionPipeline(ctx, seed: 7);
+            pipeline.LateInitialize();
+
+            var action = new AIAction
+            {
+                ActionType = AIActionType.UseAbility,
+                ActionId = "Target_Darkvision",
+                TargetId = actor.Id
+            };
+
+            var profile = new AIProfile { Difficulty = AIDifficulty.Nightmare };
+            InvokeScoreAbility(pipeline, action, actor, profile);
+
+            Assert.False(action.ScoreBreakdown.ContainsKey("spell_level_value"));
+        }
+
+        [Fact]
+        public void ScoreAbility_SelfTargetedStatusSpell_InMeleeAppliesThreatPenalty()
+        {
+            var ctx = new TestCombatContext();
+            var actor = CreateTestCombatant("hero", Faction.Player, hp: 50);
+            var enemy = CreateTestCombatant("enemy", Faction.Hostile, hp: 50);
+            enemy.Position = new Vector3(1.2f, 0f, 0f);
+            ctx.RegisterCombatant(actor);
+            ctx.RegisterCombatant(enemy);
+
+            var effectPipeline = new EffectPipeline();
+            effectPipeline.RegisterAction(new ActionDefinition
+            {
+                Id = "Target_Darkvision",
+                Name = "Darkvision",
+                TargetType = TargetType.Self,
+                TargetFilter = TargetFilter.Self,
+                Intent = VerbalIntent.Utility,
+                SpellLevel = 2,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "apply_status", StatusId = "DARKVISION" }
+                }
+            });
+            ctx.RegisterService(effectPipeline);
+
+            var pipeline = new AIDecisionPipeline(ctx, seed: 7);
+            pipeline.LateInitialize();
+
+            var action = new AIAction
+            {
+                ActionType = AIActionType.UseAbility,
+                ActionId = "Target_Darkvision",
+                TargetId = actor.Id
+            };
+
+            var profile = new AIProfile { Difficulty = AIDifficulty.Nightmare };
+            InvokeScoreAbility(pipeline, action, actor, profile);
+
+            Assert.True(action.ScoreBreakdown.ContainsKey("self_buff_threatened_penalty"));
+            Assert.True(action.ScoreBreakdown["self_buff_threatened_penalty"] < 0f);
+        }
+
+        [Fact]
+        public void ScoreAbility_SelfCastAllyTargetableCombatBuff_NotPenalizedLikeUtility()
+        {
+            var ctx = new TestCombatContext();
+            var actor = CreateTestCombatant("hero", Faction.Player, hp: 50);
+            var enemy = CreateTestCombatant("enemy", Faction.Hostile, hp: 50);
+            enemy.Position = new Vector3(1.2f, 0f, 0f);
+            ctx.RegisterCombatant(actor);
+            ctx.RegisterCombatant(enemy);
+
+            var effectPipeline = new EffectPipeline();
+            effectPipeline.RegisterAction(new ActionDefinition
+            {
+                Id = "Target_ShieldOfFaith",
+                Name = "Shield of Faith",
+                TargetType = TargetType.SingleUnit,
+                TargetFilter = TargetFilter.Allies | TargetFilter.Self,
+                Intent = VerbalIntent.Buff,
+                SpellLevel = 1,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "apply_status", StatusId = "SHIELD_OF_FAITH" }
+                }
+            });
+            ctx.RegisterService(effectPipeline);
+
+            var pipeline = new AIDecisionPipeline(ctx, seed: 7);
+            pipeline.LateInitialize();
+
+            var action = new AIAction
+            {
+                ActionType = AIActionType.UseAbility,
+                ActionId = "Target_ShieldOfFaith",
+                TargetId = actor.Id
+            };
+
+            var profile = new AIProfile { Difficulty = AIDifficulty.Nightmare };
+            InvokeScoreAbility(pipeline, action, actor, profile);
+
+            Assert.False(action.ScoreBreakdown.ContainsKey("self_buff_threatened_penalty"));
+            Assert.True(action.ScoreBreakdown.ContainsKey("spell_level_value"));
+        }
+
+        [Fact]
+        public void ScoreAbility_SelfCastAllySelfUtilityStatusSpell_SuppressesSpellLevelValue()
+        {
+            var ctx = new TestCombatContext();
+            var actor = CreateTestCombatant("hero", Faction.Player, hp: 50);
+            var enemy = CreateTestCombatant("enemy", Faction.Hostile, hp: 50);
+            enemy.Position = new Vector3(1.2f, 0f, 0f);
+            ctx.RegisterCombatant(actor);
+            ctx.RegisterCombatant(enemy);
+
+            var effectPipeline = new EffectPipeline();
+            effectPipeline.RegisterAction(new ActionDefinition
+            {
+                Id = "Target_Longstrider",
+                Name = "Longstrider",
+                TargetType = TargetType.SingleUnit,
+                TargetFilter = TargetFilter.Allies | TargetFilter.Self,
+                Intent = VerbalIntent.Utility,
+                SpellLevel = 1,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "apply_status", StatusId = "LONGSTRIDER" }
+                }
+            });
+            ctx.RegisterService(effectPipeline);
+
+            var pipeline = new AIDecisionPipeline(ctx, seed: 7);
+            pipeline.LateInitialize();
+
+            var action = new AIAction
+            {
+                ActionType = AIActionType.UseAbility,
+                ActionId = "Target_Longstrider",
+                TargetId = actor.Id
+            };
+
+            var profile = new AIProfile { Difficulty = AIDifficulty.Nightmare };
+            InvokeScoreAbility(pipeline, action, actor, profile);
+
+            Assert.False(action.ScoreBreakdown.ContainsKey("spell_level_value"));
+            Assert.True(action.ScoreBreakdown.ContainsKey("self_buff_threatened_penalty"));
+        }
+
+        [Fact]
+        public void GenerateCandidates_AiNoUseTaggedAbility_IsExcluded()
+        {
+            var ctx = new TestCombatContext();
+            var actor = CreateTestCombatant("hero", Faction.Player, hp: 50);
+            actor.KnownActions.Add("Target_Darkvision");
+            ctx.RegisterCombatant(actor);
+
+            var enemy = CreateTestCombatant("enemy", Faction.Hostile, hp: 50);
+            enemy.Position = new Vector3(2f, 0f, 0f);
+            ctx.RegisterCombatant(enemy);
+
+            var effectPipeline = new EffectPipeline();
+            effectPipeline.RegisterAction(new ActionDefinition
+            {
+                Id = "Target_Darkvision",
+                Name = "Darkvision",
+                TargetType = TargetType.SingleUnit,
+                TargetFilter = TargetFilter.Allies | TargetFilter.Self,
+                Intent = VerbalIntent.Utility,
+                Cost = new ActionCost { UsesAction = true },
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "apply_status", StatusId = "DARKVISION" }
+                },
+                Tags = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "ai_no_use" }
+            });
+            ctx.RegisterService(effectPipeline);
+
+            var pipeline = new AIDecisionPipeline(ctx, seed: 13);
+            pipeline.LateInitialize();
+
+            var candidates = pipeline.GenerateCandidates(actor);
+
+            Assert.DoesNotContain(candidates, c => c.ActionType == AIActionType.UseAbility && c.ActionId == "Target_Darkvision");
+        }
+
+        [Fact]
+        public void GenerateCandidates_ShoveInRange_GeneratesShoveCandidate()
+        {
+            var ctx = new TestCombatContext();
+            var actor = CreateTestCombatant("hero", Faction.Player, hp: 50);
+            actor.Position = Vector3.Zero;
+            ctx.RegisterCombatant(actor);
+
+            var enemy = CreateTestCombatant("enemy", Faction.Hostile, hp: 50);
+            enemy.Position = new Vector3(1.2f, 0f, 0f);
+            ctx.RegisterCombatant(enemy);
+
+            var effectPipeline = new EffectPipeline();
+            effectPipeline.RegisterAction(new ActionDefinition
+            {
+                Id = "shove",
+                Name = "Shove",
+                TargetType = TargetType.SingleUnit,
+                TargetFilter = TargetFilter.Enemies,
+                Range = 2f,
+                Cost = new ActionCost { UsesBonusAction = true },
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "contest" }
+                }
+            });
+            ctx.RegisterService(effectPipeline);
+
+            var pipeline = new AIDecisionPipeline(ctx, seed: 11);
+            pipeline.LateInitialize();
+
+            var candidates = pipeline.GenerateCandidates(actor);
+            var shoveCandidates = candidates
+                .Where(c => c.ActionType == AIActionType.Shove && c.TargetId == enemy.Id)
+                .ToList();
+
+            Assert.NotEmpty(shoveCandidates);
+            Assert.All(shoveCandidates, c => Assert.Equal("shove", c.ActionId));
+        }
+
+        [Fact]
+        public void MakeDecision_TwoStepPlan_ExecutesMoveFirstAndPreservesPrimaryAction()
+        {
+            var ctx = new TestCombatContext();
+            var actor = CreateTestCombatant("hero", Faction.Player, hp: 50);
+            actor.Position = Vector3.Zero;
+            actor.KnownActions.Add("main_hand_attack");
+            ctx.RegisterCombatant(actor);
+
+            var enemy = CreateTestCombatant("enemy", Faction.Hostile, hp: 40);
+            enemy.Position = new Vector3(6f, 0f, 0f);
+            ctx.RegisterCombatant(enemy);
+
+            var effectPipeline = new EffectPipeline();
+            effectPipeline.RegisterAction(new ActionDefinition
+            {
+                Id = "main_hand_attack",
+                Name = "Main Hand Attack",
+                TargetType = TargetType.SingleUnit,
+                TargetFilter = TargetFilter.Enemies,
+                Range = 1.5f,
+                AttackType = AttackType.MeleeWeapon,
+                Cost = new ActionCost { UsesAction = true },
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", Value = 12f, DamageType = "Slashing" }
+                }
+            });
+            ctx.RegisterService(effectPipeline);
+
+            var pipeline = new AIDecisionPipeline(ctx, seed: 22);
+            pipeline.LateInitialize();
+
+            AIActionType? loggedActionType = null;
+            string loggedPrimaryActionId = null;
+            pipeline.OnDecisionMade += (_, decision) =>
+            {
+                loggedActionType = decision?.ChosenAction?.ActionType;
+                loggedPrimaryActionId = decision?.PrimaryAction?.ActionId;
+            };
+
+            var profile = new AIProfile { Difficulty = AIDifficulty.Nightmare };
+            var result = pipeline.MakeDecision(actor, profile);
+
+            Assert.NotNull(result.TurnPlan);
+            Assert.True(result.TurnPlan.PlannedActions.Count >= 2);
+            Assert.Equal(AIActionType.Move, result.TurnPlan.PlannedActions[0].ActionType);
+            Assert.Equal(AIActionType.Move, result.ChosenAction.ActionType);
+            Assert.Equal("main_hand_attack", result.PrimaryAction.ActionId);
+            Assert.Equal(AIActionType.Move, loggedActionType);
+            Assert.Equal("main_hand_attack", loggedPrimaryActionId);
+        }
+
+        private (AIDecisionPipeline pipeline, Combatant actor, Combatant target) BuildCrownScoringPipeline(
+            bool includeThirdParty,
+            bool applySavedCharmMarker)
+        {
+            var ctx = new TestCombatContext();
+
+            var actor = CreateTestCombatant("bard", Faction.Player, hp: 50);
+            actor.Position = Vector3.Zero;
+            ctx.RegisterCombatant(actor);
+
+            var target = CreateTestCombatant("enemy", Faction.Hostile, hp: 50);
+            target.Position = new Vector3(6f, 0f, 0f);
+            ctx.RegisterCombatant(target);
+
+            if (includeThirdParty)
+            {
+                var extraEnemy = CreateTestCombatant("enemy2", Faction.Hostile, hp: 50);
+                extraEnemy.Position = new Vector3(7f, 0f, 1f);
+                ctx.RegisterCombatant(extraEnemy);
+            }
+
+            var effectPipeline = new EffectPipeline();
+            effectPipeline.RegisterAction(new ActionDefinition
+            {
+                Id = "Target_CrownOfMadness",
+                Name = "Crown of Madness",
+                TargetType = TargetType.SingleUnit,
+                TargetFilter = TargetFilter.Enemies,
+                Range = 18f,
+                Cost = new ActionCost { UsesAction = true },
+                SpellLevel = 2,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "apply_status", StatusId = "crown_of_madness" }
+                }
+            });
+            ctx.RegisterService(effectPipeline);
+
+            var statusManager = new StatusManager(new RulesEngine(seed: 7));
+            statusManager.RegisterStatus(new StatusDefinition
+            {
+                Id = "saved_against_hostile_spell_charm",
+                Name = "Saved Against Hostile Charm"
+            });
+            if (applySavedCharmMarker)
+            {
+                statusManager.ApplyStatus("saved_against_hostile_spell_charm", actor.Id, target.Id, duration: 1);
+            }
+            ctx.RegisterService(statusManager);
+
+            var pipeline = new AIDecisionPipeline(ctx, seed: 7);
+            pipeline.LateInitialize();
+
+            return (pipeline, actor, target);
+        }
+
+        [Fact]
+        public void ScoreAbility_CrownOfMadness_InOneVsOne_GetsLowValue()
+        {
+            var (pipeline, actor, target) = BuildCrownScoringPipeline(includeThirdParty: false, applySavedCharmMarker: false);
+            var action = new AIAction
+            {
+                ActionType = AIActionType.UseAbility,
+                ActionId = "Target_CrownOfMadness",
+                TargetId = target.Id
+            };
+
+            var profile = new AIProfile { Difficulty = AIDifficulty.Nightmare };
+            InvokeScoreAbility(pipeline, action, actor, profile);
+
+            Assert.True(action.ScoreBreakdown.ContainsKey("behavior_control_no_third_party"));
+            Assert.True(action.Score < 0f, $"Expected low/negative 1v1 crown score, got {action.Score:F2}");
+        }
+
+        [Fact]
+        public void ScoreAbility_CrownOfMadness_AfterSavedMarker_GetsStrongPenalty()
+        {
+            var (pipeline, actor, target) = BuildCrownScoringPipeline(includeThirdParty: true, applySavedCharmMarker: true);
+            var action = new AIAction
+            {
+                ActionType = AIActionType.UseAbility,
+                ActionId = "Target_CrownOfMadness",
+                TargetId = target.Id
+            };
+
+            var profile = new AIProfile { Difficulty = AIDifficulty.Nightmare };
+            InvokeScoreAbility(pipeline, action, actor, profile);
+
+            Assert.True(action.ScoreBreakdown.ContainsKey("charm_control_saved_marker"));
+            Assert.True(action.Score < 0f, $"Expected saved-marker crown penalty to drive score negative, got {action.Score:F2}");
+        }
+
+        [Fact]
+        public void ScoreAbility_CrownOfMadness_WithThirdParty_RemainsViable()
+        {
+            var (pipeline, actor, target) = BuildCrownScoringPipeline(includeThirdParty: true, applySavedCharmMarker: false);
+            var action = new AIAction
+            {
+                ActionType = AIActionType.UseAbility,
+                ActionId = "Target_CrownOfMadness",
+                TargetId = target.Id
+            };
+
+            var profile = new AIProfile { Difficulty = AIDifficulty.Nightmare };
+            InvokeScoreAbility(pipeline, action, actor, profile);
+
+            Assert.False(action.ScoreBreakdown.ContainsKey("behavior_control_no_third_party"));
+            Assert.True(action.Score > 0f, $"Expected positive crown score when third-party targets exist, got {action.Score:F2}");
+        }
+
+        private static void InvokeScoreAbility(AIDecisionPipeline pipeline, AIAction action, Combatant actor, AIProfile profile)
+        {
+            var method = typeof(AIDecisionPipeline).GetMethod(
+                "ScoreAbility",
+                BindingFlags.NonPublic | BindingFlags.Instance);
+
+            Assert.NotNull(method);
+            method.Invoke(pipeline, new object[] { action, actor, profile });
         }
 
         [Fact]

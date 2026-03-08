@@ -58,7 +58,7 @@ namespace QDND.Tests.Unit
             var effect = tickEffects[0];
             Assert.Equal("damage", effect.EffectType);
             Assert.Equal("fire", effect.DamageType);
-            Assert.Contains("1d4", effect.Tags); // Dice formula stored as tag
+            Assert.Equal("1d4", effect.DiceFormula);
         }
 
         [Fact]

@@ -5,6 +5,7 @@ using Godot;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules.Boosts;
 using QDND.Combat.Rules.Conditions;
+using QDND.Combat.Rules;
 using QDND.Data.CharacterModel;
 using QDND.Combat.Environment;
 using QDND.Combat.Statuses;
@@ -170,7 +171,11 @@ namespace QDND.Combat.Targeting
 
             // Range check using position data
             // Melee attacks get a tolerance for character body radius positioning
-            if (action.Range > 0)
+            float effectiveRange = (action.AttackType == Actions.AttackType.MeleeWeapon)
+                ? CombatRules.GetMeleeReach(source)
+                : action.Range;
+
+            if (effectiveRange > 0)
             {
                 float distance;
                 if (IsShoveAction(action))
@@ -190,8 +195,8 @@ namespace QDND.Combat.Targeting
                                action.AttackType == Actions.AttackType.MeleeWeapon ||
                                action.AttackType == Actions.AttackType.MeleeSpell;
                 float tolerance = isMelee ? 0.75f : 0.5f;  // Body radius tolerance
-                if (distance > action.Range + tolerance)
-                    return TargetValidation.Invalid($"Target out of range ({distance:F1}/{action.Range + tolerance:F1})");
+                if (distance > effectiveRange + tolerance)
+                    return TargetValidation.Invalid($"Target out of range ({distance:F1}/{effectiveRange + tolerance:F1})");
             }
 
             // Targeting restriction checks (hostile-only, different entity)
@@ -228,6 +233,10 @@ namespace QDND.Combat.Targeting
             if (action.TargetType == Actions.TargetType.None)
                 return new List<Combatant>();
 
+            float abilityRange = (action.AttackType == Actions.AttackType.MeleeWeapon)
+                ? CombatRules.GetMeleeReach(source)
+                : action.Range;
+
             return allCombatants
                 .Where(c => IsTargetStateAllowed(action, c))
                 .Where(c => IsValidFaction(action.TargetFilter, source, c))
@@ -236,7 +245,7 @@ namespace QDND.Combat.Targeting
                 .Where(c => PassesTargetCondition(action, source, c))
                 .Where(c => !IsShoveAction(action) || IsValidShoveSize(source, c))
                 .Where(c => HasLineOfSight(source, c))
-                .Where(c => IsInAbilityRange(source, c, action.Range))
+                .Where(c => IsInAbilityRange(source, c, abilityRange))
                 .ToList();
         }
 

@@ -26,6 +26,7 @@ namespace QDND.Combat.Actions.Effects
             {
                 // Track whether this target should receive half damage (save succeeded on a saveTakesHalf effect)
                 bool applyHalfDamage = false;
+                bool triggeredRelentlessEndurance = false;
 
                 // Check condition inline (with per-target save support)
                 if (!string.IsNullOrEmpty(definition.Condition))
@@ -274,6 +275,14 @@ namespace QDND.Combat.Actions.Effects
                             {
                                 total += context.Rng.Next(1, sides + 1);
                             }
+                        }
+
+                        // Savage Attacks (Half-Orc): one extra weapon damage die on melee critical hits.
+                        if (context.IsCritical &&
+                            context.Ability?.AttackType == AttackType.MeleeWeapon &&
+                            context.Source?.Tags?.Any(t => string.Equals(t, "savage_attacks", StringComparison.OrdinalIgnoreCase)) == true)
+                        {
+                            total += context.Rng.Next(1, sides + 1);
                         }
 
                         baseDamage = total;
@@ -642,6 +651,22 @@ namespace QDND.Combat.Actions.Effects
 
                 // Apply damage to target (TakeDamage handles temp HP layering automatically)
                 int actualDamageDealt = target.Resources.TakeDamage(finalDamage);
+
+                // Relentless Endurance (Half-Orc): drop to 1 HP instead of 0, once per long rest.
+                if (target.Resources.IsDowned &&
+                    currentHpBeforeDamage > 0 &&
+                    !massiveDamageInstantDeath &&
+                    !target.RelentlessEnduranceUsed &&
+                    target.Tags?.Any(t => string.Equals(t, "relentless_endurance", StringComparison.OrdinalIgnoreCase)) == true)
+                {
+                    int healed = target.Resources.Heal(1);
+                    if (healed > 0)
+                    {
+                        target.RelentlessEnduranceUsed = true;
+                        triggeredRelentlessEndurance = true;
+                    }
+                }
+
                 bool killed = target.Resources.IsDowned;
 
                 // Update OnHitContext with actual damage dealt and kill status
@@ -730,6 +755,12 @@ namespace QDND.Combat.Actions.Effects
                         {
                             target.LifeState = CombatantLifeState.Dead;
                         }
+
+                        if (target.LifeState == CombatantLifeState.Downed)
+                        {
+                            // Notify same-faction allies that a combatant entered death saves.
+                            context.Pipeline?.TryTriggerAllyDownedReactions(context.Source, target);
+                        }
                     }
                 }
 
@@ -791,6 +822,7 @@ namespace QDND.Combat.Actions.Effects
                 if (appliedDestructiveWrath) msg += " (DESTRUCTIVE WRATH - MAXIMIZED)";
                 if (isTollTheDead && targetIsInjured) msg += " (TOLL THE DEAD: INJURED TARGET)";
                 if (applyHalfDamage) msg += " (HALF - SAVE)";
+                if (triggeredRelentlessEndurance) msg += " (RELENTLESS ENDURANCE)";
                 if (killed) msg += " (KILLED)";
 
                 var result = EffectResult.Succeeded(Type, context.Source.Id, target.Id, finalDamage, msg);
@@ -804,6 +836,7 @@ namespace QDND.Combat.Actions.Effects
                 result.Data["destructiveWrath"] = appliedDestructiveWrath;
                 result.Data["tollTheDeadUpgraded"] = isTollTheDead && targetIsInjured;
                 result.Data["halfDamageOnSave"] = applyHalfDamage;
+                result.Data["relentlessEndurance"] = triggeredRelentlessEndurance;
                 results.Add(result);
             }
 

@@ -272,6 +272,7 @@ void fragment() {
             _actionBarPanel.OnActionHovered += OnActionHovered;
             _actionBarPanel.OnActionHoverExited += OnActionHoverExited;
             _actionBarPanel.OnActionReordered += OnActionReordered;
+            _actionBarPanel.OnItemDroppedToHotbar += OnItemDroppedToHotbar;
             _actionBarPanel.OnGridResized += OnHotbarGridResized;
 
             // Portrait — left of hotbar, 30px from screen bottom
@@ -834,6 +835,7 @@ void fragment() {
                 _actionBarPanel.OnActionHovered -= OnActionHovered;
                 _actionBarPanel.OnActionHoverExited -= OnActionHoverExited;
                 _actionBarPanel.OnActionReordered -= OnActionReordered;
+                _actionBarPanel.OnItemDroppedToHotbar -= OnItemDroppedToHotbar;
             }
             if (_partyPanel != null) _partyPanel.OnMemberClicked -= OnPartyMemberClicked;
             if (_reactionPrompt != null)
@@ -1614,6 +1616,22 @@ void fragment() {
             }
 
             Arena.ReorderActionBarSlots(Arena.ActiveCombatantId, fromSlot, toSlot);
+        }
+
+        private void OnItemDroppedToHotbar(string itemInstanceId, int targetSlot)
+        {
+            if (Arena?.ActiveCombatantId == null)
+            {
+                return;
+            }
+
+            var actionBarService = Arena.Context?.GetService<ActionBarService>();
+            if (actionBarService == null)
+            {
+                return;
+            }
+
+            actionBarService.AssignItemToSlot(Arena.ActiveCombatantId, itemInstanceId, targetSlot);
         }
 
         private void OnHotbarGridResized(int newColumns)

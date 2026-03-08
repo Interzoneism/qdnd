@@ -17,6 +17,7 @@ namespace QDND.Combat.UI.Panels
         public event Action<int> OnActionHovered;
         public event Action OnActionHoverExited;
         public event Action<int, int> OnActionReordered;
+        public event Action<string, int> OnItemDroppedToHotbar;
         public event Action<int> OnGridResized;
 
         private VBoxContainer _rootContainer;
@@ -529,6 +530,9 @@ namespace QDND.Combat.UI.Panels
                     ? entry.Hotkey
                     : GetDefaultHotkeyLabel(button.SlotIndex),
                 CostText = string.Join(" ", costs),
+                QuantityText = !string.IsNullOrWhiteSpace(entry.ItemInstanceId) && entry.ChargesMax > 0
+                    ? $"×{entry.ChargesRemaining}"
+                    : null,
                 IsAvailable = entry.IsAvailable,
                 IsSelected = IsSelectedAction(entry),
                 IsSpinning = entry.IsToggle && entry.IsToggledOn,
@@ -575,6 +579,14 @@ namespace QDND.Combat.UI.Panels
             if (data.VariantType != Variant.Type.Dictionary) return false;
 
             var dict = data.AsGodotDictionary();
+
+            if (dict.ContainsKey("source_type") &&
+                dict["source_type"].AsString() == "bag" &&
+                dict.ContainsKey("instance_id"))
+            {
+                return true;
+            }
+
             if (!dict.ContainsKey("panel_id") || !dict.ContainsKey("source_slot") || !dict.ContainsKey("content_kind"))
                 return false;
 
@@ -608,6 +620,14 @@ namespace QDND.Combat.UI.Panels
             if (!CanDropSlotData(targetSlot, data)) return;
 
             var dict = data.AsGodotDictionary();
+
+            if (dict.ContainsKey("source_type") && dict["source_type"].AsString() == "bag")
+            {
+                string instanceId = dict["instance_id"].AsString();
+                OnItemDroppedToHotbar?.Invoke(instanceId, targetSlot);
+                return;
+            }
+
             int sourceSlot = (int)dict["source_slot"];
             HandleSlotDrop(sourceSlot, targetSlot);
         }

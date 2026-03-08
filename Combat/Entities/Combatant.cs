@@ -316,6 +316,11 @@ namespace QDND.Combat.Entities
         /// </summary>
         public bool HasShield { get; set; } = false;
 
+        /// <summary>
+        /// Tracks whether Relentless Endurance has been used (resets on long rest).
+        /// </summary>
+        public bool RelentlessEnduranceUsed { get; set; }
+
         /// <summary>True when wearing armor the character is not proficient with.</summary>
         public bool IsWearingNonproficientArmor
         {

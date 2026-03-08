@@ -63,12 +63,16 @@ public sealed class SingleTargetMode : ITargetingMode
     {
         recycledData.ActiveMode = TargetingModeType.SingleTarget;
 
+        float effectiveRange = (_action.AttackType == AttackType.MeleeWeapon)
+            ? CombatRules.GetMeleeReach(_source)
+            : _action.Range;
+
         // Always show a range ring centered on the source.
         recycledData.GroundShapes.Add(new GroundShapeData
         {
             Type = GroundShapeType.RangeRing,
             Center = _sourceWorldPos,
-            Radius = _action.Range,
+            Radius = effectiveRange,
             Validity = TargetingValidity.Valid,
         });
 

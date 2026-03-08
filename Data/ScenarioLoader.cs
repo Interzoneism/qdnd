@@ -469,28 +469,8 @@ namespace QDND.Data
                         if (shouldRollInitiative)
                         {
                             int dexMod = resolved.GetModifier(AbilityType.Dexterity);
-                            int initiativeBonus = 0;
-                            bool hasAlertFeat = resolved.Sheet?.FeatIds?.Any(f =>
-                                string.Equals(f, "alert", StringComparison.OrdinalIgnoreCase)) == true;
-                            bool hasAlertTag = resolved.Features?.Any(f =>
-                                f.Tags != null && f.Tags.Any(t => string.Equals(t, "initiative_bonus_5", StringComparison.OrdinalIgnoreCase))) == true;
-                            if (hasAlertFeat || hasAlertTag)
-                            {
-                                initiativeBonus += 5;
-                            }
-
-                            // Feral Instinct (Barbarian L7): advantage on initiative rolls
-                            bool hasFeralInstinct = resolved.Features?.Any(f =>
-                                string.Equals(f.Id, "feral_instinct", StringComparison.OrdinalIgnoreCase)) == true;
-
-                            int initRoll = Roll(1, 20);
-                            if (hasFeralInstinct)
-                            {
-                                int secondRoll = Roll(1, 20);
-                                initRoll = Math.Max(initRoll, secondRoll);
-                            }
-
-                            combatant.Initiative = initRoll + dexMod + initiativeBonus;
+                            int initRoll = Roll(1, 4);
+                            combatant.Initiative = initRoll + dexMod;
                             combatant.InitiativeTiebreaker = resolved.AbilityScores[AbilityType.Dexterity];
                             initiativeResolved = true;
                         }
@@ -504,8 +484,8 @@ namespace QDND.Data
                     if (shouldRollInitiative)
                     {
                         int dexScore = unit.BaseDexterity ?? 10;
-                        int dexMod = (dexScore - 10) / 2;
-                        int initRoll = Roll(1, 20);
+                        int dexMod = (int)Math.Floor((dexScore - 10) / 2.0);
+                        int initRoll = Roll(1, 4);
                         combatant.Initiative = initRoll + dexMod;
                         combatant.InitiativeTiebreaker = unit.InitiativeTiebreaker != 0
                             ? unit.InitiativeTiebreaker
