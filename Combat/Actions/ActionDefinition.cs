@@ -339,6 +339,31 @@ namespace QDND.Combat.Actions
         public string BG3TargetConditions { get; set; }
 
         /// <summary>
+        /// Raw BG3 container spell references for chained/packaged spell definitions.
+        /// </summary>
+        public string BG3ContainerSpells { get; set; }
+
+        /// <summary>
+        /// Raw BG3 spell container identifier.
+        /// </summary>
+        public string BG3SpellContainerId { get; set; }
+
+        /// <summary>
+        /// Raw BG3 surface type metadata for environment-affecting spells.
+        /// </summary>
+        public string BG3SurfaceType { get; set; }
+
+        /// <summary>
+        /// Raw BG3 AoE conditions formula.
+        /// </summary>
+        public string BG3AoEConditions { get; set; }
+
+        /// <summary>
+        /// Raw BG3 maximum total target HP budget (for HP-pool style effects).
+        /// </summary>
+        public string BG3MaximumTotalTargetHP { get; set; }
+
+        /// <summary>
         /// Number of projectiles spawned (for Projectile-type spells).
         /// </summary>
         public int ProjectileCount { get; set; } = 1;

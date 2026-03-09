@@ -234,14 +234,15 @@ done
 
 # Full-fidelity runs MUST have a wall-clock timeout to prevent runaway processes.
 # Godot + llvmpipe (software Vulkan in WSL/headless) can burn 50%+ CPU indefinitely
-# if the internal quit path hangs. Default: 180s for team battles, 60s for others.
+# if the internal quit path hangs. Default: 240s for team battles, 180s for others.
+# Multi-unit scenarios (4v5 party fights) need ~170s with animations; 60s was too short.
 if [[ "$FULL_FIDELITY" == "true" && "$HAS_MAX_TIME" == "false" ]]; then
     if [[ "$FF_TEAM_BATTLE" == "true" ]]; then
-        USER_ARGS+=(--max-time-seconds 180)
-        log_info "Injected default --max-time-seconds 180 for team battle (override with explicit --max-time-seconds <N>)"
+        USER_ARGS+=(--max-time-seconds 240)
+        log_info "Injected default --max-time-seconds 240 for team battle (override with explicit --max-time-seconds <N>)"
     else
-        USER_ARGS+=(--max-time-seconds 60)
-        log_info "Injected default --max-time-seconds 60 (override with explicit --max-time-seconds <N>)"
+        USER_ARGS+=(--max-time-seconds 180)
+        log_info "Injected default --max-time-seconds 180 (override with explicit --max-time-seconds <N>)"
     fi
 fi
 

@@ -74,6 +74,7 @@ namespace QDND.Data.Actions
 
                 // Concentration
                 RequiresConcentration = spell.HasFlag("IsConcentration"),
+                ConcentrationStatusId = spell.ConcentrationSpellID,
 
                 // Upcasting
                 CanUpcast = spell.Level > 0 && spell.SpellType != BG3SpellType.Cantrip,
@@ -126,6 +127,11 @@ namespace QDND.Data.Actions
                 action.BG3TargetConditions = spell.TargetConditions;
                 action.TooltipDamageList = spell.TooltipDamageList;
                 action.TooltipAttackSave = spell.TooltipAttackSave;
+                action.BG3ContainerSpells = spell.ContainerSpells;
+                action.BG3SpellContainerId = spell.SpellContainerID;
+                action.BG3SurfaceType = spell.SurfaceType;
+                action.BG3AoEConditions = spell.AoEConditions;
+                action.BG3MaximumTotalTargetHP = spell.MaximumTotalTargetHP;
             }
 
             // For Zone spells, use ZoneRange as the ability range (controls cone length / line length)
@@ -134,6 +140,29 @@ namespace QDND.Data.Actions
                 float zoneRange = ParseAreaRadius(spell.ZoneRange); // reuse float parser
                 if (zoneRange > 0)
                     action.Range = zoneRange;
+            }
+
+            // Shout AoE spells are self-centered but still require an actionable range for targeting preview.
+            if (spell.SpellType == BG3SpellType.Shout && action.AreaRadius > 0 && action.Range <= 0)
+            {
+                action.Range = action.AreaRadius;
+            }
+
+            // BG3 square zones behave as short frontal area projections (Thunderwave-like).
+            // Map to cone semantics with a 90-degree angle and derived radius.
+            if (spell.SpellType == BG3SpellType.Zone &&
+                string.Equals(spell.ZoneShape, "Square", StringComparison.OrdinalIgnoreCase))
+            {
+                float zoneBase = ParseAreaRadius(spell.ZoneBase);
+                float zoneRange = ParseAreaRadius(spell.ZoneRange);
+
+                action.ConeAngle = 90f;
+                if (zoneBase > 0)
+                    action.AreaRadius = zoneBase;
+                if (zoneRange > 0)
+                    action.Range = zoneRange;
+                else if (action.Range <= 0 && action.AreaRadius > 0)
+                    action.Range = action.AreaRadius;
             }
 
             // Add requirements from BG3 conditions
@@ -172,7 +201,7 @@ namespace QDND.Data.Actions
                 if (string.Equals(spell.ZoneShape, "Cone", StringComparison.OrdinalIgnoreCase))
                     return TargetType.Cone;
                 if (string.Equals(spell.ZoneShape, "Square", StringComparison.OrdinalIgnoreCase))
-                    return TargetType.Line; // BG3 "Square" zones are rectangular areas projected from caster
+                    return TargetType.Cone;
                 return TargetType.Circle; // Fallback for unknown Zone shapes
             }
 

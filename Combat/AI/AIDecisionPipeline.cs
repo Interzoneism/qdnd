@@ -938,6 +938,15 @@ namespace QDND.Combat.AI
                 else if (distance <= remainingMovement + attackRange + 0.5f && 
                          actor.ActionBudget?.HasAction == true)
                 {
+                    if (_movement != null)
+                    {
+                        var dir = (enemy.Position - actor.Position).Normalized();
+                        float approachDistance = Math.Max(Math.Max(attackRange * 0.8f, 1.2f), 2.0f);
+                        var approachPos = enemy.Position - dir * approachDistance;
+                        if (!_movement.CanReach(actor, approachPos))
+                            continue;
+                    }
+
                     // Generate attack candidate - NeedsMovementFirst() will detect this
                     // and BuildTurnPlan() will automatically insert movement before the attack
                     var action = new AIAction
@@ -3747,14 +3756,51 @@ namespace QDND.Combat.AI
                             if (actionDef != null) attackRange = actionDef.Range;
                         }
                         // Position just inside attack range
-                        var approachPos = target.Position - dir * System.Math.Max(attackRange * 0.8f, 1.2f);
-                        moveAction = new AIAction
+                        float approachDistance = System.Math.Max(System.Math.Max(attackRange * 0.8f, 1.2f), 2.0f);
+                        var approachPos = target.Position - dir * approachDistance;
+                        if (_movement?.CanReach(actor, approachPos) == true)
                         {
-                            ActionType = AIActionType.Move,
-                            TargetPosition = approachPos,
-                            IsValid = true
-                        };
+                            moveAction = new AIAction
+                            {
+                                ActionType = AIActionType.Move,
+                                TargetPosition = approachPos,
+                                IsValid = true
+                            };
+                        }
                     }
+                }
+                if (moveAction == null)
+                {
+                    primaryAction.IsValid = false;
+                    primaryAction.InvalidReason = "Target unreachable for move-then-attack";
+
+                    var fallbackAction = allCandidates
+                        .Where(c => c.IsValid &&
+                               !ReferenceEquals(c, primaryAction) &&
+                               c.ActionType != AIActionType.EndTurn &&
+                               c.Score > 1f &&
+                               !NeedsMovementFirst(actor, c))
+                        .OrderByDescending(c => c.Score)
+                        .FirstOrDefault();
+
+                    if (bonusAction != null && !ReferenceEquals(bonusAction, fallbackAction))
+                        plan.PlannedActions.Add(bonusAction);
+
+                    if (fallbackAction != null)
+                    {
+                        plan.PlannedActions.Add(fallbackAction);
+                    }
+                    else if (plan.PlannedActions.Count == 0)
+                    {
+                        plan.PlannedActions.Add(new AIAction
+                        {
+                            ActionType = AIActionType.EndTurn,
+                            IsValid = true
+                        });
+                    }
+
+                    plan.TotalExpectedValue = plan.PlannedActions.Sum(a => a.ExpectedValue);
+                    return plan;
                 }
                 if (moveAction != null) plan.PlannedActions.Add(moveAction);
                 if (bonusAction != null) plan.PlannedActions.Add(bonusAction);
@@ -3844,7 +3890,10 @@ namespace QDND.Combat.AI
                 var actionDef = _effectPipeline.GetAction(action.ActionId);
                 if (actionDef != null)
                 {
-                    return distance > actionDef.Range;
+                    bool isMelee = actionDef.AttackType == AttackType.MeleeWeapon ||
+                                   actionDef.AttackType == AttackType.MeleeSpell;
+                    float tolerance = isMelee ? 0.75f : 0.5f;
+                    return distance > actionDef.Range + tolerance;
                 }
             }
             

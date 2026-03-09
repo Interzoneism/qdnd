@@ -1148,6 +1148,18 @@ namespace QDND.Combat.Arena
                 if (string.Equals(combatantId, ActiveCombatantId, StringComparison.Ordinal))
                     _actionBarService?.Populate(combatantId);
             };
+
+            if (_functorExecutor != null)
+            {
+                _functorExecutor.EffectPipeline = _effectPipeline;
+                _functorExecutor.SurfaceManager = _surfaceManager;
+                _functorExecutor.ForcedMovement = _forcedMovementService;
+                _functorExecutor.InventoryService = _inventoryService;
+                _functorExecutor.BreakConcentrationAction = (combatantId, reason) =>
+                    _concentrationSystem?.BreakConcentration(combatantId, reason);
+                _functorExecutor.CounterspellAction = (sourceId, targetId) =>
+                    _concentrationSystem?.BreakConcentration(targetId, "Counterspell");
+            }
             
             // Wire ResolveCombatant callbacks for status and concentration systems
             _statusManager.ResolveCombatant = id => _combatContext?.GetCombatant(id);

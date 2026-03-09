@@ -431,7 +431,8 @@ namespace QDND.Combat.Actions
             bool isTestActor = testActionId != null && string.Equals(actionId, testActionId, StringComparison.OrdinalIgnoreCase);
 
             // Check cooldown (enforced for all combatants, including test actors)
-            var cooldownKey = $"{source.Id}:{actionId}";
+            var canonicalActionId = ActionRegistry?.GetAction(actionId)?.Id ?? actionId;
+            var cooldownKey = $"{source.Id}:{canonicalActionId}";
             if (_cooldowns.TryGetValue(cooldownKey, out var cooldown))
             {
                 if (cooldown.CurrentCharges <= 0)
@@ -476,6 +477,13 @@ namespace QDND.Combat.Actions
                 var (canPay, budgetReason) = source.ActionBudget.CanPayCost(action.Cost);
                 if (!canPay)
                     return (false, budgetReason);
+
+                if (source.ActionBudget.HasCastLeveledBonusActionSpell &&
+                    action.Cost?.UsesAction == true &&
+                    action.SpellLevel > 0)
+                {
+                    return (false, "Cannot cast a leveled action spell after casting a bonus action spell this turn");
+                }
 
                 // Weapon attacks also need AttacksRemaining > 0 (Extra Attack pool).
                 // CanPayCost only checks _actionCharges, but ExecuteAction checks the
@@ -674,6 +682,13 @@ namespace QDND.Combat.Actions
                 var (bg3Success, bg3ConsumeReason) = ConsumeBG3ResourceCost(source, action, effectiveCost);
                 if (!bg3Success)
                     return ActionExecutionResult.Failure(actionId, source.Id, bg3ConsumeReason);
+
+                if (source.ActionBudget != null &&
+                    effectiveCost.UsesBonusAction &&
+                    action.SpellLevel > 0)
+                {
+                    source.ActionBudget.HasCastLeveledBonusActionSpell = true;
+                }
             }
 
             // Build effective effects list
@@ -1213,6 +1228,8 @@ namespace QDND.Combat.Actions
             }
 
             // Execute effects - check for multi-projectile
+            int handledEffectCount = 0;
+            int unhandledEffectCount = 0;
             if (effectiveProjectileCount > 1)
             {
                 // Multi-projectile spell: execute each projectile separately
@@ -1223,7 +1240,9 @@ namespace QDND.Combat.Actions
                     effectiveEffects, 
                     effectiveTags, 
                     context,
-                    effectiveProjectileCount);
+                    effectiveProjectileCount,
+                    out handledEffectCount,
+                    out unhandledEffectCount);
                 result.EffectResults.AddRange(multiProjectileResults);
 
                 // Aggregate per-projectile attack results for downstream logging
@@ -1251,14 +1270,22 @@ namespace QDND.Combat.Actions
                 {
                     if (!_effectHandlers.TryGetValue(effectDef.Type, out var handler))
                     {
-                        Godot.GD.PushWarning($"Unknown effect type: {effectDef.Type}");
+                        QDND.Data.RuntimeSafety.LogWarning($"[EffectPipeline] Unknown effect type: {effectDef.Type}");
                         OnEffectUnhandled?.Invoke(effectDef.Type, action.Id);
+                        unhandledEffectCount++;
                         continue;
                     }
 
+                    handledEffectCount++;
                     var effectResults = handler.Execute(effectDef, context);
                     result.EffectResults.AddRange(effectResults);
                 }
+            }
+
+            if (handledEffectCount == 0 && unhandledEffectCount > 0)
+            {
+                result.Success = false;
+                result.ErrorMessage = $"All effects were unhandled for action '{action.Id}'";
             }
 
             // Handle concentration abilities
@@ -1270,7 +1297,10 @@ namespace QDND.Combat.Actions
             if (action.RequiresConcentration && Concentration != null)
             {
                 string concentrationStatusId = action.ConcentrationStatusId;
-                string concentrationTargetId = targets.Count > 0 ? targets[0].Id : source.Id;
+                var concentrationTargetIds = targets.Count > 0
+                    ? targets.Select(t => t.Id).Where(id => !string.IsNullOrWhiteSpace(id)).Distinct().ToList()
+                    : new List<string> { source.Id };
+                string concentrationTargetId = concentrationTargetIds[0];
 
                 if (string.IsNullOrEmpty(concentrationStatusId))
                 {
@@ -1286,7 +1316,8 @@ namespace QDND.Combat.Actions
                     CombatantId = source.Id,
                     ActionId = actionId,
                     StatusId = concentrationStatusId,
-                    TargetId = concentrationTargetId
+                    TargetId = concentrationTargetId,
+                    TargetIds = concentrationTargetIds
                 });
             }
 
@@ -1577,31 +1608,11 @@ namespace QDND.Combat.Actions
                     return $"{totalCount}d{sides1}";
             }
 
-            // Different die types - just add bonus
-            int combinedBonus = bonus1 + bonus2 + (count2 > 0 ? 0 : 0);
-            if (sides2 > 0)
-            {
-                // Different die types, approximate by adding average
-                int avgAdd = (int)Math.Round(count2 * (1 + sides2) / 2.0);
-                combinedBonus += avgAdd;
-            }
-            else
-            {
-                combinedBonus += bonus2;
-            }
-
-            if (combinedBonus > bonus1)
-            {
-                if (bonus1 != 0)
-                {
-                    string baseFormula = formula1.Contains("+") ? formula1[..formula1.IndexOf('+')]
-                        : formula1.Contains("-") ? formula1[..formula1.IndexOf('-')] : formula1;
-                    return combinedBonus >= 0 ? $"{baseFormula}+{combinedBonus}" : $"{baseFormula}{combinedBonus}";
-                }
-            }
-
-            // Fallback: return formula1 with added dice as bonus approximation
-            return formula1;
+            // Preserve mixed dice expressions exactly (e.g., 2d6 + 1d4).
+            // DiceRoller already handles multi-term formulas, so avoid lossy averaging.
+            return formula2.StartsWith("-", StringComparison.Ordinal)
+                ? $"{formula1}{formula2}"
+                : $"{formula1}+{formula2}";
         }
 
         /// <summary>
@@ -1701,9 +1712,13 @@ namespace QDND.Combat.Actions
             List<EffectDefinition> effectiveEffects,
             HashSet<string> effectiveTags,
             EffectContext baseContext,
-            int projectileCount)
+            int projectileCount,
+            out int handledEffectCount,
+            out int unhandledEffectCount)
         {
             var allResults = new List<EffectResult>();
+            handledEffectCount = 0;
+            unhandledEffectCount = 0;
 
             // If targets list is shorter than projectile count, we'll cycle through targets
             // (e.g., 3 magic missiles on 1 target still fires 3 times)
@@ -1942,9 +1957,13 @@ namespace QDND.Combat.Actions
                 {
                     if (!_effectHandlers.TryGetValue(effectDef.Type, out var handler))
                     {
+                        QDND.Data.RuntimeSafety.LogWarning($"[EffectPipeline] Unknown effect type: {effectDef.Type}");
+                        OnEffectUnhandled?.Invoke(effectDef.Type, action.Id);
+                        unhandledEffectCount++;
                         continue;
                     }
 
+                    handledEffectCount++;
                     var effectResults = handler.Execute(effectDef, projectileContext);
 
                     // Attach per-projectile attack result to each effect result for logging
@@ -1990,7 +2009,8 @@ namespace QDND.Combat.Actions
             bool isTestActor = testActionId != null && string.Equals(actionId, testActionId, StringComparison.OrdinalIgnoreCase);
 
             // Check cooldown (enforced for all combatants, including test actors)
-            var cooldownKey = $"{source.Id}:{actionId}";
+            var canonicalActionId = ActionRegistry?.GetAction(actionId)?.Id ?? actionId;
+            var cooldownKey = $"{source.Id}:{canonicalActionId}";
             if (_cooldowns.TryGetValue(cooldownKey, out var cooldown))
             {
                 if (cooldown.CurrentCharges <= 0)
@@ -2024,6 +2044,13 @@ namespace QDND.Combat.Actions
                 var (canPay, budgetReason) = source.ActionBudget.CanPayCost(budgetCost);
                 if (!canPay)
                     return (false, budgetReason);
+
+                if (source.ActionBudget.HasCastLeveledBonusActionSpell &&
+                    budgetCost.UsesAction &&
+                    action.SpellLevel > 0)
+                {
+                    return (false, "Cannot cast a leveled action spell after casting a bonus action spell this turn");
+                }
             }
 
             // Check BG3 ActionResources and legacy resources — skipped for test actors
@@ -2857,25 +2884,32 @@ namespace QDND.Combat.Actions
 
         private void ConsumeCooldown(string combatantId, string actionId, ActionDefinition action)
         {
-            // Only track cooldowns for abilities that have a cooldown defined
-            if (action.Cooldown.TurnCooldown == 0 && action.Cooldown.RoundCooldown == 0)
+            // ActionCooldown.MaxCharges defaults to 1 for many actions via parser defaults.
+            // Treat charge-only tracking as explicit limited-use actions (e.g. short-rest abilities).
+            bool hasCharges = action.Cooldown.MaxCharges > 0 && !action.Cooldown.ResetsOnCombatEnd;
+            bool hasCooldownTimer = action.Cooldown.TurnCooldown > 0 || action.Cooldown.RoundCooldown > 0;
+
+            // No charges and no timer means this action does not use cooldown tracking.
+            if (!hasCharges && !hasCooldownTimer)
                 return;
 
-            var key = $"{combatantId}:{actionId}";
+            var canonicalId = ActionRegistry?.GetAction(actionId)?.Id ?? actionId;
+            var key = $"{combatantId}:{canonicalId}";
 
             if (!_cooldowns.TryGetValue(key, out var cooldown))
             {
                 cooldown = new ActionCooldownState
                 {
-                    MaxCharges = action.Cooldown.MaxCharges,
-                    CurrentCharges = action.Cooldown.MaxCharges,
-                    DecrementType = action.Cooldown.TurnCooldown > 0 ? "turn" : "round"
+                    MaxCharges = hasCharges ? action.Cooldown.MaxCharges : 1,
+                    CurrentCharges = hasCharges ? action.Cooldown.MaxCharges : 1,
+                    DecrementType = !hasCooldownTimer ? "none"
+                        : (action.Cooldown.TurnCooldown > 0 ? "turn" : "round")
                 };
                 _cooldowns[key] = cooldown;
             }
 
             cooldown.CurrentCharges--;
-            if (cooldown.CurrentCharges < cooldown.MaxCharges)
+            if (hasCooldownTimer && cooldown.CurrentCharges < cooldown.MaxCharges)
             {
                 cooldown.RemainingCooldown = action.Cooldown.TurnCooldown > 0
                     ? action.Cooldown.TurnCooldown

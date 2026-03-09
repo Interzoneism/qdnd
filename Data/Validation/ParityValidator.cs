@@ -230,6 +230,8 @@ namespace QDND.Data.Validation
         {
             var result = existing ?? new ParityValidationResult();
 
+            ValidateActionRegistryParity(actionRegistry, result);
+
             // Scenario cross-reference checks
             ValidateScenarios(
                 scenarioDirectory,
@@ -245,6 +247,97 @@ namespace QDND.Data.Validation
             ValidateActionEffectStatuses(actionRegistry, statusRegistry, result);
 
             return result;
+        }
+
+        // =================================================================
+        //  Action registry parity checks
+        // =================================================================
+
+        private static void ValidateActionRegistryParity(
+            ActionRegistry actionRegistry,
+            ParityValidationResult result)
+        {
+            if (actionRegistry == null)
+                return;
+
+            var actions = actionRegistry.GetAllActions().ToList();
+            if (actions.Count == 0)
+                return;
+
+            foreach (var action in actions)
+            {
+                if (string.Equals(action.BG3SpellType, "Wall", StringComparison.OrdinalIgnoreCase))
+                {
+                    result.TotalChecks++;
+                    if (action.TargetType != TargetType.WallSegment)
+                    {
+                        result.Errors.Add(new ParityError(
+                            "ActionParity",
+                            $"Wall spell '{action.Id}' has TargetType '{action.TargetType}' instead of WallSegment"));
+                    }
+                }
+
+                if (action.RequiresConcentration)
+                {
+                    result.TotalChecks++;
+                    bool hasConcentrationBinding = !string.IsNullOrWhiteSpace(action.ConcentrationStatusId) ||
+                        (action.Effects?.Any(e =>
+                            string.Equals(e.Type, "apply_status", StringComparison.OrdinalIgnoreCase) &&
+                            !string.IsNullOrWhiteSpace(e.StatusId)) ?? false);
+
+                    if (!hasConcentrationBinding)
+                    {
+                        result.Warnings.Add(new ParityWarning(
+                            "ActionParity",
+                            $"Concentration action '{action.Id}' has no concentration status binding"));
+                    }
+                }
+            }
+
+            var upcastable = actions.Where(a => a.CanUpcast && a.SpellLevel > 0).ToList();
+            if (upcastable.Count > 0)
+            {
+                result.TotalChecks++;
+                int withScaling = upcastable.Count(a => HasMeaningfulUpcastScaling(a.UpcastScaling));
+                float coverage = withScaling / (float)upcastable.Count;
+                if (coverage < 0.70f)
+                {
+                    result.Warnings.Add(new ParityWarning(
+                        "ActionParity",
+                        $"Upcast coverage is low: {withScaling}/{upcastable.Count} actions have scaling ({coverage:P0})"));
+                }
+            }
+
+            var allActionIds = actionRegistry.GetAllActionIds();
+            int aliasCount = Math.Max(0, allActionIds.Count - actions.Count);
+            result.TotalChecks++;
+            if (aliasCount == 0)
+            {
+                result.Warnings.Add(new ParityWarning(
+                    "ActionParity",
+                    "No action aliases are registered; BG3 variant collisions may be collapsing data without traceability"));
+            }
+
+            int levelVariantAliases = allActionIds.Count(id => Regex.IsMatch(id, @"_\d+$"));
+            result.TotalChecks++;
+            if (levelVariantAliases == 0)
+            {
+                result.Warnings.Add(new ParityWarning(
+                    "ActionParity",
+                    "No level-suffixed action aliases found (e.g., *_2); upcast variant ID collision handling may be incomplete"));
+            }
+        }
+
+        private static bool HasMeaningfulUpcastScaling(UpcastScaling scaling)
+        {
+            if (scaling == null)
+                return false;
+
+            return !string.IsNullOrWhiteSpace(scaling.DicePerLevel)
+                || scaling.DamagePerLevel != 0
+                || scaling.ProjectilesPerLevel != 0
+                || scaling.TargetsPerLevel != 0
+                || scaling.DurationPerLevel != 0;
         }
 
         // =================================================================

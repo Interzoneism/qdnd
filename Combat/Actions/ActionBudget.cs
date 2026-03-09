@@ -43,6 +43,12 @@ namespace QDND.Combat.Actions
         public bool SneakAttackUsedThisTurn { get; set; } = false;
 
         /// <summary>
+        /// Tracks the 5e rule gate: after casting a leveled spell as a bonus action,
+        /// only cantrips may be cast with an action for the rest of the turn.
+        /// </summary>
+        public bool HasCastLeveledBonusActionSpell { get; set; } = false;
+
+        /// <summary>
         /// Tracks which once-per-turn features have been used this turn.
         /// Cleared on ResetForTurn(). Used for Colossus Slayer, etc.
         /// </summary>
@@ -109,6 +115,7 @@ namespace QDND.Combat.Actions
             RemainingMovement = MaxMovement;
             AttacksRemaining = MaxAttacks;
             SneakAttackUsedThisTurn = false;
+            HasCastLeveledBonusActionSpell = false;
             UsedOncePerTurnFeatures.Clear();
             OnBudgetChanged?.Invoke();
         }
@@ -132,6 +139,7 @@ namespace QDND.Combat.Actions
             _reactionCharges = 1;
             RemainingMovement = MaxMovement;
             AttacksRemaining = MaxAttacks;
+            HasCastLeveledBonusActionSpell = false;
             OnBudgetChanged?.Invoke();
         }
 

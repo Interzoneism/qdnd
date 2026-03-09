@@ -10,7 +10,7 @@ namespace QDND.Tests.Unit
     public class BG3StatusIntegrationTests
     {
         [Fact]
-        public void ConvertToStatusDefinition_BasicBoostStatus_ConvertsCorrectly()
+        public void ConvertToStatusDefinition_AcBoost_DoesNotEmitLegacyAcModifier()
         {
             // Arrange
             var bg3Status = new BG3StatusData
@@ -33,8 +33,8 @@ namespace QDND.Tests.Unit
             Assert.Equal("Blessed by divine power", statusDef.Description);
             Assert.Equal(10, statusDef.DefaultDuration);
             Assert.True(statusDef.IsBuff);
-            // Modifiers from Boosts parsing should be added
-            Assert.NotEmpty(statusDef.Modifiers);
+            // AC boosts are handled by the boost pipeline; status modifiers should not duplicate AC.
+            Assert.DoesNotContain(statusDef.Modifiers, m => m.Target == ModifierTarget.ArmorClass);
         }
 
         [Fact]

@@ -117,19 +117,49 @@ namespace QDND.Data.Actions
                 _warnings.Add(warning);
 
             // Convert and register each spell
+            var variantBuckets = new Dictionary<string, List<ActionDefinition>>(StringComparer.OrdinalIgnoreCase);
             foreach (var spell in orderedSpells)
             {
                 try
                 {
                     var action = BG3ActionConverter.ConvertToAction(spell, includeRawFormulas: true);
+                    if (!variantBuckets.TryGetValue(action.Id, out var variants))
+                    {
+                        variants = new List<ActionDefinition>();
+                        variantBuckets[action.Id] = variants;
+                    }
+                    variants.Add(action);
+
+                    string canonicalNormalizedId = SpellUpcastRules.NormalizeBG3SpellId(spell.Id);
+                    string variantAliasId = SpellUpcastRules.NormalizeBG3SpellIdPreserveLevelSuffix(spell.Id);
+                    bool canRegisterVariantAlias = action.Id.Equals(canonicalNormalizedId, StringComparison.OrdinalIgnoreCase);
                     
                     if (registry.RegisterAction(action, overwrite: false))
                     {
                         _loadedCount++;
+                        if (canRegisterVariantAlias &&
+                            !string.IsNullOrEmpty(variantAliasId) &&
+                            !variantAliasId.Equals(action.Id, StringComparison.OrdinalIgnoreCase))
+                        {
+                            registry.RegisterAlias(variantAliasId, action.Id);
+                        }
                     }
                     else
                     {
-                        _warnings.Add($"Failed to register action '{action.Id}' (may be duplicate)");
+                        if (registry.HasAction(action.Id))
+                        {
+                            if (canRegisterVariantAlias &&
+                                !string.IsNullOrEmpty(variantAliasId) &&
+                                !variantAliasId.Equals(action.Id, StringComparison.OrdinalIgnoreCase))
+                            {
+                                registry.RegisterAlias(variantAliasId, action.Id);
+                            }
+
+                            _warnings.Add($"Collapsed BG3 variant '{spell.Id}' into canonical action '{action.Id}'");
+                            continue;
+                        }
+
+                        _warnings.Add($"Failed to register action '{action.Id}'");
                         _failedCount++;
                     }
                 }
@@ -138,6 +168,24 @@ namespace QDND.Data.Actions
                     _errors.Add($"Failed to convert spell '{spell.Id}': {ex.Message}");
                     _failedCount++;
                 }
+            }
+
+            int derivedUpcastRules = 0;
+            foreach (var (baseId, variants) in variantBuckets)
+            {
+                if (SpellUpcastRules.TryRegisterDerivedUpcastRule(baseId, variants))
+                    derivedUpcastRules++;
+            }
+
+            if (derivedUpcastRules > 0)
+            {
+                _warnings.Add($"Derived {derivedUpcastRules} upcast rule(s) from BG3 variant groups");
+            }
+
+            // Re-apply rules after derivation so actions loaded earlier receive newly inferred scaling.
+            foreach (var registeredAction in registry.GetAllActions())
+            {
+                SpellUpcastRules.ApplyUpcastRule(registeredAction);
             }
 
             // Collect registry errors

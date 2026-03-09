@@ -71,6 +71,11 @@ namespace QDND.Combat.Statuses
         public string TargetId { get; set; }
 
         /// <summary>
+        /// All targets affected by the concentration effect.
+        /// </summary>
+        public List<string> TargetIds { get; set; } = new();
+
+        /// <summary>
         /// When concentration started (Unix timestamp milliseconds).
         /// </summary>
         public long StartedAt { get; set; }
@@ -351,7 +356,8 @@ namespace QDND.Combat.Statuses
                 CombatantId = combatantId,
                 ActionId = actionId,
                 StatusId = statusId,
-                TargetId = targetId
+                TargetId = targetId,
+                TargetIds = new List<string> { targetId }
             });
         }
 
@@ -542,12 +548,27 @@ namespace QDND.Combat.Statuses
 
         private static ConcentrationInfo NormalizeContract(ConcentrationInfo contract)
         {
+            var normalizedTargetIds = contract.TargetIds?
+                .Where(id => !string.IsNullOrWhiteSpace(id))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList() ?? new List<string>();
+
+            if (!string.IsNullOrWhiteSpace(contract.TargetId) &&
+                !normalizedTargetIds.Contains(contract.TargetId, StringComparer.OrdinalIgnoreCase))
+            {
+                normalizedTargetIds.Add(contract.TargetId);
+            }
+
+            if (normalizedTargetIds.Count == 0)
+                normalizedTargetIds.Add(contract.CombatantId);
+
             return new ConcentrationInfo
             {
                 CombatantId = contract.CombatantId,
                 ActionId = contract.ActionId,
                 StatusId = contract.StatusId,
-                TargetId = string.IsNullOrWhiteSpace(contract.TargetId) ? contract.CombatantId : contract.TargetId,
+                TargetId = normalizedTargetIds[0],
+                TargetIds = normalizedTargetIds,
                 StartedAt = contract.StartedAt > 0
                     ? contract.StartedAt
                     : DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
@@ -592,13 +613,20 @@ namespace QDND.Combat.Statuses
             }
 
             // Backward-compatible fallback for effects that aren't represented as status instances.
-            if (matchingStatuses.Count == 0 && !string.IsNullOrWhiteSpace(info.TargetId))
+            if (matchingStatuses.Count == 0)
             {
-                info.LinkedEffects.Add(new ConcentrationEffectLink
+                var targetIds = info.TargetIds?.Count > 0
+                    ? info.TargetIds
+                    : new List<string> { info.TargetId };
+
+                foreach (var targetId in targetIds.Where(id => !string.IsNullOrWhiteSpace(id)).Distinct(StringComparer.OrdinalIgnoreCase))
                 {
-                    StatusId = info.StatusId,
-                    TargetId = info.TargetId
-                });
+                    info.LinkedEffects.Add(new ConcentrationEffectLink
+                    {
+                        StatusId = info.StatusId,
+                        TargetId = targetId
+                    });
+                }
             }
         }
 

@@ -106,6 +106,9 @@ namespace QDND.Data.Actions
                         if (effect.Type == "damage")
                         {
                             effect.SaveTakesHalf = true;
+                            // BG3 commonly encodes SpellFail as DealDamage(.../2, ...).
+                            // SaveTakesHalf already captures this runtime behavior.
+                            effect.Parameters.Remove("damageMultiplier");
                         }
                     }
                     

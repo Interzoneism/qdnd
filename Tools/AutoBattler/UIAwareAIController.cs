@@ -599,6 +599,9 @@ namespace QDND.Tools.AutoBattler
                         }
                         else
                         {
+                            _actionBarRejectionsThisTurn.Add(action.ActionId);
+                            aiPipeline.InvalidateCurrentPlan();
+                            
                             OnActionExecuted?.Invoke(actor.Id, $"{FormatActionDescription(action)} - invalid params", false);
                         }
                         break;
@@ -649,6 +652,7 @@ namespace QDND.Tools.AutoBattler
                             if (actor.Position.DistanceTo(posBeforeMove) < 0.1f)
                             {
                                 _consecutiveFailedMoves++;
+                                aiPipeline.InvalidateCurrentPlan();
                                 Log($"Movement failed (position unchanged), consecutive failures: {_consecutiveFailedMoves}");
                                 if (_consecutiveFailedMoves >= MAX_CONSECUTIVE_FAILED_MOVES)
                                 {

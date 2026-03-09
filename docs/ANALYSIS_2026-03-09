@@ -1,0 +1,122 @@
+# QDND Architecture Analysis: Major Systems That Should Be Done Differently
+
+## Critical Severity (would restructure these first)
+
+### 1. EffectPipeline is 6 systems in a trenchcoat
+EffectPipeline.cs (3,426 lines, 15 injected services, 67 methods) simultaneously owns: action storage (the dictionary + lookup), action execution orchestration, attack roll math, saving throw math, resource validation/consumption, cooldown management, multi-projectile execution, turn lifecycle hooks, damage previews, upcast resolution, dice formula arithmetic, reaction trigger events, and weapon proficiency checking.
+
+**Why it matters:** Every combat feature touches this file. 15 optional service dependencies accumulate because each new system (surfaces, forced movement, LOS, height) gets bolted on as a nullable property. The file is a perpetual merge conflict.
+
+**Better approach:** Split into `ActionStore` (registry), `AttackRollEngine` (roll calculation), `ResourceValidator` (cost checking/consumption), and `ActionExecutor` (orchestration). Each sub-system takes only the 2-4 services it actually needs as constructor dependencies.
+
+### 2. CombatArena is composition root + scene controller + API facade + visual manager
+CombatArena.cs (2,558 lines, 50+ private fields, 59 public methods) creates 30+ services in a ~400-line `RegisterServices()` method, manages scene lifecycle, holds the shared mutable combatant list, acts as the facade for all external callers (8 classes hold a direct reference; `HudController` alone makes 80 `Arena.` calls), and does visual work (spawns CombatantVisual nodes, manages surface visuals).
+
+**Why it matters:** Every new feature requires editing this file. It's untestable — you can't test any service's wiring without constructing the entire arena. The `List<Combatant>` passed by reference to 6+ services creates implicit shared mutable state with no ownership model.
+
+**Better approach:** Extract a `CombatArenaComposer` for service wiring, an `ICombatController` interface with the ~10 methods other classes actually need, and an `ICombatantRegistry` that owns the combatant list behind Add/Remove/GetAll with events. `CombatArena._Ready()` becomes a thin bootstrap call.
+
+### 3. ID normalization destroys upcast variant data before it can be used
+`NormalizeBG3SpellId()` in SpellUpcastRules.cs strips level suffixes, collapsing 4,698 BG3 entries to ~2,160. The discarded entries contain the exact upcast effect data needed to compute scaling. The workaround is a hand-maintained static dictionary covering ~35 of hundreds of spells.
+
+**Why it matters:** Upcast fidelity for the majority of spells is either heuristic or missing. The data exists in the BG3 files but is destroyed at parse time.
+
+**Better approach:** Two-pass pipeline: collect all entries by normalized base ID into `Dictionary<string, List<BG3SpellData>>`, compute upcast deltas from variant differences, register only the base, but store variants in a companion `SpellVariantRegistry`.
+
+---
+
+## Major Severity (significant structural debt)
+
+### 4. ICombatContext is a service locator, not dependency injection
+CombatContext.cs is a `Dictionary<Type, object>` with `GetService<T>()`. Despite the coding standard claiming "constructor injection via ICombatContext", `GetService<T>()` is called **126 times** across 18 files outside the composition root. Dependencies are hidden, not declared — failures surface at runtime, not compile time. The `AIDecisionPipeline.LateInitialize()` method pulling 8 services is the clearest symptom.
+
+**Better approach:** Services declare dependencies as constructor parameters. `ICombatContext` is reduced to combatant registration/lookup only. Service-to-service wiring happens once at the composition root.
+
+### 5. Mega-constructors use callbacks as inversion-of-control (27-31 parameters)
+`TurnLifecycleService` takes 27 constructor parameters (15 services + 12 `Action<>`/`Func<>` callbacks). `ActionExecutionService` takes 31. The callbacks are CombatArena methods wrapped in closures — this is service locator semantics expressed as delegates. A 27-parameter constructor is as untestable as `GetService<T>()`.
+
+**Better approach:** Group related callbacks into explicit interfaces: `ITurnDriver` (3 methods), `IInputState` (2 queries), `IPresentationCoordinator` (4 methods). Each service takes 3-6 interface parameters instead of 27 raw lambdas.
+
+### 6. Reaction suspension is synchronous/re-entrant, not true async
+`EffectPipeline.ExecuteAction` calls `ReactionResolver.Resolve()` which shows a UI prompt and returns a sentinel `null` for player reactions. The C# call frame stays on the stack — the system depends on Godot's single-threaded main loop for correctness. If reaction resolution ever needs to be asynchronous (multiplayer, complex UI), the entire model breaks.
+
+**Better approach:** Model reactions as a proper coroutine or `TaskCompletionSource<bool>` — fire a pending event, suspend the pipeline, and resume on resolution.
+
+### 7. Turn lifecycle has implicit ordering constraints
+TurnLifecycleService.cs (888 lines) executes ~18 steps in `BeginTurn` with ordering dependencies encoded only in comments (e.g., "aura processing MUST fire before status ticks"). No test asserts this ordering.
+
+**Better approach:** Define an ordered `ITurnPhase[]` pipeline where each phase declares its dependencies. Phases are executed in resolved order, enforcing the constraint structurally.
+
+### 8. Event architecture has no cleanup path
+`CombatArena.RegisterServices()` wires `+=` event subscriptions with no corresponding `-=` deregistration. On `ReloadWithScenario`, old services are abandoned but their events still have subscribers holding arena references — a memory leak and potential double-dispatch. The 4 reaction-trigger events fired by EffectPipeline must arrive in a fixed causal order, but ordering is implicit.
+
+**Better approach:** Introduce explicit `Dispose`/`Unsubscribe` pass in `ReloadWithScenario`. Give reaction-trigger events an explicit ordering contract in a `ReactionTriggerPipeline` type.
+
+### 9. Dual HUD creates correctness risk
+CombatHUD.cs (2,408 lines, "legacy") and HudController.cs (2,755 lines, "new") both coexist, both subscribe to the same events, both populate ability buttons on turn change. Neither is clearly authoritative for any given piece of UI.
+
+**Better approach:** Establish a clear cutover: `CombatHUD` is removed in a single PR, `HudController` becomes the sole UI controller.
+
+### 10. SpellEffectConverter is a monolithic string parser (2,074 lines)
+SpellEffectConverter.cs — every new BG3 functor type requires editing this one file and extending an 800-line dispatch chain of sequential `if` blocks. No pluggability.
+
+**Better approach:** A `Dictionary<string, Func<args, EffectDefinition>>` handler registry where each functor type registers its own parser. New functors are additive, not modifications.
+
+### 11. BG3 raw formula strings leak into the runtime model
+ActionDefinition.cs carries `BG3SpellProperties`, `BG3SpellRoll`, `BG3SpellSuccess`, `BG3SpellFail` — unparsed BG3 strings on a runtime combat object. Any code can either use the parsed `Effects` list or re-parse the raw strings. Dual representations of the same data coexist.
+
+**Better approach:** Split into `BG3SpellDefinition` (data layer, raw strings) and `ActionDefinition` (runtime, parsed fields only). The converter owns the boundary.
+
+### 12. Registries are copy-pasted with no shared base
+4 registries (`ActionRegistry`, `StatusRegistry`, `PassiveRegistry`, `InterruptRegistry`) follow the same pattern but have diverged: `PassiveRegistry` uses case-sensitive key comparison while the other three are case-insensitive. This is a latent runtime bug.
+
+**Better approach:** Extract a generic `Registry<T>` base class with shared override/error/warning semantics. Each concrete registry provides only its secondary indexes.
+
+### 13. Rule window/passive hooks collapse pre- and post- timing
+`GenericFunctorRuleProvider.MapWindowToFunctorContext` maps both `BeforeSavingThrow` and `AfterSavingThrow` to the same `FunctorContext.OnCast`, erasing timing distinctions. Passives like Heightened Spell (impose disadvantage on *first* save) can't be correctly expressed.
+
+**Better approach:** Add `BeforeX` / `AfterX` as distinct `FunctorContext` values. This is a data model change, not a refactor.
+
+---
+
+## Medium Severity (worth fixing but not blocking)
+
+### 14. Testing architecture gaps
+- **Shadow-class tests** (reimplementing `TestRulesEngine`, `TestStatusSystem` from scratch rather than testing real code) give false confidence — ~200 lines of mock code that nobody maintains. The real classes are now pure C# and testable directly.
+- **28 services have no interfaces** — can't substitute or mock. `EffectPipeline` needs 12 real services to exercise full code paths.
+- **26 UI model tests permanently skipped** — models inherit `RefCounted`, which requires Godot runtime.
+- **`AIDecisionPipeline` does `as CombatContext` downcast** at AIDecisionPipeline.cs, silently getting `null` when running against test `HeadlessCombatContext`.
+
+### 15. BG3SpellParser inheritance is manual (35 of 75 fields)
+`BG3SpellParser.ApplyInheritance` copies ~35 fields manually. `BG3SpellData` has ~75. Adding a field silently breaks inheritance for that field. No compile-time enforcement.
+
+### 16. Shared mutable combatant list
+`CombatArena._combatants` (`List<Combatant>`) is passed by reference to 6+ services. Any service can observe or cause mutations mid-frame. Between `.Clear()` and `.AddRange()` during scenario reload, any holder sees an empty list.
+
+---
+
+## What's Actually Done Well
+
+Not everything needs rework. These systems are clean:
+
+- **CombatStateMachine** — clean 238-line explicit transition table with validation
+- **CharacterResolver** — pure functional resolution pipeline, correct formula usage
+- **Targeting 3-layer contract** — modes/system/visuals separation is well-designed
+- **Data layer Godot isolation** — parsers and registries are almost entirely Godot-free and testable
+- **RulesEngine** — pure C#, deterministic with seed injection, well-tested
+- **`RuntimeSafety` pattern** — consistent testhost detection across 112 call sites
+
+---
+
+## Recommended Priority
+
+If I were prioritizing restructuring effort:
+
+1. **Split EffectPipeline** (#1) — highest daily pain, blocks every feature
+2. **Fix ID normalization** (#3) — critical for BG3 parity, data is being destroyed
+3. **Remove CombatHUD** (#9) — eliminates dual-HUD risk, one PR
+4. **Extract CombatArena facade** (#2) — reduces the god object incrementally
+5. **Interface-ify service locator** (#4, #5) — enables testability for everything else 
+
+Completed: *Synthesize findings into analysis* (5/5)
+

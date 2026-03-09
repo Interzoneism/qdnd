@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Godot;
 using Xunit;
 using QDND.Combat.Rules;
@@ -186,6 +187,22 @@ namespace QDND.Tests.Unit
         #region Damage Tests
 
         [Fact]
+        public void CombineDiceFormulas_DifferentDieTypes_PreservesBothTerms()
+        {
+            // Arrange
+            var (pipeline, _, _) = CreatePipeline();
+            var method = typeof(EffectPipeline).GetMethod("CombineDiceFormulas", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            Assert.NotNull(method);
+
+            // Act
+            var combined = (string)method!.Invoke(pipeline, new object[] { "2d6", "1d4" });
+
+            // Assert
+            Assert.Equal("2d6+1d4", combined);
+        }
+
+        [Fact]
         public void ExecuteAbility_DealsDamage_ReducesHP()
         {
             // Arrange
@@ -336,6 +353,55 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
+        public void ExecuteAbility_ConcentrationSpell_MultiTarget_TracksAllTargets()
+        {
+            var (pipeline, rules, statuses) = CreatePipeline();
+            var concentration = new ConcentrationSystem(statuses, rules);
+            pipeline.Concentration = concentration;
+
+            statuses.RegisterStatus(new StatusDefinition
+            {
+                Id = "bless",
+                Name = "Bless",
+                DurationType = DurationType.Turns,
+                DefaultDuration = 10
+            });
+
+            var source = CreateCombatant("caster", 100);
+            var allyOne = CreateCombatant("ally_one", 100);
+            var allyTwo = CreateCombatant("ally_two", 100);
+
+            var action = new ActionDefinition
+            {
+                Id = "bless_multi",
+                Name = "Bless Multi",
+                TargetType = TargetType.MultiUnit,
+                RequiresConcentration = true,
+                ConcentrationStatusId = "bless",
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition
+                    {
+                        Type = "apply_status",
+                        StatusId = "bless",
+                        StatusDuration = 10,
+                        StatusStacks = 1
+                    }
+                }
+            };
+            pipeline.RegisterAction(action);
+
+            var result = pipeline.ExecuteAction("bless_multi", source, new List<Combatant> { allyOne, allyTwo });
+
+            Assert.True(result.Success);
+            var info = concentration.GetConcentratedEffect(source.Id);
+            Assert.NotNull(info);
+            Assert.Equal(2, info.TargetIds.Count);
+            Assert.Contains("ally_one", info.TargetIds);
+            Assert.Contains("ally_two", info.TargetIds);
+        }
+
+        [Fact]
         public void BreakConcentration_RemovesMatchingStatusFromAllTargets()
         {
             // Arrange
@@ -361,6 +427,133 @@ namespace QDND.Tests.Unit
             Assert.True(broke);
             Assert.False(statuses.HasStatus("ally_one", "bless"));
             Assert.False(statuses.HasStatus("ally_two", "bless"));
+        }
+
+        [Fact]
+        public void ExecuteAbility_OnlyUnknownEffects_ReturnsFailure()
+        {
+            var (pipeline, _, _) = CreatePipeline();
+            var source = CreateCombatant("caster", 100);
+            var target = CreateCombatant("target", 100);
+
+            pipeline.RegisterAction(new ActionDefinition
+            {
+                Id = "unknown_only",
+                Name = "Unknown Only",
+                TargetType = TargetType.SingleUnit,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "totally_unknown_effect_type" }
+                }
+            });
+
+            var result = pipeline.ExecuteAction("unknown_only", source, new List<Combatant> { target });
+
+            Assert.False(result.Success);
+            Assert.Contains("unhandled", result.ErrorMessage, StringComparison.OrdinalIgnoreCase);
+        }
+
+        [Fact]
+        public void ExecuteAbility_LeveledBonusSpell_BlocksLeveledActionSpellButAllowsCantrip()
+        {
+            var (pipeline, _, _) = CreatePipeline();
+            var source = CreateCombatant("caster", 100);
+            var target = CreateCombatant("target", 100);
+
+            pipeline.RegisterAction(new ActionDefinition
+            {
+                Id = "bonus_spell",
+                Name = "Bonus Spell",
+                SpellLevel = 1,
+                TargetType = TargetType.SingleUnit,
+                Cost = new ActionCost { UsesBonusAction = true },
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "heal", Value = 1 }
+                }
+            });
+
+            pipeline.RegisterAction(new ActionDefinition
+            {
+                Id = "leveled_action_spell",
+                Name = "Leveled Action Spell",
+                SpellLevel = 1,
+                TargetType = TargetType.SingleUnit,
+                Cost = new ActionCost { UsesAction = true },
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", Value = 10, DamageType = "fire" }
+                }
+            });
+
+            pipeline.RegisterAction(new ActionDefinition
+            {
+                Id = "action_cantrip",
+                Name = "Action Cantrip",
+                SpellLevel = 0,
+                TargetType = TargetType.SingleUnit,
+                Cost = new ActionCost { UsesAction = true },
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", Value = 5, DamageType = "force" }
+                }
+            });
+
+            var bonusResult = pipeline.ExecuteAction("bonus_spell", source, new List<Combatant> { source });
+            Assert.True(bonusResult.Success);
+            Assert.True(source.ActionBudget.HasCastLeveledBonusActionSpell);
+
+            var (canUseLeveled, leveledReason) = pipeline.CanUseAbility("leveled_action_spell", source);
+            Assert.False(canUseLeveled);
+            Assert.Contains("bonus action spell", leveledReason, StringComparison.OrdinalIgnoreCase);
+
+            var (canUseCantrip, _) = pipeline.CanUseAbility("action_cantrip", source);
+            Assert.True(canUseCantrip);
+        }
+
+        [Fact]
+        public void ExecuteAbility_CreateExplosion_ExecutesReferencedSpellDamage()
+        {
+            var (pipeline, _, _) = CreatePipeline();
+            var source = CreateCombatant("caster", 100);
+            var target = CreateCombatant("target", 100);
+
+            pipeline.RegisterAction(new ActionDefinition
+            {
+                Id = "explosion_payload",
+                Name = "Explosion Payload",
+                TargetType = TargetType.SingleUnit,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", Value = 12, DamageType = "fire" }
+                }
+            });
+
+            pipeline.RegisterAction(new ActionDefinition
+            {
+                Id = "trigger_explosion",
+                Name = "Trigger Explosion",
+                TargetType = TargetType.Point,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition
+                    {
+                        Type = "create_explosion",
+                        Parameters = new Dictionary<string, object>
+                        {
+                            { "spell_id", "explosion_payload" },
+                            { "position", "target" }
+                        }
+                    }
+                }
+            });
+
+            int hpBefore = target.Resources.CurrentHP;
+            var result = pipeline.ExecuteAction("trigger_explosion", source, new List<Combatant> { target });
+
+            Assert.True(result.Success);
+            Assert.Equal(hpBefore - 12, target.Resources.CurrentHP);
+            Assert.Contains(result.EffectResults, er => er.EffectType == "create_explosion" && er.Success);
         }
 
         [Fact]

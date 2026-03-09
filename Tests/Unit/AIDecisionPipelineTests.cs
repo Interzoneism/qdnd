@@ -7,6 +7,7 @@ using Xunit;
 using QDND.Combat.Actions;
 using QDND.Combat.AI;
 using QDND.Combat.Entities;
+using QDND.Combat.Movement;
 using QDND.Combat.Rules;
 using QDND.Combat.Services;
 using QDND.Combat.Statuses;
@@ -785,6 +786,12 @@ namespace QDND.Tests.Unit
                 }
             });
             ctx.RegisterService(effectPipeline);
+
+            var movement = new MovementService
+            {
+                GetCombatants = () => ctx.GetAllCombatants()
+            };
+            ctx.RegisterService(movement);
 
             var pipeline = new AIDecisionPipeline(ctx, seed: 22);
             pipeline.LateInitialize();

@@ -22,16 +22,59 @@ namespace QDND.Combat.Actions.Effects
         {
             var results = new List<EffectResult>();
 
+            if (context?.Source == null)
+            {
+                results.Add(EffectResult.Failed(Type, "unknown", null, "Missing source context"));
+                return results;
+            }
+
             if (!definition.Parameters.TryGetValue("spell_id", out var spellIdObj))
             {
                 results.Add(EffectResult.Failed(Type, context.Source.Id, null, "No spell_id specified"));
                 return results;
             }
 
+            if (context.Pipeline == null)
+            {
+                results.Add(EffectResult.Failed(Type, context.Source.Id, null, "No pipeline available for explosion spell execution"));
+                return results;
+            }
+
             string spellId = spellIdObj.ToString();
             string position = definition.Parameters.TryGetValue("position", out var posObj) ? posObj.ToString() : "target";
 
-            // Emit event for explosion creation (actual explosion logic handled by game layer)
+            var targetPosition = context.TargetPosition ??
+                context.Targets?.FirstOrDefault()?.Position ??
+                context.Source.Position;
+
+            if (string.Equals(position, "source", StringComparison.OrdinalIgnoreCase))
+                targetPosition = context.Source.Position;
+
+            var options = new ActionExecutionOptions
+            {
+                SkipCostValidation = true,
+                TargetPosition = targetPosition
+            };
+
+            var targets = context.Targets ?? new List<Combatant>();
+            var subResult = context.Pipeline.ExecuteAction(spellId, context.Source, targets, options);
+            if (!subResult.Success)
+            {
+                results.Add(EffectResult.Failed(
+                    Type,
+                    context.Source.Id,
+                    targets.FirstOrDefault()?.Id,
+                    $"Explosion spell '{spellId}' failed: {subResult.ErrorMessage}"));
+                return results;
+            }
+
+            int totalDamage = subResult.EffectResults
+                .Where(er => string.Equals(er.EffectType, "damage", StringComparison.OrdinalIgnoreCase))
+                .Sum(er => er.Data.TryGetValue("actualDamageDealt", out var dealt)
+                    ? Convert.ToInt32(dealt)
+                    : Convert.ToInt32(er.Value));
+
+            // Emit event for presentation systems.
             context.Rules.Events.Dispatch(new QDND.Combat.Rules.RuleEvent
             {
                 Type = QDND.Combat.Rules.RuleEventType.Custom,
@@ -41,14 +84,16 @@ namespace QDND.Combat.Actions.Effects
                 {
                     { "spellId", spellId },
                     { "position", position },
-                    { "targetPosition", context.TargetPosition ?? context.Source.Position }
+                    { "targetPosition", targetPosition }
                 }
             });
 
-            string msg = $"Created explosion: {spellId}";
-            var result = EffectResult.Succeeded(Type, context.Source.Id, null, 0, msg);
+            string msg = $"Created explosion via '{spellId}' affecting {targets.Count} target(s)";
+            var result = EffectResult.Succeeded(Type, context.Source.Id, targets.FirstOrDefault()?.Id, totalDamage, msg);
             result.Data["spellId"] = spellId;
             result.Data["position"] = position;
+            result.Data["targetCount"] = targets.Count;
+            result.Data["totalDamage"] = totalDamage;
             results.Add(result);
 
             return results;

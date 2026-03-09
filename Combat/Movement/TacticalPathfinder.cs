@@ -81,7 +81,8 @@ namespace QDND.Combat.Movement
                 ?? (maxCostBudget.HasValue
                     ? Mathf.CeilToInt(maxCostBudget.Value / spacing) + SearchPaddingCells
                     : (straightCells * 3) + SearchPaddingCells + 12);
-            radiusCells = Mathf.Clamp(radiusCells, straightCells + SearchPaddingCells + 2, 256);
+            int minRadius = straightCells + SearchPaddingCells + 2;
+            radiusCells = Mathf.Clamp(radiusCells, Math.Min(minRadius, 256), 256);
 
             int minX = Math.Min(startCell.X, goalCell.X) - radiusCells;
             int maxX = Math.Max(startCell.X, goalCell.X) + radiusCells;

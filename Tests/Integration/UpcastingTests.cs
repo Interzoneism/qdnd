@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Xunit;
 using QDND.Combat.Actions;
@@ -347,6 +348,44 @@ namespace QDND.Tests.Integration
         {
             var result = SpellUpcastRules.NormalizeBG3SpellId(bg3Id);
             Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public void NormalizeBG3SpellIdPreserveLevelSuffix_KeepsVariantLevel()
+        {
+            string normalized = SpellUpcastRules.NormalizeBG3SpellIdPreserveLevelSuffix("Projectile_MagicMissile_4");
+            Assert.Equal("magic_missile_4", normalized);
+        }
+
+        [Fact]
+        public void TryRegisterDerivedUpcastRule_DerivesDiceScalingFromVariants()
+        {
+            string actionId = $"test_upcast_spell_{Guid.NewGuid():N}";
+            var level1 = new ActionDefinition
+            {
+                Id = actionId,
+                SpellLevel = 1,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", DiceFormula = "2d6", DamageType = "fire" }
+                }
+            };
+            var level2 = new ActionDefinition
+            {
+                Id = actionId,
+                SpellLevel = 2,
+                Effects = new List<EffectDefinition>
+                {
+                    new EffectDefinition { Type = "damage", DiceFormula = "3d6", DamageType = "fire" }
+                }
+            };
+
+            bool registered = SpellUpcastRules.TryRegisterDerivedUpcastRule(actionId, new[] { level1, level2 });
+            var derived = SpellUpcastRules.GetUpcastScaling(actionId);
+
+            Assert.True(registered);
+            Assert.NotNull(derived);
+            Assert.Equal("1d6", derived.DicePerLevel);
         }
 
         [Theory]

@@ -31,6 +31,7 @@ namespace QDND.Tests.Unit
         public void ResetForTurn_ResetsActionBonusMovement_NotReaction()
         {
             var budget = new ActionBudget(30f);
+            budget.HasCastLeveledBonusActionSpell = true;
 
             // Consume all resources
             budget.ConsumeAction();
@@ -51,6 +52,7 @@ namespace QDND.Tests.Unit
             Assert.True(budget.HasAction);
             Assert.True(budget.HasBonusAction);
             Assert.Equal(30f, budget.RemainingMovement);
+            Assert.False(budget.HasCastLeveledBonusActionSpell);
 
             // Reaction should NOT reset
             Assert.False(budget.HasReaction);

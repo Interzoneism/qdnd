@@ -364,6 +364,7 @@ namespace QDND.Tests
             // "/2" divisor is stripped; half-damage is signalled by SaveTakesHalf
             Assert.Equal("3d6", failEffects[0].DiceFormula);
             Assert.True(failEffects[0].SaveTakesHalf);
+            Assert.False(failEffects[0].Parameters.ContainsKey("damageMultiplier"));
         }
 
         [Fact]
@@ -933,15 +934,15 @@ namespace QDND.Tests
         }
 
         [Fact]
-        public void ParseSingleEffect_InnerParenDivisor_ExtractsMultiplierAndDice()
+        public void ParseSingleEffect_InnerParenDivisor_StripsMultiplierForFailEffects()
         {
             var effects = SpellEffectConverter.ParseEffects("DealDamage((1d10/2),Piercing,Magical)", isFailEffect: true);
             Assert.Single(effects);
             var effect = effects[0];
             Assert.Equal("damage", effect.Type);
             Assert.Equal("1d10", effect.DiceFormula);
-            Assert.True(effect.Parameters.TryGetValue("damageMultiplier", out var m));
-            Assert.Equal(0.5f, Convert.ToSingle(m), 3);
+            Assert.True(effect.SaveTakesHalf);
+            Assert.False(effect.Parameters.ContainsKey("damageMultiplier"));
         }
     }
 }

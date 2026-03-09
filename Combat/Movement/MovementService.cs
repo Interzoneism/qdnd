@@ -569,6 +569,25 @@ namespace QDND.Combat.Movement
         }
 
         /// <summary>
+        /// Lightweight reachability check for AI/planning.
+        /// Computes path success only and skips preview processing/allocation.
+        /// </summary>
+        public bool CanReach(Combatant combatant, Vector3 destination)
+        {
+            if (combatant == null)
+                return false;
+
+            // Check actual-position occupancy to mirror CanMoveTo behavior.
+            // The pathfinder checks from snapped cell centers, missing blockers
+            // that are within collision radius of the actual destination.
+            if (GetBlockingCombatant(combatant, destination) != null)
+                return false;
+
+            var path = ComputePath(combatant, destination, null);
+            return path.Success;
+        }
+
+        /// <summary>
         /// Get a detailed path preview with waypoints, costs, and terrain information.
         /// Used by UI to display movement path before execution.
         /// </summary>

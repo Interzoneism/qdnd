@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using QDND.Combat.Actions;
 
 namespace QDND.Data.Spells
@@ -51,6 +53,21 @@ namespace QDND.Data.Spells
         /// </summary>
         public static string NormalizeBG3SpellId(string bg3Id)
         {
+            return NormalizeBG3SpellIdInternal(bg3Id, stripLevelSuffix: true);
+        }
+
+        /// <summary>
+        /// Normalizes a BG3 spell ID while preserving trailing level suffixes.
+        /// E.g., "Projectile_MagicMissile_2" -> "magic_missile_2".
+        /// Useful for variant alias registration and collision audits.
+        /// </summary>
+        public static string NormalizeBG3SpellIdPreserveLevelSuffix(string bg3Id)
+        {
+            return NormalizeBG3SpellIdInternal(bg3Id, stripLevelSuffix: false);
+        }
+
+        private static string NormalizeBG3SpellIdInternal(string bg3Id, bool stripLevelSuffix)
+        {
             if (string.IsNullOrEmpty(bg3Id))
                 return bg3Id;
 
@@ -69,15 +86,149 @@ namespace QDND.Data.Spells
                 }
             }
 
-            // Strip level suffixes like "_2", "_3" (upcast variants)
-            stripped = System.Text.RegularExpressions.Regex.Replace(stripped, @"_\d+$", "");
+            if (stripLevelSuffix)
+            {
+                // Strip level suffixes like "_2", "_3" (upcast variants)
+                stripped = Regex.Replace(stripped, @"_\d+$", "");
+            }
 
             // Handle consecutive-uppercase runs (e.g., "AoEBlast" → "Ao_EBlast") before standard split
-            stripped = System.Text.RegularExpressions.Regex.Replace(stripped, @"([A-Z]+)([A-Z][a-z])", "$1_$2");
+            stripped = Regex.Replace(stripped, @"([A-Z]+)([A-Z][a-z])", "$1_$2");
             // Standard PascalCase → snake_case BEFORE lowercasing so boundaries are detectable
-            stripped = System.Text.RegularExpressions.Regex.Replace(stripped, @"([a-z\d])([A-Z])", "$1_$2");
+            stripped = Regex.Replace(stripped, @"([a-z\d])([A-Z])", "$1_$2");
 
             return stripped.ToLowerInvariant();
+        }
+
+        /// <summary>
+        /// Attempts to auto-derive an upcast scaling rule from BG3 variant action definitions.
+        /// Curated explicit rules always win unless overwrite=true.
+        /// </summary>
+        public static bool TryRegisterDerivedUpcastRule(
+            string baseSpellId,
+            IReadOnlyList<ActionDefinition> variants,
+            bool overwrite = false)
+        {
+            if (string.IsNullOrWhiteSpace(baseSpellId) || variants == null || variants.Count < 2)
+                return false;
+
+            string normalizedBaseId = baseSpellId.ToLowerInvariant();
+            if (!overwrite && _upcastRules.ContainsKey(normalizedBaseId))
+                return false;
+
+            var byLevel = variants
+                .Where(v => v != null && v.SpellLevel > 0)
+                .GroupBy(v => v.SpellLevel)
+                .OrderBy(g => g.Key)
+                .ToDictionary(g => g.Key, g => SelectBestVariant(g), comparer: EqualityComparer<int>.Default);
+
+            if (byLevel.Count < 2)
+                return false;
+
+            int baseLevel = byLevel.Keys.Min();
+            int nextLevel = byLevel.Keys.First(l => l > baseLevel);
+            int levelDelta = Math.Max(1, nextLevel - baseLevel);
+
+            var baseAction = byLevel[baseLevel];
+            var nextAction = byLevel[nextLevel];
+
+            var scaling = new UpcastScaling
+            {
+                ResourceKey = "spell_slot",
+                BaseCost = 1,
+                CostPerLevel = 1,
+                MaxUpcastLevel = Math.Min(9, byLevel.Keys.Max()),
+                PerLevel = levelDelta > 1 ? levelDelta : null
+            };
+
+            bool hasScalingSignal = false;
+
+            int projectileDelta = nextAction.ProjectileCount - baseAction.ProjectileCount;
+            if (projectileDelta > 0)
+            {
+                scaling.ProjectilesPerLevel = Math.Max(1, projectileDelta / levelDelta);
+                hasScalingSignal = true;
+            }
+
+            int targetDelta = nextAction.MaxTargets - baseAction.MaxTargets;
+            if (targetDelta > 0)
+            {
+                scaling.TargetsPerLevel = Math.Max(1, targetDelta / levelDelta);
+                hasScalingSignal = true;
+            }
+
+            if (TryGetPrimaryDiceSignature(baseAction, out var baseDice) &&
+                TryGetPrimaryDiceSignature(nextAction, out var nextDice) &&
+                baseDice.Sides == nextDice.Sides)
+            {
+                int countDelta = nextDice.Count - baseDice.Count;
+                if (countDelta > 0)
+                {
+                    int countPerLevel = Math.Max(1, countDelta / levelDelta);
+                    scaling.DicePerLevel = $"{countPerLevel}d{baseDice.Sides}";
+                    hasScalingSignal = true;
+                }
+
+                int flatDelta = nextDice.Bonus - baseDice.Bonus;
+                if (flatDelta > 0)
+                {
+                    scaling.DamagePerLevel = Math.Max(1, flatDelta / levelDelta);
+                    hasScalingSignal = true;
+                }
+            }
+
+            if (!hasScalingSignal)
+                return false;
+
+            _upcastRules[normalizedBaseId] = scaling;
+            return true;
+        }
+
+        private static ActionDefinition SelectBestVariant(IEnumerable<ActionDefinition> candidates)
+        {
+            return candidates
+                .OrderByDescending(GetVariantSignalScore)
+                .ThenBy(a => a.Id, StringComparer.OrdinalIgnoreCase)
+                .First();
+        }
+
+        private static int GetVariantSignalScore(ActionDefinition action)
+        {
+            int score = 0;
+            if (action.ProjectileCount > 1)
+                score += 4;
+            if (action.MaxTargets > 1)
+                score += 3;
+            if (TryGetPrimaryDiceSignature(action, out _))
+                score += 5;
+            if (action.Effects != null)
+                score += action.Effects.Count;
+            return score;
+        }
+
+        private static bool TryGetPrimaryDiceSignature(ActionDefinition action, out (int Count, int Sides, int Bonus) signature)
+        {
+            signature = default;
+            if (action?.Effects == null)
+                return false;
+
+            var effect = action.Effects.FirstOrDefault(e =>
+                (string.Equals(e.Type, "damage", StringComparison.OrdinalIgnoreCase) ||
+                 string.Equals(e.Type, "heal", StringComparison.OrdinalIgnoreCase)) &&
+                !string.IsNullOrWhiteSpace(e.DiceFormula));
+
+            if (effect == null)
+                return false;
+
+            var match = Regex.Match(effect.DiceFormula.Trim(), @"^(\d+)d(\d+)([+-]\d+)?$", RegexOptions.IgnoreCase);
+            if (!match.Success)
+                return false;
+
+            int count = int.Parse(match.Groups[1].Value);
+            int sides = int.Parse(match.Groups[2].Value);
+            int bonus = match.Groups[3].Success ? int.Parse(match.Groups[3].Value) : 0;
+            signature = (count, sides, bonus);
+            return true;
         }
 
         /// <summary>

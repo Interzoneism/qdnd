@@ -94,6 +94,24 @@ namespace QDND.Data.Spells
         
         /// <summary>Effects applied on failure.</summary>
         public string SpellFail { get; set; }
+
+        /// <summary>Status ID used to track concentration ownership for this spell.</summary>
+        public string ConcentrationSpellID { get; set; }
+
+        /// <summary>Container spell references used by BG3 for chained/packaged spells.</summary>
+        public string ContainerSpells { get; set; }
+
+        /// <summary>Identifier linking this spell to a spell container definition.</summary>
+        public string SpellContainerID { get; set; }
+
+        /// <summary>Surface type metadata used by certain environmental spell effects.</summary>
+        public string SurfaceType { get; set; }
+
+        /// <summary>Additional AoE condition formula for BG3 targeting semantics.</summary>
+        public string AoEConditions { get; set; }
+
+        /// <summary>Maximum total target HP budget for HP-pool style effects.</summary>
+        public string MaximumTotalTargetHP { get; set; }
         
         /// <summary>Saving throw ability requirement.</summary>
         public string SpellSaveDC { get; set; }

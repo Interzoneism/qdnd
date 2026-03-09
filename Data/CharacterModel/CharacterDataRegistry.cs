@@ -37,8 +37,45 @@ namespace QDND.Data.CharacterModel
         public RaceDefinition GetRace(string id) => id != null && _races.TryGetValue(id, out var r) ? r : null;
         public ClassDefinition GetClass(string id) => id != null && _classes.TryGetValue(id, out var c) ? c : null;
         public FeatDefinition GetFeat(string id) => id != null && _feats.TryGetValue(id, out var f) ? f : null;
-        public WeaponDefinition GetWeapon(string id) => id != null && _weapons.TryGetValue(id, out var w) ? w : null;
-        public ArmorDefinition GetArmor(string id) => id != null && _armors.TryGetValue(id, out var a) ? a : null;
+        public WeaponDefinition GetWeapon(string id)
+        {
+            if (id == null) return null;
+            if (_weapons.TryGetValue(id, out var w)) return w;
+
+            var normalized = NormalizeBG3Id(id);
+            return normalized != id && _weapons.TryGetValue(normalized, out w) ? w : null;
+        }
+
+        public ArmorDefinition GetArmor(string id)
+        {
+            if (id == null) return null;
+            if (_armors.TryGetValue(id, out var a)) return a;
+
+            var normalized = NormalizeBG3Id(id);
+            return normalized != id && _armors.TryGetValue(normalized, out a) ? a : null;
+        }
+
+        private static string NormalizeBG3Id(string id)
+        {
+            var s = id;
+            if (s.StartsWith("WPN_", StringComparison.OrdinalIgnoreCase))
+            {
+                s = s[4..];
+            }
+            else if (s.StartsWith("ARM_", StringComparison.OrdinalIgnoreCase))
+            {
+                s = s[4..];
+            }
+
+            if (s.EndsWith("_Body", StringComparison.OrdinalIgnoreCase))
+            {
+                s = s[..^5];
+            }
+
+            return System.Text.RegularExpressions.Regex
+                .Replace(s, "(?<=[a-z])([A-Z])", "_$1")
+                .ToLowerInvariant();
+        }
         
         public IReadOnlyCollection<RaceDefinition> GetAllRaces() => _races.Values;
         public IReadOnlyCollection<ClassDefinition> GetAllClasses() => _classes.Values;

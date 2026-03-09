@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Godot;
+using QDND.Combat.Actions;
+using QDND.Combat.Environment;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
+using QDND.Combat.Services;
 using QDND.Combat.Statuses;
 
 namespace QDND.Combat.Rules.Functors
@@ -48,6 +52,30 @@ namespace QDND.Combat.Rules.Functors
         /// Optional forced movement service for push/pull effects.
         /// </summary>
         public Movement.ForcedMovementService ForcedMovement { get; set; }
+
+        /// <summary>
+        /// Optional effect pipeline for sub-spell/projectile execution.
+        /// </summary>
+        public EffectPipeline EffectPipeline { get; set; }
+
+        /// <summary>
+        /// Optional surface manager for surface/zone/douse functors.
+        /// </summary>
+        public SurfaceManager SurfaceManager { get; set; }
+
+        /// <summary>
+        /// Optional inventory service for SummonInInventory functors.
+        /// </summary>
+        public InventoryService InventoryService { get; set; }
+
+        /// <summary>
+        /// Optional counterspell callback for reaction systems.
+        /// Parameters: (sourceId, targetId).
+        /// </summary>
+        public Action<string, string> CounterspellAction { get; set; }
+
+        [ThreadStatic] private static int _subspellRecursionDepth;
+        private const int MaxSubspellRecursionDepth = 3;
 
         /// <summary>
         /// Create a new FunctorExecutor wired to the given rules engine and status manager.
@@ -148,17 +176,46 @@ namespace QDND.Combat.Rules.Functors
                     ExecuteUseAttack(functor, sourceId, effectiveTarget);
                     break;
 
-                // Stubs — log and skip
                 case FunctorType.SpawnSurface:
+                    ExecuteSpawnSurface(functor, sourceId, effectiveTarget);
+                    break;
+
                 case FunctorType.SummonInInventory:
+                    ExecuteSummonInInventory(functor, sourceId, effectiveTarget);
+                    break;
+
                 case FunctorType.Explode:
+                    ExecuteExplode(functor, sourceId, effectiveTarget);
+                    break;
+
                 case FunctorType.Teleport:
+                    ExecuteTeleport(functor, sourceId, effectiveTarget);
+                    break;
+
                 case FunctorType.UseSpell:
+                    ExecuteUseSpell(functor, sourceId, effectiveTarget);
+                    break;
+
                 case FunctorType.CreateZone:
+                    ExecuteCreateZone(functor, sourceId, effectiveTarget);
+                    break;
+
                 case FunctorType.FireProjectile:
+                    ExecuteFireProjectile(functor, sourceId, effectiveTarget);
+                    break;
+
                 case FunctorType.Resurrect:
+                    ExecuteResurrect(functor, sourceId, effectiveTarget);
+                    break;
+
                 case FunctorType.Douse:
+                    ExecuteDouse(functor, sourceId, effectiveTarget);
+                    break;
+
                 case FunctorType.Counterspell:
+                    ExecuteCounterspell(functor, sourceId, effectiveTarget);
+                    break;
+
                 case FunctorType.Unknown:
                     LogStub(functor, context, sourceId, effectiveTarget);
                     break;
@@ -851,5 +908,359 @@ namespace QDND.Combat.Rules.Functors
                 $"[FunctorExecutor] STUB functor {functor.Type} not implemented " +
                 $"(context={context}, source={sourceId}, target={targetId}, raw={functor.RawString})");
         }
+
+        private void ExecuteUseSpell(FunctorDefinition functor, string sourceId, string targetId)
+        {
+            ExecuteSubspellFunctor(functor, sourceId, targetId, "UseSpell");
+        }
+
+        private void ExecuteFireProjectile(FunctorDefinition functor, string sourceId, string targetId)
+        {
+            ExecuteSubspellFunctor(functor, sourceId, targetId, "FireProjectile");
+        }
+
+        private void ExecuteExplode(FunctorDefinition functor, string sourceId, string targetId)
+        {
+            ExecuteSubspellFunctor(functor, sourceId, targetId, "Explode");
+        }
+
+        private void ExecuteSubspellFunctor(FunctorDefinition functor, string sourceId, string targetId, string label)
+        {
+            if (EffectPipeline == null)
+            {
+                Console.WriteLine($"[FunctorExecutor] {label}: no EffectPipeline wired");
+                return;
+            }
+
+            var source = ResolveCombatant?.Invoke(sourceId);
+            var target = ResolveCombatant?.Invoke(targetId);
+            if (source == null)
+            {
+                Console.Error.WriteLine($"[FunctorExecutor] {label}: cannot resolve source '{sourceId}'");
+                return;
+            }
+
+            if (functor.Parameters.Length == 0)
+            {
+                Console.Error.WriteLine($"[FunctorExecutor] {label}: missing spell/projectile id: {functor.RawString}");
+                return;
+            }
+
+            int spellIndex = 0;
+            string qualifier = NormalizeToken(functor.Parameters[0]).ToUpperInvariant();
+            if (LooksLikeSourceQualifier(qualifier) && functor.Parameters.Length > 1)
+            {
+                spellIndex = 1;
+            }
+
+            string spellId = NormalizeToken(functor.Parameters[spellIndex]);
+            if (string.IsNullOrWhiteSpace(spellId))
+            {
+                Console.Error.WriteLine($"[FunctorExecutor] {label}: empty spell/projectile id: {functor.RawString}");
+                return;
+            }
+
+            var castSource = source;
+            var targets = new List<Combatant>();
+
+            if (spellIndex == 1)
+            {
+                switch (qualifier)
+                {
+                    case "SWAP":
+                        castSource = target ?? source;
+                        if (source != null)
+                            targets.Add(source);
+                        break;
+                    case "SELF":
+                    case "OBSERVER_SOURCE":
+                        targets.Add(source);
+                        break;
+                    case "TARGET":
+                    case "OBSERVER_TARGET":
+                        if (target != null)
+                            targets.Add(target);
+                        break;
+                    default:
+                        if (target != null)
+                            targets.Add(target);
+                        break;
+                }
+            }
+
+            if (targets.Count == 0)
+            {
+                if (target != null)
+                    targets.Add(target);
+                else
+                    targets.Add(castSource);
+            }
+
+            if (_subspellRecursionDepth >= MaxSubspellRecursionDepth)
+            {
+                Console.WriteLine($"[FunctorExecutor] {label}: recursion depth limit reached for '{spellId}'");
+                return;
+            }
+
+            _subspellRecursionDepth++;
+            try
+            {
+                var options = new ActionExecutionOptions
+                {
+                    SkipCostValidation = true,
+                    TargetPosition = targets[0]?.Position
+                };
+
+                var result = EffectPipeline.ExecuteAction(spellId, castSource, targets, options);
+                if (!result.Success)
+                {
+                    Console.WriteLine($"[FunctorExecutor] {label}: sub-action '{spellId}' failed: {result.ErrorMessage}");
+                }
+            }
+            finally
+            {
+                _subspellRecursionDepth--;
+            }
+        }
+
+        private static bool LooksLikeSourceQualifier(string token)
+        {
+            return token is "SWAP" or "SELF" or "TARGET" or "OBSERVER_SOURCE" or "OBSERVER_TARGET" or "OBSERVER_OBSERVER";
+        }
+
+        private static string NormalizeToken(string token)
+        {
+            return token?.Trim().Trim('\'', '"') ?? string.Empty;
+        }
+
+        private void ExecuteSpawnSurface(FunctorDefinition functor, string sourceId, string targetId)
+        {
+            ExecuteSurfaceFunctor(functor, sourceId, targetId, defaultSurfaceType: "fire", defaultRadius: 2.5f, defaultDuration: 2, label: "SpawnSurface");
+        }
+
+        private void ExecuteCreateZone(FunctorDefinition functor, string sourceId, string targetId)
+        {
+            ExecuteSurfaceFunctor(functor, sourceId, targetId, defaultSurfaceType: "fog", defaultRadius: 3.0f, defaultDuration: 3, label: "CreateZone");
+        }
+
+        private void ExecuteSurfaceFunctor(
+            FunctorDefinition functor,
+            string sourceId,
+            string targetId,
+            string defaultSurfaceType,
+            float defaultRadius,
+            int defaultDuration,
+            string label)
+        {
+            if (SurfaceManager == null)
+            {
+                Console.WriteLine($"[FunctorExecutor] {label}: no SurfaceManager wired");
+                return;
+            }
+
+            string surfaceType = defaultSurfaceType;
+            float radius = defaultRadius;
+            int duration = defaultDuration;
+
+            bool hasRadius = false;
+            bool hasDuration = false;
+
+            foreach (var param in functor.Parameters)
+            {
+                string token = NormalizeToken(param);
+                if (string.IsNullOrWhiteSpace(token))
+                    continue;
+
+                if (!hasRadius && float.TryParse(token, NumberStyles.Float, CultureInfo.InvariantCulture, out float parsedRadius))
+                {
+                    radius = Math.Max(0.5f, parsedRadius);
+                    hasRadius = true;
+                    continue;
+                }
+
+                if (!hasDuration && int.TryParse(token, NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsedDuration))
+                {
+                    duration = parsedDuration;
+                    hasDuration = true;
+                    continue;
+                }
+
+                if (token.Any(char.IsLetter))
+                {
+                    surfaceType = token.ToLowerInvariant();
+                }
+            }
+
+            var target = ResolveCombatant?.Invoke(targetId);
+            var source = ResolveCombatant?.Invoke(sourceId);
+            Vector3 position = target?.Position ?? source?.Position ?? Vector3.Zero;
+
+            var created = SurfaceManager.CreateSurface(surfaceType, position, radius, sourceId, duration);
+            if (created == null)
+            {
+                Console.WriteLine($"[FunctorExecutor] {label}: failed to create surface '{surfaceType}'");
+                return;
+            }
+
+            Console.WriteLine($"[FunctorExecutor] {label}: created {surfaceType} at {position} r={radius:F1} d={duration}");
+        }
+
+        private void ExecuteTeleport(FunctorDefinition functor, string sourceId, string targetId)
+        {
+            var target = ResolveCombatant?.Invoke(targetId);
+            if (target == null)
+            {
+                Console.Error.WriteLine($"[FunctorExecutor] Teleport: cannot resolve target '{targetId}'");
+                return;
+            }
+
+            var source = ResolveCombatant?.Invoke(sourceId);
+            Vector3 destination = target.Position;
+
+            if (functor.Parameters.Length >= 3 &&
+                float.TryParse(NormalizeToken(functor.Parameters[0]), NumberStyles.Float, CultureInfo.InvariantCulture, out float x) &&
+                float.TryParse(NormalizeToken(functor.Parameters[1]), NumberStyles.Float, CultureInfo.InvariantCulture, out float y) &&
+                float.TryParse(NormalizeToken(functor.Parameters[2]), NumberStyles.Float, CultureInfo.InvariantCulture, out float z))
+            {
+                destination = new Vector3(x, y, z);
+            }
+            else if (functor.Parameters.Length >= 1 &&
+                     float.TryParse(NormalizeToken(functor.Parameters[0]), NumberStyles.Float, CultureInfo.InvariantCulture, out float distance))
+            {
+                Vector3 origin = source?.Position ?? target.Position;
+                Vector3 direction = (target.Position - origin).Length() > 0.01f
+                    ? (target.Position - origin).Normalized()
+                    : Vector3.Forward;
+                destination = target.Position + direction * Math.Abs(distance);
+            }
+            else if (source != null)
+            {
+                destination = source.Position;
+            }
+
+            if (ForcedMovement != null)
+            {
+                ForcedMovement.Teleport(target, destination);
+            }
+            else
+            {
+                target.Position = destination;
+            }
+
+            Console.WriteLine($"[FunctorExecutor] Teleport: moved {targetId} to {destination}");
+        }
+
+        private void ExecuteResurrect(FunctorDefinition functor, string sourceId, string targetId)
+        {
+            var target = ResolveCombatant?.Invoke(targetId);
+            if (target == null)
+            {
+                Console.Error.WriteLine($"[FunctorExecutor] Resurrect: cannot resolve target '{targetId}'");
+                return;
+            }
+
+            int hpPercent = 1;
+            if (functor.Parameters.Length >= 2 && int.TryParse(NormalizeToken(functor.Parameters[1]), out int p2))
+            {
+                hpPercent = p2;
+            }
+            else if (functor.Parameters.Length >= 1 && int.TryParse(NormalizeToken(functor.Parameters[0]), out int p1) && p1 > 0 && p1 <= 100)
+            {
+                hpPercent = p1;
+            }
+
+            hpPercent = Math.Clamp(hpPercent, 1, 100);
+            int restoredHp = Math.Max(1, (int)Math.Round(target.Resources.MaxHP * (hpPercent / 100.0f)));
+
+            target.Resources.CurrentHP = restoredHp;
+            target.LifeState = CombatantLifeState.Alive;
+            target.ResetDeathSaves();
+
+            Console.WriteLine($"[FunctorExecutor] Resurrect: revived {targetId} at {restoredHp} HP ({hpPercent}% max)");
+        }
+
+        private void ExecuteDouse(FunctorDefinition functor, string sourceId, string targetId)
+        {
+            var target = ResolveCombatant?.Invoke(targetId);
+            if (target != null)
+            {
+                _statusManager.RemoveStatus(target.Id, "BURNING");
+                _statusManager.RemoveStatus(target.Id, "burning");
+            }
+
+            if (SurfaceManager != null)
+            {
+                float radius = 2.5f;
+                if (functor.Parameters.Length >= 1 &&
+                    float.TryParse(NormalizeToken(functor.Parameters[0]), NumberStyles.Float, CultureInfo.InvariantCulture, out float parsedRadius))
+                {
+                    radius = Math.Max(0.5f, parsedRadius);
+                }
+
+                var source = ResolveCombatant?.Invoke(sourceId);
+                Vector3 position = target?.Position ?? source?.Position ?? Vector3.Zero;
+                int affected = SurfaceManager.ApplySurfaceEvent("douse", position, radius, sourceId);
+                Console.WriteLine($"[FunctorExecutor] Douse: affected {affected} surface tiles around {position}");
+            }
+        }
+
+        private void ExecuteSummonInInventory(FunctorDefinition functor, string sourceId, string targetId)
+        {
+            if (InventoryService == null)
+            {
+                Console.WriteLine("[FunctorExecutor] SummonInInventory: no InventoryService wired");
+                return;
+            }
+
+            if (functor.Parameters.Length == 0)
+            {
+                Console.Error.WriteLine($"[FunctorExecutor] SummonInInventory: missing item id: {functor.RawString}");
+                return;
+            }
+
+            string itemId = NormalizeToken(functor.Parameters[0]);
+            int quantity = 1;
+            if (functor.Parameters.Length >= 3 && int.TryParse(NormalizeToken(functor.Parameters[2]), out int q3))
+                quantity = Math.Max(1, q3);
+            else if (functor.Parameters.Length >= 2 && int.TryParse(NormalizeToken(functor.Parameters[1]), out int q2))
+                quantity = Math.Max(1, q2);
+
+            var recipient = ResolveCombatant?.Invoke(targetId) ?? ResolveCombatant?.Invoke(sourceId);
+            if (recipient == null)
+            {
+                Console.Error.WriteLine($"[FunctorExecutor] SummonInInventory: cannot resolve recipient '{targetId}'");
+                return;
+            }
+
+            var item = new InventoryItem
+            {
+                DefinitionId = itemId,
+                Name = itemId,
+                Category = ItemCategory.Misc,
+                Quantity = quantity
+            };
+
+            bool added = InventoryService.AddItemToBag(recipient, item);
+            Console.WriteLine($"[FunctorExecutor] SummonInInventory: {(added ? "added" : "failed")} {quantity}x {itemId} for {recipient.Id}");
+        }
+
+        private void ExecuteCounterspell(FunctorDefinition functor, string sourceId, string targetId)
+        {
+            if (CounterspellAction != null)
+            {
+                CounterspellAction(sourceId, targetId);
+                return;
+            }
+
+            if (BreakConcentrationAction != null)
+            {
+                BreakConcentrationAction(targetId, "Counterspell");
+                Console.WriteLine($"[FunctorExecutor] Counterspell: broke concentration on {targetId}");
+                return;
+            }
+
+            Console.WriteLine("[FunctorExecutor] Counterspell: no callback wired");
+        }
+
     }
 }

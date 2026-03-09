@@ -547,9 +547,36 @@ namespace QDND.Combat.Rules.Conditions
                 case "classlevelhigheroregualtos":
                 case "classlevelhigheroregualto1":
                 case "classlevelhighorequalto1":
+                case "classlevelhigherorequalthan":
                 {
-                    int level = (int)ArgDouble(args, 0, 1);
-                    string className = ArgString(args, 1);
+                    int level;
+                    string className;
+
+                    if (args.Count == 1)
+                    {
+                        // Single-arg form is a total-level check: ClassLevelHigherOrEqualThan(5)
+                        level = (int)ArgDouble(args, 0, 1);
+                        className = string.Empty;
+                    }
+                    else
+                    {
+                        // Support both (Level, ClassName) and (ClassName, Level)
+                        level = (int)ArgDouble(args, 0, -1);
+                        className = StripQuotes(ArgString(args, 1));
+
+                        if (level < 0 || string.IsNullOrWhiteSpace(className))
+                        {
+                            className = StripQuotes(ArgString(args, 0));
+                            level = (int)ArgDouble(args, 1, 1);
+                        }
+                    }
+
+                    if (level < 1)
+                        level = 1;
+
+                    if (string.IsNullOrWhiteSpace(className))
+                        return (subject?.ResolvedCharacter?.Sheet?.TotalLevel ?? 1) >= level;
+
                     return CheckClassLevel(subject, level, className);
                 }
 
@@ -594,6 +621,12 @@ namespace QDND.Combat.Rules.Conditions
                     string armorType = StripQuotes(ArgString(args, 0));
                     Combatant armorSubject = ResolveTargetArg(args, 1, subject);
                     return CheckWearingArmor(armorSubject, armorType);
+                }
+
+                case "wearingarmor":
+                {
+                    Combatant armorWho = ResolveTargetArg(args, 0, subject);
+                    return armorWho?.EquippedArmor != null;
                 }
 
                 case "isequippedwith":
@@ -896,9 +929,36 @@ namespace QDND.Combat.Rules.Conditions
 
                 case "hasmetalarmorinanyhand":
                 case "hasmetalweaponinanyhand":
+                case "hasmetalweapon":
                 {
                     Combatant who = ResolveTargetArg(args, 0, subject);
                     return who?.MainHandWeapon != null || who?.OffHandWeapon != null;
+                }
+
+                case "wieldingweapon":
+                {
+                    Combatant who = ResolveTargetArg(args, 1, subject);
+                    if (who?.MainHandWeapon == null)
+                        return false;
+
+                    string weaponFilter = StripQuotes(ArgString(args, 0));
+                    if (string.IsNullOrWhiteSpace(weaponFilter))
+                        return true;
+
+                    return who.MainHandWeapon.WeaponType.ToString().Equals(weaponFilter, StringComparison.OrdinalIgnoreCase) ||
+                           (who.MainHandWeapon.Name?.Contains(weaponFilter, StringComparison.OrdinalIgnoreCase) ?? false);
+                }
+
+                case "maneuversavedc":
+                {
+                    Combatant who = ResolveTargetArg(args, 0, subject);
+                    if (who == null)
+                        return 8;
+
+                    int proficiency = who.GetProficiencyBonus();
+                    int strMod = who.GetAbilityModifier(AbilityType.Strength);
+                    int dexMod = who.GetAbilityModifier(AbilityType.Dexterity);
+                    return 8 + proficiency + Math.Max(strMod, dexMod);
                 }
 
                 case "hasmetalarmor":

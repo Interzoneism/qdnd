@@ -424,6 +424,24 @@ namespace QDND.Data.Parsers
                 case "SpellFail":
                     spell.SpellFail = value;
                     break;
+                case "ConcentrationSpellID":
+                    spell.ConcentrationSpellID = value;
+                    break;
+                case "ContainerSpells":
+                    spell.ContainerSpells = value;
+                    break;
+                case "SpellContainerID":
+                    spell.SpellContainerID = value;
+                    break;
+                case "SurfaceType":
+                    spell.SurfaceType = value;
+                    break;
+                case "AoEConditions":
+                    spell.AoEConditions = value;
+                    break;
+                case "MaximumTotalTargetHP":
+                    spell.MaximumTotalTargetHP = value;
+                    break;
                 case "SpellSaveDC":
                     spell.SpellSaveDC = value;
                     break;
@@ -582,6 +600,7 @@ namespace QDND.Data.Parsers
                 "projectile" => BG3SpellType.Projectile,
                 "shout" => BG3SpellType.Shout,
                 "zone" => BG3SpellType.Zone,
+                "wall" => BG3SpellType.Wall,
                 "rush" => BG3SpellType.Rush,
                 "teleportation" => BG3SpellType.Teleportation,
                 "throw" => BG3SpellType.Throw,

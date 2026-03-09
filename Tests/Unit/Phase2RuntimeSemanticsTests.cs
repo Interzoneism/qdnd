@@ -247,6 +247,128 @@ namespace QDND.Tests.Unit
         }
 
         [Fact]
+        public void BG3SpellParser_SpellTypeWall_ParsesAsWall()
+        {
+            string tempFile = Path.GetTempFileName();
+            try
+            {
+                File.WriteAllText(tempFile,
+                    "new entry \"Test_WallSpell\"\n" +
+                    "type \"SpellData\"\n" +
+                    "data \"SpellType\" \"Wall\"\n");
+
+                var parser = new BG3SpellParser();
+                var spells = parser.ParseFile(tempFile);
+
+                var spell = Assert.Single(spells);
+                Assert.Equal(BG3SpellType.Wall, spell.SpellType);
+            }
+            finally
+            {
+                File.Delete(tempFile);
+            }
+        }
+
+        [Fact]
+        public void BG3SpellParser_ConcentrationSpellId_FlowsToActionDefinition()
+        {
+            string tempFile = Path.GetTempFileName();
+            try
+            {
+                File.WriteAllText(tempFile,
+                    "new entry \"Test_ConcentrationSpell\"\n" +
+                    "type \"SpellData\"\n" +
+                    "data \"SpellType\" \"Target\"\n" +
+                    "data \"ConcentrationSpellID\" \"CONCENTRATION_TEST_STATUS\"\n");
+
+                var parser = new BG3SpellParser();
+                var spells = parser.ParseFile(tempFile);
+                var spell = Assert.Single(spells);
+
+                Assert.Equal("CONCENTRATION_TEST_STATUS", spell.ConcentrationSpellID);
+
+                var action = BG3ActionConverter.ConvertToAction(spell);
+                Assert.Equal("CONCENTRATION_TEST_STATUS", action.ConcentrationStatusId);
+            }
+            finally
+            {
+                File.Delete(tempFile);
+            }
+        }
+
+        [Fact]
+        public void BG3SpellParser_PriorityMetadataFields_FlowToActionDefinition()
+        {
+            string tempFile = Path.GetTempFileName();
+            try
+            {
+                File.WriteAllText(tempFile,
+                    "new entry \"Test_MetadataSpell\"\n" +
+                    "type \"SpellData\"\n" +
+                    "data \"SpellType\" \"Target\"\n" +
+                    "data \"ContainerSpells\" \"Spell_A;Spell_B\"\n" +
+                    "data \"SpellContainerID\" \"Container_Test\"\n" +
+                    "data \"SurfaceType\" \"Fire\"\n" +
+                    "data \"AoEConditions\" \"not Ally()\"\n" +
+                    "data \"MaximumTotalTargetHP\" \"24\"\n");
+
+                var parser = new BG3SpellParser();
+                var spells = parser.ParseFile(tempFile);
+                var spell = Assert.Single(spells);
+
+                var action = BG3ActionConverter.ConvertToAction(spell);
+
+                Assert.Equal("Spell_A;Spell_B", action.BG3ContainerSpells);
+                Assert.Equal("Container_Test", action.BG3SpellContainerId);
+                Assert.Equal("Fire", action.BG3SurfaceType);
+                Assert.Equal("not Ally()", action.BG3AoEConditions);
+                Assert.Equal("24", action.BG3MaximumTotalTargetHP);
+            }
+            finally
+            {
+                File.Delete(tempFile);
+            }
+        }
+
+        [Fact]
+        public void BG3ActionConverter_ShoutWithAreaRadius_UsesAreaRadiusAsRangeWhenRangeMissing()
+        {
+            var spell = new BG3SpellData
+            {
+                Id = "Shout_Test",
+                SpellType = BG3SpellType.Shout,
+                AreaRadius = "3"
+            };
+
+            var action = BG3ActionConverter.ConvertToAction(spell);
+
+            Assert.Equal(TargetType.Circle, action.TargetType);
+            Assert.Equal(3f, action.AreaRadius);
+            Assert.Equal(3f, action.Range);
+        }
+
+        [Fact]
+        public void BG3ActionConverter_ZoneSquare_MapsToAreaTargeting_NotLine()
+        {
+            var spell = new BG3SpellData
+            {
+                Id = "Thunderwave_Test",
+                SpellType = BG3SpellType.Zone,
+                ZoneShape = "Square",
+                ZoneBase = "3",
+                ZoneRange = "4"
+            };
+
+            var action = BG3ActionConverter.ConvertToAction(spell);
+
+            Assert.Equal(TargetType.Cone, action.TargetType);
+            Assert.NotEqual(TargetType.Line, action.TargetType);
+            Assert.Equal(90f, action.ConeAngle);
+            Assert.Equal(3f, action.AreaRadius);
+            Assert.Equal(4f, action.Range);
+        }
+
+        [Fact]
         public void BG3SpellParser_AIFlags_AreParsedFromSpellData()
         {
             string tempFile = Path.GetTempFileName();

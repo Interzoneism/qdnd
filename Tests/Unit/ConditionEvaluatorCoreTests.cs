@@ -267,5 +267,48 @@ namespace QDND.Tests.Unit
             // Common BG3 condition for ranged penalties
             Assert.True(evaluator.Evaluate("IsRangedAttack() or IsSpellAttack()", ctx));
         }
+
+        [Fact]
+        public void Evaluate_ClassLevelHigherOrEqualThan_Alias_IsRecognized()
+        {
+            var evaluator = ConditionEvaluator.Instance;
+            var source = new Combatant("id1", "Fighter", Faction.Player, 50, 10);
+            var ctx = new ConditionContext { Source = source };
+
+            Assert.True(evaluator.Evaluate("ClassLevelHigherOrEqualThan(1)", ctx));
+        }
+
+        [Fact]
+        public void Evaluate_HasMetalWeaponAndWieldingWeapon_ReturnsTrueWithEquippedWeapon()
+        {
+            var evaluator = ConditionEvaluator.Instance;
+            var source = new Combatant("id1", "Warrior", Faction.Player, 50, 10)
+            {
+                MainHandWeapon = new WeaponDefinition
+                {
+                    Name = "Greatsword",
+                    WeaponType = WeaponType.Greatsword
+                }
+            };
+
+            var ctx = new ConditionContext { Source = source };
+
+            Assert.True(evaluator.Evaluate("HasMetalWeapon()", ctx));
+            Assert.True(evaluator.Evaluate("WieldingWeapon('great')", ctx));
+        }
+
+        [Fact]
+        public void Evaluate_ManeuverSaveDC_ComputesExpectedValue()
+        {
+            var evaluator = ConditionEvaluator.Instance;
+            var source = new Combatant("id1", "Battlemaster", Faction.Player, 50, 10);
+            source.AbilityScoreOverrides[AbilityType.Strength] = 16; // +3
+            source.AbilityScoreOverrides[AbilityType.Dexterity] = 12; // +1
+            source.ProficiencyBonus = 2;
+
+            var ctx = new ConditionContext { Source = source };
+
+            Assert.True(evaluator.Evaluate("ManeuverSaveDC() == 13", ctx));
+        }
     }
 }

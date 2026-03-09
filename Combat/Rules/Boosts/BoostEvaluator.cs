@@ -374,7 +374,7 @@ namespace QDND.Combat.Rules.Boosts
                 var resourceType = boost.Definition.GetStringParameter(0, "");
                 if (resourceType.Equals("Movement", StringComparison.OrdinalIgnoreCase))
                 {
-                    var mult = boost.Definition.GetFloatParameter(1, 1.0f);
+                    var mult = boost.Definition.GetFloatParameter(1, 100.0f) / 100.0f;
                     multiplier *= mult;
                 }
             }

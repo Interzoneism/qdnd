@@ -244,17 +244,11 @@ namespace QDND.Data.Statuses
             {
                 var trimmed = boost.Trim();
 
-                // AC(N) - flat AC bonus
+                // AC(N) is handled by the boost pipeline at runtime.
+                // Do not emit legacy status modifiers here to avoid double-applying AC bonuses.
                 var acMatch = Regex.Match(trimmed, @"AC\s*\(\s*(-?\d+)\s*\)", RegexOptions.IgnoreCase);
                 if (acMatch.Success)
                 {
-                    int.TryParse(acMatch.Groups[1].Value, out var value);
-                    statusDef.Modifiers.Add(new StatusModifier
-                    {
-                        Target = ModifierTarget.ArmorClass,
-                        Type = ModifierType.Flat,
-                        Value = value
-                    });
                     continue;
                 }
 

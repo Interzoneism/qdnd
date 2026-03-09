@@ -121,7 +121,7 @@ namespace QDND.Combat.Rules.Boosts
         /// Multiplies available action resources.
         /// Syntax: ActionResourceMultiplier(ResourceType, multiplier, base)
         /// Examples:
-        /// - ActionResourceMultiplier(Movement, 2, 0) - Dash (doubles movement)
+        /// - ActionResourceMultiplier(Movement, 200, 0) - Dash (doubles movement, 200%)
         /// </summary>
         ActionResourceMultiplier,
 
@@ -451,6 +451,13 @@ namespace QDND.Combat.Rules.Boosts
         /// Gameplay-relevant (e.g. Magic Weapon spell) but stubbed for now.
         /// Syntax: WeaponProperty(PropertyName)
         /// </summary>
-        WeaponProperty
+        WeaponProperty,
+
+        /// <summary>
+        /// Ignores leave attack range checks for opportunity attacks.
+        /// Parsed to prevent BG3 data warnings; runtime behavior is handled via tags.
+        /// Syntax: IgnoreLeaveAttackRange()
+        /// </summary>
+        IgnoreLeaveAttackRange
     }
 }
