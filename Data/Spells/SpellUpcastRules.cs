@@ -118,7 +118,7 @@ namespace QDND.Data.Spells
 
             var byLevel = variants
                 .Where(v => v != null && v.SpellLevel > 0)
-                .GroupBy(v => v.SpellLevel)
+                .GroupBy(v => GetVariantSlotLevel(v))
                 .OrderBy(g => g.Key)
                 .ToDictionary(g => g.Key, g => SelectBestVariant(g), comparer: EqualityComparer<int>.Default);
 
@@ -182,6 +182,21 @@ namespace QDND.Data.Spells
 
             _upcastRules[normalizedBaseId] = scaling;
             return true;
+        }
+
+        private static int GetVariantSlotLevel(ActionDefinition action)
+        {
+            if (action == null)
+                return 0;
+
+            if (!string.IsNullOrWhiteSpace(action.BG3SourceId))
+            {
+                var suffixMatch = Regex.Match(action.BG3SourceId, @"_(\d+)$");
+                if (suffixMatch.Success && int.TryParse(suffixMatch.Groups[1].Value, out int parsedLevel) && parsedLevel > 0)
+                    return parsedLevel;
+            }
+
+            return action.SpellLevel;
         }
 
         private static ActionDefinition SelectBestVariant(IEnumerable<ActionDefinition> candidates)
@@ -458,7 +473,7 @@ namespace QDND.Data.Spells
 
             // === LEVEL 6 SPELLS ===
 
-            // Chain Lightning: +1d10 lightning damage per level
+            // Chain Lightning: +1d8 lightning damage per slot level above 6th (D&D 5e SRD)
             _upcastRules["chain_lightning"] = new UpcastScaling
             {
                 DicePerLevel = "1d8",

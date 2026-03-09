@@ -137,6 +137,9 @@ namespace QDND.Data
 
             // Wire ActionRegistry into EffectPipeline
             r.EffectPipeline.ActionRegistry = r.ActionRegistry;
+            var cooldownTracker = new CooldownTracker(r.ActionRegistry);
+            r.EffectPipeline.Cooldowns = cooldownTracker;
+            r.EffectPipeline.Builder = new EffectBuilder();
             combatContext.RegisterService(r.ActionRegistry);
 
             // Initialize BG3 Stats Registry (Characters, Weapons, Armor)

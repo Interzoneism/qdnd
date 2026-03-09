@@ -16,100 +16,12 @@ using QDND.Data.CharacterModel;
 namespace QDND.Combat.Actions
 {
     /// <summary>
-    /// Event args for reaction trigger events.
-    /// </summary>
-    public class ReactionTriggerEventArgs
-    {
-        /// <summary>
-        /// The trigger context with all details.
-        /// </summary>
-        public ReactionTriggerContext Context { get; set; }
-
-        /// <summary>
-        /// List of eligible reactors (combatantId, reaction).
-        /// </summary>
-        public List<(string CombatantId, ReactionDefinition Reaction)> EligibleReactors { get; set; } = new();
-
-        /// <summary>
-        /// Set to true to cancel the triggering action (if cancellable).
-        /// </summary>
-        public bool Cancel { get; set; }
-
-        /// <summary>
-        /// Optional damage modifier (e.g., for shield reactions).
-        /// </summary>
-        public float DamageModifier { get; set; } = 1.0f;
-
-        /// <summary>
-        /// AC modifier from reactions (e.g., Shield +5 AC).
-        /// </summary>
-        public int ACModifier { get; set; } = 0;
-
-        /// <summary>
-        /// Roll modifier from reactions (e.g., Cutting Words -1d8).
-        /// </summary>
-        public int RollModifier { get; set; } = 0;
-    }
-    /// <summary>
-    /// Result of executing an action.
-    /// </summary>
-    public class ActionExecutionResult
-    {
-        public bool Success { get; set; }
-        public string ActionId { get; set; }
-        public string SourceId { get; set; }
-        public List<string> TargetIds { get; set; } = new();
-        public List<EffectResult> EffectResults { get; set; } = new();
-        public QueryResult AttackResult { get; set; }
-        public QueryResult SaveResult { get; set; }
-
-        /// <summary>Result of a contested check (e.g., shove).</summary>
-        public QDND.Combat.Rules.ContestResult ContestResult { get; set; }
-
-        /// <summary>
-        /// Per-projectile attack results for multi-projectile spells (Scorching Ray, Eldritch Blast, etc.).
-        /// Null or empty for single-projectile/non-attack spells.
-        /// </summary>
-        public List<QueryResult> ProjectileAttackResults { get; set; }
-
-        /// <summary>
-        /// Per-target saving throw outcomes keyed by target combatant ID.
-        /// Empty when the action has no save component.
-        /// </summary>
-        public Dictionary<string, QueryResult> SaveResultsByTarget { get; set; } = new();
-        public string ErrorMessage { get; set; }
-        public long ExecutedAt { get; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-
-        /// <summary>
-        /// Source position before action execution (for movement/position tracking).
-        /// </summary>
-        public float[] SourcePositionBefore { get; set; }
-
-        /// <summary>
-        /// Target positions before action execution, keyed by target ID.
-        /// </summary>
-        public Dictionary<string, float[]> TargetPositionsBefore { get; set; } = new();
-
-        public static ActionExecutionResult Failure(string actionId, string sourceId, string error)
-        {
-            return new ActionExecutionResult
-            {
-                Success = false,
-                ActionId = actionId,
-                SourceId = sourceId,
-                ErrorMessage = error
-            };
-        }
-    }
-
-    /// <summary>
     /// Manages ability execution and effect resolution.
     /// </summary>
     public class EffectPipeline
     {
         private readonly Dictionary<string, Effect> _effectHandlers = new();
         private readonly Dictionary<string, ActionDefinition> _actions = new(StringComparer.OrdinalIgnoreCase);
-        private readonly Dictionary<string, ActionCooldownState> _cooldowns = new();
 
         public RulesEngine Rules { get; set; }
         public StatusManager Statuses { get; set; }
@@ -120,6 +32,18 @@ namespace QDND.Combat.Actions
         /// If set, GetAction() will fallback to registry when action not found locally.
         /// </summary>
         public ActionRegistry ActionRegistry { get; set; }
+
+        /// <summary>
+        /// Optional cooldown tracker for ability charges and cooldown timers.
+        /// </summary>
+        public CooldownTracker? Cooldowns { get; set; }
+
+        /// <summary>
+        /// Resource validation/consumption engine for BG3 ActionResources.
+        /// </summary>
+        public ResourceCostEngine Resources { get; set; }
+
+        public EffectBuilder Builder { get; set; }
 
         /// <summary>
         /// Optional combat context for service location.
@@ -283,6 +207,11 @@ namespace QDND.Combat.Actions
             RegisterEffect(new SwitchDeathTypeEffect());
             RegisterEffect(new SetAdvantageEffect());
             RegisterEffect(new SetDisadvantageEffect());
+
+            // Default tracker keeps cooldown behavior working for direct EffectPipeline usage.
+            Cooldowns = new CooldownTracker(ActionRegistry);
+            Builder = new EffectBuilder();
+            Resources = new ResourceCostEngine();
         }
 
         /// <summary>
@@ -431,13 +360,8 @@ namespace QDND.Combat.Actions
             bool isTestActor = testActionId != null && string.Equals(actionId, testActionId, StringComparison.OrdinalIgnoreCase);
 
             // Check cooldown (enforced for all combatants, including test actors)
-            var canonicalActionId = ActionRegistry?.GetAction(actionId)?.Id ?? actionId;
-            var cooldownKey = $"{source.Id}:{canonicalActionId}";
-            if (_cooldowns.TryGetValue(cooldownKey, out var cooldown))
-            {
-                if (cooldown.CurrentCharges <= 0)
-                    return (false, $"On cooldown ({cooldown.RemainingCooldown} turns)");
-            }
+            if (Cooldowns?.HasAvailableCharges(source.Id, actionId) == false)
+                return (false, "On cooldown");
 
             // Check requirements — skipped for test actors (they may not meet class/level
             // requirements for the tested ability but are explicitly designated to test it)
@@ -500,7 +424,7 @@ namespace QDND.Combat.Actions
             // (they may lack spell slots and similar resources for the tested ability)
             if (!isTestActor)
             {
-                var (bg3CanPay, bg3Reason) = ValidateBG3ResourceCost(source, action);
+                var (bg3CanPay, bg3Reason) = Resources.ValidateBG3ResourceCost(source, action);
                 if (!bg3CanPay)
                     return (false, bg3Reason);
             }
@@ -628,7 +552,7 @@ namespace QDND.Combat.Actions
             }
 
             // Build effective cost (base + variant + upcast)
-            var effectiveCost = BuildEffectiveCost(action, variant, options.UpcastLevel);
+            var effectiveCost = Builder.BuildEffectiveCost(action, variant, options.UpcastLevel);
 
             // Validate and consume costs unless skipped (for Extra Attack).
             // Test actors go through the normal path: CanUseAbilityWithCost skips their
@@ -639,7 +563,7 @@ namespace QDND.Combat.Actions
                 if (!canUse)
                     return ActionExecutionResult.Failure(actionId, source.Id, reason);
 
-                var budgetCost = BuildBudgetCostOverride(effectiveCost, options.SkipReactionBudgetConsumption);
+                var budgetCost = ResourceCostEngine.BuildBudgetCostOverride(effectiveCost, options.SkipReactionBudgetConsumption);
 
                 // Extra Attack handling: weapon attacks consume from attack pool
                 bool isWeaponAttack = action.AttackType == AttackType.MeleeWeapon ||
@@ -679,7 +603,7 @@ namespace QDND.Combat.Actions
                 }
 
                 // Consume BG3 ActionResources first
-                var (bg3Success, bg3ConsumeReason) = ConsumeBG3ResourceCost(source, action, effectiveCost);
+                var (bg3Success, bg3ConsumeReason) = Resources.ConsumeBG3ResourceCost(source, action, effectiveCost);
                 if (!bg3Success)
                     return ActionExecutionResult.Failure(actionId, source.Id, bg3ConsumeReason);
 
@@ -692,7 +616,7 @@ namespace QDND.Combat.Actions
             }
 
             // Build effective effects list
-            var effectiveEffects = BuildEffectiveEffects(action.Effects, variant, options.UpcastLevel, action.UpcastScaling);
+            var effectiveEffects = Builder.BuildEffectiveEffects(action.Effects, variant, options.UpcastLevel, action.UpcastScaling);
             
             // Issue 1: Resolve dynamic formulas in effects (SpellcastingAbilityModifier, MainMeleeWeapon, etc.)
             var charRegistry = CombatContext?.GetService<CharacterDataRegistry>();
@@ -732,7 +656,7 @@ namespace QDND.Combat.Actions
             }
 
             // Build effective tags
-            var effectiveTags = BuildEffectiveTags(action.Tags, variant);
+            var effectiveTags = Builder.BuildEffectiveTags(action.Tags, variant);
 
             // Create context
             var context = new EffectContext
@@ -1322,7 +1246,7 @@ namespace QDND.Combat.Actions
             }
 
             // Consume cooldown/charges
-            ConsumeCooldown(source.Id, actionId, action);
+            Cooldowns?.ConsumeCooldown(source.Id, actionId, action);
 
             // Dispatch ability resolved event
             Rules?.Events.Dispatch(new RuleEvent
@@ -1349,355 +1273,6 @@ namespace QDND.Combat.Actions
 
             OnAbilityExecuted?.Invoke(result);
             return result;
-        }
-
-        /// <summary>
-        /// Build the effective cost including base, variant, and upcast costs.
-        /// </summary>
-        private ActionCost BuildEffectiveCost(ActionDefinition action, ActionVariant variant, int upcastLevel)
-        {
-            var effectiveCost = new ActionCost
-            {
-                UsesAction = action.Cost?.UsesAction == true,
-                UsesBonusAction = action.Cost?.UsesBonusAction == true,
-                UsesReaction = action.Cost?.UsesReaction == true,
-                MovementCost = action.Cost?.MovementCost ?? 0,
-                ResourceCosts = action.Cost?.ResourceCosts != null
-                    ? new Dictionary<string, int>(action.Cost.ResourceCosts)
-                    : new Dictionary<string, int>()
-            };
-
-            // Apply action type override from variant (e.g., Quickened Spell metamagic)
-            if (variant?.ActionTypeOverride != null)
-            {
-                // Reset all action types first
-                effectiveCost.UsesAction = false;
-                effectiveCost.UsesBonusAction = false;
-                effectiveCost.UsesReaction = false;
-
-                // Set the overridden action type
-                switch (variant.ActionTypeOverride.ToLowerInvariant())
-                {
-                    case "action":
-                        effectiveCost.UsesAction = true;
-                        break;
-                    case "bonus":
-                    case "bonus_action":
-                        effectiveCost.UsesBonusAction = true;
-                        break;
-                    case "reaction":
-                        effectiveCost.UsesReaction = true;
-                        break;
-                }
-            }
-
-            // Add variant costs
-            if (variant?.AdditionalCost != null)
-            {
-                if (variant.AdditionalCost.UsesAction) effectiveCost.UsesAction = true;
-                if (variant.AdditionalCost.UsesBonusAction) effectiveCost.UsesBonusAction = true;
-                if (variant.AdditionalCost.UsesReaction) effectiveCost.UsesReaction = true;
-                effectiveCost.MovementCost += variant.AdditionalCost.MovementCost;
-
-                foreach (var (key, value) in variant.AdditionalCost.ResourceCosts)
-                {
-                    if (effectiveCost.ResourceCosts.ContainsKey(key))
-                        effectiveCost.ResourceCosts[key] += value;
-                    else
-                        effectiveCost.ResourceCosts[key] = value;
-                }
-            }
-
-            // Handle upcast costs
-            if (upcastLevel > 0 && action.UpcastScaling != null)
-            {
-                // D&D 5e spell slot model: when upcasting, replace the base spell slot
-                // with a higher-level slot (e.g., spell_slot_1 → spell_slot_2 for +1 upcast)
-                var slotKeys = effectiveCost.ResourceCosts.Keys
-                    .Where(k => k.StartsWith("spell_slot_"))
-                    .ToList();
-
-                if (slotKeys.Count > 0)
-                {
-                    // Find the base spell slot level from resource costs
-                    foreach (var slotKey in slotKeys)
-                    {
-                        string levelStr = slotKey.Replace("spell_slot_", "");
-                        if (int.TryParse(levelStr, out int baseLevel))
-                        {
-                            int amount = effectiveCost.ResourceCosts[slotKey];
-                            int newLevel = baseLevel + upcastLevel;
-
-                            // Remove the original slot cost
-                            effectiveCost.ResourceCosts.Remove(slotKey);
-
-                            // Add the higher-level slot cost
-                            string newKey = $"spell_slot_{newLevel}";
-                            effectiveCost.ResourceCosts[newKey] = amount;
-                        }
-                    }
-                }
-                else
-                {
-                    // Fallback: use the generic resource key model
-                    string resourceKey = action.UpcastScaling.ResourceKey;
-                    int additionalCost = upcastLevel * action.UpcastScaling.CostPerLevel;
-
-                    if (effectiveCost.ResourceCosts.ContainsKey(resourceKey))
-                        effectiveCost.ResourceCosts[resourceKey] += additionalCost;
-                    else
-                        effectiveCost.ResourceCosts[resourceKey] = action.UpcastScaling.BaseCost + additionalCost;
-                }
-            }
-
-            return effectiveCost;
-        }
-
-        /// <summary>
-        /// Build the effective effects list with variant and upcast modifications.
-        /// </summary>
-        private List<EffectDefinition> BuildEffectiveEffects(
-            List<EffectDefinition> baseEffects,
-            ActionVariant variant,
-            int upcastLevel,
-            UpcastScaling upcastScaling)
-        {
-            var effectiveEffects = new List<EffectDefinition>();
-
-            foreach (var baseEffect in baseEffects)
-            {
-                // Clone the effect
-                var effect = CloneEffectDefinition(baseEffect);
-
-                // Apply variant modifications
-                if (variant != null)
-                {
-                    ApplyVariantToEffect(effect, variant);
-                }
-
-                // Apply upcast modifications
-                if (upcastLevel > 0 && upcastScaling != null)
-                {
-                    ApplyUpcastToEffect(effect, upcastLevel, upcastScaling);
-                    
-                    // Issue 3: Scale target count based on TargetsPerLevel
-                    if (upcastScaling.TargetsPerLevel > 0)
-                    {
-                        int additionalTargets = upcastLevel * upcastScaling.TargetsPerLevel;
-                        // Store target count scaling in effect parameters for later use
-                        effect.Parameters["upcast_additional_targets"] = additionalTargets;
-                    }
-                }
-
-                effectiveEffects.Add(effect);
-            }
-
-            // Add variant additional effects
-            if (variant?.AdditionalEffects != null)
-            {
-                foreach (var additionalEffect in variant.AdditionalEffects)
-                {
-                    var cloned = CloneEffectDefinition(additionalEffect);
-
-                    // Apply upcast to additional effects too
-                    if (upcastLevel > 0 && upcastScaling != null)
-                    {
-                        ApplyUpcastToEffect(cloned, upcastLevel, upcastScaling);
-                    }
-
-                    effectiveEffects.Add(cloned);
-                }
-            }
-
-            return effectiveEffects;
-        }
-
-        /// <summary>
-        /// Apply variant modifications to an effect.
-        /// </summary>
-        private void ApplyVariantToEffect(EffectDefinition effect, ActionVariant variant)
-        {
-            // Replace damage type
-            if (!string.IsNullOrEmpty(variant.ReplaceDamageType) && !string.IsNullOrEmpty(effect.DamageType))
-            {
-                effect.DamageType = variant.ReplaceDamageType;
-            }
-
-            // Add flat damage
-            if (variant.AdditionalDamage != 0 && effect.Type == "damage")
-            {
-                effect.Value += variant.AdditionalDamage;
-            }
-
-            // Add additional dice
-            if (!string.IsNullOrEmpty(variant.AdditionalDice) && effect.Type == "damage")
-            {
-                effect.DiceFormula = CombineDiceFormulas(effect.DiceFormula, variant.AdditionalDice);
-            }
-
-            // Replace status ID
-            if (!string.IsNullOrEmpty(variant.ReplaceStatusId) && effect.Type == "apply_status")
-            {
-                effect.StatusId = variant.ReplaceStatusId;
-            }
-        }
-
-        /// <summary>
-        /// Apply upcast scaling to an effect.
-        /// </summary>
-        private void ApplyUpcastToEffect(EffectDefinition effect, int upcastLevel, UpcastScaling scaling)
-        {
-            if (effect.Type != "damage" && effect.Type != "heal" && effect.Type != "apply_status")
-                return;
-
-            // Calculate effective scaling steps based on perLevel
-            int perLevel = scaling.PerLevel ?? 1;
-            int scalingSteps = perLevel > 0 ? upcastLevel / perLevel : upcastLevel;
-
-            if (scalingSteps <= 0)
-                return;
-
-            // Add flat damage per level
-            if (scaling.DamagePerLevel != 0)
-            {
-                effect.Value += scaling.DamagePerLevel * scalingSteps;
-            }
-
-            // Add dice per level
-            if (!string.IsNullOrEmpty(scaling.DicePerLevel))
-            {
-                for (int i = 0; i < scalingSteps; i++)
-                {
-                    effect.DiceFormula = CombineDiceFormulas(effect.DiceFormula, scaling.DicePerLevel);
-                }
-            }
-
-            // Duration scaling for status effects
-            if (effect.Type == "apply_status" && scaling.DurationPerLevel != 0)
-            {
-                effect.StatusDuration += scaling.DurationPerLevel * scalingSteps;
-            }
-
-            // Target scaling (for abilities like Invisibility)
-            // This modifies the max targets, handled at ability level, not per-effect
-            // But we track it here for completeness
-        }
-
-        /// <summary>
-        /// Combine two dice formulas (e.g., "2d6+3" + "1d6" = "3d6+3").
-        /// </summary>
-        private string CombineDiceFormulas(string formula1, string formula2)
-        {
-            if (string.IsNullOrEmpty(formula1)) return formula2;
-            if (string.IsNullOrEmpty(formula2)) return formula1;
-
-            // Parse both formulas
-            var (count1, sides1, bonus1) = ParseDiceFormula(formula1);
-            var (count2, sides2, bonus2) = ParseDiceFormula(formula2);
-
-            // If same die type, combine counts
-            if (sides1 == sides2 && sides1 > 0)
-            {
-                int totalCount = count1 + count2;
-                int totalBonus = bonus1 + bonus2;
-                if (totalBonus > 0)
-                    return $"{totalCount}d{sides1}+{totalBonus}";
-                else if (totalBonus < 0)
-                    return $"{totalCount}d{sides1}{totalBonus}";
-                else
-                    return $"{totalCount}d{sides1}";
-            }
-
-            // Preserve mixed dice expressions exactly (e.g., 2d6 + 1d4).
-            // DiceRoller already handles multi-term formulas, so avoid lossy averaging.
-            return formula2.StartsWith("-", StringComparison.Ordinal)
-                ? $"{formula1}{formula2}"
-                : $"{formula1}+{formula2}";
-        }
-
-        /// <summary>
-        /// Parse a dice formula into components.
-        /// </summary>
-        private (int count, int sides, int bonus) ParseDiceFormula(string formula)
-        {
-            if (string.IsNullOrEmpty(formula))
-                return (0, 0, 0);
-
-            formula = formula.ToLower().Replace(" ", "");
-
-            int bonus = 0;
-            int plusIdx = formula.IndexOf('+');
-            int minusIdx = formula.LastIndexOf('-');
-            if (minusIdx == 0) minusIdx = -1; // Ignore leading minus
-
-            int bonusIdx = -1;
-            if (plusIdx > 0) bonusIdx = plusIdx;
-            else if (minusIdx > 0) bonusIdx = minusIdx;
-
-            if (bonusIdx > 0)
-            {
-                if (int.TryParse(formula[bonusIdx..], out bonus))
-                {
-                    formula = formula[..bonusIdx];
-                }
-            }
-
-            int dIdx = formula.IndexOf('d');
-            if (dIdx < 0)
-            {
-                if (int.TryParse(formula, out int flat))
-                    return (0, 0, flat + bonus);
-                return (0, 0, bonus);
-            }
-
-            string countStr = dIdx == 0 ? "1" : formula[..dIdx];
-            string sidesStr = formula[(dIdx + 1)..];
-
-            int.TryParse(countStr, out int count);
-            int.TryParse(sidesStr, out int sides);
-
-            return (count, sides, bonus);
-        }
-
-        /// <summary>
-        /// Clone an effect definition.
-        /// </summary>
-        private EffectDefinition CloneEffectDefinition(EffectDefinition original)
-        {
-            return new EffectDefinition
-            {
-                Type = original.Type,
-                Value = original.Value,
-                DiceFormula = original.DiceFormula,
-                DamageType = original.DamageType,
-                StatusId = original.StatusId,
-                StatusDuration = original.StatusDuration,
-                StatusStacks = original.StatusStacks,
-                TargetType = original.TargetType,
-                Condition = original.Condition,
-                SaveTakesHalf = original.SaveTakesHalf,
-                Scaling = new Dictionary<string, float>(original.Scaling),
-                Parameters = new Dictionary<string, object>(original.Parameters)
-            };
-        }
-
-        /// <summary>
-        /// Build effective tags with variant modifications.
-        /// </summary>
-        private HashSet<string> BuildEffectiveTags(HashSet<string> baseTags, ActionVariant variant)
-        {
-            var effectiveTags = new HashSet<string>(baseTags);
-
-            if (variant != null)
-            {
-                foreach (var tag in variant.AdditionalTags)
-                    effectiveTags.Add(tag);
-
-                foreach (var tag in variant.RemoveTags)
-                    effectiveTags.Remove(tag);
-            }
-
-            return effectiveTags;
         }
 
         /// <summary>
@@ -2009,13 +1584,8 @@ namespace QDND.Combat.Actions
             bool isTestActor = testActionId != null && string.Equals(actionId, testActionId, StringComparison.OrdinalIgnoreCase);
 
             // Check cooldown (enforced for all combatants, including test actors)
-            var canonicalActionId = ActionRegistry?.GetAction(actionId)?.Id ?? actionId;
-            var cooldownKey = $"{source.Id}:{canonicalActionId}";
-            if (_cooldowns.TryGetValue(cooldownKey, out var cooldown))
-            {
-                if (cooldown.CurrentCharges <= 0)
-                    return (false, $"On cooldown ({cooldown.RemainingCooldown} turns)");
-            }
+            if (Cooldowns?.HasAvailableCharges(source.Id, actionId) == false)
+                return (false, "On cooldown");
 
             // Check requirements — skipped for test actors
             if (!isTestActor)
@@ -2040,7 +1610,7 @@ namespace QDND.Combat.Actions
             // Check action economy budget with effective cost (enforced for all combatants)
             if (source.ActionBudget != null)
             {
-                var budgetCost = BuildBudgetCostOverride(cost, ignoreReactionBudgetCheck);
+                var budgetCost = ResourceCostEngine.BuildBudgetCostOverride(cost, ignoreReactionBudgetCheck);
                 var (canPay, budgetReason) = source.ActionBudget.CanPayCost(budgetCost);
                 if (!canPay)
                     return (false, budgetReason);
@@ -2057,274 +1627,12 @@ namespace QDND.Combat.Actions
             // (they may lack spell slots and similar resources for the tested ability)
             if (!isTestActor)
             {
-                var (bg3CanPay, bg3Reason) = ValidateBG3ResourceCost(source, action, cost);
+                var (bg3CanPay, bg3Reason) = Resources.ValidateBG3ResourceCost(source, action, cost);
                 if (!bg3CanPay)
                     return (false, bg3Reason);
             }
 
             return (true, null);
-        }
-
-        private static ActionCost BuildBudgetCostOverride(ActionCost original, bool ignoreReaction)
-        {
-            if (!ignoreReaction || original == null || !original.UsesReaction)
-                return original;
-
-            return new ActionCost
-            {
-                UsesAction = original.UsesAction,
-                UsesBonusAction = original.UsesBonusAction,
-                UsesReaction = false,
-                MovementCost = original.MovementCost,
-                ResourceCosts = original.ResourceCosts != null
-                    ? new Dictionary<string, int>(original.ResourceCosts)
-                    : new Dictionary<string, int>()
-            };
-        }
-
-        /// <summary>
-        /// Validates whether the combatant's BG3 ActionResources can cover the resource costs of an action.
-        /// Maps ActionCost fields to BG3 resource names and checks availability.
-        /// Resources not tracked by ActionResources are skipped (the legacy pool handles them).
-        /// </summary>
-        /// <param name="combatant">The combatant whose resources to check.</param>
-        /// <param name="action">The action definition (used for SpellLevel-based implicit spell slot costs).</param>
-        /// <param name="cost">Optional cost override (for variants/upcasting). Uses action.Cost if null.</param>
-        /// <returns>(canPay, failReason). Returns (true, null) when all BG3-tracked resources are sufficient.</returns>
-        internal (bool CanPay, string Reason) ValidateBG3ResourceCost(
-            Combatant combatant, ActionDefinition action, ActionCost cost = null)
-        {
-            cost ??= action?.Cost;
-            if (cost == null) return (true, null);
-
-            var pool = combatant.ActionResources;
-            if (pool == null) return (true, null);
-
-            // Map action economy fields → BG3 resource names
-            if (cost.UsesAction && pool.HasResource("ActionPoint") && !pool.Has("ActionPoint", 1))
-                return (false, "No ActionPoint available");
-            if (cost.UsesBonusAction && pool.HasResource("BonusActionPoint") && !pool.Has("BonusActionPoint", 1))
-                return (false, "No BonusActionPoint available");
-            if (cost.UsesReaction && pool.HasResource("ReactionActionPoint") && !pool.Has("ReactionActionPoint", 1))
-                return (false, "No ReactionActionPoint available");
-            if (cost.MovementCost > 0 && pool.HasResource("Movement") && !pool.Has("Movement", cost.MovementCost))
-                return (false, $"Insufficient Movement ({pool.GetCurrent("Movement")}/{cost.MovementCost})");
-
-            // Map ResourceCosts dictionary → BG3 resources
-            if (cost.ResourceCosts != null)
-            {
-                foreach (var (key, amount) in cost.ResourceCosts)
-                {
-                    if (amount <= 0) continue;
-
-                    // spell_slot_N → SpellSlot at level N, with WarlockSpellSlot fallback
-                    if (key.StartsWith("spell_slot_", StringComparison.OrdinalIgnoreCase))
-                    {
-                        string levelStr = key.Substring("spell_slot_".Length);
-                        if (int.TryParse(levelStr, out int level))
-                        {
-                            // Only validate if pool actually tracks BG3 spell slot resources;
-                            // otherwise let the legacy ResourcePool handle spell_slot_N costs.
-                            bool poolTracksSpellSlots = pool.HasResource("SpellSlot") || pool.HasResource("WarlockSpellSlot");
-                            if (poolTracksSpellSlots)
-                            {
-                                bool hasEnough = (pool.HasResource("SpellSlot") && pool.Has("SpellSlot", amount, level))
-                                              || (pool.HasResource("WarlockSpellSlot") && pool.Has("WarlockSpellSlot", amount, level));
-                                if (!hasEnough)
-                                    return (false, $"Insufficient SpellSlot level {level}");
-                            }
-                            else if (pool.HasResource(key) && !pool.Has(key, amount))
-                            {
-                                // Flat spell_slot_N registered directly in ActionResources (ad-hoc/test setup)
-                                return (false, $"Insufficient {key} ({pool.GetCurrent(key)}/{amount})");
-                            }
-                        }
-                        continue;
-                    }
-
-                    // Direct resource name lookup
-                    if (pool.HasResource(key))
-                    {
-                        if (!pool.Has(key, amount))
-                            return (false, $"Insufficient resource {key} ({pool.GetCurrent(key)}/{amount})");
-                    }
-                    else
-                    {
-                        // Resource not registered in any pool — cannot pay
-                        return (false, $"Insufficient resource: {key}");
-                    }
-                }
-            }
-
-            // Implicit spell slot cost: spells with SpellLevel > 0 and no explicit spell_slot in ResourceCosts
-            if (action?.SpellLevel > 0)
-            {
-                bool hasExplicitSlot = cost.ResourceCosts?.Keys
-                    .Any(k => k.StartsWith("spell_slot_", StringComparison.OrdinalIgnoreCase)) == true;
-                if (!hasExplicitSlot)
-                {
-                    // If pool doesn't track any spell slot resource, skip validation (legacy handles it)
-                    if (pool.HasResource("SpellSlot") || pool.HasResource("WarlockSpellSlot"))
-                    {
-                        bool hasEnough = (pool.HasResource("SpellSlot") && pool.Has("SpellSlot", 1, action.SpellLevel))
-                                      || (pool.HasResource("WarlockSpellSlot") && pool.Has("WarlockSpellSlot", 1, action.SpellLevel));
-                        if (!hasEnough)
-                            return (false, $"Insufficient SpellSlot level {action.SpellLevel}");
-                    }
-                }
-            }
-
-            return (true, null);
-        }
-
-        /// <summary>
-        /// Consumes BG3 ActionResources for the resource costs of an action.
-        /// Maps ActionCost fields to BG3 resource names and consumes them.
-        /// Resources not tracked by ActionResources are skipped (the legacy pool handles them).
-        /// Logs each resource consumption for debugging.
-        /// </summary>
-        /// <param name="combatant">The combatant whose resources to consume.</param>
-        /// <param name="action">The action definition (used for SpellLevel-based implicit spell slot costs).</param>
-        /// <param name="cost">Optional cost override (for variants/upcasting). Uses action.Cost if null.</param>
-        /// <returns>(success, failReason).</returns>
-        internal (bool Success, string Reason) ConsumeBG3ResourceCost(
-            Combatant combatant, ActionDefinition action, ActionCost cost = null)
-        {
-            cost ??= action?.Cost;
-            if (cost == null) return (true, null);
-
-            var pool = combatant.ActionResources;
-            if (pool == null) return (true, null);
-
-            // Consume action economy from BG3 resources
-            if (cost.UsesAction && pool.HasResource("ActionPoint"))
-            {
-                if (!pool.Consume("ActionPoint", 1))
-                    return (false, "Failed to consume ActionPoint");
-                RuntimeSafety.Log($"[BG3Resource] {combatant.Name} consumed 1 ActionPoint");
-            }
-            if (cost.UsesBonusAction && pool.HasResource("BonusActionPoint"))
-            {
-                if (!pool.Consume("BonusActionPoint", 1))
-                    return (false, "Failed to consume BonusActionPoint");
-                RuntimeSafety.Log($"[BG3Resource] {combatant.Name} consumed 1 BonusActionPoint");
-            }
-            if (cost.UsesReaction && pool.HasResource("ReactionActionPoint"))
-            {
-                if (!pool.Consume("ReactionActionPoint", 1))
-                    return (false, "Failed to consume ReactionActionPoint");
-                RuntimeSafety.Log($"[BG3Resource] {combatant.Name} consumed 1 ReactionActionPoint");
-            }
-            if (cost.MovementCost > 0 && pool.HasResource("Movement"))
-            {
-                if (!pool.Consume("Movement", cost.MovementCost))
-                    return (false, $"Failed to consume {cost.MovementCost} Movement");
-                RuntimeSafety.Log($"[BG3Resource] {combatant.Name} consumed {cost.MovementCost} Movement");
-            }
-
-            // Consume resource costs
-            if (cost.ResourceCosts != null)
-            {
-                foreach (var (key, amount) in cost.ResourceCosts)
-                {
-                    if (amount <= 0) continue;
-
-                    // spell_slot_N → SpellSlot at level N, with WarlockSpellSlot fallback
-                    if (key.StartsWith("spell_slot_", StringComparison.OrdinalIgnoreCase))
-                    {
-                        string levelStr = key.Substring("spell_slot_".Length);
-                        if (int.TryParse(levelStr, out int level))
-                        {
-                            // Only consume if pool actually tracks BG3 spell slot resources;
-                            // otherwise let the legacy ResourcePool handle spell_slot_N costs.
-                            bool poolTracksSpellSlots = pool.HasResource("SpellSlot") || pool.HasResource("WarlockSpellSlot");
-                            if (poolTracksSpellSlots)
-                            {
-                                bool consumed = (pool.HasResource("SpellSlot") && pool.Consume("SpellSlot", amount, level))
-                                             || (pool.HasResource("WarlockSpellSlot") && pool.Consume("WarlockSpellSlot", amount, level));
-                                if (!consumed)
-                                    return (false, $"Failed to consume SpellSlot level {level}");
-                                RuntimeSafety.Log($"[BG3Resource] {combatant.Name} consumed {amount} SpellSlot(L{level})");
-                            }
-                            else if (pool.HasResource(key))
-                            {
-                                // Flat spell_slot_N registered directly in ActionResources (ad-hoc/test setup)
-                                if (!pool.Consume(key, amount))
-                                    return (false, $"Failed to consume {key}");
-                                RuntimeSafety.Log($"[BG3Resource] {combatant.Name} consumed {amount} {key}");
-                            }
-                        }
-                        continue;
-                    }
-
-                    // Direct resource name lookup
-                    if (pool.HasResource(key))
-                    {
-                        if (!pool.Consume(key, amount))
-                            return (false, $"Failed to consume {key}");
-                        RuntimeSafety.Log($"[BG3Resource] {combatant.Name} consumed {amount} {key}");
-                    }
-                }
-            }
-
-            // Implicit spell slot consumption, with WarlockSpellSlot fallback
-            if (action?.SpellLevel > 0)
-            {
-                bool hasExplicitSlot = cost.ResourceCosts?.Keys
-                    .Any(k => k.StartsWith("spell_slot_", StringComparison.OrdinalIgnoreCase)) == true;
-                if (!hasExplicitSlot)
-                {
-                    // If pool doesn't track any spell slot resource, skip consumption (legacy handles it)
-                    if (pool.HasResource("SpellSlot") || pool.HasResource("WarlockSpellSlot"))
-                    {
-                        bool consumed = (pool.HasResource("SpellSlot") && pool.Consume("SpellSlot", 1, action.SpellLevel))
-                                     || (pool.HasResource("WarlockSpellSlot") && pool.Consume("WarlockSpellSlot", 1, action.SpellLevel));
-                        if (!consumed)
-                            return (false, $"Failed to consume SpellSlot level {action.SpellLevel}");
-                        RuntimeSafety.Log($"[BG3Resource] {combatant.Name} consumed 1 SpellSlot(L{action.SpellLevel})");
-                    }
-                }
-            }
-
-            return (true, null);
-        }
-
-        /// <summary>
-        /// Returns resource costs from ActionCost.ResourceCosts that are NOT tracked by the combatant's
-        /// BG3 ActionResources pool (neither as leveled SpellSlot nor as flat spell_slot_N keys).
-        /// </summary>
-        /// <param name="combatant">The combatant whose ActionResources to check.</param>
-        /// <param name="cost">The action cost containing resource requirements.</param>
-        /// <returns>Dictionary of resource costs that need legacy pool handling.</returns>
-        private static Dictionary<string, int> GetLegacyFallbackCosts(Combatant combatant, ActionCost cost)
-        {
-            if (cost?.ResourceCosts == null || cost.ResourceCosts.Count == 0)
-                return new Dictionary<string, int>();
-
-            var pool = combatant.ActionResources;
-            var legacy = new Dictionary<string, int>();
-
-            foreach (var (key, amount) in cost.ResourceCosts)
-            {
-                if (amount <= 0) continue;
-
-                // spell_slot_N is handled by BG3 SpellSlot or WarlockSpellSlot if available,
-                // or by a flat spell_slot_N key registered directly in ActionResources
-                if (key.StartsWith("spell_slot_", StringComparison.OrdinalIgnoreCase) &&
-                    (pool?.HasResource("SpellSlot") == true ||
-                     pool?.HasResource("WarlockSpellSlot") == true ||
-                     pool?.HasResource(key) == true))
-                    continue;
-
-                // Direct resource tracked by BG3
-                if (pool?.HasResource(key) == true)
-                    continue;
-
-                // Not handled by BG3 → needs legacy pool
-                legacy[key] = amount;
-            }
-
-            return legacy;
         }
 
         private static AbilityType? ParseAbilityType(string actionName)
@@ -2833,31 +2141,7 @@ namespace QDND.Combat.Actions
         /// </summary>
         public void ProcessTurnStart(string combatantId)
         {
-            var toRemove = new List<string>();
-
-            foreach (var (key, cooldown) in _cooldowns)
-            {
-                if (key.StartsWith(combatantId + ":"))
-                {
-                    if (cooldown.DecrementType == "turn")
-                    {
-                        cooldown.RemainingCooldown--;
-                        if (cooldown.RemainingCooldown <= 0)
-                        {
-                            cooldown.CurrentCharges = Math.Min(
-                                cooldown.CurrentCharges + 1,
-                                cooldown.MaxCharges
-                            );
-                            cooldown.RemainingCooldown = 0;
-                        }
-                    }
-                }
-            }
-
-            foreach (var key in toRemove)
-            {
-                _cooldowns.Remove(key);
-            }
+            Cooldowns?.ProcessTurnStart(combatantId);
         }
 
         /// <summary>
@@ -2865,56 +2149,7 @@ namespace QDND.Combat.Actions
         /// </summary>
         public void ProcessRoundEnd()
         {
-            foreach (var (key, cooldown) in _cooldowns)
-            {
-                if (cooldown.DecrementType == "round")
-                {
-                    cooldown.RemainingCooldown--;
-                    if (cooldown.RemainingCooldown <= 0)
-                    {
-                        cooldown.CurrentCharges = Math.Min(
-                            cooldown.CurrentCharges + 1,
-                            cooldown.MaxCharges
-                        );
-                        cooldown.RemainingCooldown = 0;
-                    }
-                }
-            }
-        }
-
-        private void ConsumeCooldown(string combatantId, string actionId, ActionDefinition action)
-        {
-            // ActionCooldown.MaxCharges defaults to 1 for many actions via parser defaults.
-            // Treat charge-only tracking as explicit limited-use actions (e.g. short-rest abilities).
-            bool hasCharges = action.Cooldown.MaxCharges > 0 && !action.Cooldown.ResetsOnCombatEnd;
-            bool hasCooldownTimer = action.Cooldown.TurnCooldown > 0 || action.Cooldown.RoundCooldown > 0;
-
-            // No charges and no timer means this action does not use cooldown tracking.
-            if (!hasCharges && !hasCooldownTimer)
-                return;
-
-            var canonicalId = ActionRegistry?.GetAction(actionId)?.Id ?? actionId;
-            var key = $"{combatantId}:{canonicalId}";
-
-            if (!_cooldowns.TryGetValue(key, out var cooldown))
-            {
-                cooldown = new ActionCooldownState
-                {
-                    MaxCharges = hasCharges ? action.Cooldown.MaxCharges : 1,
-                    CurrentCharges = hasCharges ? action.Cooldown.MaxCharges : 1,
-                    DecrementType = !hasCooldownTimer ? "none"
-                        : (action.Cooldown.TurnCooldown > 0 ? "turn" : "round")
-                };
-                _cooldowns[key] = cooldown;
-            }
-
-            cooldown.CurrentCharges--;
-            if (hasCooldownTimer && cooldown.CurrentCharges < cooldown.MaxCharges)
-            {
-                cooldown.RemainingCooldown = action.Cooldown.TurnCooldown > 0
-                    ? action.Cooldown.TurnCooldown
-                    : action.Cooldown.RoundCooldown;
-            }
+            Cooldowns?.ProcessRoundEnd();
         }
 
         private bool CheckRequirement(ActionRequirement req, Combatant source)
@@ -3382,7 +2617,7 @@ namespace QDND.Combat.Actions
         /// </summary>
         public void Reset()
         {
-            _cooldowns.Clear();
+            Cooldowns?.Reset();
         }
 
         /// <summary>
@@ -3390,26 +2625,7 @@ namespace QDND.Combat.Actions
         /// </summary>
         public List<Persistence.CooldownSnapshot> ExportCooldowns()
         {
-            var snapshots = new List<Persistence.CooldownSnapshot>();
-
-            foreach (var (key, cooldown) in _cooldowns)
-            {
-                var parts = key.Split(':');
-                if (parts.Length != 2)
-                    continue;
-
-                snapshots.Add(new Persistence.CooldownSnapshot
-                {
-                    CombatantId = parts[0],
-                    ActionId = parts[1],
-                    MaxCharges = cooldown.MaxCharges,
-                    CurrentCharges = cooldown.CurrentCharges,
-                    RemainingCooldown = cooldown.RemainingCooldown,
-                    DecrementType = cooldown.DecrementType
-                });
-            }
-
-            return snapshots;
+            return Cooldowns?.ExportCooldowns() ?? new List<Persistence.CooldownSnapshot>();
         }
 
         /// <summary>
@@ -3417,35 +2633,7 @@ namespace QDND.Combat.Actions
         /// </summary>
         public void ImportCooldowns(List<Persistence.CooldownSnapshot> snapshots)
         {
-            if (snapshots == null)
-                return;
-
-            // Clear existing cooldowns
-            _cooldowns.Clear();
-
-            // Restore from snapshots
-            foreach (var snapshot in snapshots)
-            {
-                var key = $"{snapshot.CombatantId}:{snapshot.ActionId}";
-                _cooldowns[key] = new ActionCooldownState
-                {
-                    MaxCharges = snapshot.MaxCharges,
-                    CurrentCharges = snapshot.CurrentCharges,
-                    RemainingCooldown = snapshot.RemainingCooldown,
-                    DecrementType = snapshot.DecrementType ?? "turn"
-                };
-            }
+            Cooldowns?.ImportCooldowns(snapshots);
         }
-    }
-
-    /// <summary>
-    /// Tracks cooldown state for an action.
-    /// </summary>
-    internal class ActionCooldownState
-    {
-        public int MaxCharges { get; set; }
-        public int CurrentCharges { get; set; }
-        public int RemainingCooldown { get; set; }
-        public string DecrementType { get; set; } // "turn" or "round"
     }
 }

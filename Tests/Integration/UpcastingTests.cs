@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using Xunit;
 using QDND.Combat.Actions;
 using QDND.Combat.Entities;
 using QDND.Combat.Rules;
 using QDND.Data.Spells;
+using QDND.Data.Actions;
 using QDND.Data.CharacterModel;
 
 namespace QDND.Tests.Integration
@@ -13,6 +17,7 @@ namespace QDND.Tests.Integration
     /// Integration tests for spell upcasting (Issue 8).
     /// Verifies that SpellUpcastRules are applied correctly and produce expected results.
     /// </summary>
+    [Collection("BenchmarkTests")]
     public class UpcastingTests
     {
         [Fact]
@@ -360,6 +365,8 @@ namespace QDND.Tests.Integration
         [Fact]
         public void TryRegisterDerivedUpcastRule_DerivesDiceScalingFromVariants()
         {
+            var originalRules = SnapshotUpcastRules();
+
             string actionId = $"test_upcast_spell_{Guid.NewGuid():N}";
             var level1 = new ActionDefinition
             {
@@ -380,12 +387,57 @@ namespace QDND.Tests.Integration
                 }
             };
 
-            bool registered = SpellUpcastRules.TryRegisterDerivedUpcastRule(actionId, new[] { level1, level2 });
-            var derived = SpellUpcastRules.GetUpcastScaling(actionId);
+            try
+            {
+                bool registered = SpellUpcastRules.TryRegisterDerivedUpcastRule(actionId, new[] { level1, level2 });
+                var derived = SpellUpcastRules.GetUpcastScaling(actionId);
 
-            Assert.True(registered);
-            Assert.NotNull(derived);
-            Assert.Equal("1d6", derived.DicePerLevel);
+                Assert.True(registered);
+                Assert.NotNull(derived);
+                Assert.Equal("1d6", derived.DicePerLevel);
+            }
+            finally
+            {
+                ReplaceUpcastRules(originalRules);
+            }
+        }
+
+        [Fact]
+        public void LoadAllSpells_DerivesAtLeastOneUpcastRuleFromBG3Variants()
+        {
+            var originalRules = SnapshotUpcastRules();
+            string bg3Path = Path.Combine(FindRepoRoot(), "BG3_Data");
+            Assert.True(Directory.Exists(bg3Path), $"BG3 data directory was not found at '{bg3Path}'");
+
+            try
+            {
+                ResetUpcastRulesToCuratedBaseline();
+
+                var curatedRules = SpellUpcastRules.GetAllRules();
+                var curatedKeys = new HashSet<string>(curatedRules.Keys, StringComparer.OrdinalIgnoreCase);
+                int rulesBefore = curatedRules.Count;
+
+                // Ensure a known curated rule exists before BG3 variant derivation runs.
+                Assert.True(curatedKeys.Contains("magic_missile") || curatedKeys.Contains("burning_hands"));
+
+                var loader = new ActionDataLoader();
+                var registry = new ActionRegistry();
+                int loaded = loader.LoadAllSpells(bg3Path, registry);
+
+                Assert.True(loaded > 0, $"Expected BG3 spells to load from '{bg3Path}'. Errors: {string.Join(" | ", loader.Errors)}");
+
+                var allRulesAfterLoad = SpellUpcastRules.GetAllRules();
+                int rulesAfter = allRulesAfterLoad.Count;
+                int derivedUpcastRules = rulesAfter - rulesBefore;
+                var derivedKeys = allRulesAfterLoad.Keys.Where(k => !curatedKeys.Contains(k)).ToList();
+
+                Assert.True(derivedUpcastRules > 0, $"Expected at least one derived upcast rule from BG3 variants. Before={rulesBefore}, After={rulesAfter}");
+                Assert.NotEmpty(derivedKeys);
+            }
+            finally
+            {
+                ReplaceUpcastRules(originalRules);
+            }
         }
 
         [Theory]
@@ -430,6 +482,51 @@ namespace QDND.Tests.Integration
             
             SpellUpcastRules.ApplyUpcastRule(action);
             return action;
+        }
+
+        private static string FindRepoRoot()
+        {
+            var dir = AppContext.BaseDirectory;
+            while (!string.IsNullOrEmpty(dir))
+            {
+                if (File.Exists(Path.Combine(dir, "project.godot")))
+                    return dir;
+                dir = Directory.GetParent(dir)?.FullName;
+            }
+
+            return Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+        }
+
+        private static void ResetUpcastRulesToCuratedBaseline()
+        {
+            var rulesField = typeof(SpellUpcastRules).GetField("_upcastRules", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.NotNull(rulesField);
+
+            var rules = rulesField.GetValue(null) as IDictionary<string, UpcastScaling>;
+            Assert.NotNull(rules);
+            rules.Clear();
+
+            var initMethod = typeof(SpellUpcastRules).GetMethod("InitializeUpcastRules", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.NotNull(initMethod);
+            initMethod.Invoke(null, null);
+        }
+
+        private static Dictionary<string, UpcastScaling> SnapshotUpcastRules()
+        {
+            return new Dictionary<string, UpcastScaling>(SpellUpcastRules.GetAllRules(), StringComparer.OrdinalIgnoreCase);
+        }
+
+        private static void ReplaceUpcastRules(Dictionary<string, UpcastScaling> snapshot)
+        {
+            var rulesField = typeof(SpellUpcastRules).GetField("_upcastRules", BindingFlags.NonPublic | BindingFlags.Static);
+            Assert.NotNull(rulesField);
+
+            var rules = rulesField.GetValue(null) as IDictionary<string, UpcastScaling>;
+            Assert.NotNull(rules);
+
+            rules.Clear();
+            foreach (var (key, value) in snapshot)
+                rules[key] = value;
         }
     }
 }

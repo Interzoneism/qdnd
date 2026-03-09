@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Godot;
 using Xunit;
 using QDND.Combat.Rules;
@@ -190,13 +189,10 @@ namespace QDND.Tests.Unit
         public void CombineDiceFormulas_DifferentDieTypes_PreservesBothTerms()
         {
             // Arrange
-            var (pipeline, _, _) = CreatePipeline();
-            var method = typeof(EffectPipeline).GetMethod("CombineDiceFormulas", BindingFlags.NonPublic | BindingFlags.Instance);
-
-            Assert.NotNull(method);
+            var builder = new EffectBuilder();
 
             // Act
-            var combined = (string)method!.Invoke(pipeline, new object[] { "2d6", "1d4" });
+            var combined = builder.CombineDiceFormulas("2d6", "1d4");
 
             // Assert
             Assert.Equal("2d6+1d4", combined);
