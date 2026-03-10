@@ -30,6 +30,7 @@ namespace QDND.Combat.UI.Screens
         private Combatant _combatant;
         private InventoryService _inventoryService;
         private CharacterDisplayData _displayData;
+        public ICombatController CombatController { get; set; }
 
         // ── Title bar extras ───────────────────────────────────────
         private Label _levelLabel;
@@ -864,8 +865,7 @@ namespace QDND.Combat.UI.Screens
 
         private bool TryCloneArenaModel()
         {
-            var arena = GetTree()?.Root?.FindChild("CombatArena", true, false) as CombatArena;
-            var sourceModel = arena?.GetVisual(_combatant.Id)?.ModelRoot;
+            var sourceModel = CombatController?.GetVisual(_combatant.Id)?.ModelRoot;
             if (sourceModel == null || !IsInstanceValid(sourceModel))
                 return false;
 

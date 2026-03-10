@@ -27,8 +27,9 @@ namespace QDND.Combat.UI
     /// </summary>
     public partial class HudController : Control
     {
-        [Export] public CombatArena Arena;
+        [Export] public Node CombatControllerNode;
         [Export] public bool DebugUI = false;
+        private ICombatController Arena;
 
         // ── Panels ─────────────────────────────────────────────────
         private InitiativeRibbon _initiativeRibbon;
@@ -158,8 +159,8 @@ namespace QDND.Combat.UI
         {
             if (_disposed || !IsInstanceValid(this) || !IsInsideTree()) return;
 
-            if (Arena == null)
-                Arena = GetTree().Root.FindChild("CombatArena", true, false) as CombatArena;
+            Arena ??= CombatControllerNode as ICombatController
+                ?? GetTree().Root.FindChild("CombatArena", true, false) as ICombatController;
 
             // Skip HUD in fast auto-battle mode
             if (Arena != null && Arena.IsAutoBattleMode && !QDND.Tools.DebugFlags.IsFullFidelity)
@@ -363,6 +364,7 @@ void fragment() {
 
             _characterInventoryScreen = new CharacterInventoryScreen();
             _characterInventoryScreen.Visible = false;
+            _characterInventoryScreen.CombatController = Arena;
             _characterInventoryScreen.OnCloseRequested += OnCharacterInventoryScreenClosed;
             _windowManager.AddChild(_characterInventoryScreen);
 

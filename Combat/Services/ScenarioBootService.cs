@@ -488,9 +488,11 @@ namespace QDND.Combat.Services
             }
 
             var losService = _combatContext.GetService<LOSService>();
+            _combatContext.Combatants.ReplaceAll(Combatants);
+            losService?.ClearCombatants();
+            _forcedMovementService?.ClearCombatants();
             foreach (var c in Combatants)
             {
-                _combatContext.RegisterCombatant(c);
                 losService?.RegisterCombatant(c);
                 _forcedMovementService?.RegisterCombatant(c);
             }

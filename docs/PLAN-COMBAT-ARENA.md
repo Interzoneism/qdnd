@@ -67,3 +67,12 @@ Refactor `CombatArena` in three bounded steps, in this order: extract service wi
 - Scope for this refactor is composer + controller facade + combatant registry ownership. Full visual-manager extraction is deferred.
 - Only broad/non-scene consumers move to `ICombatController` now; arena-internal child nodes can remain concrete until a later cleanup pass.
 - `TurnQueueService` keeps its current queue/order responsibilities; registry becomes the sole general combatant source of truth, not the turn-order owner.
+
+## Implemented Notes
+- `CombatArena` now composes services through `CombatArenaComposer`, applies the returned `CombatArenaComposition`, and disposes composer-managed subscriptions on `_ExitTree()`.
+- `ICombatantRegistry` / `CombatantRegistry` are the sole combatant authority for `CombatArena`, `CombatContext`, `ScenarioBootService`, and the execution/reaction/movement coordinators.
+- `HudController` and `CharacterInventoryScreen` now depend on `ICombatController` instead of the concrete `CombatArena` scene type.
+- `ScenarioBootService` replaces the registry contents in one step and then re-registers LOS / forced-movement occupants from that registry-backed source.
+- `UnsummonCombatantEffect` now removes summons from the shared combatant registry after they leave the turn queue.
+- `Tests/Unit/CombatantRegistryTests.cs` covers registry ordering, lookup, replacement, and clear semantics.
+- Direct xUnit coverage for `CombatContext` was intentionally not kept because constructing the Godot `CombatContext : Node` in `dotnet test` can crash `testhost` in this repo; that contract is instead validated through registry tests plus the required Godot smoke gate.

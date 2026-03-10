@@ -26,14 +26,15 @@ namespace QDND.Tests.Unit
         /// </summary>
         private class TestCombatContext : ICombatContext
         {
-            private readonly Dictionary<string, Combatant> _combatants = new();
+            private readonly CombatantRegistry _combatants = new();
             private readonly Dictionary<Type, object> _services = new();
             private readonly List<string> _registeredServiceNames = new();
 
-            public void RegisterCombatant(Combatant combatant) => _combatants[combatant.Id] = combatant;
+            public ICombatantRegistry Combatants => _combatants;
+            public void RegisterCombatant(Combatant combatant) => _combatants.Add(combatant);
             public void AddCombatant(Combatant combatant) => RegisterCombatant(combatant);
-            public Combatant GetCombatant(string id) => _combatants.TryGetValue(id, out var c) ? c : null;
-            public IEnumerable<Combatant> GetAllCombatants() => _combatants.Values;
+            public Combatant GetCombatant(string id) => _combatants.Get(id);
+            public IEnumerable<Combatant> GetAllCombatants() => _combatants.GetAll();
             public void ClearCombatants() => _combatants.Clear();
 
             public void RegisterService<T>(T service) where T : class

@@ -45,6 +45,7 @@ namespace QDND.Combat.Actions.Effects
 
                 // Remove from turn queue
                 context.TurnQueue?.RemoveCombatant(summon.Id);
+                context.CombatContext.Combatants.Remove(summon.Id);
 
                 // Clean up all statuses on the summon
                 context.Statuses?.RemoveStatuses(summon.Id, _ => true);

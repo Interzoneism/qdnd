@@ -288,13 +288,15 @@ namespace QDND.Tests.Integration
         /// </summary>
         private class TestCombatContext : ICombatContext
         {
-            private readonly Dictionary<string, Combatant> _combatants = new Dictionary<string, Combatant>();
+            private readonly CombatantRegistry _combatants = new CombatantRegistry();
             private readonly Dictionary<Type, object> _services = new Dictionary<Type, object>();
             private readonly List<string> _registeredServices = new List<string>();
 
+            public ICombatantRegistry Combatants => _combatants;
+
             public void RegisterCombatant(Combatant combatant)
             {
-                _combatants[combatant.Id] = combatant;
+                _combatants.Add(combatant);
             }
 
             public void AddCombatant(Combatant combatant)
@@ -304,10 +306,10 @@ namespace QDND.Tests.Integration
 
             public Combatant GetCombatant(string id)
             {
-                return _combatants.TryGetValue(id, out var c) ? c : null;
+                return _combatants.Get(id);
             }
 
-            public IEnumerable<Combatant> GetAllCombatants() => _combatants.Values;
+            public IEnumerable<Combatant> GetAllCombatants() => _combatants.GetAll();
 
             public void ClearCombatants()
             {

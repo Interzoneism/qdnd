@@ -8,17 +8,18 @@ namespace QDND.Combat.Actions
     /// </summary>
     public class CooldownTracker
     {
-        private readonly ActionRegistry _actionRegistry;
         private readonly Dictionary<string, ActionCooldownState> _cooldowns = new();
 
-        public CooldownTracker(ActionRegistry actionRegistry)
+        public ActionRegistry ActionRegistry { get; set; }
+
+        public CooldownTracker(ActionRegistry actionRegistry = null)
         {
-            _actionRegistry = actionRegistry;
+            ActionRegistry = actionRegistry;
         }
 
         public bool HasAvailableCharges(string combatantId, string actionId)
         {
-            var canonicalActionId = _actionRegistry?.GetAction(actionId)?.Id ?? actionId;
+            var canonicalActionId = ActionRegistry?.GetAction(actionId)?.Id ?? actionId;
             var cooldownKey = $"{combatantId}:{canonicalActionId}";
 
             if (_cooldowns.TryGetValue(cooldownKey, out var cooldown))
@@ -40,7 +41,7 @@ namespace QDND.Combat.Actions
             if (!hasCharges && !hasCooldownTimer)
                 return;
 
-            var canonicalId = _actionRegistry?.GetAction(actionId)?.Id ?? actionId;
+            var canonicalId = ActionRegistry?.GetAction(actionId)?.Id ?? actionId;
             var key = $"{combatantId}:{canonicalId}";
 
             if (!_cooldowns.TryGetValue(key, out var cooldown))

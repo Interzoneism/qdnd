@@ -9,6 +9,8 @@ namespace QDND.Combat.Services
     /// </summary>
     public interface ICombatContext
     {
+        ICombatantRegistry Combatants { get; }
+
         /// <summary>
         /// Register a service with the combat context.
         /// </summary>

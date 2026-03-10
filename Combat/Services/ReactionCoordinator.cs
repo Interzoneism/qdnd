@@ -33,7 +33,7 @@ namespace QDND.Combat.Services
         private readonly CombatContext _combatContext;
         private TargetValidator _targetValidator;
         private readonly TurnQueueService _turnQueue;
-        private readonly List<Combatant> _combatants;
+        private readonly ICombatantRegistry _combatants;
         private readonly Func<bool> _isAutoBattleMode;
         private readonly Func<Random> _getRng;
         private readonly Action<string> _log;
@@ -46,7 +46,7 @@ namespace QDND.Combat.Services
             CombatContext combatContext,
             TargetValidator targetValidator,
             TurnQueueService turnQueue,
-            List<Combatant> combatants,
+            ICombatantRegistry combatants,
             Func<bool> isAutoBattleMode,
             Func<Random> getRng,
             Action<string> log)
@@ -63,6 +63,8 @@ namespace QDND.Combat.Services
             _getRng = getRng;
             _log = log;
         }
+
+        private List<Combatant> GetCombatants() => _combatants?.GetAll().ToList() ?? new List<Combatant>();
 
         /// <summary>
         /// Inject the reaction resolver after construction. Required because the
@@ -248,9 +250,10 @@ namespace QDND.Combat.Services
                 case TargetType.None:
                     return new List<Combatant>();
                 case TargetType.All:
+                    var combatants = GetCombatants();
                     return _targetValidator != null
-                        ? _targetValidator.GetValidTargets(action, reactor, _combatants)
-                        : _combatants.Where(c => c.IsActive).ToList();
+                        ? _targetValidator.GetValidTargets(action, reactor, combatants)
+                        : combatants.Where(c => c.IsActive).ToList();
                 case TargetType.Circle:
                 case TargetType.Cone:
                 case TargetType.Line:
@@ -265,7 +268,7 @@ namespace QDND.Combat.Services
                         action,
                         reactor,
                         triggerContext.Position,
-                        _combatants,
+                        GetCombatants(),
                         GetPosition);
                 }
                 case TargetType.SingleUnit:

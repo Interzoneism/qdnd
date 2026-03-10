@@ -77,6 +77,14 @@ namespace QDND.Combat.Movement
         }
 
         /// <summary>
+        /// Clear all registered combatants without affecting registered obstacles.
+        /// </summary>
+        public void ClearCombatants()
+        {
+            _combatants.Clear();
+        }
+
+        /// <summary>
         /// Register an obstacle for collision.
         /// </summary>
         public void RegisterObstacle(Obstacle obstacle)

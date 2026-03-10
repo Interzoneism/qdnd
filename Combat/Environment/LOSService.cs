@@ -215,6 +215,14 @@ namespace QDND.Combat.Environment
         }
 
         /// <summary>
+        /// Clear all registered combatants without affecting obstacles.
+        /// </summary>
+        public void ClearCombatants()
+        {
+            _combatants.Clear();
+        }
+
+        /// <summary>
         /// Check line of sight between two positions.
         /// </summary>
         public LOSResult CheckLOS(Vector3 from, Vector3 to)

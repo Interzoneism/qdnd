@@ -17,12 +17,18 @@ namespace QDND.Combat.Services
 
         private readonly Dictionary<Type, object> _services = new Dictionary<Type, object>();
         private readonly List<string> _registeredServices = new List<string>();
-        private readonly Dictionary<string, Combatant> _combatants = new Dictionary<string, Combatant>(StringComparer.OrdinalIgnoreCase);
+        private readonly CombatantRegistry _combatants = new();
+        public ICombatantRegistry Combatants => _combatants;
 
         /// <summary>
         /// Fired when a new combatant is registered (including mid-combat summons).
         /// </summary>
         public event Action<Combatant> OnCombatantRegistered;
+
+        public CombatContext()
+        {
+            _combatants.CombatantAdded += HandleCombatantAdded;
+        }
 
         public override void _EnterTree()
         {
@@ -127,8 +133,7 @@ namespace QDND.Combat.Services
         /// </summary>
         public void RegisterCombatant(Combatant combatant)
         {
-            _combatants[combatant.Id] = combatant;
-            OnCombatantRegistered?.Invoke(combatant);
+            _combatants.Add(combatant);
         }
 
         /// <summary>
@@ -144,13 +149,13 @@ namespace QDND.Combat.Services
         /// </summary>
         public Combatant GetCombatant(string id)
         {
-            return _combatants.TryGetValue(id, out var c) ? c : null;
+            return _combatants.Get(id);
         }
 
         /// <summary>
         /// Get all registered combatants.
         /// </summary>
-        public IEnumerable<Combatant> GetAllCombatants() => _combatants.Values;
+        public IEnumerable<Combatant> GetAllCombatants() => _combatants.GetAll();
 
         /// <summary>
         /// Clear all combatants (for testing or reset).
@@ -158,6 +163,11 @@ namespace QDND.Combat.Services
         public void ClearCombatants()
         {
             _combatants.Clear();
+        }
+
+        private void HandleCombatantAdded(Combatant combatant)
+        {
+            OnCombatantRegistered?.Invoke(combatant);
         }
     }
 }

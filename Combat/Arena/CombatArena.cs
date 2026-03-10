@@ -39,7 +39,7 @@ namespace QDND.Combat.Arena
     /// Main combat arena scene controller. Handles visual representation of combat,
     /// spawns combatant visuals, manages camera, and coordinates UI.
     /// </summary>
-    public partial class CombatArena : Node3D
+    public partial class CombatArena : Node3D, ICombatController
     {
         [Export] public string ScenarioPath = "res://Data/Scenarios/bg3_party_vs_goblins.json";
         [Export] public bool UseRandom2v2Scenario = false;
@@ -112,6 +112,7 @@ namespace QDND.Combat.Arena
         private RealtimeAIController _realtimeAIController;
         private UIAwareAIController _uiAwareAIController;
         private QDND.Combat.Movement.ForcedMovementService _forcedMovementService;
+        private ICombatantRegistry _combatantRegistry;
         private readonly JumpPathfinder3D _jumpPathfinder = new();
         private readonly SpecialMovementService _specialMovementService = new();
         private QDND.Combat.Rules.Functors.FunctorExecutor _functorExecutor;
@@ -121,6 +122,7 @@ namespace QDND.Combat.Arena
         private int? _autoBattleSeedOverride;
         private CustomFightLogger _customFightLogger;
         private ScenarioBootService _scenarioBootService;
+        private CombatArenaComposition _composition;
         private SphereShape3D _navigationProbeShape;
         private SphereShape3D _jumpProbeShape;
         private JumpPathResult _cachedJumpPreviewPath;
@@ -140,7 +142,6 @@ namespace QDND.Combat.Arena
         // Visual tracking
         private Dictionary<string, CombatantVisual> _combatantVisuals = new();
         private Dictionary<string, SurfaceVisual> _surfaceVisuals = new();
-        private List<Combatant> _combatants = new();
         private readonly HashSet<string> _oneTimeLogKeys = new();
         private Random _rng;
         private bool _initialLoadComplete;
@@ -180,14 +181,16 @@ namespace QDND.Combat.Arena
         public ActionBarModel ActionBarModel => _actionBarModel;
         public TurnTrackerModel TurnTrackerModel => _turnTrackerModel;
         public ResourceBarModel ResourceBarModel => _resourceBarModel;
+        float ICombatController.DefaultMovePoints => DefaultMovePoints;
 
         // Input state — owned by SelectionService
         // IsPlayerTurn, _trackedPlayerBudget* — now owned by TurnLifecycleService
 
-        public CombatContext Context => _combatContext;
+        public ICombatContext Context => _combatContext;
         public string SelectedCombatantId => _selectionService?.SelectedCombatantId;
         public string SelectedAbilityId => _selectionService?.SelectedAbilityId;
         public bool IsPlayerTurn => _turnLifecycleService?.IsPlayerTurn ?? false;
+        private IReadOnlyList<Combatant> Combatants => _combatantRegistry?.GetAll() ?? Array.Empty<Combatant>();
         
         /// <summary>
         /// Get a clone of the selected ability options (variant/upcast).
@@ -775,7 +778,7 @@ namespace QDND.Combat.Arena
             }
 
             float blockingRadius = Mathf.Max(0.25f, probeRadius + 0.55f);
-            foreach (var other in _combatants)
+            foreach (var other in Combatants)
             {
                 if (other == null || !other.IsActive || other.Id == movingCombatantId)
                 {
@@ -883,495 +886,150 @@ namespace QDND.Combat.Arena
             Log("CombatContext created");
         }
 
-        private void RegisterServices()
+        private CombatArenaCompositionArgs CreateCompositionArgs()
         {
-            // Core services
-            _stateMachine = new CombatStateMachine();
-            _turnQueue = new TurnQueueService();
-            _commandService = new CommandService();
-            _combatLog = new CombatLog();
-            _scenarioLoader = new ScenarioLoader();
-
-            _commandService.StateMachine = _stateMachine;
-            _commandService.TurnQueue = _turnQueue;
-
-            // Subscribe to events
-            _stateMachine.OnStateChanged += OnStateChanged;
-            _turnQueue.OnTurnChanged += OnTurnChanged;
-            _commandService.OnCommandExecuted += OnCommandExecuted;
-
-            _combatContext.RegisterService(_stateMachine);
-            _combatContext.RegisterService(_turnQueue);
-            _combatContext.RegisterService(_commandService);
-            _combatContext.RegisterService(_combatLog);
-            _combatContext.RegisterService(_scenarioLoader);
-
-            // Phase B: Registry initialization (DataRegistry, ActionRegistry, StatsRegistry,
-            // StatusRegistry, PassiveRegistry, InterruptRegistry, and functor/hit-trigger pipeline).
-            var registries = RegistryInitializer.Bootstrap(
-                dataPath: ProjectSettings.GlobalizePath("res://Data"),
-                bg3DataPath: ProjectSettings.GlobalizePath("res://BG3_Data"),
-                verboseLogging: VerboseLogging,
-                scenarioLoader: _scenarioLoader,
-                combatContext: _combatContext,
-                log: Log,
-                logError: msg => GD.PrintErr(msg),
-                resolveCombatant: id => _combatContext?.GetCombatant(id),
-                getAllCombatantIds: () => _combatants.Select(c => c.Id),
-                removeSurfacesByCreator: creatorId => _surfaceManager?.RemoveSurfacesByCreator(creatorId),
-                removeSurfaceById: instanceId => _surfaceManager?.RemoveSurfaceById(instanceId),
-                removeSummonsByOwner: ownerId =>
-                {
-                    // Remove all combatants owned by this caster (summoned creatures).
-                    // Mirrors UnsummonCombatantEffect: set dead, remove from queue, fire death event.
-                    var summons = _combatContext?.GetAllCombatants()
-                        ?.Where(c => c.OwnerId == ownerId && c.Id != ownerId)
-                        .ToList();
-                    if (summons == null) return;
-                    foreach (var summon in summons)
-                    {
-                        summon.LifeState = CombatantLifeState.Dead;
-                        summon.Resources.CurrentHP = 0;
-                        _turnQueue?.RemoveCombatant(summon.Id);
-                        _rulesEngine?.Events.Dispatch(new QDND.Combat.Rules.RuleEvent
-                        {
-                            Type = QDND.Combat.Rules.RuleEventType.CombatantDied,
-                            SourceId = ownerId,
-                            TargetId = summon.Id,
-                            Data = new System.Collections.Generic.Dictionary<string, object>
-                                { { "cause", "concentration_broken" } }
-                        });
-                        Log($"[ConcentrationSystem] Unsummoned {summon.Name} (concentration broken)");
-                    }
-                });
-
-            _dataRegistry = registries.DataRegistry;
-            _rulesEngine = registries.RulesEngine;
-            _statusManager = registries.StatusManager;
-            _specialMovementService.SetStatusQuery(
-                (combatantId, statusId) => _statusManager?.HasStatus(combatantId, statusId) == true);
-            _metamagicService = registries.MetamagicService;
-            _concentrationSystem = registries.ConcentrationSystem;
-            _effectPipeline = registries.EffectPipeline;
-            _actionRegistry = registries.ActionRegistry;
-            _statsRegistry = registries.StatsRegistry;
-            _bg3StatusRegistry = registries.BG3StatusRegistry;
-            _bg3StatusIntegration = registries.BG3StatusIntegration;
-            _passiveRegistry = registries.PassiveRegistry;
-            _interruptRegistry = registries.InterruptRegistry;
-            _functorExecutor = registries.FunctorExecutor;
-            HudIcons.SetIconService(registries.IconService);
-            _bg3AiRegistry = new BG3AIRegistry();
-            var charRegistry = registries.CharRegistry;
-
-            var bg3AiPath = Path.Combine(ProjectSettings.GlobalizePath("res://BG3_Data"), "AI");
-            if (_bg3AiRegistry.LoadFromDirectory(bg3AiPath))
+            return new CombatArenaCompositionArgs
             {
-                Log($"BG3 AI Registry: {_bg3AiRegistry.Archetypes.Count} archetypes, {_bg3AiRegistry.SurfaceCombos.Count} combos loaded");
-            }
-            else
-            {
-                Log($"BG3 AI Registry load completed with {_bg3AiRegistry.Errors.Count} errors");
-            }
-
-            foreach (var warning in _bg3AiRegistry.Warnings.Take(10))
-            {
-                GD.PushWarning($"[BG3AI] {warning}");
-            }
-
-            foreach (var error in _bg3AiRegistry.Errors.Take(10))
-            {
-                GD.PushError($"[BG3AI] {error}");
-            }
-
-            _combatContext.RegisterService(_bg3AiRegistry);
-
-            // Phase D: Wire reaction system
-            var reactionAliasResolver = new ReactionAliasResolver();
-            var reactionSystem = new ReactionSystem(_rulesEngine.Events, reactionAliasResolver)
-            {
-                StrictGrantValidation = true
-            };
-            reactionSystem.AdditionalEligibilityCheck = (reactor, reaction, context) =>
-            {
-                if (_effectPipeline == null || reactor == null)
-                    return true;
-                if (string.IsNullOrWhiteSpace(reaction?.ActionId))
-                    return true;
-
-                // Opportunity attack currently resolves through main_hand_attack, which is not
-                // action-economy equivalent to explicit action use in this reaction window.
-                if (reaction.Tags != null && reaction.Tags.Contains("opportunity_attack"))
-                    return true;
-
-                var (canUse, _) = _effectPipeline.CanUseAbility(reaction.ActionId, reactor);
-                return canUse;
-            };
-            _reactionSystem = reactionSystem; // Store reference
-            _resolutionStack = new ResolutionStack();
-
-            // Construct coordinator first so we can use its methods as resolver delegates.
-            _reactionCoordinator = new ReactionCoordinator(
-                reactionSystem,
-                (prompt, cb) => _reactionPromptUI.Show(prompt, cb),
-                _stateMachine,
-                _effectPipeline,
-                _combatContext,
-                _targetValidator,
-                _turnQueue,
-                _combatants,
-                () => IsAutoBattleMode,
-                () => _rng,
-                Log);
-
-            _reactionResolver = new ReactionResolver(reactionSystem, _resolutionStack, seed: 42)
-            {
-                GetCombatants = () => _combatants,
-                PromptDecisionProvider = _reactionCoordinator.ResolveSynchronousReactionPromptDecision,
-                AIDecisionProvider = _reactionCoordinator.DecideAIReaction
-            };
-
-            // Inject resolver back into coordinator (breaks the construction cycle).
-            _reactionCoordinator.SetReactionResolver(_reactionResolver);
-
-            // Wire Counterspell slot picker: reads available spell slots and delegates to HudController.
-            _reactionCoordinator.SetShowSlotPicker((prompt, callback) =>
-            {
-                var reactor = _combatContext.GetCombatant(prompt.ReactorId);
-                var pool = reactor?.ActionResources;
-                var slots = ReactionSystem.GetAvailableSpellSlots(pool, 3);
-                var hud = _hudLayer?.GetNodeOrNull<QDND.Combat.UI.HudController>("HudController");
-                if (hud != null)
-                    hud.ShowSpellSlotPicker("Counterspell", slots, callback);
-                else
-                    callback?.Invoke(-1); // No HUD — treat as cancelled
-            });
-
-            // Wire BG3 interrupt-driven reactions FIRST so its OnReactionUsed handler runs before the coordinator's
-            var bg3ReactionIntegration = new BG3ReactionIntegration(reactionSystem, _interruptRegistry);
-            bg3ReactionIntegration.RegisterCoreInterrupts();
-            _combatContext.RegisterService(bg3ReactionIntegration);
-            Log("BG3 Reaction Integration wired (OpportunityAttack, Shield, Counterspell, UncannyDodge)");
-
-            // Subscribe coordinator AFTER BG3 integration so BG3 effects (Shield AC, Counterspell) are applied first
-            reactionSystem.OnPromptCreated += _reactionCoordinator.OnReactionPrompt;
-            reactionSystem.OnReactionUsed += _reactionCoordinator.OnReactionUsed;
-
-            // Wire reaction system into effect pipeline
-            _effectPipeline.Reactions = reactionSystem;
-            _effectPipeline.ReactionResolver = _reactionResolver;
-            _effectPipeline.GetCombatants = () => _combatants;
-            _effectPipeline.CombatContext = _combatContext;
-            _effectPipeline.TurnQueue = _turnQueue;
-            _effectPipeline.DataRegistry = _dataRegistry;
-
-            // Surface Manager
-            _surfaceManager = new SurfaceManager(_rulesEngine.Events, _statusManager);
-            _surfaceManager.Rules = _rulesEngine;  // Wire up for resistance calculations
-            _surfaceManager.OnSurfaceCreated += OnSurfaceCreated;
-            _surfaceManager.OnSurfaceRemoved += OnSurfaceRemoved;
-            _surfaceManager.OnSurfaceTransformed += OnSurfaceTransformed;
-            _surfaceManager.OnSurfaceTriggered += OnSurfaceTriggered;
-            _surfaceManager.OnSurfaceGeometryChanged += OnSurfaceGeometryChanged;
-            _surfaceManager.ResolveCombatants = () => _combatants;
-            _combatContext.RegisterService(_surfaceManager);
-
-            // Phase D: Create LOS and Height services
-            var losService = new LOSService();
-            losService.SetSurfaceManager(_surfaceManager);
-            var heightService = new HeightService(_rulesEngine.Events);
-
-            // Phase E: Create ForcedMovementService with dependencies
-            _forcedMovementService = new QDND.Combat.Movement.ForcedMovementService(
-                events: _rulesEngine.Events,
-                surfaces: _surfaceManager,
-                height: heightService);
-
-            // Wire into effect pipeline
-            _effectPipeline.LOS = losService;
-            _effectPipeline.Heights = heightService;
-            _effectPipeline.ForcedMovement = _forcedMovementService;
-
-            _targetValidator = new TargetValidator(losService, c => c.Position);
-            _targetValidator.Statuses = _statusManager;
-            _targetValidator.ConditionEval = QDND.Combat.Rules.Conditions.ConditionEvaluator.Instance;
-            _reactionCoordinator.SetTargetValidator(_targetValidator);
-
-            // Subscribe to status events for visual feedback
-            _statusManager.OnStatusApplied += OnStatusApplied;
-            _statusManager.OnStatusRemoved += OnStatusRemoved;
-            _statusManager.OnStatusTick += OnStatusTick;
-
-            // Create processor for status tick mechanical logic
-            _statusTickProcessor = new StatusTickProcessor(_rulesEngine, _combatLog, _statusManager)
-            {
-                Log = Log,
-                OnShowDamage = (id, amt, dt) => { if (_combatantVisuals.TryGetValue(id, out var v)) v.ShowDamage(amt, damageType: dt); },
-                OnShowHealing = (id, amt) => { if (_combatantVisuals.TryGetValue(id, out var v)) v.ShowHealing(amt); },
-                ResolveCombatant = id => _combatContext.GetCombatant(id)
-            };
-
-            _combatContext.RegisterService(_dataRegistry);
-            _combatContext.RegisterService(_rulesEngine);
-            _combatContext.RegisterService(_statusManager);
-            _combatContext.RegisterService(_concentrationSystem);
-
-            // Wire concentration visual events
-            _concentrationSystem.OnConcentrationStarted += (combatantId, info) =>
-            {
-                if (_combatantVisuals.TryGetValue(combatantId, out var visual))
-                    visual.SetConcentrating(true);
-            };
-            _concentrationSystem.OnConcentrationBroken += (combatantId, info, reason) =>
-            {
-                if (_combatantVisuals.TryGetValue(combatantId, out var visual))
-                    visual.SetConcentrating(false);
-            };
-            
-            // Resource management services
-            _resourceManager = new ResourceManager();
-            _combatContext.RegisterService(_resourceManager);
-            
-            _restService = new RestService(_resourceManager);
-            _combatContext.RegisterService(_restService);
-
-            // Inventory management
-            var _inventoryService = new InventoryService(charRegistry, _statsRegistry, _combatContext);
-            _combatContext.RegisterService(_inventoryService);
-            _inventoryService.OnEquipmentChanged += (combatantId, _) =>
-            {
-                if (string.Equals(combatantId, ActiveCombatantId, StringComparison.Ordinal))
-                    _actionBarService?.Populate(combatantId);
-            };
-            _inventoryService.OnInventoryChanged += combatantId =>
-            {
-                if (string.Equals(combatantId, ActiveCombatantId, StringComparison.Ordinal))
-                    _actionBarService?.Populate(combatantId);
-            };
-
-            if (_functorExecutor != null)
-            {
-                _functorExecutor.EffectPipeline = _effectPipeline;
-                _functorExecutor.SurfaceManager = _surfaceManager;
-                _functorExecutor.ForcedMovement = _forcedMovementService;
-                _functorExecutor.InventoryService = _inventoryService;
-                _functorExecutor.BreakConcentrationAction = (combatantId, reason) =>
-                    _concentrationSystem?.BreakConcentration(combatantId, reason);
-                _functorExecutor.CounterspellAction = (sourceId, targetId) =>
-                    _concentrationSystem?.BreakConcentration(targetId, "Counterspell");
-            }
-            
-            // Wire ResolveCombatant callbacks for status and concentration systems
-            _statusManager.ResolveCombatant = id => _combatContext?.GetCombatant(id);
-
-            // Mechanical status interaction rules (wet→burning, haste→lethargic)
-            _statusInteractionRules = new StatusInteractionRules(_statusManager, id => _combatContext?.GetCombatant(id));
-
-            _combatContext.RegisterService(_effectPipeline);
-            _combatContext.RegisterService(_targetValidator);
-            _combatContext.RegisterService(_resolutionStack);
-            _combatContext.RegisterService(reactionSystem);
-            _combatContext.RegisterService<IReactionResolver>(_reactionResolver);
-            _combatContext.RegisterService(losService);
-            _combatContext.RegisterService(heightService);
-
-            // AI Pipeline
-            _aiPipeline = new AIDecisionPipeline(_combatContext);
-            _combatContext.RegisterService(_aiPipeline);
-
-            // Movement Service (Phase E)
-            _movementService = new MovementService(_rulesEngine.Events, _surfaceManager, reactionSystem, _statusManager);
-            _movementService.GetCombatants = () => _combatants;
-            _movementService.ResolveCombatant = id => _combatContext?.GetCombatant(id);
-            _movementService.ReactionResolver = _reactionResolver;
-            _movementService.PathNodeSpacing = 0.75f;
-            _movementService.IsWorldPositionBlocked = IsWorldNavigationBlocked;
-            _combatContext.RegisterService(_movementService);
-
-            // CombatMovementCoordinator — owns movement mode, preview, dash, disengage, and ExecuteMovement.
-            _movementCoordinator = new CombatMovementCoordinator(
-                _movementService,
-                _movementPreview,
-                _rangeIndicator,
-                _inputHandler,
-                _combatContext,
-                _combatants,
-                _combatantVisuals,
-                _statusManager,
-                _combatLog,
-                _stateMachine,
-                _cameraService,
-                TileSize,
-                DefaultMovePoints,
-                () => _selectionService?.SelectedCombatantId,
-                () => _turnLifecycleService?.IsPlayerTurn ?? false,
-                () => ActiveCombatantId,
-                () => _autoBattleConfig,
-                () => _actionExecutionService.AllocateActionId(),
-                CanPlayerControl,
-                RefreshActionBarUsability,
-                c => _turnLifecycleService?.UpdateResourceModelFromCombatant(c),
-                (reason, actionId) => _actionExecutionService.ResumeDecisionStateIfExecuting(reason, actionId),
-                () => _turnLifecycleService?.SyncThreatenedStatuses(),
-                (window, source, target) => DispatchRuleWindow(window, source, target),
-                (secs) => GetTree().CreateTimer(secs),
-                Log);
-
-            // Wire surface support into the effect pipeline.
-            _effectPipeline.Surfaces = _surfaceManager;
-
-            // Resolve deferred service dependencies for AI now that all core services are registered.
-            _aiPipeline.LateInitialize();
-
-            // Camera state hooks (Phase F) — owned by CombatCameraService
-            _combatContext.RegisterService(_cameraService.CameraHooks);
-
-            // UI Models
-            _actionBarModel = new ActionBarModel();
-            _actionBarService = new ActionBarService(
-                _combatContext, _actionRegistry, _actionBarModel,
-                _passiveRegistry, _effectPipeline,
-                LogOnce);
-
-            // SelectionService — owns selected-combatant/ability state and all Godot-free validation logic.
-            _selectionService = new SelectionService(
-                _combatContext,
-                _effectPipeline,
-                _passiveRegistry,
-                CanPlayerControl,
-                Log,
-                RefreshActionBarUsability,
-                PopulateActionBar,
-                id => _actionBarModel?.SelectAction(id),
-                () => _actionBarModel?.ClearSelection());
-
-            _turnTrackerModel = new TurnTrackerModel();
-            _resourceBarModel = new ResourceBarModel();
-
-            // CombatPresentationService — owns PresentationRequestBus, active timelines, and all VFX/marker logic.
-            _presentationService = new CombatPresentationService(
-                _combatantVisuals, _pendingJumpWorldPaths,
-                _turnQueue, _cameraService, _turnTrackerModel, TileSize);
-            _combatContext.RegisterService(_presentationService.PresentationBus);
-
-            var vfxConfig = VfxConfigLoader.LoadDefault();
-            _vfxManager.ConfigureRuntimeCaps(vfxConfig.ActiveCap, vfxConfig.InitialPoolSize);
-            var vfxResolver = new VfxRuleResolver(vfxConfig);
-            _vfxPlaybackService = new VfxPlaybackService(
-                _presentationService.PresentationBus,
-                _vfxManager,
-                _combatContext,
-                TileSize,
-                vfxResolver);
-            _combatContext.RegisterService<IVfxRuleResolver>(vfxResolver);
-            _combatContext.RegisterService<IVfxPlaybackService>(_vfxPlaybackService);
-
-            _presentationService.SetPreviewDependencies(
-                _combatContext, _effectPipeline, _rulesEngine, _targetValidator);
-
-            // Initialize new targeting system after all services are ready
-            InitializeTargetingSystem();
-
-            Log($"UI Models initialized");
-
-            // AuraSystem — processes entity-attached auras at turn end.
-            var auraSystem = new AuraSystem(
-                _statusManager,
-                () => _combatants,
-                id => _combatContext.GetCombatant(id));
-            _combatContext.RegisterService(auraSystem);
-
-            // TurnLifecycleService — owns StartCombat, BeginTurn, EndCurrentTurn and all turn state.
-            _turnLifecycleService = new TurnLifecycleService(
-                _turnQueue, _stateMachine, _effectPipeline, _statusManager,
-                _surfaceManager, _rulesEngine, _resourceManager, _presentationService,
-                _combatLog, _actionBarModel, _turnTrackerModel, _resourceBarModel,
-                _combatantVisuals, DefaultMovePoints,
-                () => _combatants,
-                () => _rng,
-                ExecuteAITurn,
-                SelectCombatant,
-                CenterCameraOnCombatant,
-                PopulateActionBar,
-                (window, source, target) => DispatchRuleWindow(window, source, target),
-                reason => _actionExecutionService.ResumeDecisionStateIfExecuting(reason),
-                secs => GetTree().CreateTimer(secs),
-                () => IsAutoBattleMode,
-                () => UseBuiltInAI,
-                Log,
-                auraSystem);
-            _turnLifecycleService.AfterBeginTurnHook = OnAfterBeginTurn;
-            _turnLifecycleService.AllowVictoryHook = ShouldAllowVictory;
-
-            // ActionExecutionService — owns all action execution, item use, special cases, and AI dispatch.
-            _actionExecutionService = new ActionExecutionService(
-                _effectPipeline,
-                _combatContext,
-                _stateMachine,
-                _turnQueue,
-                _targetValidator,
-                _actionBarModel,
-                _resourceBarModel,
-                _presentationService,
-                _surfaceManager,
-                _statusManager,
-                _rulesEngine,
-                _combatLog,
-                _combatants,
-                _pendingJumpWorldPaths,
-                TileSize,
-                ClearSelection,
-                FaceCombatantTowardsGridPoint,
-                RefreshActionBarUsability,
-                c => _turnLifecycleService.UpdateResourceModelFromCombatant(c),
-                () => _turnLifecycleService?.IsPlayerTurn ?? false,
-                CanPlayerControl,
-                () => { if (ShouldAllowVictory() && _turnQueue.ShouldEndCombat()) EndCombat(); },
-                BuildJumpPath,
-                GetJumpDistanceLimit,
-                (actor, action, candidates) => _movementCoordinator.ExecuteAIMovementWithFallback(actor, action, candidates),
-                actor => _movementCoordinator.ExecuteDash(actor),
-                actor => _movementCoordinator.ExecuteDisengage(actor),
-                secs => GetTree().CreateTimer(secs),
-                Log);
-            _effectPipeline.OnAbilityExecuted += _actionExecutionService.OnAbilityExecuted;
-            _actionExecutionService.OnAIAbilityNotify = (actor, actionDef) => OnAIAbilityUsed?.Invoke(actor, actionDef);
-
-            Log($"Services registered: {_combatContext.GetRegisteredServices().Count}");
-
-            // ScenarioBootService — owns all one-shot scenario loading and visual spawning.
-            var bootConfig = new ScenarioBootConfig
-            {
+                ArenaScene = this,
+                CombatContext = _combatContext,
+                CameraService = _cameraService,
+                MovementPreview = _movementPreview,
+                InputHandler = _inputHandler,
+                RangeIndicator = _rangeIndicator,
+                ReactionPromptUI = _reactionPromptUI,
+                HudLayer = _hudLayer,
+                VfxManager = _vfxManager,
+                CombatantsContainer = _combatantsContainer,
+                CombatantVisuals = _combatantVisuals,
+                PendingJumpWorldPaths = _pendingJumpWorldPaths,
+                OneTimeLogKeys = _oneTimeLogKeys,
+                SpecialMovementService = _specialMovementService,
+                TileSize = TileSize,
+                DefaultMovePoints = DefaultMovePoints,
+                VerboseLogging = VerboseLogging,
+                AutoBattleConfig = _autoBattleConfig,
+                RandomSeed = RandomSeed,
                 ScenarioSeedOverride = _scenarioSeedOverride,
                 AutoBattleSeedOverride = _autoBattleSeedOverride,
-                RandomSeed = RandomSeed,
                 ResolvedScenarioSeed = _resolvedScenarioSeed,
-                DynamicMode = _dynamicScenarioMode,
+                DynamicScenarioMode = _dynamicScenarioMode,
                 DynamicActionTestId = _dynamicActionTestId,
                 DynamicActionBatchIds = _dynamicActionBatchIds,
                 DynamicCharacterLevel = _dynamicCharacterLevel,
                 DynamicTeamSize = _dynamicTeamSize,
-                AutoBattleConfig = _autoBattleConfig,
+                Log = Log,
+                LogOnce = LogOnce,
+                LogError = msg => GD.PrintErr(msg),
+                ResolveCombatant = id => _combatContext?.GetCombatant(id),
+                GetCombatants = () => Combatants,
+                GetRandom = () => _rng,
+                IsAutoBattleMode = () => IsAutoBattleMode,
+                UseBuiltInAI = () => UseBuiltInAI,
+                GetSelectedCombatantId = () => _selectionService?.SelectedCombatantId,
+                GetIsPlayerTurn = () => _turnLifecycleService?.IsPlayerTurn ?? false,
+                GetActiveCombatantId = () => ActiveCombatantId,
+                GetAutoBattleConfig = () => _autoBattleConfig,
+                CanPlayerControl = CanPlayerControl,
+                CreateFloatTimer = secs => GetTree().CreateTimer(secs),
+                CreateDoubleTimer = secs => GetTree().CreateTimer(secs),
+                IsWorldPositionBlocked = IsWorldNavigationBlocked,
+                BuildJumpPath = BuildJumpPath,
+                GetJumpDistanceLimit = GetJumpDistanceLimit,
+                ExecuteAIMovementWithFallback = (actor, action, candidates) => _movementCoordinator.ExecuteAIMovementWithFallback(actor, action, candidates),
+                ExecuteDash = actor => _movementCoordinator.ExecuteDash(actor),
+                ExecuteDisengage = actor => _movementCoordinator.ExecuteDisengage(actor),
+                ShouldAllowVictory = ShouldAllowVictory,
+                CheckAndEndCombat = () => { if (ShouldAllowVictory() && _turnQueue.ShouldEndCombat()) EndCombat(); },
+                ExecuteAITurn = ExecuteAITurn,
+                SelectCombatant = SelectCombatant,
+                CenterCameraOnCombatant = CenterCameraOnCombatant,
+                PopulateActionBar = PopulateActionBar,
+                RefreshActionBarUsability = RefreshActionBarUsability,
+                ClearSelection = ClearSelection,
+                FaceCombatantTowardsGridPoint = FaceCombatantTowardsGridPoint,
+                ResumeDecisionStateIfExecuting = (reason, actionId) => _actionExecutionService.ResumeDecisionStateIfExecuting(reason, actionId),
+                DispatchThreatenedStatusesSync = SyncThreatenedStatuses,
+                DispatchRuleWindow = (window, source, target) => DispatchRuleWindow(window, source, target),
+                HandleStateChanged = OnStateChanged,
+                HandleTurnChanged = OnTurnChanged,
+                HandleCommandExecuted = OnCommandExecuted,
+                HandleStatusApplied = OnStatusApplied,
+                HandleStatusRemoved = OnStatusRemoved,
+                HandleStatusTick = OnStatusTick,
+                HandleSurfaceCreated = OnSurfaceCreated,
+                HandleSurfaceRemoved = OnSurfaceRemoved,
+                HandleSurfaceTransformed = OnSurfaceTransformed,
+                HandleSurfaceGeometryChanged = OnSurfaceGeometryChanged,
+                HandleSurfaceTriggered = OnSurfaceTriggered,
+                SetConcentratingVisual = (combatantId, value) =>
+                {
+                    if (_combatantVisuals.TryGetValue(combatantId, out var visual))
+                    {
+                        visual.SetConcentrating(value);
+                    }
+                },
+                NotifyAIAbilityUsed = (actor, actionDef) => OnAIAbilityUsed?.Invoke(actor, actionDef)
             };
-            var bootVisuals = new ScenarioBootVisuals
-            {
-                Arena = this,
-                CombatantsContainer = _combatantsContainer,
-                CombatantVisuals = _combatantVisuals,
-                TileSize = TileSize,
-            };
-            _scenarioBootService = new ScenarioBootService(
-                _combatContext,
-                _functorExecutor,
-                _forcedMovementService,
-                _movementCoordinator.ApplyDefaultMovementToCombatants,
-                _reactionCoordinator.GrantBaselineReactions,
-                Log,
-                _oneTimeLogKeys,
-                bootConfig,
-                bootVisuals);
+        }
 
-            // Subscribe to mid-combat summon visual spawning and death cleanup
+        private void ApplyComposition(CombatArenaComposition composition)
+        {
+            _composition = composition;
+            _stateMachine = composition.StateMachine;
+            _turnQueue = composition.TurnQueue;
+            _commandService = composition.CommandService;
+            _combatLog = composition.CombatLog;
+            _scenarioLoader = composition.ScenarioLoader;
+            _dataRegistry = composition.DataRegistry;
+            _rulesEngine = composition.RulesEngine;
+            _statusManager = composition.StatusManager;
+            _statusTickProcessor = composition.StatusTickProcessor;
+            _concentrationSystem = composition.ConcentrationSystem;
+            _effectPipeline = composition.EffectPipeline;
+            _targetValidator = composition.TargetValidator;
+            _actionRegistry = composition.ActionRegistry;
+            _statsRegistry = composition.StatsRegistry;
+            _bg3StatusRegistry = composition.BG3StatusRegistry;
+            _bg3StatusIntegration = composition.BG3StatusIntegration;
+            _statusInteractionRules = composition.StatusInteractionRules;
+            _passiveRegistry = composition.PassiveRegistry;
+            _interruptRegistry = composition.InterruptRegistry;
+            _bg3AiRegistry = composition.BG3AiRegistry;
+            _aiPipeline = composition.AIPipeline;
+            _movementService = composition.MovementService;
+            _movementCoordinator = composition.MovementCoordinator;
+            _reactionSystem = composition.ReactionSystem;
+            _reactionCoordinator = composition.ReactionCoordinator;
+            _reactionResolver = composition.ReactionResolver;
+            _resolutionStack = composition.ResolutionStack;
+            _surfaceManager = composition.SurfaceManager;
+            _resourceManager = composition.ResourceManager;
+            _restService = composition.RestService;
+            _forcedMovementService = composition.ForcedMovementService;
+            _functorExecutor = composition.FunctorExecutor;
+            _metamagicService = composition.MetamagicService;
+            _turnLifecycleService = composition.TurnLifecycleService;
+            _actionExecutionService = composition.ActionExecutionService;
+            _presentationService = composition.PresentationService;
+            _vfxPlaybackService = composition.VfxPlaybackService;
+            _actionBarModel = composition.ActionBarModel;
+            _turnTrackerModel = composition.TurnTrackerModel;
+            _resourceBarModel = composition.ResourceBarModel;
+            _actionBarService = composition.ActionBarService;
+            _selectionService = composition.SelectionService;
+            _scenarioBootService = composition.ScenarioBootService;
+            _combatantRegistry = composition.CombatantRegistry;
+            _turnLifecycleService.AfterBeginTurnHook = OnAfterBeginTurn;
+        }
+
+        private void RegisterServices()
+        {
+            _composition?.Dispose();
+            ApplyComposition(CombatArenaComposer.Compose(CreateCompositionArgs()));
+            InitializeTargetingSystem();
+            Log("UI Models initialized");
+            Log($"Services registered: {_combatContext.GetRegisteredServices().Count}");
+
             _combatContext.OnCombatantRegistered += OnMidCombatCombatantRegistered;
             _combatantDiedSubscription = _rulesEngine?.Events.Subscribe(RuleEventType.CombatantDied, OnCombatantDiedCleanupVisual);
         }
@@ -1418,10 +1076,6 @@ namespace QDND.Combat.Arena
             }
 
             // Register with spatial services so LOS/forced-movement work for summons
-            var losService = _combatContext?.GetService<LOSService>();
-            losService?.RegisterCombatant(combatant);
-            _forcedMovementService?.RegisterCombatant(combatant);
-
             // Grant movement budget and baseline reactions like initial combatants get
             _movementCoordinator?.ApplyDefaultMovementToCombatants(new[] { combatant });
             _reactionCoordinator?.GrantBaselineReactions(new[] { combatant });
@@ -1453,19 +1107,15 @@ namespace QDND.Combat.Arena
         /// <summary>Syncs output state written by ScenarioBootService back to CombatArena fields.</summary>
         private void SyncFromBootService()
         {
-            _combatants.Clear();
-            if (_scenarioBootService.Combatants != null)
-            {
-                _combatants.AddRange(_scenarioBootService.Combatants);
-            }
+            _combatantRegistry?.ReplaceAll(_scenarioBootService.Combatants ?? new List<Combatant>());
             _rng = _scenarioBootService.Rng;
             _resolvedScenarioSeed = _scenarioBootService.ResolvedScenarioSeed;
             RandomSeed = _scenarioBootService.ResolvedRandomSeed;
 
             // Wire per-combatant event-driven recomputation subscriptions.
-            if (_combatants != null)
+            if (_combatantRegistry != null)
             {
-                foreach (var combatant in _combatants)
+                foreach (var combatant in Combatants)
                     WireCombatantEvents(combatant);
             }
         }
@@ -2028,7 +1678,7 @@ namespace QDND.Combat.Arena
             return _combatantVisuals.TryGetValue(combatantId, out var v) ? v : null;
         }
 
-        public IEnumerable<Combatant> GetCombatants() => _combatants;
+        public IEnumerable<Combatant> GetCombatants() => Combatants;
 
         /// <summary>
         /// Resolve the highest-priority surface at a world position.
@@ -2103,10 +1753,7 @@ namespace QDND.Combat.Arena
                 visual.QueueFree();
             }
             _combatantVisuals.Clear();
-            _combatants.Clear();
-
-            // Clear context combatants
-            _combatContext.ClearCombatants();
+            _combatantRegistry?.Clear();
 
             // Reset turn queue
             _turnQueue.Clear();
@@ -2130,7 +1777,7 @@ namespace QDND.Combat.Arena
             StartCombat();
             CallDeferred(nameof(SetupRealtimeAIController));
 
-            Log($"Scenario reloaded: {_combatants.Count} combatants");
+            Log($"Scenario reloaded: {Combatants.Count} combatants");
         }
 
         // --- ActionBar methods delegated to ActionBarService ---
@@ -2347,7 +1994,7 @@ namespace QDND.Combat.Arena
             }
         }
 
-        private void SetupInitialCamera() => _cameraService?.SetupInitialCamera(_combatants, Log);
+        private void SetupInitialCamera() => _cameraService?.SetupInitialCamera(Combatants, Log);
 
         private void PositionCameraFromOrbit(Vector3 lookTarget, float pitch, float yaw, float distance)
             => _cameraService?.PositionCameraFromOrbit(lookTarget, pitch, yaw, distance);
@@ -2474,7 +2121,7 @@ namespace QDND.Combat.Arena
             // Dependencies
             var losService = _combatContext?.GetService<LOSService>();
             Func<string, Combatant> getCombatant = id => _combatContext.GetCombatant(id);
-            Func<List<Combatant>> getAllCombatants = () => _combatants;
+            Func<List<Combatant>> getAllCombatants = () => Combatants.ToList();
             Func<Combatant, Vector3> getPosition = c => CombatantPositionToWorld(c.Position);
             Func<PhysicsDirectSpaceState3D> getSpaceState = () => GetWorld3D().DirectSpaceState;
 
@@ -2557,6 +2204,7 @@ namespace QDND.Combat.Arena
             if (_combatantDiedSubscription != null)
                 _rulesEngine?.Events.Unsubscribe(_combatantDiedSubscription.Id);
 
+            _composition?.Dispose();
             base._ExitTree();
         }
 

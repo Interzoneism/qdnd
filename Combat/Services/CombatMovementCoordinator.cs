@@ -30,7 +30,7 @@ namespace QDND.Combat.Services
 
         // Combat context and state
         private readonly ICombatContext _combatContext;
-        private readonly List<Combatant> _combatants;
+        private readonly ICombatantRegistry _combatants;
         private readonly Dictionary<string, CombatantVisual> _combatantVisuals;
         private readonly StatusManager _statusManager;
         private readonly CombatLog _combatLog;
@@ -63,7 +63,7 @@ namespace QDND.Combat.Services
             RangeIndicator rangeIndicator,
             CombatInputHandler inputHandler,
             ICombatContext combatContext,
-            List<Combatant> combatants,
+            ICombatantRegistry combatants,
             Dictionary<string, CombatantVisual> combatantVisuals,
             StatusManager statusManager,
             CombatLog combatLog,
@@ -112,6 +112,8 @@ namespace QDND.Combat.Services
             _createTimer = createTimer;
             _log = log;
         }
+
+        private IReadOnlyList<Combatant> GetCombatants() => _combatants?.GetAll() ?? Array.Empty<Combatant>();
 
         private Vector3 CombatantPositionToWorld(Vector3 gridPos) =>
             new Vector3(gridPos.X * _tileSize, gridPos.Y, gridPos.Z * _tileSize);
@@ -358,7 +360,7 @@ namespace QDND.Combat.Services
             _dispatchRuleWindow(RuleWindow.OnMove, actor, null);
             foreach (var opportunity in result.TriggeredOpportunityAttacks)
             {
-                var reactor = _combatants.FirstOrDefault(c => c.Id == opportunity.ReactorId);
+                var reactor = GetCombatants().FirstOrDefault(c => c.Id == opportunity.ReactorId);
                 _dispatchRuleWindow(RuleWindow.OnLeaveThreateningArea, actor, reactor);
 
                 // Sentinel feat: if OA context has targetSpeedZero, drain mover's remaining movement.

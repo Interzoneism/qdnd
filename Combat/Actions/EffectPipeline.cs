@@ -22,33 +22,95 @@ namespace QDND.Combat.Actions
     {
         private readonly Dictionary<string, Effect> _effectHandlers = new();
         private readonly Dictionary<string, ActionDefinition> _actions = new(StringComparer.OrdinalIgnoreCase);
+        private ReactionSystem _reactions;
+        private IReactionResolver _reactionResolver;
+        private StatusManager _statuses;
+        private CooldownTracker _cooldowns;
+        private ResourceCostEngine _resources;
+        private ConcentrationSystem _concentration;
+        private QDND.Combat.Services.IAbilityTestPolicy _testPolicy = QDND.Combat.Services.NoOpAbilityTestPolicy.Instance;
+        private QDND.Combat.Services.ICombatContext _combatContext;
+        private Func<IEnumerable<Combatant>> _getCombatants;
 
         public RulesEngine Rules { get; set; }
-        public StatusManager Statuses { get; set; }
+        public StatusManager Statuses
+        {
+            get => _statuses;
+            set
+            {
+                _statuses = value;
+                if (Rolls != null)
+                    Rolls.Statuses = value;
+                if (Validator != null)
+                    Validator.Statuses = value;
+            }
+        }
         public Random Rng { get; set; }
 
         /// <summary>
         /// Optional centralized action registry for spell and ability lookups.
         /// If set, GetAction() will fallback to registry when action not found locally.
         /// </summary>
-        public ActionRegistry ActionRegistry { get; set; }
+        private ActionRegistry _actionRegistry;
+        public ActionRegistry ActionRegistry
+        {
+            get => _actionRegistry;
+            set
+            {
+                _actionRegistry = value;
+                if (Cooldowns != null) Cooldowns.ActionRegistry = value;
+            }
+        }
 
         /// <summary>
         /// Optional cooldown tracker for ability charges and cooldown timers.
         /// </summary>
-        public CooldownTracker? Cooldowns { get; set; }
+        public CooldownTracker? Cooldowns
+        {
+            get => _cooldowns;
+            set
+            {
+                _cooldowns = value;
+                if (Validator != null)
+                    Validator.Cooldowns = value;
+            }
+        }
 
         /// <summary>
         /// Resource validation/consumption engine for BG3 ActionResources.
         /// </summary>
-        public ResourceCostEngine Resources { get; set; }
+        public ResourceCostEngine Resources
+        {
+            get => _resources;
+            set
+            {
+                _resources = value;
+                if (Validator != null)
+                    Validator.Resources = value;
+            }
+        }
+
+        public ReactionTriggerDispatcher ReactionTriggers { get; set; }
 
         public EffectBuilder Builder { get; set; }
+
+        public CombatRollResolver Rolls { get; set; }
+
+        public ActionValidator Validator { get; set; }
 
         /// <summary>
         /// Optional combat context for service location.
         /// </summary>
-        public QDND.Combat.Services.ICombatContext CombatContext { get; set; }
+        public QDND.Combat.Services.ICombatContext CombatContext
+        {
+            get => _combatContext;
+            set
+            {
+                _combatContext = value;
+                if (Rolls != null)
+                    Rolls.CombatContext = value;
+            }
+        }
 
         /// <summary>
         /// Optional turn queue service for summon effects.
@@ -68,17 +130,44 @@ namespace QDND.Combat.Actions
         /// <summary>
         /// Optional reaction system for triggering reactions on damage/ability cast.
         /// </summary>
-        public ReactionSystem Reactions { get; set; }
+        public ReactionSystem Reactions
+        {
+            get => _reactions;
+            set
+            {
+                _reactions = value;
+                if (ReactionTriggers != null)
+                    ReactionTriggers.Reactions = value;
+            }
+        }
 
         /// <summary>
         /// Optional centralized resolver that can immediately execute interrupts/reactions.
         /// </summary>
-        public IReactionResolver ReactionResolver { get; set; }
+        public IReactionResolver ReactionResolver
+        {
+            get => _reactionResolver;
+            set
+            {
+                _reactionResolver = value;
+                if (ReactionTriggers != null)
+                    ReactionTriggers.ReactionResolver = value;
+            }
+        }
 
         /// <summary>
         /// Optional concentration system for tracking concentration effects.
         /// </summary>
-        public ConcentrationSystem Concentration { get; set; }
+        public ConcentrationSystem Concentration
+        {
+            get => _concentration;
+            set
+            {
+                _concentration = value;
+                if (Validator != null)
+                    Validator.Concentration = value;
+            }
+        }
 
         /// <summary>
         /// Optional surface manager for effects that create or rely on surfaces.
@@ -103,13 +192,33 @@ namespace QDND.Combat.Actions
         /// <summary>
         /// All combatants in combat (for reaction eligibility checking).
         /// </summary>
-        public Func<IEnumerable<Combatant>> GetCombatants { get; set; }
+        public Func<IEnumerable<Combatant>> GetCombatants
+        {
+            get => _getCombatants;
+            set
+            {
+                _getCombatants = value;
+                if (ReactionTriggers != null)
+                    ReactionTriggers.GetCombatants = value;
+                if (Rolls != null)
+                    Rolls.GetCombatants = value;
+            }
+        }
 
         /// <summary>
         /// Policy that controls ability-test bypasses. Defaults to no-op (production).
         /// Set to <see cref="QDND.Combat.Services.TagBasedAbilityTestPolicy"/> for action test scenarios.
         /// </summary>
-        public QDND.Combat.Services.IAbilityTestPolicy TestPolicy { get; set; } = QDND.Combat.Services.NoOpAbilityTestPolicy.Instance;
+        public QDND.Combat.Services.IAbilityTestPolicy TestPolicy
+        {
+            get => _testPolicy;
+            set
+            {
+                _testPolicy = value ?? QDND.Combat.Services.NoOpAbilityTestPolicy.Instance;
+                if (Validator != null)
+                    Validator.TestPolicy = _testPolicy;
+            }
+        }
 
         public event Action<ActionExecutionResult> OnAbilityExecuted;
 
@@ -127,22 +236,38 @@ namespace QDND.Combat.Actions
         /// <summary>
         /// Fired before damage is dealt - allows reaction checks for shields/damage reduction.
         /// </summary>
-        public event Action<ReactionTriggerEventArgs> OnDamageTrigger;
+        public event Action<ReactionTriggerEventArgs> OnDamageTrigger
+        {
+            add => ReactionTriggers.OnDamageTrigger += value;
+            remove => ReactionTriggers.OnDamageTrigger -= value;
+        }
 
         /// <summary>
         /// Fired when an ability is cast - allows reaction checks for counterspell-type reactions.
         /// </summary>
-        public event Action<ReactionTriggerEventArgs> OnAbilityCastTrigger;
+        public event Action<ReactionTriggerEventArgs> OnAbilityCastTrigger
+        {
+            add => ReactionTriggers.OnAbilityCastTrigger += value;
+            remove => ReactionTriggers.OnAbilityCastTrigger -= value;
+        }
 
         /// <summary>
         /// Fired when a combatant is attacked (after attack roll, before effects) - allows reactions like Shield.
         /// </summary>
-        public event Action<ReactionTriggerEventArgs> OnAttackTrigger;
+        public event Action<ReactionTriggerEventArgs> OnAttackTrigger
+        {
+            add => ReactionTriggers.OnAttackTrigger += value;
+            remove => ReactionTriggers.OnAttackTrigger -= value;
+        }
 
         /// <summary>
         /// Fired when a combatant is hit (attack succeeded, before damage) - allows reactions like Uncanny Dodge.
         /// </summary>
-        public event Action<ReactionTriggerEventArgs> OnHitTrigger;
+        public event Action<ReactionTriggerEventArgs> OnHitTrigger
+        {
+            add => ReactionTriggers.OnHitTrigger += value;
+            remove => ReactionTriggers.OnHitTrigger -= value;
+        }
 
         public EffectPipeline()
         {
@@ -210,8 +335,17 @@ namespace QDND.Combat.Actions
 
             // Default tracker keeps cooldown behavior working for direct EffectPipeline usage.
             Cooldowns = new CooldownTracker(ActionRegistry);
+            ReactionTriggers = new ReactionTriggerDispatcher();
             Builder = new EffectBuilder();
             Resources = new ResourceCostEngine();
+            Rolls = new CombatRollResolver(CombatContext, Statuses, GetCombatants);
+            Validator = new ActionValidator();
+            Validator.GetAction = GetAction;
+            Validator.Cooldowns = Cooldowns;
+            Validator.Resources = Resources;
+            Validator.Statuses = Statuses;
+            Validator.Concentration = Concentration;
+            Validator.TestPolicy = TestPolicy;
         }
 
         /// <summary>
@@ -320,8 +454,8 @@ namespace QDND.Combat.Actions
         /// </summary>
         public int GetSaveDC(Combatant source, ActionDefinition action)
         {
-            var tags = action.Tags ?? new HashSet<string>();
-            return ComputeSaveDC(source, action, tags);
+            var tags = new HashSet<string>(action?.Tags ?? Enumerable.Empty<string>());
+            return Rolls.ComputeSaveDC(source, action, tags);
         }
 
         /// <summary>
@@ -329,7 +463,7 @@ namespace QDND.Combat.Actions
         /// </summary>
         public int GetSaveBonus(Combatant target, string saveType)
         {
-            return GetSavingThrowBonus(target, saveType);
+            return Rolls.GetSavingThrowBonus(target, saveType);
         }
 
         /// <summary>
@@ -338,160 +472,15 @@ namespace QDND.Combat.Actions
         /// </summary>
         public int GetAttackBonus(Combatant source, ActionDefinition action)
         {
-            var tags = action.Tags ?? new HashSet<string>();
-            return GetAttackRollBonus(source, action, tags);
+            var tags = new HashSet<string>(action?.Tags ?? Enumerable.Empty<string>());
+            return Rolls.GetAttackRollBonus(source, action, tags);
         }
 
         /// <summary>
         /// Check if an ability can be used.
         /// </summary>
         public (bool CanUse, string Reason) CanUseAbility(string actionId, Combatant source)
-        {
-            if (!_actions.TryGetValue(actionId, out var action))
-            {
-                action = ActionRegistry?.GetAction(actionId);
-                if (action == null)
-                    return (false, "Unknown action");
-            }
-
-            // For test actors using their designated test action, skip only the known-list/
-            // requirements check — cooldown and action-budget checks still apply.
-            var testActionId = TestPolicy.GetTestActionId(source);
-            bool isTestActor = testActionId != null && string.Equals(actionId, testActionId, StringComparison.OrdinalIgnoreCase);
-
-            // Check cooldown (enforced for all combatants, including test actors)
-            if (Cooldowns?.HasAvailableCharges(source.Id, actionId) == false)
-                return (false, "On cooldown");
-
-            // Check requirements — skipped for test actors (they may not meet class/level
-            // requirements for the tested ability but are explicitly designated to test it)
-            if (!isTestActor)
-            {
-                foreach (var req in action.Requirements)
-                {
-                    bool met = CheckRequirement(req, source);
-                    if (req.Inverted ? met : !met)
-                        return (false, $"Requirement not met: {req.Type}");
-                }
-            }
-
-            // Check if source is alive
-            if (!source.IsActive)
-                return (false, "Source is incapacitated");
-
-            // Check for Silence blocking verbal spells
-            if (Statuses?.HasStatus(source.Id, "silenced") == true &&
-                action.Components.HasFlag(SpellComponents.Verbal))
-            {
-                return (false, "Cannot cast: Silenced (spell requires verbal component)");
-            }
-
-            // Nonproficient armor blocks spell casting (BG3/5e)
-            if (action.SpellLevel > 0 && source.IsWearingNonproficientArmor)
-                return (false, "Cannot cast spells in non-proficient armor");
-
-            // Check status-based action blocks
-            var blockedReason = GetBlockedByStatusReason(source, actionId, action.Cost);
-            if (blockedReason != null)
-                return (false, blockedReason);
-
-            // Check action economy budget
-            if (source.ActionBudget != null)
-            {
-                var (canPay, budgetReason) = source.ActionBudget.CanPayCost(action.Cost);
-                if (!canPay)
-                    return (false, budgetReason);
-
-                if (source.ActionBudget.HasCastLeveledBonusActionSpell &&
-                    action.Cost?.UsesAction == true &&
-                    action.SpellLevel > 0)
-                {
-                    return (false, "Cannot cast a leveled action spell after casting a bonus action spell this turn");
-                }
-
-                // Weapon attacks also need AttacksRemaining > 0 (Extra Attack pool).
-                // CanPayCost only checks _actionCharges, but ExecuteAction checks the
-                // attack pool for weapon attacks, so we must validate here too to keep
-                // CanUseAbility and ExecuteAction in sync.
-                bool isWeaponAttack = action.AttackType == AttackType.MeleeWeapon ||
-                                      action.AttackType == AttackType.RangedWeapon;
-                if (isWeaponAttack && (action.Cost?.UsesAction ?? false) &&
-                    source.ActionBudget.AttacksRemaining <= 0)
-                    return (false, "No attacks remaining");
-            }
-
-            // Check BG3 ActionResources first for resource costs — skipped for test actors
-            // (they may lack spell slots and similar resources for the tested ability)
-            if (!isTestActor)
-            {
-                var (bg3CanPay, bg3Reason) = Resources.ValidateBG3ResourceCost(source, action);
-                if (!bg3CanPay)
-                    return (false, bg3Reason);
-            }
-
-            // Block recasting the same concentration spell while already concentrating on it.
-            // Casting a *different* concentration spell is allowed and will break the old one.
-            if (action.RequiresConcentration && Concentration != null)
-            {
-                var currentConc = Concentration.GetConcentratedEffect(source.Id);
-                if (currentConc != null &&
-                    (string.Equals(currentConc.ActionId, actionId, StringComparison.OrdinalIgnoreCase) ||
-                     (!string.IsNullOrEmpty(action.ConcentrationStatusId) &&
-                      string.Equals(currentConc.StatusId, action.ConcentrationStatusId, StringComparison.OrdinalIgnoreCase))))
-                {
-                    return (false, "Already concentrating on this spell");
-                }
-            }
-
-            // Block modify_resource actions when the granted resource is already at max.
-            // Skipped for test actors since they do not pay resource costs.
-            if (!isTestActor && IsModifyResourceCapped(action, source))
-                return (false, "Resource already at maximum");
-
-            return (true, null);
-        }
-
-        /// <summary>
-        /// Returns true when every positive modify_resource effect in the action would have
-        /// zero impact because the target resource on the source combatant is already at max.
-        /// Only considers effects that target self (effect TargetType == Self, or action targets self).
-        /// </summary>
-        private bool IsModifyResourceCapped(ActionDefinition action, Combatant source)
-        {
-            if (action.Effects == null || action.Effects.Count == 0)
-                return false;
-
-            bool actionTargetsSelf = action.TargetType == TargetType.Self;
-
-            var positiveModifyEffects = action.Effects
-                .Where(e => string.Equals(e.Type, "modify_resource", StringComparison.OrdinalIgnoreCase)
-                            && e.Value > 0
-                            && (actionTargetsSelf || e.TargetType == EffectTargetType.Self))
-                .ToList();
-
-            if (positiveModifyEffects.Count == 0)
-                return false;
-
-            foreach (var effect in positiveModifyEffects)
-            {
-                string resource = effect.Parameters.TryGetValue("resource", out var r) ? r?.ToString() : null;
-                if (string.IsNullOrEmpty(resource))
-                    continue;
-
-                // Check ActionResources for the resource
-                if (source.ActionResources != null && source.ActionResources.HasResource(resource))
-                {
-                    if (source.ActionResources.GetCurrent(resource) < source.ActionResources.GetMax(resource))
-                        return false; // At least one effect would do something
-                }
-                else
-                {
-                    return false; // Resource not tracked — don't block
-                }
-            }
-
-            return true;
-        }
+            => Validator.CanUseAbility(actionId, source);
 
         /// <summary>
         /// Execute an action.
@@ -559,7 +548,7 @@ namespace QDND.Combat.Actions
             // resource checks but enforces cooldown and budget.
             if (!options.SkipCostValidation)
             {
-                var (canUse, reason) = CanUseAbilityWithCost(actionId, source, effectiveCost, options.IgnoreReactionBudgetCheck);
+                var (canUse, reason) = Validator.CanUseAbilityWithCost(actionId, source, effectiveCost, options.IgnoreReactionBudgetCheck);
                 if (!canUse)
                     return ActionExecutionResult.Failure(actionId, source.Id, reason);
 
@@ -679,7 +668,7 @@ namespace QDND.Combat.Actions
                 TriggerContext = options.TriggerContext,
                 OnBeforeDamage = (src, tgt, dmg, dmgType) =>
                 {
-                    var triggerArgs = TryTriggerDamageReactions(src, tgt, dmg, dmgType, action.Id);
+                    var triggerArgs = ReactionTriggers.TryTriggerDamageReactions(src, tgt, dmg, dmgType, action.Id);
                     return triggerArgs?.DamageModifier ?? 1.0f;
                 }
             };
@@ -717,7 +706,7 @@ namespace QDND.Combat.Actions
             }
 
             // Check for SpellCastNearby reactions (counterspell, etc.)
-            var spellCastTrigger = TryTriggerAbilityCastReactionsWithTags(source, action, targets, effectiveTags, options);
+            var spellCastTrigger = ReactionTriggers.TryTriggerAbilityCastReactionsWithTags(source, action, targets, effectiveTags, options);
             if (spellCastTrigger?.Cancel == true && spellCastTrigger.Context.IsCancellable)
             {
                 return ActionExecutionResult.Failure(actionId, source.Id, "Ability was countered by a reaction");
@@ -795,7 +784,7 @@ namespace QDND.Combat.Actions
                     Type = QueryType.AttackRoll,
                     Source = source,
                     Target = primaryTarget,
-                    BaseValue = GetAttackRollBonus(source, action, effectiveTags) + heightMod
+                    BaseValue = Rolls.GetAttackRollBonus(source, action, effectiveTags) + heightMod
                 };
                 var attackTags = new HashSet<string>(effectiveTags);
                 if (isMeleeAttack) attackTags.Add("melee_attack");
@@ -819,7 +808,7 @@ namespace QDND.Combat.Actions
                     condDisadvantages.AddRange(srcEffects.AttackDisadvantageSources.Select(id => $"Attacker {id}"));
                     condAdvantages.AddRange(tgtEffects.DefenseAdvantageSources.Select(id => $"Target {id}"));
                     condDisadvantages.AddRange(tgtEffects.DefenseDisadvantageSources.Select(id => $"Target {id}"));
-                    if (ShouldApplyMeleeAutoCrit(tgtEffects.MeleeAutocrits, isMeleeAttack, attackDistance))
+                    if (CombatRollResolver.ShouldApplyMeleeAutoCrit(tgtEffects.MeleeAutocrits, isMeleeAttack, attackDistance))
                         autoCritOnHit = true;
                     if (Statuses.HasStatus(primaryTarget.Id, "dodging"))
                         condDisadvantages.Add("Target Dodging");
@@ -843,7 +832,7 @@ namespace QDND.Combat.Actions
                             WeaponType.LightCrossbow or WeaponType.HandCrossbow or WeaponType.HeavyCrossbow;
                         if (!(hasCrossbowExpert && isAttackingWithCrossbow) &&
                             (Statuses.HasStatus(source.Id, "threatened") ||
-                             (GetCombatants != null && IsWithinHostileMeleeRange(source))))
+                             (GetCombatants != null && Rolls.IsWithinHostileMeleeRange(source))))
                             condDisadvantages.Add("Threatened");
                     }
 
@@ -864,7 +853,7 @@ namespace QDND.Combat.Actions
                 if (autoCritOnHit)
                     attackQuery.Parameters["autoCritOnHit"] = true;
 
-                attackQuery.Parameters["criticalThreshold"] = GetCriticalThreshold(source, isSpellAttack);
+                attackQuery.Parameters["criticalThreshold"] = CombatRollResolver.GetCriticalThreshold(source, isSpellAttack);
 
                 if (coverACBonus != 0)
                 {
@@ -897,7 +886,7 @@ namespace QDND.Combat.Actions
                     return ActionExecutionResult.Failure(actionId, source.Id, "Attack was cancelled by a passive rule");
                 }
 
-                ApplyWindowRollSources(attackQuery, beforeAttackContext);
+                CombatRollResolver.ApplyWindowRollSources(attackQuery, beforeAttackContext);
 
                 context.AttackResult = Rules.RollAttack(attackQuery);
                 result.AttackResult = context.AttackResult;
@@ -923,7 +912,7 @@ namespace QDND.Combat.Actions
                 // === Fire YouAreAttacked reactions (e.g., Shield, Cutting Words) ===
                 if (context.AttackResult != null)
                 {
-                    var attackReactions = TryTriggerAttackReactions(source, primaryTarget, action,
+                    var attackReactions = ReactionTriggers.TryTriggerAttackReactions(source, primaryTarget, action,
                         action.AttackType?.ToString(), context.AttackResult?.IsSuccess ?? true);
                     if (attackReactions != null)
                     {
@@ -947,7 +936,7 @@ namespace QDND.Combat.Actions
                 // === Fire YouAreHit reactions (e.g., Uncanny Dodge, Hellish Rebuke) ===
                 if (context.AttackResult?.IsSuccess == true)
                 {
-                    var hitReactions = TryTriggerHitReactions(source, primaryTarget, 0,
+                    var hitReactions = ReactionTriggers.TryTriggerHitReactions(source, primaryTarget, 0,
                         action.Effects?.FirstOrDefault(e => e.Type == "deal_damage")?.DamageType ?? "untyped",
                         action.AttackType?.ToString(),
                         context.AttackResult.IsCritical, action.Id);
@@ -970,8 +959,8 @@ namespace QDND.Combat.Actions
             {
                 foreach (var target in targets)
                 {
-                    int attackerMod = GetContestSkillBonus(source, action.ContestAttackerSkill);
-                    int defenderMod = GetBestContestSkillBonus(target, action.ContestDefenderSkills);
+                    int attackerMod = Rolls.GetContestSkillBonus(source, action.ContestAttackerSkill);
+                    int defenderMod = Rolls.GetBestContestSkillBonus(target, action.ContestDefenderSkills);
 
                     string attackerSkillName = action.ContestAttackerSkill ?? "Athletics";
                     string defenderSkillName = action.ContestDefenderSkills ?? "Athletics";
@@ -1030,11 +1019,11 @@ namespace QDND.Combat.Actions
                 
                 if (!skipSaveDueToMiss)
                 {
-                int saveDC = (action.SaveDC ?? ComputeSaveDC(source, action, effectiveTags)) + action.SaveDCBonus;
+                int saveDC = (action.SaveDC ?? Rolls.ComputeSaveDC(source, action, effectiveTags)) + action.SaveDCBonus;
                 context.SaveDC = saveDC;
                 foreach (var target in targets)
                 {
-                    if (ShouldAutoFailSave(target, action.SaveType))
+                    if (Rolls.ShouldAutoFailSave(target, action.SaveType))
                     {
                         context.SaveResult = new QueryResult
                         {
@@ -1044,7 +1033,7 @@ namespace QDND.Combat.Actions
                                 Source = source,
                                 Target = target,
                                 DC = saveDC,
-                                BaseValue = GetSavingThrowBonus(target, action.SaveType)
+                                BaseValue = Rolls.GetSavingThrowBonus(target, action.SaveType)
                             },
                             BaseValue = 0,
                             NaturalRoll = 1,
@@ -1065,7 +1054,7 @@ namespace QDND.Combat.Actions
                         Source = source,
                         Target = target,
                         DC = saveDC,
-                        BaseValue = GetSavingThrowBonus(target, action.SaveType)
+                        BaseValue = Rolls.GetSavingThrowBonus(target, action.SaveType)
                     };
                     saveQuery.Tags.Add($"save:{action.SaveType}");
 
@@ -1099,7 +1088,7 @@ namespace QDND.Combat.Actions
                         }
                     }
 
-                    var saveAbility = ParseAbilityType(action.SaveType);
+                    var saveAbility = CombatRollResolver.ParseAbilityType(action.SaveType);
                     saveQuery.Parameters["ability"] = saveAbility.HasValue ? saveAbility.Value : action.SaveType;
 
                     var beforeSaveContext = new RuleEventContext
@@ -1130,7 +1119,7 @@ namespace QDND.Combat.Actions
                     }
 
                     saveQuery.BaseValue += beforeSaveContext.TotalSaveBonus;
-                    ApplyWindowRollSources(saveQuery, beforeSaveContext);
+                    CombatRollResolver.ApplyWindowRollSources(saveQuery, beforeSaveContext);
 
                     context.SaveResult = Rules.RollSave(saveQuery);
                     result.SaveResult = context.SaveResult;
@@ -1364,7 +1353,7 @@ namespace QDND.Combat.Actions
                         Type = QueryType.AttackRoll,
                         Source = source,
                         Target = targetForProjectile,
-                        BaseValue = GetAttackRollBonus(source, action, effectiveTags) + heightMod
+                        BaseValue = Rolls.GetAttackRollBonus(source, action, effectiveTags) + heightMod
                     };
 
                     var attackTags = new HashSet<string>(effectiveTags);
@@ -1389,7 +1378,7 @@ namespace QDND.Combat.Actions
                         condDisadvantages.AddRange(srcEffects.AttackDisadvantageSources.Select(id => $"Attacker {id}"));
                         condAdvantages.AddRange(tgtEffects.DefenseAdvantageSources.Select(id => $"Target {id}"));
                         condDisadvantages.AddRange(tgtEffects.DefenseDisadvantageSources.Select(id => $"Target {id}"));
-                        if (ShouldApplyMeleeAutoCrit(tgtEffects.MeleeAutocrits, isMeleeAttack, attackDistance))
+                        if (CombatRollResolver.ShouldApplyMeleeAutoCrit(tgtEffects.MeleeAutocrits, isMeleeAttack, attackDistance))
                             autoCritOnHit = true;
                         if (Statuses.HasStatus(targetForProjectile.Id, "dodging"))
                             condDisadvantages.Add("Target Dodging");
@@ -1411,7 +1400,7 @@ namespace QDND.Combat.Actions
                                 WeaponType.LightCrossbow or WeaponType.HandCrossbow or WeaponType.HeavyCrossbow;
                             if (!(hasCrossbowExpert && isAttackingWithCrossbow) &&
                                 (Statuses.HasStatus(source.Id, "threatened") ||
-                                 (GetCombatants != null && IsWithinHostileMeleeRange(source))))
+                                 (GetCombatants != null && Rolls.IsWithinHostileMeleeRange(source))))
                                 condDisadvantages.Add("Threatened");
                         }
 
@@ -1432,7 +1421,7 @@ namespace QDND.Combat.Actions
                     if (autoCritOnHit)
                         attackQuery.Parameters["autoCritOnHit"] = true;
 
-                    attackQuery.Parameters["criticalThreshold"] = GetCriticalThreshold(source, isSpellAttack);
+                    attackQuery.Parameters["criticalThreshold"] = CombatRollResolver.GetCriticalThreshold(source, isSpellAttack);
 
                     if (coverACBonus != 0)
                     {
@@ -1466,7 +1455,7 @@ namespace QDND.Combat.Actions
                         continue;
                     }
 
-                    ApplyWindowRollSources(attackQuery, beforeAttackContext);
+                    CombatRollResolver.ApplyWindowRollSources(attackQuery, beforeAttackContext);
 
                     projectileContext.AttackResult = Rules.RollAttack(attackQuery);
 
@@ -1487,7 +1476,7 @@ namespace QDND.Combat.Actions
                     // === Fire YouAreAttacked reactions per projectile ===
                     if (projectileContext.AttackResult != null)
                     {
-                        var attackReactions = TryTriggerAttackReactions(source, targetForProjectile, action,
+                        var attackReactions = ReactionTriggers.TryTriggerAttackReactions(source, targetForProjectile, action,
                             action.AttackType?.ToString(), projectileContext.AttackResult?.IsSuccess ?? true);
                         if (attackReactions != null)
                         {
@@ -1508,7 +1497,7 @@ namespace QDND.Combat.Actions
                     // === Fire YouAreHit reactions per projectile ===
                     if (projectileContext.AttackResult?.IsSuccess == true)
                     {
-                        var hitReactions = TryTriggerHitReactions(source, targetForProjectile, 0,
+                        var hitReactions = ReactionTriggers.TryTriggerHitReactions(source, targetForProjectile, 0,
                             action.Effects?.FirstOrDefault(e => e.Type == "deal_damage")?.DamageType ?? "untyped",
                             action.AttackType?.ToString(),
                             projectileContext.AttackResult.IsCritical, action.Id);
@@ -1522,7 +1511,7 @@ namespace QDND.Combat.Actions
                 {
                     // Auto-hit projectiles do not re-check hit chance, but still need the
                     // YouAreAttacked reaction window so Shield can apply before damage.
-                    TryTriggerAttackReactions(source, targetForProjectile, action, "auto_hit", attackHit: true);
+                    ReactionTriggers.TryTriggerAttackReactions(source, targetForProjectile, action, "auto_hit", attackHit: true);
                 }
                 // Note: Multi-projectile spells with saves (rare) would roll saves here
                 // For now, we assume multi-projectile = attack-based or auto-hit (Magic Missile)
@@ -1562,539 +1551,6 @@ namespace QDND.Combat.Actions
             return allResults;
         }
 
-        /// <summary>
-        /// Check if an ability can be used with a specific cost.
-        /// </summary>
-        private (bool CanUse, string Reason) CanUseAbilityWithCost(
-            string actionId,
-            Combatant source,
-            ActionCost cost,
-            bool ignoreReactionBudgetCheck = false)
-        {
-            if (!_actions.TryGetValue(actionId, out var action))
-            {
-                action = ActionRegistry?.GetAction(actionId);
-                if (action == null)
-                    return (false, "Unknown action");
-            }
-
-            // For test actors using their designated test action, skip only the
-            // known-list/requirements and resource checks. Cooldown and budget still apply.
-            var testActionId = TestPolicy.GetTestActionId(source);
-            bool isTestActor = testActionId != null && string.Equals(actionId, testActionId, StringComparison.OrdinalIgnoreCase);
-
-            // Check cooldown (enforced for all combatants, including test actors)
-            if (Cooldowns?.HasAvailableCharges(source.Id, actionId) == false)
-                return (false, "On cooldown");
-
-            // Check requirements — skipped for test actors
-            if (!isTestActor)
-            {
-                foreach (var req in action.Requirements)
-                {
-                    bool met = CheckRequirement(req, source);
-                    if (req.Inverted ? met : !met)
-                        return (false, $"Requirement not met: {req.Type}");
-                }
-            }
-
-            // Check if source is alive
-            if (!source.IsActive)
-                return (false, "Source is incapacitated");
-
-            // Check status-based action blocks
-            var blockedReason = GetBlockedByStatusReason(source, actionId, cost);
-            if (blockedReason != null)
-                return (false, blockedReason);
-
-            // Check action economy budget with effective cost (enforced for all combatants)
-            if (source.ActionBudget != null)
-            {
-                var budgetCost = ResourceCostEngine.BuildBudgetCostOverride(cost, ignoreReactionBudgetCheck);
-                var (canPay, budgetReason) = source.ActionBudget.CanPayCost(budgetCost);
-                if (!canPay)
-                    return (false, budgetReason);
-
-                if (source.ActionBudget.HasCastLeveledBonusActionSpell &&
-                    budgetCost.UsesAction &&
-                    action.SpellLevel > 0)
-                {
-                    return (false, "Cannot cast a leveled action spell after casting a bonus action spell this turn");
-                }
-            }
-
-            // Check BG3 ActionResources and legacy resources — skipped for test actors
-            // (they may lack spell slots and similar resources for the tested ability)
-            if (!isTestActor)
-            {
-                var (bg3CanPay, bg3Reason) = Resources.ValidateBG3ResourceCost(source, action, cost);
-                if (!bg3CanPay)
-                    return (false, bg3Reason);
-            }
-
-            return (true, null);
-        }
-
-        private static AbilityType? ParseAbilityType(string actionName)
-        {
-            if (string.IsNullOrWhiteSpace(actionName))
-                return null;
-
-            return actionName.Trim().ToLowerInvariant() switch
-            {
-                // Core ability scores
-                "str" or "strength" => AbilityType.Strength,
-                "dex" or "dexterity" => AbilityType.Dexterity,
-                "con" or "constitution" => AbilityType.Constitution,
-                "int" or "intelligence" => AbilityType.Intelligence,
-                "wis" or "wisdom" => AbilityType.Wisdom,
-                "cha" or "charisma" => AbilityType.Charisma,
-                // Skill names -> underlying ability (for contested checks like Shove)
-                "athletics" => AbilityType.Strength,
-                "acrobatics" or "sleight_of_hand" or "stealth" => AbilityType.Dexterity,
-                "arcana" or "history" or "investigation" or "nature" or "religion" => AbilityType.Intelligence,
-                "animal_handling" or "insight" or "medicine" or "perception" or "survival" => AbilityType.Wisdom,
-                "deception" or "intimidation" or "performance" or "persuasion" => AbilityType.Charisma,
-                _ => null
-            };
-        }
-
-        private static int GetAbilityModifier(Combatant combatant, AbilityType action)
-        {
-            if (combatant == null)
-                return 0;
-
-            return combatant.GetAbilityModifier(action);
-        }
-
-        private int GetAttackRollBonus(Combatant source, ActionDefinition action, HashSet<string> effectiveTags)
-        {
-            if (source == null || source.ResolvedCharacter == null)
-                return 0;
-
-            int proficiency = Math.Max(0, source.ProficiencyBonus);
-            int abilityMod = 0;
-            int flatRollBonus = 0;
-            int enchantmentBonus = 0;
-
-            if (action.AttackType.HasValue)
-            {
-                switch (action.AttackType.Value)
-                {
-                    case AttackType.MeleeWeapon:
-                    {
-                        var weapon = source.MainHandWeapon;
-                        bool isFinesse = weapon?.IsFinesse == true || effectiveTags.Contains("finesse");
-                        bool isMonk = string.Equals(source.ResolvedCharacter?.Sheet?.StartingClassId, "Monk", StringComparison.OrdinalIgnoreCase);
-                        abilityMod = (isFinesse || isMonk)
-                            ? Math.Max(source.GetAbilityModifier(AbilityType.Strength), source.GetAbilityModifier(AbilityType.Dexterity))
-                            : source.GetAbilityModifier(AbilityType.Strength);
-                        
-                        // Check weapon proficiency
-                        if (weapon != null && !IsWeaponProficient(source, weapon))
-                            proficiency = 0;
-
-                        enchantmentBonus = weapon?.EnchantmentBonus ?? 0;
-
-                        // Apply flat RollBonus modifiers (e.g. GWM -5 penalty)
-                        var gwmContext = ConditionContext.ForAttackRoll(source, null, isMelee: true, isWeapon: true);
-                        flatRollBonus = QDND.Combat.Rules.Boosts.BoostEvaluator.GetAttackRollPenalty(source, "MeleeWeaponAttack", gwmContext);
-                        break;
-                    }
-                    case AttackType.RangedWeapon:
-                    {
-                        var weapon = source.MainHandWeapon;
-                        // Try to find the ranged weapon
-                        if (weapon != null && !weapon.IsRanged && source.OffHandWeapon?.IsRanged == true)
-                            weapon = source.OffHandWeapon;
-                        
-                        abilityMod = source.GetAbilityModifier(AbilityType.Dexterity);
-                        
-                        // Thrown weapons use STR
-                        if (weapon?.IsThrown == true && !weapon.IsRanged)
-                            abilityMod = source.GetAbilityModifier(AbilityType.Strength);
-                        
-                        // Check weapon proficiency
-                        if (weapon != null && !IsWeaponProficient(source, weapon))
-                            proficiency = 0;
-
-                        enchantmentBonus = weapon?.EnchantmentBonus ?? 0;
-
-                        // Apply flat RollBonus modifiers (e.g. Sharpshooter -5 penalty)
-                        var ssContext = ConditionContext.ForAttackRoll(source, null, isMelee: false, isWeapon: true);
-                        flatRollBonus = QDND.Combat.Rules.Boosts.BoostEvaluator.GetAttackRollPenalty(source, "RangedWeaponAttack", ssContext);
-                        break;
-                    }
-                    case AttackType.MeleeSpell:
-                    case AttackType.RangedSpell:
-                        abilityMod = GetSpellcastingAbilityModifier(source);
-                        break;
-                }
-            }
-
-            return abilityMod + proficiency + flatRollBonus + enchantmentBonus;
-        }
-
-        /// <summary>
-        /// Check if a combatant is proficient with a specific weapon.
-        /// </summary>
-        private bool IsWeaponProficient(Combatant combatant, QDND.Data.CharacterModel.WeaponDefinition weapon)
-        {
-            if (combatant.ResolvedCharacter?.Proficiencies == null)
-                return true; // Old-style units are always proficient
-            
-            var profs = combatant.ResolvedCharacter.Proficiencies;
-            
-            // Check category proficiency (Simple, Martial)
-            if (profs.IsProficientWithWeaponCategory(weapon.Category))
-                return true;
-            
-            // Check specific weapon proficiency
-            if (profs.IsProficientWithWeapon(weapon.WeaponType))
-                return true;
-            
-            return false;
-        }
-
-        private int GetSavingThrowBonus(Combatant target, string saveType)
-        {
-            if (target == null)
-                return 0;
-
-            var action = ParseAbilityType(saveType);
-            if (!action.HasValue)
-                return 0;
-
-            int bonus = target.GetAbilityModifier(action.Value);
-
-            // If no resolved character is present, bonus stays at 0
-            if (target.ResolvedCharacter?.Proficiencies.IsProficientInSave(action.Value) == true)
-            {
-                bonus += Math.Max(0, target.ProficiencyBonus);
-            }
-
-            return bonus;
-        }
-
-        /// <summary>
-        /// Get the skill check bonus for a contested check participant.
-        /// </summary>
-        private int GetContestSkillBonus(Combatant combatant, string skillName)
-        {
-            if (combatant == null || string.IsNullOrEmpty(skillName))
-                return 0;
-
-            if (Enum.TryParse<Data.CharacterModel.Skill>(skillName, true, out var skill))
-            {
-                return combatant.GetSkillBonus(skill);
-            }
-
-            // Fallback: treat as raw ability
-            var ability = ParseAbilityType(skillName);
-            return ability.HasValue ? combatant.GetAbilityModifier(ability.Value) : 0;
-        }
-
-        /// <summary>
-        /// Get the best skill bonus for the defender from a comma-separated list of skills.
-        /// BG3 Shove: defender uses max(Athletics, Acrobatics).
-        /// </summary>
-        private int GetBestContestSkillBonus(Combatant combatant, string skillNames)
-        {
-            if (combatant == null || string.IsNullOrEmpty(skillNames))
-                return 0;
-
-            int best = int.MinValue;
-            foreach (var name in skillNames.Split(','))
-            {
-                int bonus = GetContestSkillBonus(combatant, name.Trim());
-                if (bonus > best) best = bonus;
-            }
-
-            return best == int.MinValue ? 0 : best;
-        }
-
-        private int ComputeSaveDC(Combatant source, ActionDefinition action, HashSet<string> effectiveTags)
-        {
-            // Summoned entities inherit their caster's spell save DC
-            if (source?.OwnerSpellSaveDC.HasValue == true)
-                return source.OwnerSpellSaveDC.Value;
-
-            if (source?.ResolvedCharacter == null)
-                return 10;
-
-            int proficiency = Math.Max(0, source?.ProficiencyBonus ?? 0);
-            bool isSpell = effectiveTags.Contains("spell") || effectiveTags.Contains("magic");
-
-            if (isSpell)
-            {
-                return 8 + proficiency + GetSpellcastingAbilityModifier(source);
-            }
-
-            if (action.AttackType == AttackType.MeleeWeapon || action.AttackType == AttackType.RangedWeapon)
-            {
-                int strMod = source.GetAbilityModifier(AbilityType.Strength);
-                int dexMod = source.GetAbilityModifier(AbilityType.Dexterity);
-                return 8 + proficiency + Math.Max(strMod, dexMod);
-            }
-
-            return 8 + proficiency + GetSpellcastingAbilityModifier(source);
-        }
-
-        private int GetSpellcastingAbilityModifier(Combatant source)
-        {
-            if (source?.ResolvedCharacter?.Sheet?.ClassLevels == null) return 0;
-            var registry = CombatContext?.GetService<CharacterDataRegistry>();
-            if (registry != null)
-            {
-                foreach (var cl in source.ResolvedCharacter.Sheet.ClassLevels)
-                {
-                    var classDef = registry.GetClass(cl.ClassId);
-                    if (!string.IsNullOrEmpty(classDef?.SpellcastingAbility) &&
-                        Enum.TryParse<AbilityType>(classDef.SpellcastingAbility, true, out var ability))
-                        return source.GetAbilityModifier(ability);
-                }
-                return 0;
-            }
-            // Fallback if registry unavailable — use first caster class (same order as primary path)
-            foreach (var cl in source.ResolvedCharacter.Sheet.ClassLevels)
-            {
-                string classId = cl.ClassId?.ToLowerInvariant();
-                switch (classId)
-                {
-                    case "wizard": return source.GetAbilityModifier(AbilityType.Intelligence);
-                    case "cleric" or "druid" or "ranger" or "monk": return source.GetAbilityModifier(AbilityType.Wisdom);
-                    case "bard" or "sorcerer" or "warlock" or "paladin": return source.GetAbilityModifier(AbilityType.Charisma);
-                }
-            }
-            return 0;
-        }
-
-        private static int GetCriticalThreshold(Combatant source, bool isSpellAttack)
-        {
-            if (source?.ResolvedCharacter?.Features == null)
-                return 20;
-
-            bool hasImprovedCritical = source.ResolvedCharacter.Features.Any(f =>
-                string.Equals(f.Id, "improved_critical", StringComparison.OrdinalIgnoreCase));
-            bool hasSpellSniper = source.ResolvedCharacter.Sheet?.FeatIds?.Any(f =>
-                string.Equals(f, "spell_sniper", StringComparison.OrdinalIgnoreCase)) == true;
-
-            if (!isSpellAttack && hasImprovedCritical)
-                return 19;
-            if (isSpellAttack && hasSpellSniper)
-                return 19;
-
-            return 20;
-        }
-
-        private static void ApplyWindowRollSources(QueryInput query, RuleEventContext windowContext)
-        {
-            if (query == null || windowContext == null)
-                return;
-
-            MergeParameterSources(query.Parameters, "statusAdvantageSources", windowContext.AdvantageSources);
-            MergeParameterSources(query.Parameters, "statusDisadvantageSources", windowContext.DisadvantageSources);
-        }
-
-        private static void MergeParameterSources(Dictionary<string, object> parameters, string key, List<string> toAdd)
-        {
-            if (parameters == null || toAdd == null || toAdd.Count == 0)
-                return;
-
-            var merged = new List<string>();
-            if (parameters.TryGetValue(key, out var existing))
-            {
-                switch (existing)
-                {
-                    case IEnumerable<string> list:
-                        merged.AddRange(list.Where(v => !string.IsNullOrWhiteSpace(v)));
-                        break;
-                    case string single when !string.IsNullOrWhiteSpace(single):
-                        merged.Add(single);
-                        break;
-                }
-            }
-
-            merged.AddRange(toAdd.Where(v => !string.IsNullOrWhiteSpace(v)));
-            parameters[key] = merged.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-        }
-
-        /// <summary>
-        /// Check if a combatant is within melee range (1.5m) of any hostile combatant.
-        /// </summary>
-        private bool IsWithinHostileMeleeRange(Combatant combatant)
-        {
-            if (GetCombatants == null)
-                return false;
-
-            foreach (var other in GetCombatants())
-            {
-                // Skip self
-                if (other.Id == combatant.Id)
-                    continue;
-
-                // Skip non-hostile (same faction or inactive)
-                if (other.Faction == combatant.Faction || !other.IsActive)
-                    continue;
-
-                // Check distance
-                float dist = combatant.Position.DistanceTo(other.Position);
-                if (dist <= CombatRules.GetMeleeReach(other))
-                    return true;
-            }
-
-            return false;
-        }
-
-        private static bool ShouldApplyMeleeAutoCrit(bool targetMeleeAutocritFlag, bool isMeleeAttack, float attackDistanceMeters)
-        {
-            if (!targetMeleeAutocritFlag || !isMeleeAttack)
-            {
-                return false;
-            }
-
-            return attackDistanceMeters <= CombatRules.MeleeAutocritRangeMeters;
-        }
-
-        private bool ShouldAutoFailSave(Combatant target, string saveType)
-        {
-            if (Statuses == null || target == null || string.IsNullOrWhiteSpace(saveType))
-                return false;
-            string normalized = saveType.Trim().ToLowerInvariant();
-
-            // Boost-based auto-fail (any ability type, e.g. AbilityFailedSavingThrow from Hold Person)
-            if (Enum.TryParse<AbilityType>(normalized, ignoreCase: true, out var abilityType))
-            {
-                if (QDND.Combat.Rules.Boosts.BoostEvaluator.ShouldAutoFailSaveFromBoosts(target, abilityType))
-                    return true;
-            }
-
-            if (normalized != "strength" && normalized != "dexterity")
-                return false;
-
-            var activeStatuses = Statuses.GetStatuses(target.Id);
-            if (normalized == "strength" && activeStatuses.Any(s => s?.Definition?.Tags?.Contains("auto_fail_save_strength") == true))
-                return true;
-            if (normalized == "dexterity" && activeStatuses.Any(s => s?.Definition?.Tags?.Contains("auto_fail_save_dexterity") == true))
-                return true;
-
-            var tgtIds = activeStatuses.SelectMany(s => new[] { s.Definition.Id }.Concat(s.Definition.Tags ?? Enumerable.Empty<string>()));
-            var tgtEffects = ConditionEffects.GetAggregateEffects(tgtIds);
-            return tgtEffects.AutoFailStrDexSaves;
-        }
-
-        private string GetBlockedByStatusReason(Combatant source, string actionId, ActionCost cost)
-        {
-            if (Statuses == null || source == null)
-                return null;
-
-            ActionDefinition action = null;
-            if (!string.IsNullOrWhiteSpace(actionId))
-            {
-                action = GetAction(actionId);
-            }
-
-            var activeStatuses = Statuses.GetStatuses(source.Id);
-            foreach (var status in activeStatuses)
-            {
-                var blocked = status.Definition.BlockedActions;
-                if (blocked == null || blocked.Count == 0)
-                    continue;
-                string statusName = StatusPresentationPolicy.GetDisplayName(status.Definition);
-
-                if (blocked.Contains("*"))
-                    return $"{statusName} prevents acting";
-                if (cost?.UsesAction == true && blocked.Contains("action"))
-                    return $"{statusName} blocks actions";
-                if (cost?.UsesBonusAction == true && blocked.Contains("bonus_action"))
-                    return $"{statusName} blocks bonus actions";
-                if (cost?.UsesReaction == true && blocked.Contains("reaction"))
-                    return $"{statusName} blocks reactions";
-                if (cost?.MovementCost > 0 && blocked.Contains("movement"))
-                    return $"{statusName} blocks movement";
-                if (blocked.Contains("verbal_spell") &&
-                    action != null &&
-                    action.Components.HasFlag(SpellComponents.Verbal))
-                {
-                    return $"{statusName} blocks verbal spells";
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Trigger ability cast reactions with effective tags.
-        /// </summary>
-        private ReactionTriggerEventArgs TryTriggerAbilityCastReactionsWithTags(
-            Combatant source,
-            ActionDefinition action,
-            List<Combatant> targets,
-            HashSet<string> effectiveTags,
-            ActionExecutionOptions options = null)
-        {
-            if (Reactions == null || GetCombatants == null)
-                return null;
-
-            bool isSpell = effectiveTags.Contains("spell") || effectiveTags.Contains("magic");
-            if (!isSpell)
-                return null;
-
-            var context = new ReactionTriggerContext
-            {
-                TriggerType = ReactionTriggerType.SpellCastNearby,
-                TriggerSourceId = source.Id,
-                AffectedId = targets.FirstOrDefault()?.Id,
-                ActionId = action.Id,
-                TriggerSpellLevel = action.SpellLevel + (options?.UpcastLevel ?? 0),
-                Position = source.Position,
-                IsCancellable = !effectiveTags.Contains("uncounterable"),
-                Data = new Dictionary<string, object>
-                {
-                    { "actionName", action.Name },
-                    { "targetCount", targets.Count },
-                    { "priorityTarget", (object)true }
-                }
-            };
-
-            var potentialReactors = GetCombatants()
-                .Where(c => c.Id != source.Id && c.Faction != source.Faction);
-            var potentialList = potentialReactors.ToList();
-
-            List<(string CombatantId, ReactionDefinition Reaction)> eligibleReactors;
-            bool cancelledByResolver = false;
-            if (ReactionResolver != null)
-            {
-                var resolution = ReactionResolver.ResolveTrigger(
-                    context,
-                    potentialList,
-                    new ReactionResolutionOptions
-                    {
-                        ActionLabel = $"ability:{action.Id}",
-                        AllowPromptDeferral = false
-                    });
-                eligibleReactors = resolution.EligibleReactors;
-                cancelledByResolver = resolution.TriggerCancelled;
-            }
-            else
-            {
-                eligibleReactors = Reactions.GetEligibleReactors(context, potentialList);
-            }
-
-            var args = new ReactionTriggerEventArgs
-            {
-                Context = context,
-                EligibleReactors = eligibleReactors,
-                Cancel = cancelledByResolver
-            };
-
-            if (eligibleReactors.Count > 0)
-            {
-                OnAbilityCastTrigger?.Invoke(args);
-            }
-
-            return args;
-        }
 
         /// <summary>
         /// Preview an ability's expected outcomes.
@@ -2152,405 +1608,16 @@ namespace QDND.Combat.Actions
             Cooldowns?.ProcessRoundEnd();
         }
 
-        private bool CheckRequirement(ActionRequirement req, Combatant source)
-        {
-            return req.Type switch
-            {
-                "hp_above" => source.Resources.CurrentHP > float.Parse(req.Value),
-                "hp_below" => source.Resources.CurrentHP < float.Parse(req.Value),
-                "has_status" => Statuses?.HasStatus(source.Id, req.Value) ?? false,
-                _ => true // Unknown requirements pass by default
-            };
-        }
-
-        /// <summary>
-        /// Check for SpellCastNearby reactions when an ability is cast.
-        /// Returns the trigger args with eligible reactors, or null if no reactions system.
-        /// </summary>
-        private ReactionTriggerEventArgs TryTriggerAbilityCastReactions(
-            Combatant source,
-            ActionDefinition action,
-            List<Combatant> targets)
-        {
-            if (Reactions == null || GetCombatants == null)
-                return null;
-
-            // Only trigger for abilities with "spell" tag or similar
-            bool isSpell = action.Tags.Contains("spell") || action.Tags.Contains("magic");
-            if (!isSpell)
-                return null;
-
-            // Create trigger context
-            var context = new ReactionTriggerContext
-            {
-                TriggerType = ReactionTriggerType.SpellCastNearby,
-                TriggerSourceId = source.Id,
-                ActionId = action.Id,
-                Position = source.Position,
-                IsCancellable = !action.Tags.Contains("uncounterable"),
-                Data = new Dictionary<string, object>
-                {
-                    { "actionName", action.Name },
-                    { "targetCount", targets.Count },
-                    { "priorityTarget", (object)true }
-                }
-            };
-
-            // Get all combatants that could react (enemies of the caster)
-            var potentialReactors = GetCombatants()
-                .Where(c => c.Id != source.Id && c.Faction != source.Faction);
-
-            var eligibleReactors = Reactions.GetEligibleReactors(context, potentialReactors);
-
-            var args = new ReactionTriggerEventArgs
-            {
-                Context = context,
-                EligibleReactors = eligibleReactors,
-                Cancel = false
-            };
-
-            // Fire the event if there are eligible reactors
-            if (eligibleReactors.Count > 0)
-            {
-                OnAbilityCastTrigger?.Invoke(args);
-            }
-
-            return args;
-        }
-
-        /// <summary>
-        /// Check for damage reactions when damage is about to be dealt.
-        /// Returns the trigger args with eligible reactors, or null if no reactions system.
-        /// </summary>
         public ReactionTriggerEventArgs TryTriggerDamageReactions(
             Combatant source,
             Combatant target,
             int damageAmount,
             string damageType,
             string actionId = null)
-        {
-            if (Reactions == null || GetCombatants == null)
-                return null;
+            => ReactionTriggers.TryTriggerDamageReactions(source, target, damageAmount, damageType, actionId);
 
-            // Create trigger context for YouTakeDamage (target's perspective)
-            var context = new ReactionTriggerContext
-            {
-                TriggerType = ReactionTriggerType.YouTakeDamage,
-                TriggerSourceId = source.Id,
-                AffectedId = target.Id,
-                ActionId = actionId,
-                Value = damageAmount,
-                Position = target.Position,
-                IsCancellable = false, // Damage is generally not cancellable, but can be modified
-                Data = new Dictionary<string, object>
-                {
-                    { "damageType", damageType ?? "untyped" },
-                    { "originalDamage", damageAmount }
-                }
-            };
-
-            // Get eligible reactors (the target and potentially allies)
-            var eligibleReactors = new List<(string CombatantId, ReactionDefinition Reaction)>();
-            float damageModifier = 1.0f;
-
-            // Check target for YouTakeDamage reactions (like Shield)
-            if (ReactionResolver != null)
-            {
-                var selfResolution = ReactionResolver.ResolveTrigger(
-                    context,
-                    new[] { target },
-                    new ReactionResolutionOptions
-                    {
-                        ActionLabel = $"damage:{actionId ?? "unknown"}:self",
-                        AllowPromptDeferral = false
-                    });
-                eligibleReactors.AddRange(selfResolution.EligibleReactors);
-                damageModifier *= selfResolution.DamageModifier;
-            }
-            else
-            {
-                eligibleReactors.AddRange(Reactions.GetEligibleReactors(context, new[] { target }));
-            }
-
-            // Also check for AllyTakesDamage reactions from allies
-            var allyContext = new ReactionTriggerContext
-            {
-                TriggerType = ReactionTriggerType.AllyTakesDamage,
-                TriggerSourceId = source.Id,
-                AffectedId = target.Id,
-                ActionId = actionId,
-                Value = damageAmount,
-                Position = target.Position,
-                IsCancellable = false,
-                Data = new Dictionary<string, object>
-                {
-                    { "damageType", damageType ?? "untyped" },
-                    { "originalDamage", damageAmount }
-                }
-            };
-
-            var allies = GetCombatants()
-                .Where(c => c.Id != target.Id && c.Faction == target.Faction);
-            var allyList = allies.ToList();
-            if (ReactionResolver != null)
-            {
-                var allyResolution = ReactionResolver.ResolveTrigger(
-                    allyContext,
-                    allyList,
-                    new ReactionResolutionOptions
-                    {
-                        ActionLabel = $"damage:{actionId ?? "unknown"}:ally",
-                        AllowPromptDeferral = false
-                    });
-                eligibleReactors.AddRange(allyResolution.EligibleReactors);
-                damageModifier *= allyResolution.DamageModifier;
-            }
-            else
-            {
-                eligibleReactors.AddRange(Reactions.GetEligibleReactors(allyContext, allyList));
-            }
-
-            var args = new ReactionTriggerEventArgs
-            {
-                Context = context,
-                EligibleReactors = eligibleReactors,
-                Cancel = false,
-                DamageModifier = damageModifier
-            };
-
-            // Fire the event if there are eligible reactors
-            if (eligibleReactors.Count > 0)
-            {
-                OnDamageTrigger?.Invoke(args);
-            }
-
-            return args;
-        }
-
-        /// <summary>
-        /// Fires AllyDowned reactions for allies of a combatant reduced to 0 HP.
-        /// </summary>
         public void TryTriggerAllyDownedReactions(Combatant killer, Combatant downed)
-        {
-            if (downed == null || Reactions == null || GetCombatants == null)
-                return;
-
-            var context = new ReactionTriggerContext
-            {
-                TriggerType = ReactionTriggerType.AllyDowned,
-                TriggerSourceId = killer?.Id ?? string.Empty,
-                AffectedId = downed.Id,
-                Position = downed.Position,
-                IsCancellable = false,
-                Data = new Dictionary<string, object>
-                {
-                    { "downedFaction", downed.Faction.ToString() }
-                }
-            };
-
-            var allies = GetCombatants()
-                .Where(c => c.Id != downed.Id && c.Faction == downed.Faction && c.IsActive)
-                .ToList();
-
-            if (allies.Count == 0)
-                return;
-
-            if (ReactionResolver != null)
-            {
-                ReactionResolver.ResolveTrigger(
-                    context,
-                    allies,
-                    new ReactionResolutionOptions
-                    {
-                        ActionLabel = $"ally_downed:{downed.Id}",
-                        AllowPromptDeferral = false
-                    });
-                return;
-            }
-
-            var eligibleReactors = Reactions.GetEligibleReactors(context, allies);
-            foreach (var (combatantId, reaction) in eligibleReactors)
-            {
-                Reactions.CreatePrompt(combatantId, reaction, context);
-            }
-        }
-
-        /// <summary>
-        /// Fires YouAreAttacked reactions after an attack roll is made but before effects execute.
-        /// Gives reactions like Shield, Cutting Words, Warding Flare, and Defensive Duelist
-        /// a chance to modify AC or the roll.
-        /// Returns the trigger args with ACModifier and RollModifier.
-        /// </summary>
-        public ReactionTriggerEventArgs TryTriggerAttackReactions(
-            Combatant attacker,
-            Combatant target,
-            ActionDefinition action,
-            string attackType = null,
-            bool attackHit = true)
-        {
-            if (Reactions == null || GetCombatants == null)
-                return null;
-
-            var context = new ReactionTriggerContext
-            {
-                TriggerType = ReactionTriggerType.YouAreAttacked,
-                TriggerSourceId = attacker.Id,
-                AffectedId = target.Id,
-                ActionId = action?.Id,
-                Position = target.Position,
-                IsCancellable = false,
-                Data = new Dictionary<string, object>
-                {
-                    { "attackType", attackType ?? "unknown" },
-                    { "actionId", action?.Id ?? "unknown" },
-                    { "attackerId", attacker.Id },
-                    { "attackWouldHit", (object)attackHit }
-                }
-            };
-
-            var eligibleReactors = new List<(string CombatantId, ReactionDefinition Reaction)>();
-            int acModifier = 0;
-            int rollModifier = 0;
-
-            // Check target for YouAreAttacked reactions (e.g., Shield, Defensive Duelist)
-            if (ReactionResolver != null)
-            {
-                var selfResolution = ReactionResolver.ResolveTrigger(
-                    context,
-                    new[] { target },
-                    new ReactionResolutionOptions
-                    {
-                        ActionLabel = $"attacked:{action?.Id ?? "unknown"}:self",
-                        AllowPromptDeferral = false
-                    });
-                eligibleReactors.AddRange(selfResolution.EligibleReactors);
-            }
-            else
-            {
-                eligibleReactors.AddRange(Reactions.GetEligibleReactors(context, new[] { target }));
-            }
-
-            // Also check allies for reactions that trigger when an ally is attacked
-            var allies = GetCombatants()
-                .Where(c => c.Id != target.Id && c.Faction == target.Faction);
-            var allyList = allies.ToList();
-            if (allyList.Count > 0)
-            {
-                if (ReactionResolver != null)
-                {
-                    var allyResolution = ReactionResolver.ResolveTrigger(
-                        context,
-                        allyList,
-                        new ReactionResolutionOptions
-                        {
-                            ActionLabel = $"attacked:{action?.Id ?? "unknown"}:ally",
-                            AllowPromptDeferral = false
-                        });
-                    eligibleReactors.AddRange(allyResolution.EligibleReactors);
-                }
-                else
-                {
-                    eligibleReactors.AddRange(Reactions.GetEligibleReactors(context, allyList));
-                }
-            }
-
-            // Read AC/roll modifiers from context data if reactions populated them
-            if (context.Data.TryGetValue("acModifier", out var acObj) && acObj is int acVal)
-                acModifier = acVal;
-            if (context.Data.TryGetValue("rollModifier", out var rollObj) && rollObj is int rollVal)
-                rollModifier = rollVal;
-
-            var args = new ReactionTriggerEventArgs
-            {
-                Context = context,
-                EligibleReactors = eligibleReactors,
-                Cancel = false,
-                ACModifier = acModifier,
-                RollModifier = rollModifier
-            };
-
-            if (eligibleReactors.Count > 0)
-            {
-                OnAttackTrigger?.Invoke(args);
-            }
-
-            return args;
-        }
-
-        /// <summary>
-        /// Fires YouAreHit reactions after an attack hits but before damage is calculated.
-        /// For reactions like Hellish Rebuke (counter-damage), Uncanny Dodge (halve damage),
-        /// and Deflect Missiles (reduce ranged damage).
-        /// Returns the trigger args with DamageModifier.
-        /// </summary>
-        public ReactionTriggerEventArgs TryTriggerHitReactions(
-            Combatant attacker,
-            Combatant target,
-            int damageAmount,
-            string damageType,
-            string attackType = null,
-            bool isCritical = false,
-            string actionId = null)
-        {
-            if (Reactions == null || GetCombatants == null)
-                return null;
-
-            var context = new ReactionTriggerContext
-            {
-                TriggerType = ReactionTriggerType.YouAreHit,
-                TriggerSourceId = attacker.Id,
-                AffectedId = target.Id,
-                ActionId = actionId,
-                Value = damageAmount,
-                Position = target.Position,
-                IsCancellable = false,
-                Data = new Dictionary<string, object>
-                {
-                    { "attackType", attackType ?? "unknown" },
-                    { "isCritical", isCritical },
-                    { "damageAmount", damageAmount },
-                    { "damageType", damageType ?? "untyped" },
-                    { "actionId", actionId ?? "unknown" }
-                }
-            };
-
-            var eligibleReactors = new List<(string CombatantId, ReactionDefinition Reaction)>();
-            float damageModifier = 1.0f;
-
-            // Check target for YouAreHit reactions (e.g., Uncanny Dodge, Deflect Missiles)
-            if (ReactionResolver != null)
-            {
-                var selfResolution = ReactionResolver.ResolveTrigger(
-                    context,
-                    new[] { target },
-                    new ReactionResolutionOptions
-                    {
-                        ActionLabel = $"hit:{actionId ?? "unknown"}:self",
-                        AllowPromptDeferral = false
-                    });
-                eligibleReactors.AddRange(selfResolution.EligibleReactors);
-                damageModifier *= selfResolution.DamageModifier;
-            }
-            else
-            {
-                eligibleReactors.AddRange(Reactions.GetEligibleReactors(context, new[] { target }));
-            }
-
-            var args = new ReactionTriggerEventArgs
-            {
-                Context = context,
-                EligibleReactors = eligibleReactors,
-                Cancel = false,
-                DamageModifier = damageModifier
-            };
-
-            if (eligibleReactors.Count > 0)
-            {
-                OnHitTrigger?.Invoke(args);
-            }
-
-            return args;
-        }
+            => ReactionTriggers.TryTriggerAllyDownedReactions(killer, downed);
 
         /// <summary>
         /// Search ActionRegistry for a BG3-parsed action whose normalized ID matches the given game ID.

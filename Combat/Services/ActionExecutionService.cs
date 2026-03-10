@@ -48,8 +48,7 @@ namespace QDND.Combat.Services
         private readonly RulesEngine _rulesEngine;
         private readonly CombatLog _combatLog;
 
-        // Shared mutable list — same reference as CombatArena._combatants
-        private readonly List<Combatant> _combatants;
+        private readonly ICombatantRegistry _combatants;
 
         // Shared dict — same reference as CombatArena._pendingJumpWorldPaths
         private readonly Dictionary<string, List<Vector3>> _pendingJumpWorldPaths;
@@ -86,7 +85,7 @@ namespace QDND.Combat.Services
             StatusManager statusManager,
             RulesEngine rulesEngine,
             CombatLog combatLog,
-            List<Combatant> combatants,
+            ICombatantRegistry combatants,
             Dictionary<string, List<Vector3>> pendingJumpWorldPaths,
             float tileSize,
             Action clearSelection,
@@ -134,6 +133,8 @@ namespace QDND.Combat.Services
             _createTimer = createTimer;
             _log = log;
         }
+
+        private List<Combatant> GetCombatants() => _combatants?.GetAll().ToList() ?? new List<Combatant>();
 
         // ────────────────────────────────────────────────────────────────────
         // Action ID management (used by CombatMovementCoordinator via delegate)
@@ -353,9 +354,10 @@ namespace QDND.Combat.Services
                     resolvedTargets = new List<Combatant> { actor };
                     break;
                 case TargetType.All:
+                    var allCombatants = GetCombatants();
                     resolvedTargets = _targetValidator != null
-                        ? _targetValidator.GetValidTargets(action, actor, _combatants)
-                        : _combatants.Where(c => c.IsActive).ToList();
+                        ? _targetValidator.GetValidTargets(action, actor, allCombatants)
+                        : allCombatants.Where(c => c.IsActive).ToList();
                     break;
                 case TargetType.None:
                     resolvedTargets = new List<Combatant>();
@@ -422,9 +424,10 @@ namespace QDND.Combat.Services
             var action = _effectPipeline.GetAction(actionId);
             if (action == null) { _log($"UseItemAtPosition: action not found: {actionId}"); return; }
 
+            var combatants = GetCombatants();
             var resolvedTargets = _targetValidator != null
-                ? _targetValidator.ResolveAreaTargets(action, actor, targetPosition, _combatants, c => c.Position)
-                : _combatants.Where(c => c.IsActive && c.Position.DistanceTo(targetPosition) <= (action.AreaRadius > 0 ? action.AreaRadius : 5f)).ToList();
+                ? _targetValidator.ResolveAreaTargets(action, actor, targetPosition, combatants, c => c.Position)
+                : combatants.Where(c => c.IsActive && c.Position.DistanceTo(targetPosition) <= (action.AreaRadius > 0 ? action.AreaRadius : 5f)).ToList();
 
             _faceCombatantTowardsGridPoint(actor.Id, targetPosition, DebugFlags.SkipAnimations);
             ExecuteResolvedAction(actor, action, resolvedTargets, $"point:{targetPosition}", targetPosition, options);
@@ -562,7 +565,7 @@ namespace QDND.Combat.Services
             // Filter to only valid targets (faction/range validation)
             if (_targetValidator != null)
             {
-                var validIds = _targetValidator.GetValidTargets(action, actor, _combatants)
+                var validIds = _targetValidator.GetValidTargets(action, actor, GetCombatants())
                                                .Select(c => c.Id)
                                                .ToHashSet();
                 targets = targets.Where(t => validIds.Contains(t.Id)).ToList();
@@ -627,9 +630,10 @@ namespace QDND.Combat.Services
                     resolvedTargets = new List<Combatant> { actor };
                     break;
                 case TargetType.All:
+                    var allCombatants = GetCombatants();
                     resolvedTargets = _targetValidator != null
-                        ? _targetValidator.GetValidTargets(action, actor, _combatants)
-                        : _combatants.Where(c => c.IsActive).ToList();
+                        ? _targetValidator.GetValidTargets(action, actor, allCombatants)
+                        : allCombatants.Where(c => c.IsActive).ToList();
                     break;
                 case TargetType.None:
                     resolvedTargets = new List<Combatant>();
@@ -784,7 +788,7 @@ namespace QDND.Combat.Services
                 {
                     Vector3 GetPosition(Combatant c) => c.Position;
                     resolvedTargets = _targetValidator.ResolveAreaTargets(
-                        action, actor, targetPosition, _combatants, GetPosition);
+                        action, actor, targetPosition, GetCombatants(), GetPosition);
                 }
 
                 // Defensive fallback: point-teleport actions with no resolved targets should still move caster.
@@ -801,7 +805,7 @@ namespace QDND.Combat.Services
                     ? options?.SecondaryTargetPosition
                     : null;
                 resolvedTargets = _targetValidator.ResolveAreaTargets(
-                    action, actor, targetPosition, _combatants, GetPosition, wallStartParam);
+                    action, actor, targetPosition, GetCombatants(), GetPosition, wallStartParam);
             }
 
             _faceCombatantTowardsGridPoint(actor.Id, targetPosition, DebugFlags.SkipAnimations);
@@ -1385,7 +1389,7 @@ namespace QDND.Combat.Services
 
             int stealthTotal = naturalRoll + skillBonus;
 
-            foreach (var hostile in _combatants.Where(c => c.IsActive && c.Faction != actor.Faction))
+            foreach (var hostile in GetCombatants().Where(c => c.IsActive && c.Faction != actor.Faction))
             {
                 int wisMod = hostile.GetAbilityModifier(AbilityType.Wisdom);
                 int hostileProfBonus = System.Math.Max(0, hostile.ProficiencyBonus);
