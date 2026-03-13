@@ -570,6 +570,7 @@ namespace QDND.Combat.Services
         private readonly CharacterDataRegistry _charRegistry;
         private readonly StatsRegistry _statsRegistry;
         private readonly ICombatContext _context;
+        private readonly ItemDefinitionRegistry _itemDefinitionRegistry;
 
         private readonly List<InventoryTemplate> _bg3WeaponTemplates = new();
         private readonly List<InventoryTemplate> _bg3ArmorTemplates = new();
@@ -582,11 +583,16 @@ namespace QDND.Combat.Services
         /// <summary>Fired when equipment changes (combatantId, slot).</summary>
         public event Action<string, EquipSlot> OnEquipmentChanged;
 
-        public InventoryService(CharacterDataRegistry charRegistry, StatsRegistry statsRegistry = null, ICombatContext context = null)
+        public InventoryService(
+            CharacterDataRegistry charRegistry,
+            StatsRegistry statsRegistry = null,
+            ICombatContext context = null,
+            ItemDefinitionRegistry itemDefinitionRegistry = null)
         {
             _charRegistry = charRegistry;
             _statsRegistry = statsRegistry;
             _context = context;
+            _itemDefinitionRegistry = itemDefinitionRegistry;
         }
 
         /// <summary>Get or create inventory for a combatant.</summary>
@@ -1394,13 +1400,7 @@ namespace QDND.Combat.Services
 
         private ItemDefinitionRegistry ResolveItemDefinitionRegistry()
         {
-            if (_context == null)
-                return null;
-
-            if (!_context.HasService<ItemDefinitionRegistry>())
-                return null;
-
-            return _context.GetService<ItemDefinitionRegistry>();
+            return _itemDefinitionRegistry;
         }
 
         private bool AddStarterBagItemsFromBG3(Combatant combatant, Inventory inv)

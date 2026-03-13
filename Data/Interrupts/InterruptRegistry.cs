@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using QDND.Data;
 using QDND.Data.Parsers;
 
 namespace QDND.Data.Interrupts
@@ -20,22 +21,28 @@ namespace QDND.Data.Interrupts
     /// var onHitReactions = registry.GetInterruptsByContext(BG3InterruptContext.OnCastHit);
     /// </code>
     /// </summary>
-    public class InterruptRegistry
+    public class InterruptRegistry : Registry<BG3InterruptData>
     {
-        private readonly Dictionary<string, BG3InterruptData> _interrupts = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<BG3InterruptContext, List<string>> _contextIndex = new();
         private readonly Dictionary<BG3InterruptContextScope, List<string>> _scopeIndex = new();
-        private readonly List<string> _errors = new();
-        private readonly List<string> _warnings = new();
 
-        /// <summary>Total number of registered (non-stub) interrupts.</summary>
-        public int Count => _interrupts.Count;
+        protected override string GetId(BG3InterruptData item) => item.InterruptId;
 
-        /// <summary>Errors encountered during registration or loading.</summary>
-        public IReadOnlyList<string> Errors => _errors;
+        protected override void AfterRegister(BG3InterruptData interrupt)
+        {
+            IndexInterrupt(interrupt);
+        }
 
-        /// <summary>Warnings encountered during registration or loading.</summary>
-        public IReadOnlyList<string> Warnings => _warnings;
+        protected override void AfterUnregister(BG3InterruptData interrupt)
+        {
+            UnindexInterrupt(interrupt);
+        }
+
+        protected override void OnClear()
+        {
+            _contextIndex.Clear();
+            _scopeIndex.Clear();
+        }
 
         // ---------------------------------------------------------------
         //  Registration
@@ -51,31 +58,17 @@ namespace QDND.Data.Interrupts
         {
             if (interrupt == null)
             {
-                _errors.Add("Cannot register null interrupt");
+                AddError("Cannot register null interrupt");
                 return false;
             }
 
             if (string.IsNullOrEmpty(interrupt.InterruptId))
             {
-                _errors.Add($"Cannot register interrupt with null/empty ID: {interrupt.DisplayName ?? "Unknown"}");
+                AddError($"Cannot register interrupt with null/empty ID: {interrupt.DisplayName ?? "Unknown"}");
                 return false;
             }
 
-            if (_interrupts.ContainsKey(interrupt.InterruptId) && !overwrite)
-            {
-                _warnings.Add($"Interrupt '{interrupt.InterruptId}' already registered (use overwrite=true to replace)");
-                return false;
-            }
-
-            // Unindex old entry if replacing
-            if (_interrupts.ContainsKey(interrupt.InterruptId))
-            {
-                UnindexInterrupt(_interrupts[interrupt.InterruptId]);
-            }
-
-            _interrupts[interrupt.InterruptId] = interrupt;
-            IndexInterrupt(interrupt);
-            return true;
+            return BaseRegister(interrupt, overwrite, "interrupt");
         }
 
         // ---------------------------------------------------------------
@@ -91,8 +84,7 @@ namespace QDND.Data.Interrupts
         {
             if (string.IsNullOrEmpty(interruptId))
                 return null;
-            _interrupts.TryGetValue(interruptId, out var data);
-            return data;
+            return Get(interruptId);
         }
 
         /// <summary>
@@ -100,7 +92,7 @@ namespace QDND.Data.Interrupts
         /// </summary>
         public bool HasInterrupt(string interruptId)
         {
-            return !string.IsNullOrEmpty(interruptId) && _interrupts.ContainsKey(interruptId);
+            return !string.IsNullOrEmpty(interruptId) && Has(interruptId);
         }
 
         /// <summary>
@@ -114,8 +106,8 @@ namespace QDND.Data.Interrupts
                 return new List<BG3InterruptData>();
 
             return ids
-                .Where(id => _interrupts.ContainsKey(id))
-                .Select(id => _interrupts[id])
+                .Where(id => Items.ContainsKey(id))
+                .Select(id => Items[id])
                 .ToList();
         }
 
@@ -130,8 +122,8 @@ namespace QDND.Data.Interrupts
                 return new List<BG3InterruptData>();
 
             return ids
-                .Where(id => _interrupts.ContainsKey(id))
-                .Select(id => _interrupts[id])
+                .Where(id => Items.ContainsKey(id))
+                .Select(id => Items[id])
                 .ToList();
         }
 
@@ -140,7 +132,7 @@ namespace QDND.Data.Interrupts
         /// </summary>
         public List<BG3InterruptData> GetReactionCostInterrupts()
         {
-            return _interrupts.Values
+            return Items.Values
                 .Where(i => i.CostsReaction)
                 .ToList();
         }
@@ -156,7 +148,7 @@ namespace QDND.Data.Interrupts
                 return new List<BG3InterruptData>();
 
             query = query.ToLowerInvariant();
-            return _interrupts.Values
+            return Items.Values
                 .Where(i =>
                     i.InterruptId.ToLowerInvariant().Contains(query) ||
                     (i.DisplayName?.ToLowerInvariant().Contains(query) ?? false) ||
@@ -169,7 +161,7 @@ namespace QDND.Data.Interrupts
         /// </summary>
         public List<BG3InterruptData> GetAllInterrupts()
         {
-            return _interrupts.Values.ToList();
+            return GetAll().ToList();
         }
 
         // ---------------------------------------------------------------
@@ -186,7 +178,7 @@ namespace QDND.Data.Interrupts
         {
             if (filePaths == null || filePaths.Length == 0)
             {
-                _errors.Add("No interrupt file paths provided");
+                AddError("No interrupt file paths provided");
                 return 0;
             }
 
@@ -200,7 +192,7 @@ namespace QDND.Data.Interrupts
 
                 if (!File.Exists(filePath))
                 {
-                    _warnings.Add($"Interrupt file not found: {filePath}");
+                    AddWarning($"Interrupt file not found: {filePath}");
                     continue;
                 }
 
@@ -222,10 +214,17 @@ namespace QDND.Data.Interrupts
                     registered++;
             }
 
-            _errors.AddRange(parser.Errors);
-            _warnings.AddRange(parser.Warnings);
+            foreach (var error in parser.Errors)
+            {
+                AddError(error);
+            }
 
-            Console.WriteLine($"[InterruptRegistry] Loaded {registered} interrupts from {filePaths.Length} source file(s) ({_interrupts.Count} total, {parser.Warnings.Count} parser warning(s))");
+            foreach (var warning in parser.Warnings)
+            {
+                AddWarning(warning);
+            }
+
+            Console.WriteLine($"[InterruptRegistry] Loaded {registered} interrupts from {filePaths.Length} source file(s) ({Count} total, {parser.Warnings.Count} parser warning(s))");
 
             return registered;
         }
@@ -233,18 +232,6 @@ namespace QDND.Data.Interrupts
         // ---------------------------------------------------------------
         //  Lifecycle
         // ---------------------------------------------------------------
-
-        /// <summary>
-        /// Clear all registered interrupts and reset indices.
-        /// </summary>
-        public void Clear()
-        {
-            _interrupts.Clear();
-            _contextIndex.Clear();
-            _scopeIndex.Clear();
-            _errors.Clear();
-            _warnings.Clear();
-        }
 
         /// <summary>
         /// Get summary statistics about the registry contents.
@@ -257,9 +244,9 @@ namespace QDND.Data.Interrupts
                 ctxCounts[ctx.ToString()] = ids.Count;
             }
 
-            int withReactionCost = _interrupts.Values.Count(i => i.CostsReaction);
-            int withSpellSlotCost = _interrupts.Values.Count(i => i.CostsSpellSlot);
-            int withRoll = _interrupts.Values.Count(i => i.HasRoll);
+            int withReactionCost = Items.Values.Count(i => i.CostsReaction);
+            int withSpellSlotCost = Items.Values.Count(i => i.CostsSpellSlot);
+            int withRoll = Items.Values.Count(i => i.HasRoll);
 
             var lines = new List<string>
             {
@@ -276,8 +263,8 @@ namespace QDND.Data.Interrupts
                 lines.Add($"    {ctx}: {count}");
             }
 
-            lines.Add($"  Errors: {_errors.Count}");
-            lines.Add($"  Warnings: {_warnings.Count}");
+            lines.Add($"  Errors: {Errors.Count}");
+            lines.Add($"  Warnings: {Warnings.Count}");
 
             return string.Join("\n", lines);
         }

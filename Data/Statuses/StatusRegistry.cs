@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using QDND.Data;
 using QDND.Data.Parsers;
 
 namespace QDND.Data.Statuses
@@ -10,28 +11,28 @@ namespace QDND.Data.Statuses
     /// Acts as a singleton service that stores and provides access to all statuses.
     /// Similar to ActionRegistry but for status effects.
     /// </summary>
-    public class StatusRegistry
+    public class StatusRegistry : Registry<BG3StatusData>
     {
-        private readonly Dictionary<string, BG3StatusData> _statuses = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<BG3StatusType, List<string>> _typeIndex = new();
         private readonly Dictionary<string, List<string>> _groupIndex = new(StringComparer.OrdinalIgnoreCase);
-        private readonly List<string> _errors = new();
-        private readonly List<string> _warnings = new();
 
-        /// <summary>
-        /// Total number of registered statuses.
-        /// </summary>
-        public int Count => _statuses.Count;
+        protected override string GetId(BG3StatusData item) => item.StatusId;
 
-        /// <summary>
-        /// Errors encountered during status registration or loading.
-        /// </summary>
-        public IReadOnlyList<string> Errors => _errors;
+        protected override void AfterRegister(BG3StatusData status)
+        {
+            IndexStatus(status);
+        }
 
-        /// <summary>
-        /// Warnings encountered during status registration or loading.
-        /// </summary>
-        public IReadOnlyList<string> Warnings => _warnings;
+        protected override void AfterUnregister(BG3StatusData status)
+        {
+            UnindexStatus(status);
+        }
+
+        protected override void OnClear()
+        {
+            _typeIndex.Clear();
+            _groupIndex.Clear();
+        }
 
         /// <summary>
         /// Register a new status definition.
@@ -43,32 +44,21 @@ namespace QDND.Data.Statuses
         {
             if (status == null)
             {
-                _errors.Add("Cannot register null status");
+                AddError("Cannot register null status");
                 return false;
             }
 
             if (string.IsNullOrEmpty(status.StatusId))
             {
-                _errors.Add($"Cannot register status with null/empty ID: {status.DisplayName ?? "Unknown"}");
+                AddError($"Cannot register status with null/empty ID: {status.DisplayName ?? "Unknown"}");
                 return false;
             }
 
-            // Check if already exists
-            if (_statuses.ContainsKey(status.StatusId) && !overwrite)
-            {
-                _warnings.Add($"Status '{status.StatusId}' already registered (use overwrite=true to replace)");
-                return false;
-            }
+            return BaseRegister(status, overwrite, "status");
+        }
 
-            // Unindex old status if replacing
-            if (_statuses.ContainsKey(status.StatusId))
-            {
-                UnindexStatus(_statuses[status.StatusId]);
-            }
-
-            // Store status
-            _statuses[status.StatusId] = status;
-
+        private void IndexStatus(BG3StatusData status)
+        {
             // Index by type
             if (status.StatusType != BG3StatusType.Unknown)
             {
@@ -89,8 +79,6 @@ namespace QDND.Data.Statuses
                     _groupIndex[trimmedGroup].Add(status.StatusId);
                 }
             }
-
-            return true;
         }
 
         /// <summary>
@@ -131,8 +119,7 @@ namespace QDND.Data.Statuses
             if (string.IsNullOrEmpty(statusId))
                 return null;
 
-            _statuses.TryGetValue(statusId, out var status);
-            return status;
+            return Get(statusId);
         }
 
         /// <summary>
@@ -142,7 +129,7 @@ namespace QDND.Data.Statuses
         /// <returns>True if the status exists.</returns>
         public bool HasStatus(string statusId)
         {
-            return !string.IsNullOrEmpty(statusId) && _statuses.ContainsKey(statusId);
+            return !string.IsNullOrEmpty(statusId) && Has(statusId);
         }
 
         /// <summary>
@@ -156,7 +143,7 @@ namespace QDND.Data.Statuses
                 return new List<BG3StatusData>();
 
             return _typeIndex[statusType]
-                .Select(id => _statuses[id])
+                .Select(id => Items[id])
                 .ToList();
         }
 
@@ -171,7 +158,7 @@ namespace QDND.Data.Statuses
                 return new List<BG3StatusData>();
 
             return _groupIndex[group]
-                .Select(id => _statuses[id])
+                .Select(id => Items[id])
                 .ToList();
         }
 
@@ -181,7 +168,7 @@ namespace QDND.Data.Statuses
         /// <returns>List of statuses with boost definitions.</returns>
         public List<BG3StatusData> GetStatusesWithBoosts()
         {
-            return _statuses.Values
+            return Items.Values
                 .Where(s => !string.IsNullOrEmpty(s.Boosts))
                 .ToList();
         }
@@ -192,7 +179,7 @@ namespace QDND.Data.Statuses
         /// <returns>All status definitions.</returns>
         public List<BG3StatusData> GetAllStatuses()
         {
-            return _statuses.Values.ToList();
+            return GetAll().ToList();
         }
 
         /// <summary>
@@ -204,7 +191,7 @@ namespace QDND.Data.Statuses
         {
             if (statusDirectories == null || statusDirectories.Length == 0)
             {
-                _errors.Add("No status directories provided");
+                AddError("No status directories provided");
                 return 0;
             }
 
@@ -219,7 +206,7 @@ namespace QDND.Data.Statuses
 
                 if (!System.IO.Directory.Exists(statusDirectory))
                 {
-                    _warnings.Add($"Status directory not found: {statusDirectory}");
+                    AddWarning($"Status directory not found: {statusDirectory}");
                     continue;
                 }
 
@@ -231,8 +218,15 @@ namespace QDND.Data.Statuses
             parser.ResolveInheritance();
 
             // Copy parser errors/warnings
-            _errors.AddRange(parser.Errors);
-            _warnings.AddRange(parser.Warnings);
+            foreach (var error in parser.Errors)
+            {
+                AddError(error);
+            }
+
+            foreach (var warning in parser.Warnings)
+            {
+                AddWarning(warning);
+            }
 
             // Register all parsed statuses
             int registeredCount = 0;
@@ -245,28 +239,16 @@ namespace QDND.Data.Statuses
             }
 
             Console.WriteLine($"[StatusRegistry] Loaded {registeredCount} statuses from {statusDirectories.Length} source directorie(s)");
-            if (_errors.Count > 0)
+            if (Errors.Count > 0)
             {
-                Console.WriteLine($"[StatusRegistry] Encountered {_errors.Count} errors during loading");
+                Console.WriteLine($"[StatusRegistry] Encountered {Errors.Count} errors during loading");
             }
-            if (_warnings.Count > 0)
+            if (Warnings.Count > 0)
             {
-                Console.WriteLine($"[StatusRegistry] Encountered {_warnings.Count} warnings during loading");
+                Console.WriteLine($"[StatusRegistry] Encountered {Warnings.Count} warnings during loading");
             }
 
             return registeredCount;
-        }
-
-        /// <summary>
-        /// Clear all registered statuses and reset indices.
-        /// </summary>
-        public void Clear()
-        {
-            _statuses.Clear();
-            _typeIndex.Clear();
-            _groupIndex.Clear();
-            _errors.Clear();
-            _warnings.Clear();
         }
 
         /// <summary>
@@ -277,9 +259,9 @@ namespace QDND.Data.Statuses
         {
             var stats = new Dictionary<string, int>
             {
-                ["Total"] = _statuses.Count,
-                ["WithBoosts"] = _statuses.Values.Count(s => !string.IsNullOrEmpty(s.Boosts)),
-                ["WithPassives"] = _statuses.Values.Count(s => !string.IsNullOrEmpty(s.Passives)),
+                ["Total"] = Count,
+                ["WithBoosts"] = Items.Values.Count(s => !string.IsNullOrEmpty(s.Boosts)),
+                ["WithPassives"] = Items.Values.Count(s => !string.IsNullOrEmpty(s.Passives)),
                 ["BOOST"] = _typeIndex.ContainsKey(BG3StatusType.BOOST) ? _typeIndex[BG3StatusType.BOOST].Count : 0,
                 ["INCAPACITATED"] = _typeIndex.ContainsKey(BG3StatusType.INCAPACITATED) ? _typeIndex[BG3StatusType.INCAPACITATED].Count : 0,
                 ["INVISIBLE"] = _typeIndex.ContainsKey(BG3StatusType.INVISIBLE) ? _typeIndex[BG3StatusType.INVISIBLE].Count : 0,

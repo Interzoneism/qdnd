@@ -19,6 +19,35 @@ namespace QDND.Combat.Persistence
     /// </summary>
     public class CombatSaveService
     {
+        private readonly RulesEngine _rulesEngine;
+        private readonly TurnQueueService _turnQueue;
+        private readonly CombatStateMachine _stateMachine;
+        private readonly StatusManager _statusManager;
+        private readonly SurfaceManager _surfaceManager;
+        private readonly ResolutionStack _resolutionStack;
+        private readonly EffectPipeline _effectPipeline;
+        private readonly InventoryService _inventoryService;
+
+        public CombatSaveService(
+            RulesEngine rulesEngine = null,
+            TurnQueueService turnQueue = null,
+            CombatStateMachine stateMachine = null,
+            StatusManager statusManager = null,
+            SurfaceManager surfaceManager = null,
+            ResolutionStack resolutionStack = null,
+            EffectPipeline effectPipeline = null,
+            InventoryService inventoryService = null)
+        {
+            _rulesEngine = rulesEngine;
+            _turnQueue = turnQueue;
+            _stateMachine = stateMachine;
+            _statusManager = statusManager;
+            _surfaceManager = surfaceManager;
+            _resolutionStack = resolutionStack;
+            _effectPipeline = effectPipeline;
+            _inventoryService = inventoryService;
+        }
+
         /// <summary>
         /// Capture a complete snapshot of the current combat state.
         /// </summary>
@@ -27,20 +56,19 @@ namespace QDND.Combat.Persistence
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
+            var rulesEngine = _rulesEngine ?? TryResolveService<RulesEngine>(context);
+            var turnQueue = _turnQueue ?? TryResolveService<TurnQueueService>(context);
+            var stateMachine = _stateMachine ?? TryResolveService<CombatStateMachine>(context);
+            var statusManager = _statusManager ?? TryResolveService<StatusManager>(context);
+            var surfaceManager = _surfaceManager ?? TryResolveService<SurfaceManager>(context);
+            var resolutionStack = _resolutionStack ?? TryResolveService<ResolutionStack>(context);
+            var effectPipeline = _effectPipeline ?? TryResolveService<EffectPipeline>(context);
+
             var snapshot = new CombatSnapshot
             {
                 Version = 1,
                 Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
-
-            // Get services
-            var rulesEngine = context.GetService<RulesEngine>();
-            var turnQueue = context.GetService<TurnQueueService>();
-            var stateMachine = context.GetService<CombatStateMachine>();
-            var statusManager = context.GetService<StatusManager>();
-            var surfaceManager = context.GetService<SurfaceManager>();
-            var resolutionStack = context.GetService<ResolutionStack>();
-            var effectPipeline = context.GetService<EffectPipeline>();
 
             // Capture RNG state
             if (rulesEngine != null)
@@ -105,20 +133,19 @@ namespace QDND.Combat.Persistence
             if (snapshot == null)
                 throw new ArgumentNullException(nameof(snapshot));
 
+            var rulesEngine = _rulesEngine ?? TryResolveService<RulesEngine>(context);
+            var turnQueue = _turnQueue ?? TryResolveService<TurnQueueService>(context);
+            var stateMachine = _stateMachine ?? TryResolveService<CombatStateMachine>(context);
+            var statusManager = _statusManager ?? TryResolveService<StatusManager>(context);
+            var surfaceManager = _surfaceManager ?? TryResolveService<SurfaceManager>(context);
+            var resolutionStack = _resolutionStack ?? TryResolveService<ResolutionStack>(context);
+            var effectPipeline = _effectPipeline ?? TryResolveService<EffectPipeline>(context);
+
             // Validate version
             if (snapshot.Version != 1)
             {
                 throw new InvalidOperationException($"Unsupported snapshot version: {snapshot.Version}");
             }
-
-            // Get services
-            var rulesEngine = context.GetService<RulesEngine>();
-            var turnQueue = context.GetService<TurnQueueService>();
-            var stateMachine = context.GetService<CombatStateMachine>();
-            var statusManager = context.GetService<StatusManager>();
-            var surfaceManager = context.GetService<SurfaceManager>();
-            var resolutionStack = context.GetService<ResolutionStack>();
-            var effectPipeline = context.GetService<EffectPipeline>();
 
             // Restore RNG state
             if (rulesEngine != null)
@@ -173,7 +200,7 @@ namespace QDND.Combat.Persistence
         private List<CombatantSnapshot> CaptureCombatants(ICombatContext context)
         {
             var snapshots = new List<CombatantSnapshot>();
-            var inventoryService = context.GetService<InventoryService>();
+            var inventoryService = _inventoryService ?? TryResolveService<InventoryService>(context);
 
             foreach (var combatant in context.GetAllCombatants())
             {
@@ -393,6 +420,24 @@ namespace QDND.Combat.Persistence
                     turnQueue.AddCombatant(combatant);
                 }
             }
+        }
+
+        private static T TryResolveService<T>(ICombatContext context) where T : class
+        {
+            if (context != null && context.TryGetService<T>(out var service))
+            {
+                return service;
+            }
+
+            // Compatibility fallback for contexts that only implement GetService reliably.
+            var getServiceMethod = typeof(ICombatContext).GetMethod(nameof(ICombatContext.GetService));
+            if (context != null && getServiceMethod != null)
+            {
+                var genericMethod = getServiceMethod.MakeGenericMethod(typeof(T));
+                return genericMethod.Invoke(context, null) as T;
+            }
+
+            return null;
         }
     }
 }

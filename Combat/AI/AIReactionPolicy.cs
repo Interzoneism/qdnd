@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using QDND.Combat.Entities;
-using QDND.Combat.Services;
 using QDND.Combat.Rules;
 
 namespace QDND.Combat.AI
@@ -93,19 +92,14 @@ namespace QDND.Combat.AI
     /// </summary>
     public class AIReactionPolicy
     {
-        private readonly CombatContext _context;
-        private readonly AIScorer _scorer;
-
         private const float OPPORTUNITY_BASE_VALUE = 5f;
         private const float KILL_BONUS = 10f;
         private const float HIGH_THREAT_BONUS = 3f;
         private const float LOW_HP_TARGET_BONUS = 2f;
         private const float RESERVED_PENALTY = 5f;
 
-        public AIReactionPolicy(CombatContext context = null, AIScorer scorer = null)
+        public AIReactionPolicy()
         {
-            _context = context;
-            _scorer = scorer;
         }
 
         /// <summary>

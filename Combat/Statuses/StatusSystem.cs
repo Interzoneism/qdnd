@@ -94,9 +94,9 @@ namespace QDND.Combat.Statuses
         public List<StatusModifier> Modifiers { get; set; } = new();
 
         /// <summary>
-        /// Event to trigger removal (for DurationType.UntilEvent).
+        /// Events that trigger removal (for DurationType.UntilEvent).
         /// </summary>
-        public RuleEventType? RemoveOnEvent { get; set; }
+        public List<RuleEventType> RemoveOnEvents { get; set; } = new();
 
         /// <summary>
         /// Effects to trigger each tick (turn start, etc).
@@ -133,7 +133,7 @@ namespace QDND.Combat.Statuses
         /// <summary>
         /// If true, this status is removed when the bearer takes damage.
         /// BG3: FROZEN, SLEEP, HIDEOUS_LAUGHTER use RemoveEvents: OnDamage.
-        /// Unlike RemoveOnEvent (which requires DurationType.UntilEvent), this works
+        /// Unlike RemoveOnEvents (which require DurationType.UntilEvent), this works
         /// with any duration type (Turns, Permanent, etc).
         /// </summary>
         public bool RemoveOnDamage { get; set; }
@@ -563,7 +563,7 @@ namespace QDND.Combat.Statuses
         {
             if (Definition.DurationType != DurationType.UntilEvent)
                 return false;
-            return Definition.RemoveOnEvent == eventType;
+            return Definition.RemoveOnEvents.Contains(eventType);
         }
 
         /// <summary>
@@ -611,7 +611,7 @@ namespace QDND.Combat.Statuses
         /// </summary>
         private static readonly Dictionary<string, List<string>> ConditionImmunityMap = new(StringComparer.OrdinalIgnoreCase)
         {
-            { "Sleep", new List<string> { "asleep" } },
+            { "Sleep", new List<string> { "asleep", "sleep", "sleeping", "sleeping_magical", "sleeping_seated" } },
             { "Frightened", new List<string> { "frightened" } },
             { "Poisoned", new List<string> { "poisoned" } },
             { "Stunned", new List<string> { "stunned" } },
@@ -693,6 +693,9 @@ namespace QDND.Combat.Statuses
             {
                 // Legacy hardcoded removals
                 RemoveStatus(evt.TargetId, "asleep");
+                RemoveStatus(evt.TargetId, "sleep");
+                RemoveStatus(evt.TargetId, "sleeping");
+                RemoveStatus(evt.TargetId, "sleeping_magical");
                 RemoveStatus(evt.TargetId, "hypnotised");
                 // Hidden breaks when you take damage
                 RemoveStatus(evt.TargetId, "hidden");

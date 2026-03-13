@@ -20,6 +20,7 @@ namespace QDND.Combat.UI.Panels
         // ── Constants ──────────────────────────────────────────────────────────
         private const string CustomActionsPath = "user://action_editor_custom_actions.json";
         private readonly ActionEditorArena _arena;
+        private readonly ActionRegistry _actionRegistry;
 
         // ── State ──────────────────────────────────────────────────────────────
         private ActionDefinition _currentAction;
@@ -146,6 +147,7 @@ namespace QDND.Combat.UI.Panels
         public ActionEditorPanel(ActionEditorArena arena) : base()
         {
             _arena = arena;
+            _actionRegistry = arena?.ActionRegistry;
             PanelTitle = "Action Editor";
             _currentAction = CreateBlankAction();
         }
@@ -235,14 +237,13 @@ namespace QDND.Combat.UI.Panels
         {
             var list = new List<ActionDefinition>();
 
-            var registry = _arena?.Context?.GetService<ActionRegistry>();
-            if (registry != null)
+            if (_actionRegistry != null)
             {
-                list.AddRange(registry.GetAllActions());
+                list.AddRange(_actionRegistry.GetAllActions());
             }
             else
             {
-                GD.PrintErr("[ActionEditorPanel] Could not access ActionRegistry from context");
+                GD.PrintErr("[ActionEditorPanel] ActionRegistry is unavailable");
             }
 
             // Also load custom saved actions
@@ -1048,8 +1049,7 @@ namespace QDND.Combat.UI.Panels
 
             SaveCustomActionsToDisk(customList);
 
-            var registry = _arena.Context?.GetService<ActionRegistry>();
-            registry?.RegisterAction(_currentAction, overwrite: true);
+            _actionRegistry?.RegisterAction(_currentAction, overwrite: true);
 
             RefreshActionList(_searchBox?.Text ?? "");
             GD.Print($"[ActionEditorPanel] Saved action '{_currentAction.Id}' to {CustomActionsPath}");
@@ -1065,8 +1065,7 @@ namespace QDND.Combat.UI.Panels
                 GD.PrintErr("[ActionEditorPanel] Action has no ID; assigned: " + _currentAction.Id);
             }
 
-            var registry = _arena.Context?.GetService<ActionRegistry>();
-            registry?.RegisterAction(_currentAction, overwrite: true);
+            _actionRegistry?.RegisterAction(_currentAction, overwrite: true);
 
             var model = _arena.ActionBarModel;
             if (model == null)

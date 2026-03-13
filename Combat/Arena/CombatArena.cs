@@ -143,6 +143,7 @@ namespace QDND.Combat.Arena
         private Dictionary<string, CombatantVisual> _combatantVisuals = new();
         private Dictionary<string, SurfaceVisual> _surfaceVisuals = new();
         private readonly HashSet<string> _oneTimeLogKeys = new();
+        private readonly HashSet<string> _wiredCombatantIds = new();
         private Random _rng;
         private bool _initialLoadComplete;
         private RuleEventSubscription _combatantDiedSubscription;
@@ -177,10 +178,25 @@ namespace QDND.Combat.Arena
         private ResourceBarModel _resourceBarModel;
         private ActionBarService _actionBarService;
         private SelectionService _selectionService;
+        private InventoryService _inventoryService;
+        private CharacterDataRegistry _characterDataRegistry;
 
         public ActionBarModel ActionBarModel => _actionBarModel;
         public TurnTrackerModel TurnTrackerModel => _turnTrackerModel;
         public ResourceBarModel ResourceBarModel => _resourceBarModel;
+        public ActionRegistry ActionRegistry => _actionRegistry;
+        internal ActionBarService ActionBarService => _actionBarService;
+        // These properties exist for HudController and CombatInputHandler which are
+        // Godot nodes that cannot receive constructor injection. All other consumers
+        // must receive services via constructor injection.
+        public EffectPipeline EffectPipeline => _effectPipeline;
+        public TargetValidator TargetValidator => _targetValidator;
+        public RulesEngine RulesEngine => _rulesEngine;
+        public StatusManager StatusManager => _statusManager;
+        public ConcentrationSystem ConcentrationSystem => _concentrationSystem;
+        public PassiveRegistry PassiveRegistry => _passiveRegistry;
+        public InventoryService InventoryService => _inventoryService;
+        public CharacterDataRegistry CharacterDataRegistry => _characterDataRegistry;
         float ICombatController.DefaultMovePoints => DefaultMovePoints;
 
         // Input state — owned by SelectionService
@@ -362,8 +378,7 @@ namespace QDND.Combat.Arena
                     CustomFightSeed = resolvedSeed;
                     RandomSeed = resolvedSeed;
 
-                    var charRegistry = _combatContext.GetService<CharacterDataRegistry>();
-                    var scenario = CustomFightManager.BuildScenario(CustomFightCombatants, resolvedSeed, charRegistry);
+                    var scenario = CustomFightManager.BuildScenario(CustomFightCombatants, resolvedSeed, _characterDataRegistry);
                     _scenarioBootService.LoadScenarioDefinition(scenario, "custom fight");
                     SyncFromBootService();
                     scenarioLoaded = true;
@@ -390,7 +405,17 @@ namespace QDND.Combat.Arena
                     var logger = CustomFightManager.CreateLogger(resolvedSeed);
                     _customFightLogger = new CustomFightLogger { Name = "CustomFightLogger" };
                     AddChild(_customFightLogger);
-                    _customFightLogger.Initialize(logger, this, resolvedSeed);
+                    _customFightLogger.Initialize(
+                        logger,
+                        this,
+                        resolvedSeed,
+                        _stateMachine,
+                        _turnQueue,
+                        _aiPipeline,
+                        _effectPipeline,
+                        _movementService,
+                        _statusManager,
+                        _rulesEngine);
 
                     // Save preset if name is set
                     if (!string.IsNullOrEmpty(CustomFightPresetSaveName))
@@ -939,7 +964,6 @@ namespace QDND.Combat.Arena
                 ExecuteDash = actor => _movementCoordinator.ExecuteDash(actor),
                 ExecuteDisengage = actor => _movementCoordinator.ExecuteDisengage(actor),
                 ShouldAllowVictory = ShouldAllowVictory,
-                CheckAndEndCombat = () => { if (ShouldAllowVictory() && _turnQueue.ShouldEndCombat()) EndCombat(); },
                 ExecuteAITurn = ExecuteAITurn,
                 SelectCombatant = SelectCombatant,
                 CenterCameraOnCombatant = CenterCameraOnCombatant,
@@ -1016,6 +1040,8 @@ namespace QDND.Combat.Arena
             _turnTrackerModel = composition.TurnTrackerModel;
             _resourceBarModel = composition.ResourceBarModel;
             _actionBarService = composition.ActionBarService;
+            _inventoryService = composition.InventoryService;
+            _characterDataRegistry = composition.CharacterDataRegistry;
             _selectionService = composition.SelectionService;
             _scenarioBootService = composition.ScenarioBootService;
             _combatantRegistry = composition.CombatantRegistry;
@@ -1126,6 +1152,8 @@ namespace QDND.Combat.Arena
         /// </summary>
         private void WireCombatantEvents(Combatant combatant)
         {
+            if (!_wiredCombatantIds.Add(combatant.Id)) return;
+
             // Toggle passives change ability usability (e.g. Great Weapon Master, Sharpshooter).
             combatant.PassiveManager.OnToggleChanged += (_, __) =>
                 _actionBarService?.RefreshUsability(combatant.Id);
@@ -1138,6 +1166,9 @@ namespace QDND.Combat.Arena
             combatant.ActionResources.OnResourcesChanged += () =>
                 _actionBarService?.RefreshUsability(combatant.Id);
         }
+
+        private void OnTargetingCancelled_Handler()
+            => ClearSelection();
 
         private Vector3 CombatantPositionToWorld(Vector3 gridPos)
         {
@@ -1754,6 +1785,7 @@ namespace QDND.Combat.Arena
             }
             _combatantVisuals.Clear();
             _combatantRegistry?.Clear();
+            _wiredCombatantIds.Clear();
 
             // Reset turn queue
             _turnQueue.Clear();
@@ -2151,7 +2183,7 @@ namespace QDND.Combat.Arena
 
             // Subscribe to events
             _targetingSystem.OnTargetingConfirmed += OnTargetingConfirmed;
-            _targetingSystem.OnTargetingCancelled += () => ClearSelection();
+            _targetingSystem.OnTargetingCancelled += OnTargetingCancelled_Handler;
 
             Log("New targeting system initialized with 12 modes");
         }
@@ -2195,7 +2227,7 @@ namespace QDND.Combat.Arena
             if (_targetingSystem != null)
             {
                 _targetingSystem.OnTargetingConfirmed -= OnTargetingConfirmed;
-                // OnTargetingCancelled uses a lambda, so we just null the system
+                _targetingSystem.OnTargetingCancelled -= OnTargetingCancelled_Handler;
             }
 
             if (_combatContext != null)
@@ -2203,6 +2235,8 @@ namespace QDND.Combat.Arena
 
             if (_combatantDiedSubscription != null)
                 _rulesEngine?.Events.Unsubscribe(_combatantDiedSubscription.Id);
+
+            _wiredCombatantIds.Clear();
 
             _composition?.Dispose();
             base._ExitTree();

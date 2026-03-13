@@ -163,6 +163,10 @@ namespace QDND.Combat.Statuses
 
             // Unconscious (maps to asleep, downed)
             { "asleep", ConditionType.Unconscious },
+            { "sleep", ConditionType.Unconscious },
+            { "sleeping", ConditionType.Unconscious },
+            { "sleeping_magical", ConditionType.Unconscious },
+            { "sleeping_seated", ConditionType.Unconscious },
             { "downed", ConditionType.Unconscious },
             { "unconscious", ConditionType.Unconscious },
         };

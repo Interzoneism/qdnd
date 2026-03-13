@@ -56,7 +56,7 @@ namespace QDND.Combat.AI
         /// <summary>
         /// Check if the plan is still valid given current state.
         /// </summary>
-        public bool IsValid(ICombatContext context)
+        public bool IsValid(ICombatantRegistry combatants)
         {
             if (IsComplete) return false;
 
@@ -64,7 +64,7 @@ namespace QDND.Combat.AI
             if (nextAction == null) return false;
 
             // Check if actor is still valid
-            var actor = context?.GetCombatant(CombatantId);
+            var actor = combatants?.Get(CombatantId);
             if (actor == null || !actor.IsActive) return false;
 
             // Invalidate stale move actions where the actor is already at the target
@@ -79,7 +79,7 @@ namespace QDND.Combat.AI
             // Check if target is still alive and in range for attacks
             if (!string.IsNullOrEmpty(nextAction.TargetId))
             {
-                var target = context?.GetCombatant(nextAction.TargetId);
+                var target = combatants?.Get(nextAction.TargetId);
                 if (target == null || !target.IsActive || target.Resources?.CurrentHP <= 0)
                     return false;
 

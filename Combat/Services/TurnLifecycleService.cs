@@ -44,20 +44,12 @@ namespace QDND.Combat.Services
         // ── Visual state ───────────────────────────────────────────────────
         private readonly Dictionary<string, CombatantVisual> _combatantVisuals;
 
-        // ── Live-value delegates ───────────────────────────────────────────
-        private readonly Func<IReadOnlyList<Combatant>> _getCombatants;
-        private readonly Func<Random> _getRng;
-        private readonly Func<bool> _isAutoBattleMode;
-        private readonly Func<bool> _useBuiltInAI;
-
-        // ── Cross-cutting arena callbacks ──────────────────────────────────
-        private readonly Action<Combatant> _executeAITurn;
-        private readonly Action<string> _selectCombatant;
-        private readonly Action<Combatant> _centerCameraOnCombatant;
-        private readonly Action<string> _populateActionBar;
-        private readonly Action<RuleWindow, Combatant, Combatant> _dispatchRuleWindow;
-        private readonly Action<string> _resumeDecisionStateIfExecuting;
-        private readonly Func<double, SceneTreeTimer> _createTimer;
+        // ── Cross-cutting runtime bridges ──────────────────────────────────
+        private readonly ICombatRuntime _combatRuntime;
+        private readonly ITurnDriver _turnDriver;
+        private readonly ICameraCoordinator _cameraCoordinator;
+        private readonly IActionBarCoordinator _actionBarCoordinator;
+        private readonly IRuleWindowDispatcher _ruleWindowDispatcher;
         private readonly Action<string> _log;
         private readonly AuraSystem _auraSystem;
 
@@ -104,17 +96,11 @@ namespace QDND.Combat.Services
             ResourceBarModel resourceBarModel,
             Dictionary<string, CombatantVisual> combatantVisuals,
             float defaultMovePoints,
-            Func<IReadOnlyList<Combatant>> getCombatants,
-            Func<Random> getRng,
-            Action<Combatant> executeAITurn,
-            Action<string> selectCombatant,
-            Action<Combatant> centerCameraOnCombatant,
-            Action<string> populateActionBar,
-            Action<RuleWindow, Combatant, Combatant> dispatchRuleWindow,
-            Action<string> resumeDecisionStateIfExecuting,
-            Func<double, SceneTreeTimer> createTimer,
-            Func<bool> isAutoBattleMode,
-            Func<bool> useBuiltInAI,
+            ICombatRuntime combatRuntime,
+            ITurnDriver turnDriver,
+            ICameraCoordinator cameraCoordinator,
+            IActionBarCoordinator actionBarCoordinator,
+            IRuleWindowDispatcher ruleWindowDispatcher,
             Action<string> log,
             AuraSystem auraSystem = null)
         {
@@ -133,17 +119,11 @@ namespace QDND.Combat.Services
             _resourceBarModel = resourceBarModel;
             _combatantVisuals = combatantVisuals;
             _defaultMovePoints = defaultMovePoints;
-            _getCombatants = getCombatants;
-            _getRng = getRng;
-            _executeAITurn = executeAITurn;
-            _selectCombatant = selectCombatant;
-            _centerCameraOnCombatant = centerCameraOnCombatant;
-            _populateActionBar = populateActionBar;
-            _dispatchRuleWindow = dispatchRuleWindow;
-            _resumeDecisionStateIfExecuting = resumeDecisionStateIfExecuting;
-            _createTimer = createTimer;
-            _isAutoBattleMode = isAutoBattleMode;
-            _useBuiltInAI = useBuiltInAI;
+            _combatRuntime = combatRuntime;
+            _turnDriver = turnDriver;
+            _cameraCoordinator = cameraCoordinator;
+            _actionBarCoordinator = actionBarCoordinator;
+            _ruleWindowDispatcher = ruleWindowDispatcher;
             _log = log;
         }
 
@@ -162,7 +142,7 @@ namespace QDND.Combat.Services
             // Initialize BG3-style ActionResources for all combatants
             if (_resourceManager != null)
             {
-                foreach (var combatant in _getCombatants())
+                foreach (var combatant in _combatRuntime.GetCombatants())
                 {
                     if (combatant != null)
                         _resourceManager.InitializeResources(combatant);
@@ -170,7 +150,7 @@ namespace QDND.Combat.Services
             }
 
             // Apply initiative boosts from passives before queue ordering.
-            foreach (var combatant in _getCombatants())
+            foreach (var combatant in _combatRuntime.GetCombatants())
             {
                 if (combatant == null)
                     continue;
@@ -187,7 +167,7 @@ namespace QDND.Combat.Services
             _turnQueue.StartCombat();
 
             // Populate turn tracker model
-            var entries = _getCombatants().Select(c => new TurnTrackerEntry
+            var entries = _combatRuntime.GetCombatants().Select(c => new TurnTrackerEntry
             {
                 CombatantId = c.Id,
                 DisplayName = c.Name,
@@ -257,7 +237,7 @@ namespace QDND.Combat.Services
                 if (combatant.LifeState == CombatantLifeState.Downed ||
                     combatant.LifeState == CombatantLifeState.Dead)
                 {
-                    _createTimer(0.5).Timeout += () => EndCurrentTurn();
+                    _combatRuntime.CreateTimer(0.5).Timeout += () => EndCurrentTurn();
                     return;
                 }
             }
@@ -320,7 +300,7 @@ namespace QDND.Combat.Services
             }
 
             SyncThreatenedStatuses();
-            _dispatchRuleWindow(RuleWindow.OnTurnStart, combatant, null);
+            _ruleWindowDispatcher.Dispatch(RuleWindow.OnTurnStart, combatant, null);
 
             // Update turn tracker model
             _turnTrackerModel.SetActiveCombatant(combatant.Id);
@@ -338,9 +318,9 @@ namespace QDND.Combat.Services
             }
 
             // Keep the action bar model in sync for the active combatant in full-fidelity auto-battle.
-            if (_isPlayerTurn || (_isAutoBattleMode() && DebugFlags.IsFullFidelity))
+            if (_isPlayerTurn || (_combatRuntime.IsAutoBattleMode && DebugFlags.IsFullFidelity))
             {
-                _populateActionBar(combatant.Id);
+                _actionBarCoordinator.PopulateActionBar(combatant.Id);
             }
 
             AfterBeginTurnHook(combatant);
@@ -369,7 +349,7 @@ namespace QDND.Combat.Services
             {
                 _log($"{combatant.Name} is {incapacitatingStatus.Definition.Id} — skipping turn");
                 string expectedId = combatant.Id;
-                _createTimer(0.5).Timeout += () =>
+                _combatRuntime.CreateTimer(0.5).Timeout += () =>
                 {
                     if (_turnQueue?.CurrentCombatant?.Id == expectedId)
                         EndCurrentTurn();
@@ -384,15 +364,15 @@ namespace QDND.Combat.Services
             }
 
             // Center camera on active combatant at turn start
-            _centerCameraOnCombatant(combatant);
+            _cameraCoordinator.CenterCameraOnCombatant(combatant);
 
-            if (!_isPlayerTurn && _useBuiltInAI())
+            if (!_isPlayerTurn && _combatRuntime.UseBuiltInAI)
             {
-                _createTimer(0.5).Timeout += () => _executeAITurn(combatant);
+                _combatRuntime.CreateTimer(0.5).Timeout += () => _turnDriver.ExecuteAITurn(combatant);
             }
             else
             {
-                _selectCombatant(combatant.Id);
+                _cameraCoordinator.SelectCombatant(combatant.Id);
             }
 
             _log($"Turn started: {combatant.Name} ({(_isPlayerTurn ? "Player" : "AI")})");
@@ -530,7 +510,7 @@ namespace QDND.Combat.Services
                 return _rulesEngine.Dice.RollD20();
             }
 
-            var rng = _getRng();
+            var rng = _combatRuntime.GetRandom();
             if (rng == null)
                 return 10;
 
@@ -566,7 +546,7 @@ namespace QDND.Combat.Services
                 return total;
             }
 
-            var rng = _getRng();
+            var rng = _combatRuntime.GetRandom();
             if (rng == null)
                 return bonus;
 
@@ -631,7 +611,7 @@ namespace QDND.Combat.Services
                 else
                 {
                     _endTurnPending = true;
-                    _createTimer(0.15).Timeout += () => { _endTurnPending = false; EndCurrentTurn(); };
+                    _combatRuntime.CreateTimer(0.15).Timeout += () => { _endTurnPending = false; EndCurrentTurn(); };
                     return;
                 }
             }
@@ -644,12 +624,12 @@ namespace QDND.Combat.Services
                 {
                     _endTurnPollRetries++;
                     _endTurnPending = true;
-                    _createTimer(remaining + 0.05).Timeout += () => { _endTurnPending = false; EndCurrentTurn(); };
+                    _combatRuntime.CreateTimer(remaining + 0.05).Timeout += () => { _endTurnPending = false; EndCurrentTurn(); };
                     return;
                 }
             }
 
-            _dispatchRuleWindow(RuleWindow.OnTurnEnd, current, null);
+            _ruleWindowDispatcher.Dispatch(RuleWindow.OnTurnEnd, current, null);
 
             // Process auras before status ticks
             _auraSystem?.ProcessTurnEndAuras(current.Id);
@@ -710,7 +690,7 @@ namespace QDND.Combat.Services
         public void ScheduleAITurnEnd(float delaySeconds)
         {
             float delay = Mathf.Max(0.05f, delaySeconds);
-            _createTimer(delay).Timeout += () =>
+            _combatRuntime.CreateTimer(delay).Timeout += () =>
             {
                 // If still in ActionExecution, wait for it to complete
                 if (_stateMachine?.CurrentState == CombatState.ActionExecution)
@@ -732,7 +712,7 @@ namespace QDND.Combat.Services
                         }
                     }
                     // No timelines but still in ActionExecution — force resume
-                    _resumeDecisionStateIfExecuting("AI turn end: forcing out of ActionExecution");
+                    _turnDriver.ResumeDecisionStateIfExecuting("AI turn end: forcing out of ActionExecution");
                     _aiTurnEndPollRetries = 0;
                     ScheduleAITurnEnd(0.1f);
                     return;
@@ -770,7 +750,7 @@ namespace QDND.Combat.Services
             _statusManager.ProcessRoundEnd();
             _effectPipeline.ProcessRoundEnd();
 
-            var combatants = _getCombatants();
+            var combatants = _combatRuntime.GetCombatants();
             var playerAlive = combatants.Any(c => c.Faction == Faction.Player && c.IsActive);
             var enemyAlive = combatants.Any(c => c.Faction == Faction.Hostile && c.IsActive);
 
@@ -784,7 +764,7 @@ namespace QDND.Combat.Services
 
         public void RefreshAllCombatantResources()
         {
-            var combatants = _getCombatants();
+            var combatants = _combatRuntime.GetCombatants();
             if (combatants == null)
                 return;
 
@@ -804,7 +784,7 @@ namespace QDND.Combat.Services
             if (_statusManager == null)
                 return;
 
-            var combatants = _getCombatants();
+            var combatants = _combatRuntime.GetCombatants();
             if (combatants == null || combatants.Count == 0)
                 return;
 

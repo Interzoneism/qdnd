@@ -19,7 +19,6 @@
 - `Combat/Actions/EffectPipeline.cs` (~3.3k lines, ~15 injected services) — action execution core
 - `Combat/Arena/CombatArena.cs` (~2.5k lines) — composition root
 - `Combat/UI/HudController.cs` (~2.7k lines) — new UI controller
-- `Combat/Arena/CombatHUD.cs` (~2.4k lines) — legacy UI (being replaced)
 - `Combat/Services/InventoryService.cs` (~2.3k lines) — equipment/inventory
 
 ---
@@ -40,7 +39,7 @@ Combat/
 ├── Movement/       ← MovementService + TacticalPathfinder (A*, 0.5m cells) + ForcedMovementService
 ├── Environment/    ← SurfaceManager (34 surfaces) + LOSService (cover levels) + HeightService
 ├── UI/             ← HudController (new) + 9 Panels + 5 Overlays + CharacterCreation (6-step)
-├── Arena/          ← CombatArena.tscn (composition root) + CombatHUD (legacy) + CombatInputHandler
+├── Arena/          ← CombatArena.tscn (composition root) + CombatInputHandler
 ├── Entities/       ← Combatant (core entity, life states, death saves)
 ├── Persistence/    ← CombatSaveService (15 files)
 ├── VFX/            ← VfxPlaybackService + VfxRuleResolver (5 files)
@@ -88,7 +87,7 @@ Data/
 | States | `CombatStateMachine` | `Combat/States/` | 10 states, 7 substates |
 | Statuses | `StatusSystem`, `ConcentrationSystem`, `AuraSystem` | `Combat/Statuses/` | 16 D&D conditions, tick processing |
 | Targeting | `TargetingSystem` (3-layer) | `Combat/Targeting/` | 12 modes, pool-based visuals |
-| UI | `HudController` (new), `CombatHUD` (legacy) | `Combat/UI/` | 9 panels, 5 overlays, character creation |
+| UI | `HudController` (new) | `Combat/UI/` | 9 panels, 5 overlays, character creation |
 | VFX | `VfxPlaybackService`, `PresentationRequestBus` | `Combat/VFX/` | Rule-based VFX resolution |
 | Character | `CharacterSheet`, `CharacterResolver`, `CharacterBuilder` | `Data/CharacterModel/` | 12 classes, 46+ subclasses, multiclass |
 
@@ -201,7 +200,6 @@ dotnet test Tests/QDND.Tests.csproj
 - **testhost interop**: `Godot.GD.Print/PrintErr` and `FileAccess`/`DirAccess` can crash `dotnet test`. Use `RuntimeSafety` helpers (falls back to `Console`/`System.IO`) in any data-layer code exercised by unit tests.
 - **Targetless abilities** (`Self`, `All`, `None`): prime on hotbar click, execute on battlefield click — do not short-circuit this flow.
 - **Deprecated docs**: check `AGENTS.md § Governance` for the banned documentation list before consulting any doc in `/docs`.
-- **Dual HUD**: `CombatHUD` (legacy, in Arena/) and `HudController` (new, in UI/) coexist. New work should target `HudController`.
 - **EffectPipeline size**: At ~3.3k lines, it uses property injection for ~15 optional services. When adding new service dependencies, follow the existing pattern of nullable property setters.
 - **BG3StatusIntegration**: exists in both `Combat/Statuses/` and `Data/Statuses/` with different roles — data-layer conversion vs runtime integration.
 - **PROJECT_STATUS.md**: Does not exist. Do not reference it. Use AGENTS.md as the governance doc.

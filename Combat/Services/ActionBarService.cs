@@ -15,28 +15,37 @@ namespace QDND.Combat.Services
 {
     internal sealed class ActionBarService
     {
-        private readonly CombatContext _combatContext;
+        private readonly ICombatantRegistry _combatants;
         private readonly ActionRegistry _actionRegistry;
         private readonly ActionBarModel _actionBarModel;
         private readonly PassiveRegistry _passiveRegistry;
         private readonly EffectPipeline _effectPipeline;
+        private readonly InventoryService _inventoryService;
+        private readonly ConcentrationSystem _concentrationSystem;
+        private readonly QDND.Data.CharacterModel.CharacterDataRegistry _characterDataRegistry;
         private readonly Action<string, string> _logOnce;
 
         private readonly Dictionary<string, Dictionary<int, string>> _actionBarSlotOverrides = new();
 
         public ActionBarService(
-            CombatContext context,
+            ICombatantRegistry combatants,
             ActionRegistry actionRegistry,
             ActionBarModel actionBarModel,
             PassiveRegistry passiveRegistry,
             EffectPipeline effectPipeline,
+            InventoryService inventoryService,
+            ConcentrationSystem concentrationSystem,
+            QDND.Data.CharacterModel.CharacterDataRegistry characterDataRegistry,
             Action<string, string> logOnce)
         {
-            _combatContext = context;
+            _combatants = combatants;
             _actionRegistry = actionRegistry;
             _actionBarModel = actionBarModel;
             _passiveRegistry = passiveRegistry;
             _effectPipeline = effectPipeline;
+            _inventoryService = inventoryService;
+            _concentrationSystem = concentrationSystem;
+            _characterDataRegistry = characterDataRegistry;
             _logOnce = logOnce ?? ((_, _) => { });
         }
 
@@ -61,7 +70,7 @@ namespace QDND.Combat.Services
         public List<ActionDefinition> GetActionsForCombatant(string combatantId)
         {
             // Get the combatant
-            var combatant = _combatContext?.GetCombatant(combatantId);
+            var combatant = _combatants?.Get(combatantId);
             if (combatant == null)
             {
                 _logOnce($"missing_combatant:{combatantId}",
@@ -91,9 +100,9 @@ namespace QDND.Combat.Services
                 }
             }
 
-            if (_combatContext != null && _combatContext.TryGetService<InventoryService>(out var inventoryService))
+            if (_inventoryService != null)
             {
-                var usableItems = inventoryService.GetUsableItems(combatantId);
+                var usableItems = _inventoryService.GetUsableItems(combatantId);
                 foreach (var item in usableItems)
                 {
                     if (item == null || string.IsNullOrWhiteSpace(item.UseActionId) || item.Quantity <= 0)
@@ -414,7 +423,7 @@ namespace QDND.Combat.Services
 
         public void Populate(string combatantId)
         {
-            var combatant = _combatContext.GetCombatant(combatantId);
+            var combatant = _combatants?.Get(combatantId);
             if (combatant == null)
             {
                 _actionBarModel.SetActions(new List<ActionBarEntry>());
@@ -452,9 +461,9 @@ namespace QDND.Combat.Services
 
             var usableItemsByActionId = new Dictionary<string, InventoryItem>(StringComparer.OrdinalIgnoreCase);
             var itemQuantityByActionId = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-            if (_combatContext != null && _combatContext.TryGetService<InventoryService>(out var inventoryService))
+            if (_inventoryService != null)
             {
-                foreach (var item in inventoryService.GetUsableItems(combatantId))
+                foreach (var item in _inventoryService.GetUsableItems(combatantId))
                 {
                     if (item == null || string.IsNullOrWhiteSpace(item.UseActionId) || item.Quantity <= 0)
                         continue;
@@ -614,7 +623,7 @@ namespace QDND.Combat.Services
             }
 
             // Mark concentration-active entry (Step 8.3A)
-            var concentrationSystem = _combatContext?.GetService<ConcentrationSystem>();
+            var concentrationSystem = _concentrationSystem;
             if (concentrationSystem != null)
             {
                 var concentratedActionId = concentrationSystem.GetConcentratedEffect(combatantId)?.ActionId;
@@ -798,12 +807,12 @@ namespace QDND.Combat.Services
                 return;
             }
 
-            if (_combatContext == null || !_combatContext.TryGetService<InventoryService>(out var inventoryService))
+            if (_inventoryService == null)
             {
                 return;
             }
 
-            var item = inventoryService.GetUsableItems(combatantId)
+            var item = _inventoryService.GetUsableItems(combatantId)
                 .FirstOrDefault(i => i != null && string.Equals(i.InstanceId, itemInstanceId, StringComparison.Ordinal));
 
             if (item == null || string.IsNullOrWhiteSpace(item.UseActionId))
@@ -901,7 +910,7 @@ namespace QDND.Combat.Services
                 return;
             }
 
-            var combatant = _combatContext?.GetCombatant(combatantId);
+            var combatant = _combatants?.Get(combatantId);
             if (combatant == null)
             {
                 return;
@@ -1049,7 +1058,7 @@ namespace QDND.Combat.Services
         private int GetTooltipSpellcastingMod(Combatant combatant)
         {
             if (combatant?.ResolvedCharacter?.Sheet?.ClassLevels == null) return 0;
-            var registry = _combatContext?.GetService<QDND.Data.CharacterModel.CharacterDataRegistry>();
+            var registry = _characterDataRegistry;
             if (registry != null)
             {
                 foreach (var cl in combatant.ResolvedCharacter.Sheet.ClassLevels)

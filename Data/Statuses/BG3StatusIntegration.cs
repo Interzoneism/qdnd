@@ -195,36 +195,41 @@ namespace QDND.Data.Statuses
         }
 
         /// <summary>
-        /// Map BG3 RemoveEvents to DurationType.UntilEvent and RemoveOnEvent.
+        /// Map BG3 RemoveEvents to DurationType.UntilEvent and RemoveOnEvents.
         /// </summary>
         private static void MapRemoveEvents(BG3StatusData bg3Status, StatusDefinition statusDef)
         {
             if (string.IsNullOrWhiteSpace(bg3Status.RemoveEvents))
                 return;
 
-            var removeEvent = bg3Status.RemoveEvents.Trim().ToLowerInvariant();
-
-            var mappedEvent = removeEvent switch
+            var events = bg3Status.RemoveEvents.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            foreach (var ev in events)
             {
-                "onturn" => RuleEventType.TurnEnded,
-                "onmove" => RuleEventType.MovementCompleted,
-                "ondamage" => RuleEventType.DamageTaken,
-                "onattack" => RuleEventType.AttackDeclared,
-                "oncast" => RuleEventType.AbilityDeclared,
-                "onheal" => RuleEventType.HealingReceived,
-                _ => (RuleEventType?)null
-            };
+                var token = ev.Trim().ToLowerInvariant();
+                var mappedEvent = token switch
+                {
+                    "onturn" => RuleEventType.TurnEnded,
+                    "onmove" => RuleEventType.MovementCompleted,
+                    "ondamage" => RuleEventType.DamageTaken,
+                    "onattack" => RuleEventType.AttackDeclared,
+                    "oncast" => RuleEventType.AbilityDeclared,
+                    "onheal" => RuleEventType.HealingReceived,
+                    _ => (RuleEventType?)null
+                };
 
-            if (mappedEvent.HasValue)
-            {
+                if (!mappedEvent.HasValue)
+                    continue;
+
                 if (mappedEvent.Value == RuleEventType.HealingReceived)
                 {
                     // OnHeal: use dedicated RemoveOnHeal flag — keep DurationType.Turns so tick effects still fire
                     statusDef.RemoveOnHeal = true;
-                    return;
+                    continue;
                 }
+
                 statusDef.DurationType = DurationType.UntilEvent;
-                statusDef.RemoveOnEvent = mappedEvent.Value;
+                if (!statusDef.RemoveOnEvents.Contains(mappedEvent.Value))
+                    statusDef.RemoveOnEvents.Add(mappedEvent.Value);
             }
         }
 

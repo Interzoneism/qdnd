@@ -78,7 +78,7 @@ If a system is broken, **fix that system**. The test exists to prove the game wo
 3. `CombatArena.ConfigureAutoBattleFromCommandLine()` parses `--full-fidelity` and sets:
    - `DebugFlags.IsFullFidelity = true`
    - `DebugFlags.SkipAnimations = false`
-   - HUD initializes normally (CombatHUD, ActionBar, TurnTracker, ResourceBars)
+   - HUD initializes normally (HudController, ActionBar, TurnTracker, ResourceBars)
 4. `UIAwareAIController` is attached instead of `RealtimeAIController`
 5. After a startup delay (≥1.0s), the AI begins playing — checking HUD readiness, waiting for animations, verifying button availability, using 0.8–1.5s delays between actions
 6. Battle runs until victory/defeat, watchdog timeout, or max turns
@@ -140,7 +140,7 @@ Every check represents a real step that a human player would go through. If any 
 
 **What it means:** The `ActionBarModel` is never created, so the HUD is not initializing.
 
-**How to fix:** Investigate `CombatArena._Ready()` and the model initialization path. Check that `_actionBarModel = new ActionBarModel()` runs before the AI controller starts. Check `CombatHUD.DeferredInit()` for early returns that skip initialization in autobattle mode.
+**How to fix:** Investigate `CombatArena._Ready()` and the model initialization path. Check that `_actionBarModel = new ActionBarModel()` runs before the AI controller starts. Check `HudController.DeferredInit()` for early returns that skip initialization in autobattle mode.
 
 **Do NOT:** Add `if (IsFullFidelity) _hudReady = true;` to skip the check.
 
@@ -250,7 +250,7 @@ AUTO-BATTLE: FAILED (no_combatants_detected)
 **stdout pattern:**
 ```
 System.NullReferenceException: Object reference not set to an instance of an object
-  at QDND.Combat.Arena.CombatHUD.OnTurnChanged(TurnChangeEvent evt)
+   at QDND.Combat.UI.HudController.OnTurnChanged(TurnChangeEvent evt)
   at QDND.Combat.Services.TurnQueueService.AdvanceTurn()
 ```
 
@@ -545,7 +545,6 @@ jq 'select(.event == "ACTION_DETAIL" and .details.target_positions_before != nul
 | `Tools/AutoBattler/MovementDetailCollector.cs` | Extracts movement action details |
 | `Tools/DebugFlags.cs` | `IsFullFidelity`, `SkipAnimations`, `IsAutoBattle` |
 | `Combat/Arena/CombatArena.cs` | Scene controller, CLI parsing, controller wiring |
-| `Combat/Arena/CombatHUD.cs` | HUD (active in full-fidelity, disabled in fast mode) |
 | `Combat/Arena/ReactionPromptUI.cs` | Reaction prompt UI with `SimulateDecision()` |
 | `Combat/UI/ActionBarModel.cs` | Action bar data model (ability availability) |
 

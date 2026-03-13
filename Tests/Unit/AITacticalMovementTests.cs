@@ -4,6 +4,7 @@ using QDND.Combat.Entities;
 using QDND.Combat.Environment;
 using QDND.Combat.Movement;
 using QDND.Combat.Actions;
+using QDND.Combat.Services;
 using Godot;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +49,7 @@ namespace QDND.Tests.Unit
 
             var height = new HeightService { AdvantageThreshold = 3f };
             var specialMovement = new SpecialMovementService();
-            var pipeline = new AIDecisionPipeline(null, seed: 42, specialMovement: specialMovement, height: height);
+            var pipeline = new AIDecisionPipeline(new CombatantRegistry(), height: height, specialMovement: specialMovement, seed: 42);
             var profile = new AIProfile { RandomFactor = 0 }; // Deterministic
 
             // Act
@@ -112,7 +113,7 @@ namespace QDND.Tests.Unit
             var actor = CreateTestCombatantWithBudget("ai", 50, 50, Vector3.Zero, Faction.Hostile);
 
             var specialMovement = new SpecialMovementService();
-            var pipeline = new AIDecisionPipeline(null, seed: 42, specialMovement: specialMovement);
+            var pipeline = new AIDecisionPipeline(new CombatantRegistry(), specialMovement: specialMovement, seed: 42);
 
             // Act
             var candidates = pipeline.GenerateCandidates(actor);
@@ -136,7 +137,7 @@ namespace QDND.Tests.Unit
             var enemy = CreateTestCombatant("player", 40, 40, new Vector3(3, 15, 0), Faction.Player);
 
             var height = new HeightService { SafeFallDistance = 10f };
-            var pipeline = new AIDecisionPipeline(null, seed: 42, height: height);
+            var pipeline = new AIDecisionPipeline(new CombatantRegistry(), height: height, seed: 42);
 
             // Act
             var candidates = pipeline.GenerateCandidates(actor);

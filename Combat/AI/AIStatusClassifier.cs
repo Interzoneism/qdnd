@@ -1,5 +1,4 @@
 using System;
-using QDND.Combat.Services;
 using QDND.Combat.Statuses;
 using QDND.Data.Statuses;
 
@@ -21,22 +20,30 @@ namespace QDND.Combat.AI
     /// Classifies statuses into DoT/HoT/Boost sub-types and resolves the matching
     /// BG3 archetype sub-multiplier for faction + polarity.
     /// </summary>
-    public static class AIStatusClassifier
+    public class AIStatusClassifier
     {
+        private readonly StatusManager _statusManager;
+        private readonly StatusRegistry _statusRegistry;
+
+        public AIStatusClassifier(StatusManager statusManager, StatusRegistry statusRegistry)
+        {
+            _statusManager = statusManager;
+            _statusRegistry = statusRegistry;
+        }
+
         /// <summary>
         /// Classify a status into DoT, HoT, Boost, or Unknown.
         /// </summary>
         /// <param name="statusId">Status identifier to classify.</param>
-        /// <param name="context">Combat context for service lookups. Null-safe (returns Unknown).</param>
-        public static StatusSubType ClassifyStatusSubType(string statusId, ICombatContext context)
+        public StatusSubType ClassifyStatusSubType(string statusId)
         {
-            if (context == null || string.IsNullOrEmpty(statusId))
+            if (string.IsNullOrEmpty(statusId))
                 return StatusSubType.Unknown;
 
             // 1. Check StatusDefinition tick effects (runtime definitions with parsed tick data)
-            if (context.TryGetService<StatusManager>(out var statusMgr))
+            if (_statusManager != null)
             {
-                var def = statusMgr.GetDefinition(statusId);
+                var def = _statusManager.GetDefinition(statusId);
                 if (def?.TickEffects != null && def.TickEffects.Count > 0)
                 {
                     // First-match: if a status has both damage and heal ticks (mixed),
@@ -52,9 +59,7 @@ namespace QDND.Combat.AI
             }
 
             // 2. Fallback: check BG3StatusData.OnTickFunctors raw string
-            StatusRegistry statusReg = null;
-            context.TryGetService<StatusRegistry>(out statusReg);
-            var bg3Data = statusReg?.GetStatus(statusId);
+            var bg3Data = _statusRegistry?.GetStatus(statusId);
 
             if (bg3Data != null)
             {

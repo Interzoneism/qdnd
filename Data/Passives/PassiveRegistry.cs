@@ -13,27 +13,26 @@ namespace QDND.Data.Passives
     /// Acts as a singleton service that stores and provides access to all passives.
     /// Similar to ActionRegistry and StatusRegistry but for passive abilities.
     /// </summary>
-    public class PassiveRegistry
+    public class PassiveRegistry : Registry<BG3PassiveData>
     {
-        private readonly Dictionary<string, BG3PassiveData> _passives = new();
-        private readonly Dictionary<string, List<string>> _propertyIndex = new();
-        private readonly List<string> _errors = new();
-        private readonly List<string> _warnings = new();
+        private readonly Dictionary<string, List<string>> _propertyIndex = new(StringComparer.OrdinalIgnoreCase);
 
-        /// <summary>
-        /// Total number of registered passives.
-        /// </summary>
-        public int Count => _passives.Count;
+        protected override string GetId(BG3PassiveData item) => item.PassiveId;
 
-        /// <summary>
-        /// Errors encountered during passive registration or loading.
-        /// </summary>
-        public IReadOnlyList<string> Errors => _errors;
+        protected override void AfterRegister(BG3PassiveData passive)
+        {
+            IndexPassive(passive);
+        }
 
-        /// <summary>
-        /// Warnings encountered during passive registration or loading.
-        /// </summary>
-        public IReadOnlyList<string> Warnings => _warnings;
+        protected override void AfterUnregister(BG3PassiveData passive)
+        {
+            UnindexPassive(passive);
+        }
+
+        protected override void OnClear()
+        {
+            _propertyIndex.Clear();
+        }
 
         /// <summary>
         /// Register a new passive definition.
@@ -45,13 +44,13 @@ namespace QDND.Data.Passives
         {
             if (passive == null)
             {
-                _errors.Add("Cannot register null passive");
+                AddError("Cannot register null passive");
                 return false;
             }
 
             if (string.IsNullOrEmpty(passive.PassiveId))
             {
-                _errors.Add($"Cannot register passive with null/empty ID: {passive.DisplayName ?? "Unknown"}");
+                AddError($"Cannot register passive with null/empty ID: {passive.DisplayName ?? "Unknown"}");
                 return false;
             }
 
@@ -71,22 +70,11 @@ namespace QDND.Data.Passives
             if (!string.IsNullOrEmpty(passive.ExtraDescription) && !string.IsNullOrEmpty(extraParams))
                 passive.ExtraDescription = DescriptionParamResolver.Resolve(passive.ExtraDescription, extraParams);
 
-            // Check if already exists
-            if (_passives.ContainsKey(passive.PassiveId) && !overwrite)
-            {
-                _warnings.Add($"Passive '{passive.PassiveId}' already registered (use overwrite=true to replace)");
-                return false;
-            }
+            return BaseRegister(passive, overwrite, "passive");
+        }
 
-            // Unindex old passive if replacing
-            if (_passives.ContainsKey(passive.PassiveId))
-            {
-                UnindexPassive(_passives[passive.PassiveId]);
-            }
-
-            // Store passive
-            _passives[passive.PassiveId] = passive;
-
+        private void IndexPassive(BG3PassiveData passive)
+        {
             // Index by properties (e.g., "IsHidden", "Highlighted", "IsToggled")
             if (!string.IsNullOrEmpty(passive.Properties))
             {
@@ -99,8 +87,6 @@ namespace QDND.Data.Passives
                     _propertyIndex[trimmedProp].Add(passive.PassiveId);
                 }
             }
-
-            return true;
         }
 
         /// <summary>
@@ -134,8 +120,7 @@ namespace QDND.Data.Passives
             if (string.IsNullOrEmpty(passiveId))
                 return null;
 
-            _passives.TryGetValue(passiveId, out var passive);
-            return passive;
+            return Get(passiveId);
         }
 
         /// <summary>
@@ -145,7 +130,7 @@ namespace QDND.Data.Passives
         /// <returns>True if the passive exists.</returns>
         public bool HasPassive(string passiveId)
         {
-            return !string.IsNullOrEmpty(passiveId) && _passives.ContainsKey(passiveId);
+            return !string.IsNullOrEmpty(passiveId) && Has(passiveId);
         }
 
         /// <summary>
@@ -159,7 +144,7 @@ namespace QDND.Data.Passives
                 return new List<BG3PassiveData>();
 
             return _propertyIndex[property]
-                .Select(id => _passives[id])
+                .Select(id => Items[id])
                 .ToList();
         }
 
@@ -184,7 +169,7 @@ namespace QDND.Data.Passives
         /// </summary>
         public List<BG3PassiveData> GetAllPassives()
         {
-            return _passives.Values.ToList();
+            return GetAll().ToList();
         }
 
         /// <summary>
@@ -198,7 +183,7 @@ namespace QDND.Data.Passives
                 return new List<BG3PassiveData>();
 
             query = query.ToLower();
-            return _passives.Values
+            return Items.Values
                 .Where(p =>
                     p.PassiveId.ToLower().Contains(query) ||
                     (p.DisplayName?.ToLower().Contains(query) ?? false) ||
@@ -215,7 +200,7 @@ namespace QDND.Data.Passives
         {
             if (filePaths == null || filePaths.Length == 0)
             {
-                _errors.Add("No passive file paths provided");
+                AddError("No passive file paths provided");
                 return 0;
             }
 
@@ -229,7 +214,7 @@ namespace QDND.Data.Passives
 
                 if (!File.Exists(filePath))
                 {
-                    _warnings.Add($"Passive file not found: {filePath}");
+                    AddWarning($"Passive file not found: {filePath}");
                     continue;
                 }
 
@@ -251,8 +236,15 @@ namespace QDND.Data.Passives
             }
 
             // Collect errors and warnings
-            _errors.AddRange(parser.Errors);
-            _warnings.AddRange(parser.Warnings);
+            foreach (var error in parser.Errors)
+            {
+                AddError(error);
+            }
+
+            foreach (var warning in parser.Warnings)
+            {
+                AddWarning(warning);
+            }
 
             GodotLogger.Info($"[PassiveRegistry] Loaded {registeredCount} passives from {filePaths.Length} source file(s)");
             if (parser.Errors.Count > 0)
@@ -264,23 +256,12 @@ namespace QDND.Data.Passives
         }
 
         /// <summary>
-        /// Clear all registered passives and errors.
-        /// </summary>
-        public void Clear()
-        {
-            _passives.Clear();
-            _propertyIndex.Clear();
-            _errors.Clear();
-            _warnings.Clear();
-        }
-
-        /// <summary>
         /// Get statistics about registered passives.
         /// </summary>
         public string GetStats()
         {
-            int withBoosts = _passives.Values.Count(p => p.HasBoosts);
-            int withStatsFunctors = _passives.Values.Count(p => p.HasStatsFunctors);
+            int withBoosts = Items.Values.Count(p => p.HasBoosts);
+            int withStatsFunctors = Items.Values.Count(p => p.HasStatsFunctors);
             int highlighted = GetHighlightedPassives().Count;
             int toggleable = GetToggleablePassives().Count;
 
@@ -290,8 +271,8 @@ namespace QDND.Data.Passives
                    $"  With StatsFunctors: {withStatsFunctors}\n" +
                    $"  Highlighted: {highlighted}\n" +
                    $"  Toggleable: {toggleable}\n" +
-                   $"  Errors: {_errors.Count}\n" +
-                   $"  Warnings: {_warnings.Count}";
+                   $"  Errors: {Errors.Count}\n" +
+                   $"  Warnings: {Warnings.Count}";
         }
     }
 

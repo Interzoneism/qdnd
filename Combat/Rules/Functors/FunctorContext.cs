@@ -60,6 +60,33 @@ namespace QDND.Combat.Rules.Functors
         /// <summary>Triggered when the owner dies.</summary>
         OnDeath,
 
+        /// <summary>Triggered before an attack roll is resolved (pre-roll modifiers like Archery, GWM toggle).</summary>
+        BeforeAttack,
+
+        /// <summary>Triggered after an attack roll is resolved.</summary>
+        AfterAttack,
+
+        /// <summary>Triggered before damage is calculated (pre-damage modifiers like Sneak Attack eligibility).</summary>
+        BeforeDamage,
+
+        /// <summary>Triggered after damage is dealt.</summary>
+        AfterDamage,
+
+        /// <summary>Triggered before a saving throw is rolled (e.g., Heightened Spell imposing disadvantage).</summary>
+        BeforeSavingThrow,
+
+        /// <summary>Triggered after a saving throw is resolved.</summary>
+        AfterSavingThrow,
+
+        /// <summary>Triggered when an action is declared but not yet executed.</summary>
+        OnDeclareAction,
+
+        /// <summary>Triggered after an action completes execution.</summary>
+        OnActionComplete,
+
+        /// <summary>Triggered when the owner moves.</summary>
+        OnMove,
+
         /// <summary>Triggered when a toggleable passive is toggled on/off.</summary>
         OnToggle
     }

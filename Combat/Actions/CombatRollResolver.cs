@@ -13,6 +13,7 @@ namespace QDND.Combat.Actions
     public class CombatRollResolver
     {
         public QDND.Combat.Services.ICombatContext CombatContext { get; set; }
+        public CharacterDataRegistry CharacterDataRegistry { get; set; }
         public StatusManager Statuses { get; set; }
         public Func<IEnumerable<Combatant>> GetCombatants { get; set; }
 
@@ -234,7 +235,7 @@ namespace QDND.Combat.Actions
         public int GetSpellcastingAbilityModifier(Combatant source)
         {
             if (source?.ResolvedCharacter?.Sheet?.ClassLevels == null) return 0;
-            var registry = CombatContext?.GetService<CharacterDataRegistry>();
+            var registry = CharacterDataRegistry;
             if (registry != null)
             {
                 foreach (var cl in source.ResolvedCharacter.Sheet.ClassLevels)

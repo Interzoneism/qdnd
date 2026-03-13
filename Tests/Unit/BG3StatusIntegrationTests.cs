@@ -100,7 +100,7 @@ namespace QDND.Tests.Unit
             // Assert
             Assert.NotNull(statusDef);
             Assert.Equal(DurationType.UntilEvent, statusDef.DurationType);
-            Assert.Equal(RuleEventType.TurnEnded, statusDef.RemoveOnEvent);
+            Assert.Contains(RuleEventType.TurnEnded, statusDef.RemoveOnEvents);
         }
 
         [Fact]
@@ -121,7 +121,7 @@ namespace QDND.Tests.Unit
             // Assert
             Assert.NotNull(statusDef);
             Assert.Equal(DurationType.UntilEvent, statusDef.DurationType);
-            Assert.Equal(RuleEventType.MovementCompleted, statusDef.RemoveOnEvent);
+            Assert.Contains(RuleEventType.MovementCompleted, statusDef.RemoveOnEvents);
         }
 
         [Fact]
@@ -142,7 +142,29 @@ namespace QDND.Tests.Unit
             // Assert
             Assert.NotNull(statusDef);
             Assert.Equal(DurationType.UntilEvent, statusDef.DurationType);
-            Assert.Equal(RuleEventType.AttackDeclared, statusDef.RemoveOnEvent);
+            Assert.Contains(RuleEventType.AttackDeclared, statusDef.RemoveOnEvents);
+        }
+
+        [Fact]
+        public void ConvertToStatusDefinition_RemoveEventsMultiple_MapsAllEvents()
+        {
+            // Arrange
+            var bg3Status = new BG3StatusData
+            {
+                StatusId = "KNOCKED_DOWN",
+                StatusType = BG3StatusType.KNOCKED_DOWN,
+                DisplayName = "Knocked Down",
+                RemoveEvents = "OnDamage;OnTurn"
+            };
+
+            // Act
+            var statusDef = DataBG3StatusIntegration.ConvertToStatusDefinition(bg3Status);
+
+            // Assert
+            Assert.NotNull(statusDef);
+            Assert.Equal(DurationType.UntilEvent, statusDef.DurationType);
+            Assert.Contains(RuleEventType.DamageTaken, statusDef.RemoveOnEvents);
+            Assert.Contains(RuleEventType.TurnEnded, statusDef.RemoveOnEvents);
         }
 
         [Fact]

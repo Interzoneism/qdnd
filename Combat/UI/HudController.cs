@@ -126,6 +126,7 @@ namespace QDND.Combat.UI
 
         private bool _disposed;
         private Combatant _trackedSpellSlotCombatant;
+        private CombatArena _arenaNode;
 
         public override void _Ready()
         {
@@ -161,6 +162,10 @@ namespace QDND.Combat.UI
 
             Arena ??= CombatControllerNode as ICombatController
                 ?? GetTree().Root.FindChild("CombatArena", true, false) as ICombatController;
+
+            _arenaNode = Arena as CombatArena;
+            if (_arenaNode == null && Arena != null)
+                GD.PushError("[HudController] Arena is not a CombatArena — service properties unavailable");
 
             // Skip HUD in fast auto-battle mode
             if (Arena != null && Arena.IsAutoBattleMode && !QDND.Tools.DebugFlags.IsFullFidelity)
@@ -838,12 +843,17 @@ void fragment() {
                 _actionBarPanel.OnActionHoverExited -= OnActionHoverExited;
                 _actionBarPanel.OnActionReordered -= OnActionReordered;
                 _actionBarPanel.OnItemDroppedToHotbar -= OnItemDroppedToHotbar;
+                _actionBarPanel.OnGridResized -= OnHotbarGridResized;
             }
             if (_partyPanel != null) _partyPanel.OnMemberClicked -= OnPartyMemberClicked;
             if (_reactionPrompt != null)
             {
                 _reactionPrompt.OnUseReaction -= OnReactionUse;
                 _reactionPrompt.OnDeclineReaction -= OnReactionDecline;
+            }
+            if (_characterInventoryScreen != null)
+            {
+                _characterInventoryScreen.OnCloseRequested -= OnCharacterInventoryScreenClosed;
             }
             if (_spellSlotPicker != null)
             {
@@ -974,7 +984,7 @@ void fragment() {
             if (combatant == null || Arena?.Context == null)
                 return new List<ConditionIndicator>();
 
-            var manager = _statusManager ?? Arena.Context.GetService<StatusManager>();
+            var manager = _statusManager ?? _arenaNode?.StatusManager;
             if (manager == null)
                 return new List<ConditionIndicator>();
 
@@ -1074,7 +1084,7 @@ void fragment() {
                 return;
             }
 
-            var concentrationSystem = _concentrationSystem ?? Arena?.Context?.GetService<ConcentrationSystem>();
+            var concentrationSystem = _concentrationSystem ?? _arenaNode?.ConcentrationSystem;
             var info = concentrationSystem?.GetConcentratedEffect(combatant.Id);
             if (info == null)
             {
@@ -1627,7 +1637,7 @@ void fragment() {
                 return;
             }
 
-            var actionBarService = Arena.Context?.GetService<ActionBarService>();
+            var actionBarService = _arenaNode?.ActionBarService;
             if (actionBarService == null)
             {
                 return;
@@ -1783,7 +1793,7 @@ void fragment() {
         {
             if (combatant == null || _characterInventoryScreen == null) return;
 
-            var invService = Arena?.Context?.GetService<InventoryService>();
+            var invService = _arenaNode?.InventoryService;
             var data = BuildCharacterDisplayData(combatant);
             _characterInventoryScreen.Open(combatant, invService, data);
         }
@@ -1798,8 +1808,8 @@ void fragment() {
             };
 
             var rc = combatant.ResolvedCharacter;
-            var passiveRegistry = Arena?.Context?.GetService<PassiveRegistry>();
-            var charRegistry = Arena?.Context?.GetService<CharacterDataRegistry>();
+            var passiveRegistry = _arenaNode?.PassiveRegistry;
+            var charRegistry = _arenaNode?.CharacterDataRegistry;
             if (rc?.Sheet != null)
             {
                 var classLevels = rc.Sheet.ClassLevels ?? new List<ClassLevel>();
@@ -1947,7 +1957,7 @@ void fragment() {
             }
 
             // ── Weapon stats (melee/ranged attack bonus + damage) ──
-            var invService = Arena?.Context?.GetService<InventoryService>();
+            var invService = _arenaNode?.InventoryService;
             if (invService != null)
             {
                 var inv = invService.GetInventory(combatant.Id);
@@ -2341,7 +2351,7 @@ void fragment() {
             var combatant = GetActivePlayerCombatant();
             if (combatant == null) return;
 
-            var invService = Arena?.Context?.GetService<InventoryService>();
+            var invService = _arenaNode?.InventoryService;
             if (invService == null) return;
 
             var data = BuildCharacterDisplayData(combatant);
@@ -2355,7 +2365,7 @@ void fragment() {
         {
             if (_characterInventoryScreen == null || combatant == null) return;
 
-            var invService = Arena?.Context?.GetService<InventoryService>();
+            var invService = _arenaNode?.InventoryService;
             if (invService == null) return;
 
             var data = BuildCharacterDisplayData(combatant);
@@ -2595,7 +2605,7 @@ void fragment() {
             foreach (var child in _hoverConditionsRow.GetChildren())
                 child.QueueFree();
 
-            var statusManager = Arena?.Context?.GetService<StatusManager>();
+            var statusManager = _arenaNode?.StatusManager;
             if (statusManager != null)
             {
                 var statuses = statusManager.GetStatuses(combatant.Id);
@@ -2674,10 +2684,10 @@ void fragment() {
             string chanceText = "";
             if (action.AttackType.HasValue)
             {
-                var rulesEngine = Arena?.Context?.GetService<RulesEngine>();
+                var rulesEngine = _arenaNode?.RulesEngine;
                 if (rulesEngine != null)
                 {
-                    var effectPipeline = Arena?.Context?.GetService<EffectPipeline>();
+                    var effectPipeline = _arenaNode?.EffectPipeline;
                     int attackBonus = effectPipeline?.GetAttackBonus(actor, action) ?? 0;
                     int heightMod = effectPipeline?.Heights?.GetAttackModifier(actor, target) ?? 0;
 
@@ -2698,8 +2708,8 @@ void fragment() {
             }
             else if (!string.IsNullOrEmpty(action.SaveType))
             {
-                var rulesEngine = Arena?.Context?.GetService<RulesEngine>();
-                var effectPipeline = Arena?.Context?.GetService<EffectPipeline>();
+                var rulesEngine = _arenaNode?.RulesEngine;
+                var effectPipeline = _arenaNode?.EffectPipeline;
                 if (rulesEngine != null && effectPipeline != null)
                 {
                     int saveDC = effectPipeline.GetSaveDC(actor, action);

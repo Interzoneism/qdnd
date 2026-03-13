@@ -14,7 +14,7 @@ namespace QDND.Combat.AI
     /// </summary>
     public class AIReactionHandler
     {
-        private readonly ICombatContext _context;
+        private readonly ICombatantRegistry _combatants;
         private readonly ReactionSystem _reactionSystem;
         private readonly AIReactionPolicy _reactionPolicy;
         private readonly Dictionary<string, ReactionConfig> _combatantConfigs = new();
@@ -26,11 +26,11 @@ namespace QDND.Combat.AI
         public event Action<string, ReactionOpportunity> OnAIReactionDecision;
 
         public AIReactionHandler(
-            ICombatContext context,
+            ICombatantRegistry combatants,
             ReactionSystem reactionSystem,
             AIReactionPolicy reactionPolicy)
         {
-            _context = context;
+            _combatants = combatants;
             _reactionSystem = reactionSystem;
             _reactionPolicy = reactionPolicy;
         }
@@ -83,7 +83,7 @@ namespace QDND.Combat.AI
 
             foreach (var (combatantId, reaction) in eligible)
             {
-                var combatant = _context?.GetCombatant(combatantId);
+                var combatant = _combatants?.Get(combatantId);
                 if (combatant == null) continue;
                 
                 // Check if this is an AI combatant (not player-controlled)
@@ -162,7 +162,7 @@ namespace QDND.Combat.AI
             {
                 case ReactionTriggerType.EnemyLeavesReach:
                 {
-                    var target = _context?.GetCombatant(triggerContext.TriggerSourceId);
+                    var target = _combatants?.Get(triggerContext.TriggerSourceId);
                     if (target == null) return null;
                     return _reactionPolicy.EvaluateOpportunityAttack(reactor, target, profile, config);
                 }
@@ -170,7 +170,7 @@ namespace QDND.Combat.AI
                 case ReactionTriggerType.EnemyEntersReach:
                 {
                     // Sentinel-style: treat like opportunity attack
-                    var target = _context?.GetCombatant(triggerContext.TriggerSourceId);
+                    var target = _combatants?.Get(triggerContext.TriggerSourceId);
                     if (target == null) return null;
                     return _reactionPolicy.EvaluateOpportunityAttack(reactor, target, profile, config);
                 }
@@ -179,7 +179,7 @@ namespace QDND.Combat.AI
                 case ReactionTriggerType.YouAreHit:
                 case ReactionTriggerType.YouTakeDamage:
                 {
-                    var attacker = _context?.GetCombatant(triggerContext.TriggerSourceId);
+                    var attacker = _combatants?.Get(triggerContext.TriggerSourceId);
                     if (attacker == null) return null;
                     int incomingDamage = (int)triggerContext.Value;
                     return _reactionPolicy.EvaluateDefensiveReaction(
@@ -192,7 +192,7 @@ namespace QDND.Combat.AI
                 case ReactionTriggerType.AllyDowned:
                 {
                     // Defensive reaction to protect ally
-                    var attacker = _context?.GetCombatant(triggerContext.TriggerSourceId);
+                    var attacker = _combatants?.Get(triggerContext.TriggerSourceId);
                     if (attacker == null) return null;
                     int damage = (int)triggerContext.Value;
                     // Boost urgency if ally was downed
@@ -206,7 +206,7 @@ namespace QDND.Combat.AI
 
                 case ReactionTriggerType.SpellCastNearby:
                 {
-                    var caster = _context?.GetCombatant(triggerContext.TriggerSourceId);
+                    var caster = _combatants?.Get(triggerContext.TriggerSourceId);
                     if (caster == null) return null;
                     string spellId = triggerContext.ActionId ?? "unknown_spell";
                     return _reactionPolicy.EvaluateCounterReaction(reactor, caster, spellId, profile, config);

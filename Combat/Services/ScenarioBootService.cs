@@ -72,10 +72,22 @@ namespace QDND.Combat.Services
 
         // ─── Dependencies ────────────────────────────────────────────────────────
 
-        private readonly CombatContext _combatContext;
+        private readonly ICombatContext _combatContext;
         private readonly QDND.Combat.Rules.Functors.FunctorExecutor _functorExecutor;
         private readonly ForcedMovementService _forcedMovementService;
         private readonly AutoBattleConfig _autoBattleConfig;
+        private readonly CharacterDataRegistry _characterDataRegistry;
+        private readonly ActionRegistry _actionRegistry;
+        private readonly EffectPipeline _effectPipeline;
+        private readonly AIDecisionPipeline _aiPipeline;
+        private readonly ScenarioLoader _scenarioLoader;
+        private readonly TurnQueueService _turnQueue;
+        private readonly PassiveRegistry _passiveRegistry;
+        private readonly MetamagicService _metamagicService;
+        private readonly StatusManager _statusManager;
+        private readonly CombatLog _combatLog;
+        private readonly InventoryService _inventoryService;
+        private readonly LOSService _losService;
 
         // Callbacks for helpers that remain in CombatArena (they depend on arena-private state).
         private readonly Action<IEnumerable<Combatant>> _applyDefaultMovement;
@@ -121,9 +133,21 @@ namespace QDND.Combat.Services
         // ─── Constructor ─────────────────────────────────────────────────────────
 
         public ScenarioBootService(
-            CombatContext combatContext,
+            ICombatContext combatContext,
             QDND.Combat.Rules.Functors.FunctorExecutor functorExecutor,
             ForcedMovementService forcedMovementService,
+            CharacterDataRegistry characterDataRegistry,
+            ActionRegistry actionRegistry,
+            EffectPipeline effectPipeline,
+            AIDecisionPipeline aiPipeline,
+            ScenarioLoader scenarioLoader,
+            TurnQueueService turnQueue,
+            PassiveRegistry passiveRegistry,
+            MetamagicService metamagicService,
+            StatusManager statusManager,
+            CombatLog combatLog,
+            InventoryService inventoryService,
+            LOSService losService,
             Action<IEnumerable<Combatant>> applyDefaultMovement,
             Action<IEnumerable<Combatant>> grantBaselineReactions,
             Action<string> log,
@@ -135,6 +159,18 @@ namespace QDND.Combat.Services
             _functorExecutor = functorExecutor;
             _forcedMovementService = forcedMovementService;
             _autoBattleConfig = config.AutoBattleConfig;
+            _characterDataRegistry = characterDataRegistry;
+            _actionRegistry = actionRegistry;
+            _effectPipeline = effectPipeline;
+            _aiPipeline = aiPipeline;
+            _scenarioLoader = scenarioLoader;
+            _turnQueue = turnQueue;
+            _passiveRegistry = passiveRegistry;
+            _metamagicService = metamagicService;
+            _statusManager = statusManager;
+            _combatLog = combatLog;
+            _inventoryService = inventoryService;
+            _losService = losService;
             _applyDefaultMovement = applyDefaultMovement;
             _grantBaselineReactions = grantBaselineReactions;
             _log = log;
@@ -164,12 +200,10 @@ namespace QDND.Combat.Services
         /// </summary>
         public void LoadRandomScenario()
         {
-            var charRegistry = _combatContext.GetService<CharacterDataRegistry>();
-
             int seed = _scenarioSeedOverride ?? _autoBattleSeedOverride ?? (ResolvedRandomSeed != 0 ? ResolvedRandomSeed : GenerateRuntimeSeed());
             ResolvedRandomSeed = seed;
 
-            var scenarioGenerator = new ScenarioGenerator(charRegistry, seed);
+            var scenarioGenerator = new ScenarioGenerator(_characterDataRegistry, seed);
             var scenario = scenarioGenerator.GenerateRandomScenario(2, 2);
             // Random 2v2 should use the baseline starter kit for fairness.
             LoadScenarioDefinition(scenario, "random scenario", useBaseStarterKit: true);
@@ -183,9 +217,8 @@ namespace QDND.Combat.Services
             if (string.IsNullOrWhiteSpace(actionId))
                 return false;
 
-            var actionRegistry = _combatContext.GetService<ActionRegistry>();
             string normalized = actionId.Trim();
-            if (actionRegistry?.GetAction(normalized) != null)
+            if (_actionRegistry?.GetAction(normalized) != null)
                 return true;
 
             return normalized.Equals("main_hand_attack", StringComparison.OrdinalIgnoreCase)
@@ -201,15 +234,14 @@ namespace QDND.Combat.Services
         /// </summary>
         public void LoadDynamicScenario()
         {
-            var charRegistry = _combatContext.GetService<CharacterDataRegistry>();
-            if (charRegistry == null)
+            if (_characterDataRegistry == null)
                 throw new InvalidOperationException("CharacterDataRegistry service is unavailable.");
 
             int scenarioSeed = _scenarioSeedOverride ?? (ResolvedScenarioSeed != 0 ? ResolvedScenarioSeed : GenerateRuntimeSeed());
             ResolvedScenarioSeed = scenarioSeed;
             ResolvedRandomSeed = scenarioSeed;
 
-            var scenarioGenerator = new ScenarioGenerator(charRegistry, scenarioSeed);
+            var scenarioGenerator = new ScenarioGenerator(_characterDataRegistry, scenarioSeed);
             ScenarioDefinition scenario = _dynamicScenarioMode switch
             {
                 DynamicScenarioMode.ActionTest => BuildActionTestScenario(scenarioGenerator),
@@ -228,8 +260,8 @@ namespace QDND.Combat.Services
             if (isTestMode)
             {
                 var testPolicy = new TagBasedAbilityTestPolicy();
-                var effectPipeline = _combatContext.GetService<EffectPipeline>();
-                var aiPipeline = _combatContext.GetService<AIDecisionPipeline>();
+                var effectPipeline = _effectPipeline;
+                var aiPipeline = _aiPipeline;
                 if (effectPipeline == null || aiPipeline == null)
                     GD.PushWarning("[ScenarioBootService] TestPolicy not set: one or both pipelines unavailable.");
                 if (effectPipeline != null) effectPipeline.TestPolicy = testPolicy;
@@ -251,8 +283,7 @@ namespace QDND.Combat.Services
                     "Use a valid action id from Data/Actions.");
             }
 
-            var actionRegistry = _combatContext.GetService<ActionRegistry>();
-            return scenarioGenerator.GenerateActionTestScenario(_dynamicActionTestId, _dynamicCharacterLevel, actionRegistry);
+            return scenarioGenerator.GenerateActionTestScenario(_dynamicActionTestId, _dynamicCharacterLevel, _actionRegistry);
         }
 
         private ScenarioDefinition BuildActionBatchScenario(ScenarioGenerator scenarioGenerator)
@@ -275,8 +306,7 @@ namespace QDND.Combat.Services
                     "Use valid action ids from Data/Actions.");
             }
 
-            var actionRegistry = _combatContext.GetService<ActionRegistry>();
-            return scenarioGenerator.GenerateMultiActionTestScenario(_dynamicActionBatchIds, _dynamicCharacterLevel, actionRegistry);
+            return scenarioGenerator.GenerateMultiActionTestScenario(_dynamicActionBatchIds, _dynamicCharacterLevel, _actionRegistry);
         }
 
         /// <summary>
@@ -284,8 +314,7 @@ namespace QDND.Combat.Services
         /// </summary>
         public void LoadScenario(string path)
         {
-            var scenarioLoader = _combatContext.GetService<ScenarioLoader>();
-            var scenario = scenarioLoader.LoadFromFile(path);
+            var scenario = _scenarioLoader.LoadFromFile(path);
             if (_scenarioSeedOverride.HasValue)
             {
                 scenario.Seed = _scenarioSeedOverride.Value;
@@ -309,14 +338,14 @@ namespace QDND.Combat.Services
                 throw new InvalidOperationException($"Scenario '{scenario.Id ?? sourceLabel}' has no units.");
             }
 
-            var scenarioLoader = _combatContext.GetService<ScenarioLoader>();
-            var turnQueue = _combatContext.GetService<TurnQueueService>();
-            var passiveRegistry = _combatContext.GetService<PassiveRegistry>();
-            var metamagicService = _combatContext.GetService<MetamagicService>();
-            var statusManager = _combatContext.GetService<StatusManager>();
-            var effectPipeline = _combatContext.GetService<EffectPipeline>();
-            var aiPipeline = _combatContext.GetService<AIDecisionPipeline>();
-            var combatLog = _combatContext.GetService<CombatLog>();
+            var scenarioLoader = _scenarioLoader;
+            var turnQueue = _turnQueue;
+            var passiveRegistry = _passiveRegistry;
+            var metamagicService = _metamagicService;
+            var statusManager = _statusManager;
+            var effectPipeline = _effectPipeline;
+            var aiPipeline = _aiPipeline;
+            var combatLog = _combatLog;
 
             _oneTimeLogKeys.Clear();
             Combatants = scenarioLoader.SpawnCombatants(scenario, turnQueue);
@@ -467,7 +496,7 @@ namespace QDND.Combat.Services
             }
 
             // Initialize inventories for all combatants
-            var inventoryService = _combatContext.GetService<InventoryService>();
+            var inventoryService = _inventoryService;
             if (inventoryService != null)
             {
                 foreach (var c in Combatants)
@@ -487,7 +516,7 @@ namespace QDND.Combat.Services
                 _autoBattleConfig.Seed = aiSeed;
             }
 
-            var losService = _combatContext.GetService<LOSService>();
+            var losService = _losService;
             _combatContext.Combatants.ReplaceAll(Combatants);
             losService?.ClearCombatants();
             _forcedMovementService?.ClearCombatants();

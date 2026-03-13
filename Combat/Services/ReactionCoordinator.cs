@@ -34,6 +34,8 @@ namespace QDND.Combat.Services
         private TargetValidator _targetValidator;
         private readonly TurnQueueService _turnQueue;
         private readonly ICombatantRegistry _combatants;
+        private readonly BG3ReactionIntegration _bg3ReactionIntegration;
+        private readonly CombatLog _combatLog;
         private readonly Func<bool> _isAutoBattleMode;
         private readonly Func<Random> _getRng;
         private readonly Action<string> _log;
@@ -47,6 +49,8 @@ namespace QDND.Combat.Services
             TargetValidator targetValidator,
             TurnQueueService turnQueue,
             ICombatantRegistry combatants,
+            BG3ReactionIntegration bg3ReactionIntegration,
+            CombatLog combatLog,
             Func<bool> isAutoBattleMode,
             Func<Random> getRng,
             Action<string> log)
@@ -59,6 +63,8 @@ namespace QDND.Combat.Services
             _targetValidator = targetValidator;
             _turnQueue = turnQueue;
             _combatants = combatants;
+            _bg3ReactionIntegration = bg3ReactionIntegration;
+            _combatLog = combatLog;
             _isAutoBattleMode = isAutoBattleMode;
             _getRng = getRng;
             _log = log;
@@ -478,8 +484,7 @@ namespace QDND.Combat.Services
             if (_reactionSystem == null || combatants == null)
                 return;
 
-            // Retrieve BG3 reaction integration if available
-            var bg3Reactions = _combatContext?.GetService<BG3ReactionIntegration>();
+            var bg3Reactions = _bg3ReactionIntegration;
 
             foreach (var combatant in combatants)
             {
@@ -574,6 +579,6 @@ namespace QDND.Combat.Services
             }
         }
 
-        private CombatLog GetCombatLog() => _combatContext?.GetService<CombatLog>();
+        private CombatLog GetCombatLog() => _combatLog;
     }
 }

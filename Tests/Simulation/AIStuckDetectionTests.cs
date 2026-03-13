@@ -29,7 +29,11 @@ namespace QDND.Tests.Simulation
             context.RegisterService(rulesEngine);
             context.RegisterService(statusManager);
 
-            var aiPipeline = new AIDecisionPipeline(context, seed);
+            var aiPipeline = new AIDecisionPipeline(
+                context.Combatants,
+                rules: rulesEngine,
+                statusManager: statusManager,
+                seed: seed);
 
             return (context, aiPipeline);
         }

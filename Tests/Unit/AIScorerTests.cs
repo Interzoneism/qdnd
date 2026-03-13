@@ -20,8 +20,22 @@ namespace QDND.Tests.Unit
     {
         private AIScorer CreateScorer(LOSService? los = null, HeightService? height = null)
         {
-            // Pass null for context - AIScorer handles null gracefully
             return new AIScorer(null, los, height, null);
+        }
+
+        private AIScorer CreateScorer(HeadlessCombatContext context, LOSService? los = null, HeightService? height = null)
+        {
+            return new AIScorer(
+                context.Combatants,
+                los ?? context.GetService<LOSService>(),
+                height ?? context.GetService<HeightService>(),
+                null,
+                null,
+                context.GetService<QDND.Combat.Actions.EffectPipeline>(),
+                context.GetService<StatusManager>(),
+                context.GetService<ConcentrationSystem>(),
+                context.GetService<QDND.Data.CharacterModel.CharacterDataRegistry>(),
+                context.GetService<StatusRegistry>());
         }
 
         private Combatant CreateTestCombatant(string id, int hp, int maxHp, Vector3 position, Faction faction = Faction.Player)
@@ -239,7 +253,7 @@ namespace QDND.Tests.Unit
             context.RegisterCombatant(enemy1);
             context.RegisterCombatant(enemy2);
 
-            var scorer = new AIScorer(context, null, null, null);
+            var scorer = CreateScorer(context);
             var profile = new AIProfile();
             var action = new AIAction
             {
@@ -293,7 +307,7 @@ namespace QDND.Tests.Unit
             context.RegisterCombatant(enemy1);
             context.RegisterCombatant(enemy2);
 
-            var scorer = new AIScorer(context, null, null, null);
+            var scorer = CreateScorer(context);
             var profile = new AIProfile { AvoidFriendlyFire = true };
             var action = new AIAction
             {
@@ -549,7 +563,7 @@ namespace QDND.Tests.Unit
                 ["MULTIPLIER_DOT_ENEMY_POS"] = 3.0f
             });
 
-            var scorer = new AIScorer(context);
+            var scorer = CreateScorer(context);
             var action = new AIAction { ActionType = AIActionType.UseAbility, ActionId = "apply_burn" };
 
             // Act
@@ -583,7 +597,7 @@ namespace QDND.Tests.Unit
                 ["MULTIPLIER_HOT_ALLY_POS"] = 4.0f
             });
 
-            var scorer = new AIScorer(context);
+            var scorer = CreateScorer(context);
             var action = new AIAction { ActionType = AIActionType.UseAbility, ActionId = "apply_regen" };
 
             // Act
@@ -624,7 +638,7 @@ namespace QDND.Tests.Unit
                 ["MULTIPLIER_BOOST_SELF_POS"] = 5.0f
             });
 
-            var scorer = new AIScorer(context);
+            var scorer = CreateScorer(context);
             var action = new AIAction { ActionType = AIActionType.UseAbility, ActionId = "cast_bless" };
 
             // Act
@@ -654,7 +668,7 @@ namespace QDND.Tests.Unit
             context.RegisterCombatant(target);
 
             var profile = CreateBG3Profile();
-            var scorer = new AIScorer(context);
+            var scorer = CreateScorer(context);
             var action = new AIAction { ActionType = AIActionType.UseAbility, ActionId = "mystery_debuff" };
 
             // Act
@@ -670,7 +684,8 @@ namespace QDND.Tests.Unit
         public void ClassifyStatusSubType_TickDamage_ReturnsDoT()
         {
             var context = CreateContextWithDoTStatus("POISON");
-            var result = AIStatusClassifier.ClassifyStatusSubType("POISON", context);
+            var classifier = new AIStatusClassifier(context.GetService<StatusManager>(), context.GetService<StatusRegistry>());
+            var result = classifier.ClassifyStatusSubType("POISON");
             Assert.Equal(StatusSubType.DoT, result);
         }
 
@@ -678,7 +693,8 @@ namespace QDND.Tests.Unit
         public void ClassifyStatusSubType_TickHeal_ReturnsHoT()
         {
             var context = CreateContextWithHoTStatus("REGEN");
-            var result = AIStatusClassifier.ClassifyStatusSubType("REGEN", context);
+            var classifier = new AIStatusClassifier(context.GetService<StatusManager>(), context.GetService<StatusRegistry>());
+            var result = classifier.ClassifyStatusSubType("REGEN");
             Assert.Equal(StatusSubType.HoT, result);
         }
 
@@ -686,14 +702,16 @@ namespace QDND.Tests.Unit
         public void ClassifyStatusSubType_NoTicks_BoostType_ReturnsBoost()
         {
             var context = CreateContextWithBoostStatus("HASTE");
-            var result = AIStatusClassifier.ClassifyStatusSubType("HASTE", context);
+            var classifier = new AIStatusClassifier(context.GetService<StatusManager>(), context.GetService<StatusRegistry>());
+            var result = classifier.ClassifyStatusSubType("HASTE");
             Assert.Equal(StatusSubType.Boost, result);
         }
 
         [Fact]
         public void ClassifyStatusSubType_NullContext_ReturnsUnknown()
         {
-            var result = AIStatusClassifier.ClassifyStatusSubType("ANY_STATUS", null);
+            var classifier = new AIStatusClassifier(null, null);
+            var result = classifier.ClassifyStatusSubType("ANY_STATUS");
             Assert.Equal(StatusSubType.Unknown, result);
         }
 
@@ -712,7 +730,7 @@ namespace QDND.Tests.Unit
                 ["MULTIPLIER_DOT_ALLY_NEG"] = 2.0f
             });
 
-            var scorer = new AIScorer(context);
+            var scorer = CreateScorer(context);
             var action = new AIAction { ActionType = AIActionType.UseAbility, ActionId = "apply_burn" };
 
             // Act
@@ -744,7 +762,7 @@ namespace QDND.Tests.Unit
             context.RegisterCombatant(target);
 
             var profile = CreateBG3Profile();
-            var scorer = new AIScorer(context);
+            var scorer = CreateScorer(context);
             var action = new AIAction { ActionType = AIActionType.UseAbility, ActionId = "stun" };
 
             // Act

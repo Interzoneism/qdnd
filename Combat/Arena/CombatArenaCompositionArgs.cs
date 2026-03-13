@@ -70,7 +70,7 @@ namespace QDND.Combat.Arena
         public Func<Combatant, bool> ExecuteDash { get; init; }
         public Func<Combatant, bool> ExecuteDisengage { get; init; }
         public Func<bool> ShouldAllowVictory { get; init; }
-        public Action CheckAndEndCombat { get; init; }
+
         public Action<Combatant> ExecuteAITurn { get; init; }
         public Action<string> SelectCombatant { get; init; }
         public Action<Combatant> CenterCameraOnCombatant { get; init; }

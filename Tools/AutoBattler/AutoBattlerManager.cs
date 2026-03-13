@@ -219,21 +219,10 @@ namespace QDND.Tools.AutoBattler
             GD.Print($"[AutoBattlerManager] HUD layer found: {hudLayer != null}");
             if (hudLayer != null)
             {
-                // Cleanup the HudController first (check both old and new names)
+                // Cleanup the active HudController first.
                 var hudController = hudLayer.GetNodeOrNull<QDND.Combat.UI.HudController>("HudController");
-                if (hudController == null)
-                {
-                    // Fallback: try old CombatHUD name
-                    var legacyHud = hudLayer.GetNodeOrNull<Control>("CombatHUD");
-                    GD.Print($"[AutoBattlerManager] Legacy CombatHUD found: {legacyHud != null}");
-                    if (legacyHud != null && legacyHud.HasMethod("Cleanup"))
-                        legacyHud.Call("Cleanup");
-                }
-                else
-                {
-                    GD.Print($"[AutoBattlerManager] HudController found: true");
-                    hudController.Cleanup();
-                }
+                GD.Print($"[AutoBattlerManager] HudController found: {hudController != null}");
+                hudController?.Cleanup();
                 
                 // Now safe to free
                 hudLayer.QueueFree();

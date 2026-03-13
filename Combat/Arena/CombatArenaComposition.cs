@@ -13,6 +13,7 @@ using QDND.Combat.Targeting;
 using QDND.Combat.UI;
 using QDND.Data;
 using QDND.Data.AI;
+using QDND.Data.CharacterModel;
 using QDND.Data.Interrupts;
 using QDND.Data.Passives;
 using QDND.Data.Stats;
@@ -28,6 +29,7 @@ namespace QDND.Combat.Arena
         internal CombatLog CombatLog;
         internal ScenarioLoader ScenarioLoader;
         internal DataRegistry DataRegistry;
+        internal CharacterDataRegistry CharacterDataRegistry;
         internal RulesEngine RulesEngine;
         internal StatusManager StatusManager;
         internal StatusTickProcessor StatusTickProcessor;
@@ -63,6 +65,7 @@ namespace QDND.Combat.Arena
         internal TurnTrackerModel TurnTrackerModel;
         internal ResourceBarModel ResourceBarModel;
         internal ActionBarService ActionBarService;
+        internal InventoryService InventoryService;
         internal SelectionService SelectionService;
         internal ScenarioBootService ScenarioBootService;
         internal ICombatantRegistry CombatantRegistry;

@@ -49,26 +49,29 @@ namespace QDND.Combat.Arena.CustomFight
         /// <summary>
         /// Initialize the logger with combat services and write BATTLE_START.
         /// </summary>
-        public void Initialize(BlackBoxLogger logger, CombatArena arena, int seed)
+        public void Initialize(
+            BlackBoxLogger logger,
+            CombatArena arena,
+            int seed,
+            CombatStateMachine stateMachine,
+            TurnQueueService turnQueue,
+            AIDecisionPipeline aiPipeline,
+            EffectPipeline effectPipeline,
+            MovementService movementService,
+            StatusManager statusManager,
+            RulesEngine rulesEngine)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _arena = arena ?? throw new ArgumentNullException(nameof(arena));
             _seed = seed;
             _stopwatch = Stopwatch.StartNew();
 
-            var context = _arena.Context;
-            if (context == null)
-            {
-                GD.PushError("[CustomFightLogger] CombatArena.Context is null; cannot subscribe to events.");
-                return;
-            }
-
-            _stateMachine = context.GetService<CombatStateMachine>();
-            _turnQueue = context.GetService<TurnQueueService>();
-            _aiPipeline = context.GetService<AIDecisionPipeline>();
-            _effectPipeline = context.GetService<EffectPipeline>();
-            _movementService = context.GetService<MovementService>();
-            _statusManager = context.GetService<StatusManager>();
+            _stateMachine = stateMachine;
+            _turnQueue = turnQueue;
+            _aiPipeline = aiPipeline;
+            _effectPipeline = effectPipeline;
+            _movementService = movementService;
+            _statusManager = statusManager;
 
             // Subscribe to events
             if (_stateMachine != null)
@@ -94,7 +97,6 @@ namespace QDND.Combat.Arena.CustomFight
             }
 
             // Subscribe to special movement events and surface damage via RuleEventBus
-            var rulesEngine = context.GetService<RulesEngine>();
             if (rulesEngine?.Events != null)
             {
                 _ruleEventBus = rulesEngine.Events;

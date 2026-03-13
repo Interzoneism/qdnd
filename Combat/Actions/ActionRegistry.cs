@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using QDND.Data;
 
 namespace QDND.Combat.Actions
 {
@@ -9,30 +10,32 @@ namespace QDND.Combat.Actions
     /// Acts as a singleton service that stores and provides access to all actions,
     /// including BG3 spells, class abilities, weapon attacks, and custom actions.
     /// </summary>
-    public class ActionRegistry
+    public class ActionRegistry : Registry<ActionDefinition>
     {
-        private readonly Dictionary<string, ActionDefinition> _actions = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, string> _aliases = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, List<string>> _tagIndex = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<int, List<string>> _spellLevelIndex = new();
         private readonly Dictionary<SpellSchool, List<string>> _schoolIndex = new();
-        private readonly List<string> _errors = new();
-        private readonly List<string> _warnings = new();
 
-        /// <summary>
-        /// Total number of registered actions.
-        /// </summary>
-        public int Count => _actions.Count;
+        protected override string GetId(ActionDefinition item) => item.Id;
 
-        /// <summary>
-        /// Errors encountered during action registration.
-        /// </summary>
-        public IReadOnlyList<string> Errors => _errors;
+        protected override void AfterRegister(ActionDefinition action)
+        {
+            IndexAction(action);
+        }
 
-        /// <summary>
-        /// Warnings encountered during action registration.
-        /// </summary>
-        public IReadOnlyList<string> Warnings => _warnings;
+        protected override void AfterUnregister(ActionDefinition action)
+        {
+            UnindexAction(action);
+        }
+
+        protected override void OnClear()
+        {
+            _aliases.Clear();
+            _tagIndex.Clear();
+            _spellLevelIndex.Clear();
+            _schoolIndex.Clear();
+        }
 
         /// <summary>
         /// Register a new action definition.
@@ -55,32 +58,21 @@ namespace QDND.Combat.Actions
         {
             if (action == null)
             {
-                _errors.Add("Cannot register null action");
+                AddError("Cannot register null action");
                 return false;
             }
 
             if (string.IsNullOrEmpty(action.Id))
             {
-                _errors.Add($"Cannot register action with null/empty ID: {action.Name ?? "Unknown"}");
+                AddError($"Cannot register action with null/empty ID: {action.Name ?? "Unknown"}");
                 return false;
             }
 
-            // Check if already exists
-            if (_actions.ContainsKey(action.Id) && !overwrite)
-            {
-                _warnings.Add($"Action '{action.Id}' already registered (use overwrite=true to replace)");
-                return false;
-            }
+            return BaseRegister(action, overwrite, "action");
+        }
 
-            // Unindex old action if replacing
-            if (_actions.ContainsKey(action.Id))
-            {
-                UnindexAction(_actions[action.Id]);
-            }
-
-            // Store action
-            _actions[action.Id] = action;
-
+        private void IndexAction(ActionDefinition action)
+        {
             // Index by tags
             if (action.Tags != null)
             {
@@ -107,8 +99,6 @@ namespace QDND.Combat.Actions
                     _schoolIndex[action.School] = new List<string>();
                 _schoolIndex[action.School].Add(action.Id);
             }
-
-            return true;
         }
 
         /// <summary>
@@ -163,11 +153,15 @@ namespace QDND.Combat.Actions
         {
             if (string.IsNullOrEmpty(actionId))
                 return null;
-            if (_actions.TryGetValue(actionId, out var action))
+
+            var action = Get(actionId);
+            if (action != null)
                 return action;
+
             // Fallback: check aliases
             if (_aliases.TryGetValue(actionId, out var canonicalId))
-                return _actions.TryGetValue(canonicalId, out var aliased) ? aliased : null;
+                return Get(canonicalId);
+
             return null;
         }
 
@@ -179,8 +173,8 @@ namespace QDND.Combat.Actions
         public bool HasAction(string actionId)
         {
             if (string.IsNullOrEmpty(actionId)) return false;
-            return _actions.ContainsKey(actionId) ||
-                   (_aliases.TryGetValue(actionId, out var canonicalId) && _actions.ContainsKey(canonicalId));
+             return Has(actionId) ||
+                 (_aliases.TryGetValue(actionId, out var canonicalId) && Has(canonicalId));
         }
 
         /// <summary>
@@ -189,7 +183,7 @@ namespace QDND.Combat.Actions
         /// <returns>Read-only collection of all action definitions.</returns>
         public IReadOnlyCollection<ActionDefinition> GetAllActions()
         {
-            return _actions.Values.ToList();
+            return GetAll();
         }
 
         /// <summary>
@@ -198,7 +192,7 @@ namespace QDND.Combat.Actions
         /// <returns>Collection of all registered action IDs and aliases.</returns>
         public IReadOnlyCollection<string> GetAllActionIds()
         {
-            var ids = new HashSet<string>(_actions.Keys, StringComparer.OrdinalIgnoreCase);
+            var ids = new HashSet<string>(Items.Keys, StringComparer.OrdinalIgnoreCase);
             foreach (var alias in _aliases.Keys)
                 ids.Add(alias);
             return ids.ToList();
@@ -217,7 +211,7 @@ namespace QDND.Combat.Actions
             if (!_tagIndex.TryGetValue(tag, out var actionIds))
                 return new List<ActionDefinition>();
 
-            return actionIds.Select(id => _actions[id]).ToList();
+            return actionIds.Select(id => Items[id]).ToList();
         }
 
         /// <summary>
@@ -230,7 +224,7 @@ namespace QDND.Combat.Actions
             if (tags == null || tags.Length == 0)
                 return new List<ActionDefinition>();
 
-            return _actions.Values
+            return Items.Values
                 .Where(a => tags.All(tag => a.Tags != null && a.Tags.Contains(tag)))
                 .ToList();
         }
@@ -255,7 +249,7 @@ namespace QDND.Combat.Actions
                 }
             }
 
-            return matchedIds.Select(id => _actions[id]).ToList();
+            return matchedIds.Select(id => Items[id]).ToList();
         }
 
         /// <summary>
@@ -268,7 +262,7 @@ namespace QDND.Combat.Actions
             if (!_spellLevelIndex.TryGetValue(level, out var actionIds))
                 return new List<ActionDefinition>();
 
-            return actionIds.Select(id => _actions[id]).ToList();
+            return actionIds.Select(id => Items[id]).ToList();
         }
 
         /// <summary>
@@ -290,7 +284,7 @@ namespace QDND.Combat.Actions
             if (!_schoolIndex.TryGetValue(school, out var actionIds))
                 return new List<ActionDefinition>();
 
-            return actionIds.Select(id => _actions[id]).ToList();
+            return actionIds.Select(id => Items[id]).ToList();
         }
 
         /// <summary>
@@ -300,7 +294,7 @@ namespace QDND.Combat.Actions
         /// <returns>List of matching actions.</returns>
         public List<ActionDefinition> GetActionsByIntent(VerbalIntent intent)
         {
-            return _actions.Values
+            return Items.Values
                 .Where(a => a.Intent == intent)
                 .ToList();
         }
@@ -312,7 +306,7 @@ namespace QDND.Combat.Actions
         /// <returns>List of matching actions.</returns>
         public List<ActionDefinition> GetActionsByCastingTime(CastingTimeType castingTime)
         {
-            return _actions.Values
+            return Items.Values
                 .Where(a => a.CastingTime == castingTime)
                 .ToList();
         }
@@ -323,7 +317,7 @@ namespace QDND.Combat.Actions
         /// <returns>List of damage actions.</returns>
         public List<ActionDefinition> GetDamageActions()
         {
-            return _actions.Values
+            return Items.Values
                 .Where(a => a.Effects != null && a.Effects.Any(e => e.Type == "damage"))
                 .ToList();
         }
@@ -334,7 +328,7 @@ namespace QDND.Combat.Actions
         /// <returns>List of healing actions.</returns>
         public List<ActionDefinition> GetHealingActions()
         {
-            return _actions.Values
+            return Items.Values
                 .Where(a => a.Effects != null && a.Effects.Any(e => e.Type == "heal"))
                 .ToList();
         }
@@ -345,7 +339,7 @@ namespace QDND.Combat.Actions
         /// <returns>List of concentration actions.</returns>
         public List<ActionDefinition> GetConcentrationActions()
         {
-            return _actions.Values
+            return Items.Values
                 .Where(a => a.RequiresConcentration)
                 .ToList();
         }
@@ -356,7 +350,7 @@ namespace QDND.Combat.Actions
         /// <returns>List of upcastable actions.</returns>
         public List<ActionDefinition> GetUpcastableActions()
         {
-            return _actions.Values
+            return Items.Values
                 .Where(a => a.CanUpcast)
                 .ToList();
         }
@@ -371,21 +365,7 @@ namespace QDND.Combat.Actions
             if (predicate == null)
                 return new List<ActionDefinition>();
 
-            return _actions.Values.Where(predicate).ToList();
-        }
-
-        /// <summary>
-        /// Clear all registered actions and indices.
-        /// </summary>
-        public void Clear()
-        {
-            _actions.Clear();
-            _aliases.Clear();
-            _tagIndex.Clear();
-            _spellLevelIndex.Clear();
-            _schoolIndex.Clear();
-            _errors.Clear();
-            _warnings.Clear();
+            return Items.Values.Where(predicate).ToList();
         }
 
         /// <summary>
@@ -396,7 +376,7 @@ namespace QDND.Combat.Actions
         {
             var stats = new Dictionary<string, int>
             {
-                ["total"] = _actions.Count,
+                ["total"] = Count,
                 ["cantrips"] = GetCantrips().Count,
                 ["level_1_spells"] = GetActionsBySpellLevel(1).Count,
                 ["level_2_spells"] = GetActionsBySpellLevel(2).Count,

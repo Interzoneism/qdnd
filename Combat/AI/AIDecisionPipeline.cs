@@ -9,10 +9,11 @@ using QDND.Combat.Services;
 using QDND.Combat.Movement;
 using QDND.Combat.Environment;
 using QDND.Data;
+using QDND.Data.CharacterModel;
+using QDND.Data.Statuses;
 using QDND.Combat.Targeting;
 using QDND.Combat.Rules;
 using QDND.Combat.Rules.Boosts;
-using QDND.Combat.Actions;
 using QDND.Combat.Reactions;
 using QDND.Combat.Statuses;
 
@@ -97,21 +98,26 @@ namespace QDND.Combat.AI
     /// </summary>
     public class AIDecisionPipeline
     {
-        private readonly ICombatContext _context;
+        private readonly ICombatantRegistry _combatants;
         private Random _random;
         private readonly SpecialMovementService _specialMovement;
         private readonly HeightService _height;
         private AIScorer _scorer;
-        
-        // Services pulled from context in LateInitialize()
-        private RulesEngine _rules;
-        private EffectPipeline _effectPipeline;
-        private TargetValidator _targetValidator;
-        private LOSService _los;
-        private SurfaceManager _surfaces;
-        private MovementService _movement;
-        private DataRegistry _dataRegistry;
-        private StatusManager _statusSystem;
+
+        private readonly RulesEngine _rules;
+        private readonly EffectPipeline _effectPipeline;
+        private readonly TargetValidator _targetValidator;
+        private readonly LOSService _los;
+        private readonly SurfaceManager _surfaces;
+        private readonly MovementService _movement;
+        private readonly DataRegistry _dataRegistry;
+        private readonly StatusManager _statusSystem;
+        private readonly InventoryService _inventoryService;
+        private readonly ConcentrationSystem _concentrationSystem;
+        private readonly TurnQueueService _turnQueue;
+        private readonly GroundItemService _groundItemService;
+        private readonly CharacterDataRegistry _characterDataRegistry;
+        private readonly StatusRegistry _statusRegistry;
         private readonly Dictionary<Faction, TeamAIState> _teamStates = new();
         private AITurnPlan _currentPlan;
         private AIReactionHandler _reactionHandler;
@@ -136,48 +142,69 @@ namespace QDND.Combat.AI
 
         /// <summary>
         /// The AI reaction handler for processing reaction decisions.
-        /// Available after LateInitialize().
         /// </summary>
         public AIReactionHandler ReactionHandler => _reactionHandler;
 
-        public AIDecisionPipeline(ICombatContext context, int? seed = null, SpecialMovementService specialMovement = null, HeightService height = null)
+        public AIDecisionPipeline(
+            ICombatantRegistry combatants,
+            RulesEngine rules = null,
+            EffectPipeline effectPipeline = null,
+            TargetValidator targetValidator = null,
+            LOSService los = null,
+            SurfaceManager surfaces = null,
+            MovementService movement = null,
+            DataRegistry dataRegistry = null,
+            StatusManager statusManager = null,
+            ReactionSystem reactionSystem = null,
+            InventoryService inventoryService = null,
+            ConcentrationSystem concentrationSystem = null,
+            TurnQueueService turnQueue = null,
+            HeightService height = null,
+            GroundItemService groundItemService = null,
+            SpecialMovementService specialMovement = null,
+            ForcedMovementService forcedMovementService = null,
+            CharacterDataRegistry characterDataRegistry = null,
+            StatusRegistry statusRegistry = null,
+            int? seed = null)
         {
-            _context = context;
+            _combatants = combatants ?? new CombatantRegistry();
             _random = seed.HasValue ? new Random(seed.Value) : new Random();
+
+            _rules = rules;
+            _effectPipeline = effectPipeline;
+            _targetValidator = targetValidator;
+            _los = los;
+            _surfaces = surfaces;
+            _movement = movement;
+            _dataRegistry = dataRegistry;
+            _statusSystem = statusManager;
+            _inventoryService = inventoryService;
+            _concentrationSystem = concentrationSystem;
+            _turnQueue = turnQueue;
+            _groundItemService = groundItemService;
+            _characterDataRegistry = characterDataRegistry;
+            _statusRegistry = statusRegistry;
+
             _specialMovement = specialMovement;
             _height = height;
-            // Create initial scorer with limited services - will be recreated in LateInitialize
-            _scorer = new AIScorer(context, null, height);
-        }
 
-        /// <summary>
-        /// Pull remaining services from context after all services are registered.
-        /// Must be called after all services are registered in CombatContext.
-        /// </summary>
-        public void LateInitialize()
-        {
-            if (_context == null) return;
-            
-            // Pull services from context
-            _rules = _context.GetService<RulesEngine>();
-            _effectPipeline = _context.GetService<EffectPipeline>();
-            _targetValidator = _context.GetService<TargetValidator>();
-            _los = _context.GetService<LOSService>();
-            _surfaces = _context.GetService<SurfaceManager>();
-            _movement = _context.GetService<MovementService>();
-            _dataRegistry = _context.GetService<DataRegistry>();
-            _statusSystem = _context.GetService<StatusManager>();
-            
-            // Wire up reaction handler for AI reaction decisions
-            var reactionSystem = _context.GetService<ReactionSystem>();
+            _scorer = new AIScorer(
+                _combatants,
+                _los,
+                _height,
+                null,
+                forcedMovementService,
+                _effectPipeline,
+                _statusSystem,
+                _concentrationSystem,
+                _characterDataRegistry,
+                _statusRegistry);
+
             if (reactionSystem != null)
             {
-                var reactionPolicy = new AIReactionPolicy(_context as CombatContext, _scorer);
-                _reactionHandler = new AIReactionHandler(_context, reactionSystem, reactionPolicy);
+                var reactionPolicy = new AIReactionPolicy();
+                _reactionHandler = new AIReactionHandler(_combatants, reactionSystem, reactionPolicy);
             }
-            
-            // Re-create scorer with full services now available
-            _scorer = new AIScorer(_context, _los, _height, null, null);
         }
 
         /// <summary>
@@ -257,7 +284,7 @@ namespace QDND.Combat.AI
 
                 // Check if we have a valid existing plan for this actor
                 if (_currentPlan != null && _currentPlan.CombatantId == actor.Id && 
-                    !_currentPlan.IsComplete && _currentPlan.IsValid(_context))
+                    !_currentPlan.IsComplete && _currentPlan.IsValid(_combatants))
                 {
                     var nextAction = _currentPlan.GetNextAction();
                     
@@ -310,7 +337,7 @@ namespace QDND.Combat.AI
                 // No valid plan - create a new one
                 
                 // Evaluate adaptive behavior modifiers
-                var allCombatants = _context?.GetAllCombatants()?.ToList() ?? new List<Combatant>();
+                var allCombatants = GetAllCombatantsList();
                 var behaviorModifiers = _adaptiveBehavior.EvaluateConditions(actor, profile, allCombatants);
                 
                 // Apply modifiers for scoring phase
@@ -612,10 +639,10 @@ namespace QDND.Combat.AI
             if (bg3 != null && bg3.UseInventoryItemsEnabled < 0.5f)
                 return candidates;
 
-            if (_context == null || !_context.TryGetService<InventoryService>(out var inventoryService))
+            if (_inventoryService == null)
                 return candidates;
 
-            var usableItems = inventoryService.GetUsableItems(actor.Id);
+            var usableItems = _inventoryService.GetUsableItems(actor.Id);
             if (usableItems.Count == 0)
                 return candidates;
 
@@ -712,7 +739,7 @@ namespace QDND.Combat.AI
 
                     case TargetType.SingleUnit:
                     {
-                        var allCombatants = _context?.GetAllCombatants()?.ToList() ?? new List<Combatant>();
+                        var allCombatants = GetAllCombatantsList();
                         var validTargets = _targetValidator != null
                             ? _targetValidator.GetValidTargets(actionDef, actor, allCombatants)
                             : GetTargetsForFilter(actionDef.TargetFilter, actor, allCombatants);
@@ -776,7 +803,7 @@ namespace QDND.Combat.AI
             // which avoids rejections from terrain cost multipliers or floating point drift.
             float moveRange = actor.ActionBudget.RemainingMovement * 0.95f;
             var enemies = GetEnemies(actor);
-            var allies = _context?.GetAllCombatants()?.Where(c => c.Faction == actor.Faction && c.Id != actor.Id && c.IsActive).ToList() ?? new List<Combatant>();
+            var allies = GetAllCombatantsList().Where(c => c.Faction == actor.Faction && c.Id != actor.Id && c.IsActive).ToList();
 
             // Strategy 1: Radial sampling around actor
             float step = Math.Max(5f, moveRange / 3f);
@@ -873,7 +900,7 @@ namespace QDND.Combat.AI
 
             // Filter out candidates that are far outside the combat area.
             // Compute a bounding box from all living combatants, expand it, and discard outliers.
-            var allCombatants = _context?.GetAllCombatants()?.Where(c => c.IsActive).ToList();
+            var allCombatants = GetAllCombatantsList().Where(c => c.IsActive).ToList();
             if (allCombatants != null && allCombatants.Count > 0)
             {
                 float minX = float.MaxValue, maxX = float.MinValue;
@@ -979,8 +1006,8 @@ namespace QDND.Combat.AI
             
             // Check if this actor is marked for ability testing
             string testAbilityId = TestPolicy.GetTestActionId(actor);
-            
-            var allCombatants = _context?.GetAllCombatants()?.ToList() ?? new List<Combatant>();
+
+            var allCombatants = GetAllCombatantsList();
             
             foreach (var actionId in actor.KnownActions)
             {
@@ -1263,8 +1290,8 @@ namespace QDND.Combat.AI
             
             // Check if this actor is marked for ability testing
             string testAbilityId = TestPolicy.GetTestActionId(actor);
-            
-            var allCombatants = _context?.GetAllCombatants()?.ToList() ?? new List<Combatant>();
+
+            var allCombatants = GetAllCombatantsList();
             
             foreach (var actionId in actor.KnownActions)
             {
@@ -1435,9 +1462,9 @@ namespace QDND.Combat.AI
             float shoveRange = shoveAction.Range > 0f ? shoveAction.Range : 2.25f;
 
             IEnumerable<Combatant> shoveTargets;
-            if (_targetValidator != null && _context != null)
+            if (_targetValidator != null)
             {
-                var allCombatants = _context.GetAllCombatants()?.ToList() ?? new List<Combatant>();
+                var allCombatants = GetAllCombatantsList();
                 shoveTargets = _targetValidator
                     .GetValidTargets(shoveAction, actor, allCombatants)
                     .Where(t => t != null && t.IsActive && t.Faction != actor.Faction);
@@ -1700,7 +1727,7 @@ namespace QDND.Combat.AI
             // Only propose if the actor actually has this action
             if (!ActorHasAction(actor, actionId)) return candidates;
 
-            var allCombatants = _context?.GetAllCombatants()?.ToList() ?? new List<Combatant>();
+            var allCombatants = GetAllCombatantsList();
             // Include both active and downed allies (but not dead)
             var allies = allCombatants.Where(c =>
                 c.Faction == actor.Faction && c.Id != actor.Id &&
@@ -1818,11 +1845,11 @@ namespace QDND.Combat.AI
             if (bg3 == null || bg3.WeaponPickupModifier <= 0f) return candidates;
 
             // Get ground item service (null = no ground items in this combat)
-            if (_context == null || !_context.TryGetService<GroundItemService>(out var groundItemService))
+            if (_groundItemService == null)
                 return candidates;
 
             // Find weapons within search radius
-            var weapons = groundItemService.GetWeaponsInRadius(actor.Position, bg3.WeaponPickupRadius);
+            var weapons = _groundItemService.GetWeaponsInRadius(actor.Position, bg3.WeaponPickupRadius);
 
             foreach (var weapon in weapons)
             {
@@ -2170,9 +2197,9 @@ namespace QDND.Combat.AI
             // ActionId is the item DefinitionId; look up the matching InventoryItem.
             string itemDefId = action.ActionId;
             InventoryItem item = null;
-            if (_context != null && _context.TryGetService<InventoryService>(out var invSvc))
+            if (_inventoryService != null)
             {
-                item = invSvc.GetUsableItems(actor.Id)
+                item = _inventoryService.GetUsableItems(actor.Id)
                     .FirstOrDefault(i => string.Equals(i.DefinitionId, itemDefId, StringComparison.OrdinalIgnoreCase));
             }
 
@@ -3052,7 +3079,7 @@ namespace QDND.Combat.AI
                     };
                 }
 
-                var allCombatants = _context?.GetAllCombatants()?.ToList() ?? new List<Combatant>();
+                var allCombatants = GetAllCombatantsList();
                 List<Combatant> targetsInArea;
                 if (_targetValidator != null)
                 {
@@ -3164,7 +3191,7 @@ namespace QDND.Combat.AI
                         action.AddScore("charm_control_saved_marker", -18f);
                     }
 
-                    int thirdPartyCount = (_context?.GetAllCombatants() ?? Enumerable.Empty<Combatant>())
+                    int thirdPartyCount = (_combatants?.GetAll() ?? Enumerable.Empty<Combatant>())
                         .Count(c => c.IsActive && c.Resources?.CurrentHP > 0 &&
                                     !string.Equals(c.Id, actor.Id, StringComparison.OrdinalIgnoreCase) &&
                                     !string.Equals(c.Id, target.Id, StringComparison.OrdinalIgnoreCase));
@@ -3205,7 +3232,7 @@ namespace QDND.Combat.AI
                         action.AddScore("self_buff", buffValue);
 
                         // Early-combat buff bonus — casting protective spells in first 3 rounds is tactically smart
-                        int currentRound = _context?.GetService<QDND.Combat.Services.TurnQueueService>()?.CurrentRound ?? 1;
+                        int currentRound = _turnQueue?.CurrentRound ?? 1;
                         if (currentRound <= 3)
                         {
                             float earlyBuffBonus = 2f * GetEffectiveWeight(profile, "status_value");
@@ -3259,7 +3286,7 @@ namespace QDND.Combat.AI
             // Penalize re-casting a concentration spell the caster is already concentrating on
             if (actionDef.RequiresConcentration)
             {
-                var concSystem = _context?.GetService<ConcentrationSystem>();
+                var concSystem = _concentrationSystem;
                 if (concSystem != null)
                 {
                     var currentConc = concSystem.GetConcentratedEffect(actor.Id);
@@ -3324,7 +3351,7 @@ namespace QDND.Combat.AI
         {
             float score = 0;
             var enemies = GetEnemies(actor);
-            var allies = _context?.GetAllCombatants()?.Where(c => c.Faction == actor.Faction && c.Id != actor.Id && c.IsActive).ToList() ?? new List<Combatant>();
+            var allies = GetAllCombatantsList().Where(c => c.Faction == actor.Faction && c.Id != actor.Id && c.IsActive).ToList();
 
             // Distance to nearest enemy
             var nearestEnemy = enemies.OrderBy(e => position.DistanceTo(e.Position)).FirstOrDefault();
@@ -3592,10 +3619,14 @@ namespace QDND.Combat.AI
         /// <summary>
         /// Get all enemies of an actor.
         /// </summary>
+        private List<Combatant> GetAllCombatantsList()
+        {
+            return _combatants?.GetAll()?.ToList() ?? new List<Combatant>();
+        }
+
         private List<Combatant> GetEnemies(Combatant actor)
         {
-            // Would query from combat context
-            var all = _context?.GetAllCombatants() ?? new List<Combatant>();
+            var all = _combatants?.GetAll() ?? new List<Combatant>();
             return all.Where(c => c.Faction != actor.Faction && c.Resources?.CurrentHP > 0).ToList();
         }
 
@@ -3604,7 +3635,7 @@ namespace QDND.Combat.AI
         /// </summary>
         private Combatant GetCombatant(string id)
         {
-            return _context?.GetCombatant(id);
+            return _combatants?.Get(id);
         }
 
         /// <summary>

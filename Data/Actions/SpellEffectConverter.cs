@@ -46,6 +46,54 @@ namespace QDND.Data.Actions
                 ["none"] = string.Empty
             };
 
+        private static readonly Dictionary<string, Func<string, bool, EffectDefinition?>> _handlers =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                ["DealDamage"] = ParseDealDamage,
+                ["ApplyStatus"] = ParseApplyStatus,
+                ["RegainHitPoints"] = ParseRegainHitPoints,
+                ["Heal"] = ParseRegainHitPoints,
+                ["RemoveStatus"] = ParseRemoveStatus,
+                ["Force"] = ParseForce,
+                ["Teleport"] = ParseTeleport,
+                ["TeleportSource"] = ParseTeleport,
+                ["Summon"] = ParseSummon,
+                ["Unsummon"] = ParseUnsummon,
+                ["SummonCreature"] = ParseSummonCreature,
+                ["CreateSurface"] = ParseCreateSurface,
+                ["RestoreResource"] = ParseRestoreResource,
+                ["BreakConcentration"] = ParseBreakConcentration,
+                ["GainTemporaryHitPoints"] = ParseGainTemporaryHitPoints,
+                ["CreateExplosion"] = ParseCreateExplosion,
+                ["SwitchDeathType"] = ParseSwitchDeathType,
+                ["ExecuteWeaponFunctors"] = ParseExecuteWeaponFunctors,
+                ["SurfaceChange"] = ParseSurfaceChange,
+                ["SurfaceClearLayer"] = ParseSurfaceClearLayer,
+                ["Stabilize"] = ParseStabilize,
+                ["Resurrect"] = ParseResurrect,
+                ["RemoveStatusByGroup"] = ParseRemoveStatusByGroup,
+                ["Kill"] = ParseKill,
+                ["Counterspell"] = ParseCounterspell,
+                ["SetAdvantage"] = ParseSetAdvantage,
+                ["SetDisadvantage"] = ParseSetDisadvantage,
+                ["SpawnExtraProjectiles"] = ParseSpawnExtraProjectiles,
+                ["ApplyEquipmentStatus"] = ParseApplyEquipmentStatus,
+                ["Douse"] = ParseDouse,
+                ["SpawnInInventory"] = ParseSpawnInInventory,
+                ["SummonInInventory"] = ParseSpawnInInventory,
+                ["FireProjectile"] = ParseFireProjectile,
+                ["Equalize"] = ParseEqualize,
+                ["SetStatusDuration"] = ParseSetStatusDuration,
+                ["PickupEntity"] = ParsePickupEntity,
+                ["SwapPlaces"] = ParseSwapPlaces,
+                ["CreateZoneCloud"] = ParseCreateZoneCloud,
+                ["Grant"] = ParseGrant,
+                ["UseSpell"] = ParseUseSpell,
+                ["Spawn"] = ParseSpawn,
+                ["CastOffhand"] = ParseIgnoredFunctor,
+                ["CameraWait"] = ParseIgnoredFunctor
+            };
+
         /// <summary>
         /// Parse a BG3 SpellSuccess or SpellFail formula string into a list of EffectDefinitions.
         /// </summary>
@@ -152,6 +200,22 @@ namespace QDND.Data.Actions
                 return null;
             }
 
+            int parenIdx = functor.IndexOf('(');
+            string functorName = parenIdx >= 0 ? functor[..parenIdx].Trim() : functor.Trim();
+
+            if (_handlers.TryGetValue(functorName, out var handler))
+                return handler(functor, halfOnSave);
+
+            if (!IsIgnorableFunc(functor))
+            {
+                RuntimeSafety.LogWarning($"[SpellEffectConverter] Unsupported functor skipped: {functor}");
+            }
+
+            return null;
+        }
+
+        private static EffectDefinition? ParseDealDamage(string functor, bool halfOnSave)
+        {
             // DealDamage(0) — single-arg zero-damage form (used to trigger on-hit reactions)
             if (TryGetFunctorArguments(functor, "DealDamage", out var dealDamageArgs))
             {
@@ -221,6 +285,11 @@ namespace QDND.Data.Actions
                 }
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseApplyStatus(string functor, bool halfOnSave)
+        {
             // ApplyStatus(statusId, chance, duration)
             // Also supports target-first and extra-arg variants:
             // - ApplyStatus(TARGET, STATUS, 100, 2)
@@ -273,6 +342,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseRegainHitPoints(string functor, bool halfOnSave)
+        {
             // RegainHitPoints(formula) - healing
             var healMatch = Regex.Match(functor,
                 @"(?:RegainHitPoints|Heal)\s*\(\s*([^)]+)\s*\)",
@@ -286,6 +360,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseRemoveStatus(string functor, bool halfOnSave)
+        {
             // RemoveStatus(statusId)
             // Also supports multi-arg variants (target-first/flags): RemoveStatus(TARGET, STATUS, ...)
             if (TryGetFunctorArguments(functor, "RemoveStatus", out var removeStatusArgs))
@@ -314,6 +393,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseForce(string functor, bool halfOnSave)
+        {
             // Force(distance) - push effect
             // Also supports multi-arg variants like Force(TARGET, 6, ...)
             if (TryGetFunctorArguments(functor, "Force", out var forceArgs))
@@ -357,6 +441,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseTeleport(string functor, bool halfOnSave)
+        {
             // Teleport(distance) or TeleportSource() — teleports caster/source
             var teleportMatch = Regex.Match(functor,
                 @"Teleport(?:Source)?\s*\(\s*(\d+\.?\d*)?\s*\)",
@@ -373,6 +462,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseSummon(string functor, bool halfOnSave)
+        {
             // Summon(templateId[, duration[, extra...]]) - BG3 alias for SummonCreature
             // Duration may be -1 (permanent). Extra args (projectile templates etc.) are ignored.
             if (TryGetFunctorArguments(functor, "Summon", out var summonAliasArgs) && summonAliasArgs.Count >= 1)
@@ -399,6 +493,11 @@ namespace QDND.Data.Actions
                 return effect;
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseSummonCreature(string functor, bool halfOnSave)
+        {
             // SummonCreature(templateId, duration, [hp])
             var summonMatch = Regex.Match(functor,
                 @"SummonCreature\s*\(\s*([^,]+)\s*(?:,\s*(\d+)\s*)?(?:,\s*(\d+)\s*)?\)",
@@ -427,6 +526,11 @@ namespace QDND.Data.Actions
                 return effect;
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseSpawnExtraProjectiles(string functor, bool halfOnSave)
+        {
             // SpawnExtraProjectiles(countOrProjectileId)
             // BG3 passes either an integer count or a projectile template name like Projectile_MainHandAttack
             var spawnExtraProjectilesMatch = Regex.Match(functor,
@@ -448,6 +552,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseApplyEquipmentStatus(string functor, bool halfOnSave)
+        {
             // ApplyEquipmentStatus([slot,] statusId, [chance,] [duration])
             // Accepts forms:
             //   ApplyEquipmentStatus(STATUS_ID, duration)
@@ -495,6 +604,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseDouse(string functor, bool halfOnSave)
+        {
             // Douse(surfaceType)
             var douseMatch = Regex.Match(functor,
                 @"Douse\s*\(\s*([^)]+)\s*\)",
@@ -511,6 +625,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseSpawnInInventory(string functor, bool halfOnSave)
+        {
             // SpawnInInventory(itemId[, count])
             // Alias support: SummonInInventory(itemId[, count])
             List<string> inventoryArgs;
@@ -546,6 +665,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseFireProjectile(string functor, bool halfOnSave)
+        {
             // FireProjectile(projectileId[, mode])
             var fireProjectileMatch = Regex.Match(functor,
                 @"FireProjectile\s*\(\s*([^,\)]+)\s*(?:,\s*([^)]+))?\)",
@@ -563,6 +687,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseEqualize(string functor, bool halfOnSave)
+        {
             // Equalize(resource)
             var equalizeMatch = Regex.Match(functor,
                 @"Equalize\s*\(\s*([^)]+)\s*\)",
@@ -579,6 +708,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseSetStatusDuration(string functor, bool halfOnSave)
+        {
             // SetStatusDuration([target,] statusId, duration)
             // Accepts:
             //   SetStatusDuration(STATUS_ID, duration)
@@ -601,6 +735,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParsePickupEntity(string functor, bool halfOnSave)
+        {
             // PickupEntity(entityId)
             var pickupEntityMatch = Regex.Match(functor,
                 @"PickupEntity\s*\(\s*([^)]+)\s*\)",
@@ -617,6 +756,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseSwapPlaces(string functor, bool halfOnSave)
+        {
             // SwapPlaces()
             var swapPlacesMatch = Regex.Match(functor,
                 @"SwapPlaces\s*\(\s*\)",
@@ -629,6 +773,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseCreateZoneCloud(string functor, bool halfOnSave)
+        {
             // CreateZoneCloud(radius[, duration[, surfaceType]])
             var createZoneCloudMatch = Regex.Match(functor,
                 @"CreateZoneCloud\s*\(\s*(\d+\.?\d*)\s*(?:,\s*(-?\d+)\s*)?(?:,\s*([^)]+)\s*)?\)",
@@ -659,6 +808,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseGrant(string functor, bool halfOnSave)
+        {
             // Grant(resourceOrFeature[, amount])
             var grantMatch = Regex.Match(functor,
                 @"Grant\s*\(\s*([^,\)]+)\s*(?:,\s*(\d+\.?\d*))?\s*\)",
@@ -698,6 +852,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseUseSpell(string functor, bool halfOnSave)
+        {
             // UseSpell(spellId)
             var useSpellMatch = Regex.Match(functor,
                 @"UseSpell\s*\(\s*([^)]+)\s*\)",
@@ -714,6 +873,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseCreateSurface(string functor, bool halfOnSave)
+        {
             // CreateSurface(radius, duration, surfaceType) - BG3 arg order
             var surfaceMatch = Regex.Match(functor,
                 @"CreateSurface\s*\(\s*(\d+\.?\d*)\s*,\s*(-?\d*)\s*,\s*([^,\)]+)\s*(?:,\s*[^\)]*)?\)",
@@ -749,6 +913,11 @@ namespace QDND.Data.Actions
                 return effect;
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseRestoreResource(string functor, bool halfOnSave)
+        {
             // RestoreResource(resourceName, amount, [level])
             // Supports percentage amounts: RestoreResource(Resource, 100%)
             if (TryGetFunctorArguments(functor, "RestoreResource", out var restoreResourceArgs) &&
@@ -790,6 +959,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseBreakConcentration(string functor, bool halfOnSave)
+        {
             // BreakConcentration()
             var breakConcentrationMatch = Regex.Match(functor,
                 @"BreakConcentration\s*\(\s*\)",
@@ -802,6 +976,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseGainTemporaryHitPoints(string functor, bool halfOnSave)
+        {
             // GainTemporaryHitPoints(formula)
             var gainTempHPMatch = Regex.Match(functor,
                 @"GainTemporaryHitPoints\s*\(\s*([^)]+)\s*\)",
@@ -815,6 +994,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseCreateExplosion(string functor, bool halfOnSave)
+        {
             // CreateExplosion(spellId, [position])
             var createExplosionMatch = Regex.Match(functor,
                 @"CreateExplosion\s*\(\s*([^,]+)\s*(?:,\s*([^)]+))?\s*\)",
@@ -832,6 +1016,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseSwitchDeathType(string functor, bool halfOnSave)
+        {
             // SwitchDeathType(deathType)
             var switchDeathTypeMatch = Regex.Match(functor,
                 @"SwitchDeathType\s*\(\s*(\w+)\s*\)",
@@ -848,6 +1037,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseExecuteWeaponFunctors(string functor, bool halfOnSave)
+        {
             // ExecuteWeaponFunctors([damageType])
             var executeWeaponMatch = Regex.Match(functor,
                 @"ExecuteWeaponFunctors\s*\(\s*(?:(\w+))?\s*\)",
@@ -864,6 +1058,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseSurfaceChange(string functor, bool halfOnSave)
+        {
             // SurfaceChange(surfaceType[, radius[, ...[, lifetime]]])
             // Handles both common 3-arg form and BG3 variants such as:
             // SurfaceChange(Daylight,100,0,100,15)
@@ -908,6 +1107,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseSurfaceClearLayer(string functor, bool halfOnSave)
+        {
             // SurfaceClearLayer(layer) — removes all surfaces on a layer (Ground or Cloud)
             if (TryGetFunctorArguments(functor, "SurfaceClearLayer", out var clearLayerArgs) &&
                 clearLayerArgs.Count >= 1)
@@ -925,6 +1129,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseStabilize(string functor, bool halfOnSave)
+        {
             // Stabilize()
             var stabilizeMatch = Regex.Match(functor,
                 @"Stabilize\s*\(\s*\)",
@@ -937,6 +1146,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseKill(string functor, bool halfOnSave)
+        {
             // Kill() — instantly kills the target (used by e.g. Power Word Kill)
             if (TryGetFunctorArguments(functor, "Kill", out _))
             {
@@ -946,6 +1160,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseResurrect(string functor, bool halfOnSave)
+        {
             // Resurrect([hp][, ...])
             // Supports 2-arg forms while preserving default behavior.
             if (TryGetFunctorArguments(functor, "Resurrect", out var resurrectArgs))
@@ -970,6 +1189,11 @@ namespace QDND.Data.Actions
                 return effect;
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseRemoveStatusByGroup(string functor, bool halfOnSave)
+        {
             // RemoveStatusByGroup(groupId)
             var removeStatusByGroupMatch = Regex.Match(functor,
                 @"RemoveStatusByGroup\s*\(\s*(\w+)\s*\)",
@@ -986,6 +1210,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseCounterspell(string functor, bool halfOnSave)
+        {
             // Counterspell()
             var counterspellMatch = Regex.Match(functor,
                 @"Counterspell\s*\(\s*\)",
@@ -998,6 +1227,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseSetAdvantage(string functor, bool halfOnSave)
+        {
             // SetAdvantage()
             var setAdvantageMatch = Regex.Match(functor,
                 @"SetAdvantage\s*\(\s*\)",
@@ -1010,6 +1244,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseSetDisadvantage(string functor, bool halfOnSave)
+        {
             // SetDisadvantage()
             var setDisadvantageMatch = Regex.Match(functor,
                 @"SetDisadvantage\s*\(\s*\)",
@@ -1022,6 +1261,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseUnsummon(string functor, bool halfOnSave)
+        {
             // Unsummon() — removes an active summon from the battlefield
             if (Regex.IsMatch(functor, @"^Unsummon\s*\(\s*\)$", RegexOptions.IgnoreCase))
             {
@@ -1032,6 +1276,11 @@ namespace QDND.Data.Actions
                 };
             }
 
+            return null;
+        }
+
+        private static EffectDefinition? ParseSpawn(string functor, bool halfOnSave)
+        {
             // Spawn(templateId[, args...]) — spawns a creature or object (treated as summon)
             if (TryGetFunctorArguments(functor, "Spawn", out var spawnArgs) && spawnArgs.Count >= 1)
             {
@@ -1050,12 +1299,11 @@ namespace QDND.Data.Actions
                 }
             }
 
-            // If we couldn't parse it, log a warning but don't fail
-            if (!IsIgnorableFunc(functor))
-            {
-                RuntimeSafety.LogWarning($"[SpellEffectConverter] Unsupported functor skipped: {functor}");
-            }
+            return null;
+        }
 
+        private static EffectDefinition? ParseIgnoredFunctor(string functor, bool halfOnSave)
+        {
             return null;
         }
 
@@ -1677,12 +1925,9 @@ namespace QDND.Data.Actions
         {
             var ignorableFuncs = new[]
             {
-                "CastOffhand",
-                "CameraWait",
                 "ShortRest",
                 "UseActionResource",
                 "Unlock",
-                "SurfaceClearLayer",
                 "DisarmWeapon",
                 "DisarmAndStealWeapon",
                 "ResetCombatTurn"
@@ -1701,56 +1946,8 @@ namespace QDND.Data.Actions
         /// Returns true when a functor name is supported by the converter.
         /// Used by parity/functor coverage gates.
         /// </summary>
-        public static bool SupportsFunctorName(string functorName)
-        {
-            if (string.IsNullOrWhiteSpace(functorName))
-                return false;
-
-            return functorName.Trim().ToLowerInvariant() switch
-            {
-                "dealdamage" => true,
-                "applystatus" => true,
-                "regainhitpoints" => true,
-                "heal" => true,
-                "removestatus" => true,
-                "force" => true,
-                "teleport" => true,
-                "summon" => true,
-                "unsummon" => true,
-                "summoncreature" => true,
-                "createsurface" => true,
-                "restoreresource" => true,
-                "breakconcentration" => true,
-                "gaintemporaryhitpoints" => true,
-                "createexplosion" => true,
-                "switchdeathtype" => true,
-                "executeweaponfunctors" => true,
-                "surfacechange" => true,
-                "stabilize" => true,
-                "resurrect" => true,
-                "removestatusbygroup" => true,
-                "kill" => true,
-                "counterspell" => true,
-                "setadvantage" => true,
-                "setdisadvantage" => true,
-                "spawnextraprojectiles" => true,
-                "applyequipmentstatus" => true,
-                "douse" => true,
-                "spawnininventory" => true,
-                "summonininventory" => true,
-                "fireprojectile" => true,
-                "equalize" => true,
-                "setstatusduration" => true,
-                "pickupentity" => true,
-                "swapplaces" => true,
-                "createzonecloud" => true,
-                "grant" => true,
-                "usespell" => true,
-                "castoffhand" => true,
-                "camerawait" => true,
-                _ => false
-            };
-        }
+        public static bool SupportsFunctorName(string functorName) =>
+            !string.IsNullOrWhiteSpace(functorName) && _handlers.ContainsKey(functorName.Trim());
 
         #endregion
 

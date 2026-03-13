@@ -18,19 +18,41 @@ namespace QDND.Combat.AI
     /// </summary>
     public class AIScorer
     {
-        private readonly ICombatContext _context;
+        private readonly ICombatantRegistry? _combatants;
         private readonly LOSService? _los;
         private readonly HeightService? _height;
         private readonly AIWeightConfig _weights;
         private readonly ForcedMovementService? _forcedMovement;
+        private readonly EffectPipeline? _effectPipeline;
+        private readonly StatusManager? _statusManager;
+        private readonly ConcentrationSystem? _concentrationSystem;
+        private readonly CharacterDataRegistry? _characterRegistry;
+        private readonly StatusRegistry? _statusRegistry;
+        private readonly AIStatusClassifier _statusClassifier;
 
-        public AIScorer(ICombatContext? context, LOSService? los = null, HeightService? height = null, AIWeightConfig? weights = null, ForcedMovementService? forcedMovement = null)
+        public AIScorer(
+            ICombatantRegistry? combatants = null,
+            LOSService? los = null,
+            HeightService? height = null,
+            AIWeightConfig? weights = null,
+            ForcedMovementService? forcedMovement = null,
+            EffectPipeline? effectPipeline = null,
+            StatusManager? statusManager = null,
+            ConcentrationSystem? concentrationSystem = null,
+            CharacterDataRegistry? characterRegistry = null,
+            StatusRegistry? statusRegistry = null)
         {
-            _context = context; // Allow null for unit testing - methods handle null gracefully
+            _combatants = combatants;
             _los = los;
             _height = height;
             _weights = weights ?? new AIWeightConfig();
             _forcedMovement = forcedMovement;
+            _effectPipeline = effectPipeline;
+            _statusManager = statusManager;
+            _concentrationSystem = concentrationSystem;
+            _characterRegistry = characterRegistry;
+            _statusRegistry = statusRegistry;
+            _statusClassifier = new AIStatusClassifier(_statusManager, _statusRegistry);
         }
 
         /// <summary>
@@ -45,6 +67,21 @@ namespace QDND.Combat.AI
                 return;
             }
 
+            var actionDef = _effectPipeline?.GetAction(action.ActionId);
+            bool isHarmfulAction = action.ActionType == AIActionType.Attack
+                || actionDef?.Intent == VerbalIntent.Damage
+                || actionDef?.Intent == VerbalIntent.Debuff
+                || actionDef?.BG3Flags?.Contains("IsHarmful") == true
+                || (actionDef?.Effects?.Any(e => e.Type == "damage" || e.Type == "deal_damage") ?? false);
+
+            if (target.Id == actor.Id && isHarmfulAction)
+            {
+                action.IsValid = false;
+                action.InvalidReason = "Harmful actions cannot target self";
+                action.Score = 0f;
+                return;
+            }
+
             // Note: Range validation is handled upstream by AIDecisionPipeline.GenerateAttackCandidates()
             // which only generates candidates for enemies within ability range.
             // The scorer's responsibility is to score already-validated candidates.
@@ -53,7 +90,7 @@ namespace QDND.Combat.AI
             var breakdown = action.ScoreBreakdown;
             var bg3 = profile.BG3Profile;
             float baseScale = bg3 != null ? bg3.ScoreMod / 10f : 0f;
-            var statusMgr = _context?.GetService<StatusManager>();
+            var statusMgr = _statusManager;
 
             // Base damage value
             float expectedDamage = CalculateExpectedDamage(actor, target, action.ActionId, action.VariantId);
@@ -210,8 +247,6 @@ namespace QDND.Combat.AI
             }
 
             // Penalty for ranged attacks/spells when in melee range (disadvantage in D&D 5e)
-            var effectPipelineForAttackType = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
-            var actionDef = effectPipelineForAttackType?.GetAction(action.ActionId);
             if (actionDef?.AttackType == AttackType.RangedWeapon || actionDef?.AttackType == AttackType.RangedSpell)
             {
                 bool isThreatenedByMelee = actor.Position.DistanceTo(target.Position) <= 2f;
@@ -250,9 +285,7 @@ namespace QDND.Combat.AI
             // BG3: Resistance/Immunity awareness — reduce score when target resists or is immune
             if (bg3 != null && target != null)
             {
-                var effectPipelineForDmgType = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
-                var dmgActionDef = effectPipelineForDmgType?.GetAction(action.ActionId);
-                string? dmgType = dmgActionDef?.Effects?.FirstOrDefault(e =>
+                string? dmgType = actionDef?.Effects?.FirstOrDefault(e =>
                     e.Type == "damage" || e.Type == "deal_damage")?.DamageType;
 
                 if (!string.IsNullOrEmpty(dmgType) && statusMgr != null)
@@ -440,7 +473,7 @@ namespace QDND.Combat.AI
             // BG3: MultiplierResurrect — resurrect bonus
             if (bg3 != null && action.ActionId != null)
             {
-                var effectPipelineForResurrect = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
+                var effectPipelineForResurrect = _effectPipeline;
                 var resurrectActionDef = effectPipelineForResurrect?.GetAction(action.ActionId);
                 bool isResurrect = resurrectActionDef?.Effects?.Any(e =>
                     e.Type?.Contains("resurrect", StringComparison.OrdinalIgnoreCase) == true ||
@@ -550,10 +583,7 @@ namespace QDND.Combat.AI
 
             // Look up the actual status definition to determine category from BG3 type/groups
             float statusValue;
-            StatusRegistry statusRegistry = null;
-            if (_context != null)
-                _context.TryGetService<StatusRegistry>(out statusRegistry);
-            var statusDef = statusRegistry?.GetStatus(effectType);
+            var statusDef = _statusRegistry?.GetStatus(effectType);
 
             bool isControl = statusDef != null &&
                 (statusDef.StatusType == BG3StatusType.INCAPACITATED ||
@@ -634,7 +664,7 @@ namespace QDND.Combat.AI
                 // For non-Control statuses, refine the generic multiplier with a sub-type-specific one.
                 if (!isControl)
                 {
-                    var subType = AIStatusClassifier.ClassifyStatusSubType(effectType, _context);
+                    var subType = _statusClassifier.ClassifyStatusSubType(effectType);
                     if (subType != StatusSubType.Unknown)
                     {
                         // Compute strict faction flags (separate neutral from enemy)
@@ -779,7 +809,7 @@ namespace QDND.Combat.AI
             var bg3 = profile.BG3Profile;
 
             // Count neutrals for BG3 scoring
-            var all = _context?.GetAllCombatants() ?? new List<Combatant>();
+            var all = _combatants?.GetAll() ?? new List<Combatant>();
             int neutralsInAoe = all.Count(c => c.Faction != actor.Faction &&
                 !enemies.Contains(c) && c.IsActive &&
                 center.DistanceTo(c.Position) <= radius);
@@ -895,7 +925,7 @@ namespace QDND.Combat.AI
             // If this is a shove_prone variant, invalidate immediately if target is already prone
             if (string.Equals(action.VariantId, "shove_prone", StringComparison.OrdinalIgnoreCase))
             {
-                var statusSystem = _context?.GetService<StatusManager>();
+                var statusSystem = _statusManager;
                 if (statusSystem != null && statusSystem.HasStatus(target.Id, "prone"))
                 {
                     action.IsValid = false;
@@ -1115,7 +1145,7 @@ namespace QDND.Combat.AI
         /// </summary>
         private float GetActorMaxRange(Combatant actor)
         {
-            var effectPipeline = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
+            var effectPipeline = _effectPipeline;
             if (effectPipeline == null || actor?.KnownActions == null)
                 return 1.5f;
 
@@ -1137,7 +1167,7 @@ namespace QDND.Combat.AI
             if (actionId == null) return 10f;
             
             // Try to get ability data from context
-            var effectPipeline = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
+            var effectPipeline = _effectPipeline;
             var action = effectPipeline?.GetAction(actionId);
             if (action?.Effects == null) return 10f;
             
@@ -1211,7 +1241,7 @@ namespace QDND.Combat.AI
         private float CalculateExpectedHealing(Combatant actor, string? actionId)
         {
             if (string.IsNullOrEmpty(actionId)) return 5f;
-            var effectPipeline = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
+            var effectPipeline = _effectPipeline;
             var action = effectPipeline?.GetAction(actionId);
             if (action?.Effects == null) return 5f;
 
@@ -1231,7 +1261,7 @@ namespace QDND.Combat.AI
             QDND.Combat.Actions.ActionDefinition actionDef = null;
             if (!string.IsNullOrEmpty(actionId))
             {
-                var effectPipeline = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
+                var effectPipeline = _effectPipeline;
                 actionDef = effectPipeline?.GetAction(actionId);
                 attackType = actionDef?.AttackType;
             }
@@ -1293,7 +1323,7 @@ namespace QDND.Combat.AI
         /// </summary>
         private int GetSpellcastingModifier(Combatant source)
         {
-            var registry = _context?.GetService<CharacterDataRegistry>();
+            var registry = _characterRegistry;
             if (registry != null && source?.ResolvedCharacter?.Sheet?.ClassLevels != null)
             {
                 foreach (var cl in source.ResolvedCharacter.Sheet.ClassLevels)
@@ -1526,7 +1556,7 @@ namespace QDND.Combat.AI
             if (bg3 == null || string.IsNullOrEmpty(action.ActionId))
                 return 0f;
 
-            var effectPipeline = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
+            var effectPipeline = _effectPipeline;
             var actionDef = effectPipeline?.GetAction(action.ActionId);
             if (actionDef?.Cost?.ResourceCosts == null || actionDef.Cost.ResourceCosts.Count == 0)
                 return 0f;
@@ -1574,8 +1604,8 @@ namespace QDND.Combat.AI
                 return 0f;
 
             float adjustment = 0f;
-            var concSystem = _context?.GetService<ConcentrationSystem>();
-            var effectPipeline = _context?.GetService<QDND.Combat.Actions.EffectPipeline>();
+            var concSystem = _concentrationSystem;
+            var effectPipeline = _effectPipeline;
 
             // BG3: ModifierConcentrationRemoveSelf — penalty for breaking own concentration
             if (concSystem != null && effectPipeline != null)
@@ -1609,13 +1639,13 @@ namespace QDND.Combat.AI
 
         private List<Combatant> GetEnemies(Combatant actor)
         {
-            var all = _context?.GetAllCombatants() ?? new List<Combatant>();
+            var all = _combatants?.GetAll() ?? new List<Combatant>();
             return all.Where(c => c.Faction != actor.Faction && c.IsActive).ToList();
         }
 
         private List<Combatant> GetAllies(Combatant actor)
         {
-            var all = _context?.GetAllCombatants() ?? new List<Combatant>();
+            var all = _combatants?.GetAll() ?? new List<Combatant>();
             return all.Where(c => c.Faction == actor.Faction && c.Id != actor.Id && c.IsActive).ToList();
         }
     }

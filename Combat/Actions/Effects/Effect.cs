@@ -85,6 +85,11 @@ namespace QDND.Combat.Actions.Effects
         public QDND.Combat.Services.ICombatContext CombatContext { get; set; }
 
         /// <summary>
+        /// Inventory service for effects that grant/remove items (optional).
+        /// </summary>
+        public QDND.Combat.Services.InventoryService InventoryService { get; set; }
+
+        /// <summary>
         /// Surface manager for effects that create or query surfaces.
         /// </summary>
         public QDND.Combat.Environment.SurfaceManager Surfaces { get; set; }

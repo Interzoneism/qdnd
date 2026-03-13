@@ -7,11 +7,16 @@ using Xunit;
 using QDND.Combat.Actions;
 using QDND.Combat.AI;
 using QDND.Combat.Entities;
+using QDND.Combat.Environment;
 using QDND.Combat.Movement;
 using QDND.Combat.Rules;
+using QDND.Combat.Reactions;
 using QDND.Combat.Services;
 using QDND.Combat.Statuses;
+using QDND.Combat.Targeting;
+using QDND.Data;
 using QDND.Data.CharacterModel;
+using QDND.Data.Statuses;
 
 namespace QDND.Tests.Unit
 {
@@ -90,7 +95,7 @@ namespace QDND.Tests.Unit
 
             // Create pipeline with null context - SelectBest doesn't use context
             // Use Nightmare difficulty for deterministic selection (always picks highest score)
-            var pipeline = new AIDecisionPipeline(null, seed: 42);
+            var pipeline = new AIDecisionPipeline(new CombatantRegistry(), seed: 42);
 
             // Act
             var best = pipeline.SelectBest(candidates, profile);
@@ -118,7 +123,7 @@ namespace QDND.Tests.Unit
             }.ToList();
 
             var easyProfile = new AIProfile { Difficulty = AIDifficulty.Easy };
-            var pipeline = new AIDecisionPipeline(null, seed: 123);
+            var pipeline = new AIDecisionPipeline(new CombatantRegistry(), seed: 123);
 
             // Act - run multiple times to check for variety
             var selections = Enumerable.Range(0, 20)
@@ -196,6 +201,48 @@ namespace QDND.Tests.Unit
             return combatant;
         }
 
+        private AIDecisionPipeline CreatePipeline(TestCombatContext ctx, int? seed = null, SpecialMovementService specialMovement = null, HeightService height = null)
+        {
+            ctx.TryGetService<RulesEngine>(out var rules);
+            ctx.TryGetService<EffectPipeline>(out var effectPipeline);
+            ctx.TryGetService<TargetValidator>(out var targetValidator);
+            ctx.TryGetService<LOSService>(out var los);
+            ctx.TryGetService<SurfaceManager>(out var surfaces);
+            ctx.TryGetService<MovementService>(out var movement);
+            ctx.TryGetService<DataRegistry>(out var dataRegistry);
+            ctx.TryGetService<StatusManager>(out var statusManager);
+            ctx.TryGetService<ReactionSystem>(out var reactionSystem);
+            ctx.TryGetService<InventoryService>(out var inventoryService);
+            ctx.TryGetService<ConcentrationSystem>(out var concentrationSystem);
+            ctx.TryGetService<TurnQueueService>(out var turnQueue);
+            ctx.TryGetService<GroundItemService>(out var groundItemService);
+            ctx.TryGetService<ForcedMovementService>(out var forcedMovementService);
+            ctx.TryGetService<CharacterDataRegistry>(out var characterDataRegistry);
+            ctx.TryGetService<StatusRegistry>(out var statusRegistry);
+
+            return new AIDecisionPipeline(
+                ctx.Combatants,
+                rules,
+                effectPipeline,
+                targetValidator,
+                los,
+                surfaces,
+                movement,
+                dataRegistry,
+                statusManager,
+                reactionSystem,
+                inventoryService,
+                concentrationSystem,
+                turnQueue,
+                height,
+                groundItemService,
+                specialMovement,
+                forcedMovementService,
+                characterDataRegistry,
+                statusRegistry,
+                seed);
+        }
+
         // ─────────────────────────────────────────────────────
         //  Helpers for BG3 item-usage parameter tests
         // ─────────────────────────────────────────────────────
@@ -245,8 +292,7 @@ namespace QDND.Tests.Unit
             });
             ctx.RegisterService(effectPipeline);
 
-            var pipeline = new AIDecisionPipeline(ctx, seed: 42);
-            pipeline.LateInitialize();
+            var pipeline = CreatePipeline(ctx, seed: 42);
 
             return (pipeline, ctx, actor);
         }
@@ -377,8 +423,7 @@ namespace QDND.Tests.Unit
             });
             ctx.RegisterService(effectPipeline);
 
-            var pipeline = new AIDecisionPipeline(ctx, seed: 42);
-            pipeline.LateInitialize();
+            var pipeline = CreatePipeline(ctx, seed: 42);
 
             return (pipeline, ctx, actor);
         }
@@ -536,8 +581,7 @@ namespace QDND.Tests.Unit
             });
             ctx.RegisterService(effectPipeline);
 
-            var pipeline = new AIDecisionPipeline(ctx, seed: 7);
-            pipeline.LateInitialize();
+            var pipeline = CreatePipeline(ctx, seed: 7);
 
             var action = new AIAction
             {
@@ -578,8 +622,7 @@ namespace QDND.Tests.Unit
             });
             ctx.RegisterService(effectPipeline);
 
-            var pipeline = new AIDecisionPipeline(ctx, seed: 7);
-            pipeline.LateInitialize();
+            var pipeline = CreatePipeline(ctx, seed: 7);
 
             var action = new AIAction
             {
@@ -621,8 +664,7 @@ namespace QDND.Tests.Unit
             });
             ctx.RegisterService(effectPipeline);
 
-            var pipeline = new AIDecisionPipeline(ctx, seed: 7);
-            pipeline.LateInitialize();
+            var pipeline = CreatePipeline(ctx, seed: 7);
 
             var action = new AIAction
             {
@@ -664,8 +706,7 @@ namespace QDND.Tests.Unit
             });
             ctx.RegisterService(effectPipeline);
 
-            var pipeline = new AIDecisionPipeline(ctx, seed: 7);
-            pipeline.LateInitialize();
+            var pipeline = CreatePipeline(ctx, seed: 7);
 
             var action = new AIAction
             {
@@ -710,8 +751,7 @@ namespace QDND.Tests.Unit
             });
             ctx.RegisterService(effectPipeline);
 
-            var pipeline = new AIDecisionPipeline(ctx, seed: 13);
-            pipeline.LateInitialize();
+            var pipeline = CreatePipeline(ctx, seed: 13);
 
             var candidates = pipeline.GenerateCandidates(actor);
 
@@ -746,8 +786,7 @@ namespace QDND.Tests.Unit
             });
             ctx.RegisterService(effectPipeline);
 
-            var pipeline = new AIDecisionPipeline(ctx, seed: 11);
-            pipeline.LateInitialize();
+            var pipeline = CreatePipeline(ctx, seed: 11);
 
             var candidates = pipeline.GenerateCandidates(actor);
             var shoveCandidates = candidates
@@ -794,8 +833,7 @@ namespace QDND.Tests.Unit
             };
             ctx.RegisterService(movement);
 
-            var pipeline = new AIDecisionPipeline(ctx, seed: 22);
-            pipeline.LateInitialize();
+            var pipeline = CreatePipeline(ctx, seed: 22);
 
             AIActionType? loggedActionType = null;
             string loggedPrimaryActionId = null;
@@ -867,8 +905,7 @@ namespace QDND.Tests.Unit
             }
             ctx.RegisterService(statusManager);
 
-            var pipeline = new AIDecisionPipeline(ctx, seed: 7);
-            pipeline.LateInitialize();
+            var pipeline = CreatePipeline(ctx, seed: 7);
 
             return (pipeline, actor, target);
         }
@@ -974,8 +1011,7 @@ namespace QDND.Tests.Unit
             });
             ctx.RegisterService(effectPipeline);
 
-            var pipeline = new AIDecisionPipeline(ctx, seed: 42);
-            pipeline.LateInitialize();
+            var pipeline = CreatePipeline(ctx, seed: 42);
 
             // BG3 profile with MultiplierSelfOnlyThrow = 0.5
             var bg3 = new BG3ArchetypeProfile();
@@ -1036,8 +1072,7 @@ namespace QDND.Tests.Unit
             }
             ctx.RegisterService(groundItemService);
 
-            var pipeline = new AIDecisionPipeline(ctx, seed: 42);
-            pipeline.LateInitialize();
+            var pipeline = CreatePipeline(ctx, seed: 42);
 
             return (pipeline, ctx, actor);
         }

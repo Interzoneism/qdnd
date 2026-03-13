@@ -393,7 +393,6 @@ namespace QDND.Data.Actions
             bool targetsAllies = ContainsConditionToken(targetConditions, "Ally()");
             bool targetsEnemies = ContainsConditionToken(targetConditions, "Enemy()")
                                   || ContainsConditionToken(targetConditions, "not Ally()");
-            bool targetsCharacters = ContainsConditionToken(targetConditions, "Character()");
 
             if (targetsEnemies)
                 filter |= TargetFilter.Enemies;
@@ -407,13 +406,6 @@ namespace QDND.Data.Actions
 
             if (targetsSelf && allowsSelfTargeting)
                 filter |= TargetFilter.Self;
-
-            if (targetsCharacters && filter == TargetFilter.None)
-            {
-                filter |= TargetFilter.Allies;
-                if (allowsSelfTargeting)
-                    filter |= TargetFilter.Self;
-            }
 
             return filter;
         }

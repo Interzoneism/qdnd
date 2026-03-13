@@ -635,14 +635,24 @@ namespace QDND.Tests.Unit
     {
         private AIScorer CreateScorer(StatusRegistry statusRegistry = null)
         {
-            ICombatContext context = null;
+            HeadlessCombatContext context = null;
             if (statusRegistry != null)
             {
                 var headless = new HeadlessCombatContext();
                 headless.RegisterService(statusRegistry);
                 context = headless;
             }
-            return new AIScorer(context);
+            return new AIScorer(
+                context?.Combatants,
+                null,
+                null,
+                null,
+                null,
+                context?.GetService<QDND.Combat.Actions.EffectPipeline>(),
+                context?.GetService<QDND.Combat.Statuses.StatusManager>(),
+                context?.GetService<QDND.Combat.Statuses.ConcentrationSystem>(),
+                context?.GetService<QDND.Data.CharacterModel.CharacterDataRegistry>(),
+                statusRegistry);
         }
 
         private Combatant CreateTestCombatant(string id, int hp, int maxHp, Vector3 position, Faction faction)

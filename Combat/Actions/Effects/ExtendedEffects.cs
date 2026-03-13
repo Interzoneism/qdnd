@@ -608,7 +608,7 @@ namespace QDND.Combat.Actions.Effects
             if (recipients.Count == 0 && context?.Source != null)
                 recipients = new List<Combatant> { context.Source };
 
-            var inventoryService = context?.CombatContext?.GetService<InventoryService>();
+            var inventoryService = context?.InventoryService;
 
             foreach (var target in recipients)
             {

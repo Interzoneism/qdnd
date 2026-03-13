@@ -83,6 +83,7 @@ namespace QDND.Combat.Passives
             {
                 Source = eventCtx.Source,
                 Target = eventCtx.Target,
+                FunctorContext = MapWindowToFunctorContext(eventCtx.Window).ToString(),
                 IsMelee = eventCtx.IsMeleeWeaponAttack,
                 IsRanged = eventCtx.IsRangedWeaponAttack,
                 IsWeaponAttack = eventCtx.IsMeleeWeaponAttack || eventCtx.IsRangedWeaponAttack,
@@ -97,14 +98,18 @@ namespace QDND.Combat.Passives
         {
             return window switch
             {
-                RuleWindow.BeforeAttackRoll or RuleWindow.AfterAttackRoll => FunctorContext.OnAttack,
-                RuleWindow.BeforeDamage or RuleWindow.AfterDamage => FunctorContext.OnDamage,
-                RuleWindow.BeforeSavingThrow or RuleWindow.AfterSavingThrow => FunctorContext.OnCast,
+                RuleWindow.BeforeAttackRoll => FunctorContext.BeforeAttack,
+                RuleWindow.AfterAttackRoll => FunctorContext.AfterAttack,
+                RuleWindow.BeforeDamage => FunctorContext.BeforeDamage,
+                RuleWindow.AfterDamage => FunctorContext.AfterDamage,
+                RuleWindow.BeforeSavingThrow => FunctorContext.BeforeSavingThrow,
+                RuleWindow.AfterSavingThrow => FunctorContext.AfterSavingThrow,
                 RuleWindow.OnTurnStart => FunctorContext.OnTurnStart,
                 RuleWindow.OnTurnEnd => FunctorContext.OnTurnEnd,
-                RuleWindow.OnDeclareAction or RuleWindow.OnActionComplete => FunctorContext.OnCast,
-                RuleWindow.OnMove => FunctorContext.OnCast,
-                _ => FunctorContext.OnAttack
+                RuleWindow.OnDeclareAction => FunctorContext.OnDeclareAction,
+                RuleWindow.OnActionComplete => FunctorContext.OnActionComplete,
+                RuleWindow.OnMove => FunctorContext.OnMove,
+                _ => throw new System.ArgumentOutOfRangeException(nameof(window), window, $"RuleWindow.{window} has no FunctorContext mapping — add one to MapWindowToFunctorContext and the FunctorContext enum.")
             };
         }
     }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Godot;
 using Xunit;
 using QDND.Combat.Arena;
 using QDND.Combat.Entities;
@@ -12,6 +13,32 @@ namespace QDND.Tests.Unit
 {
     public class TurnLifecycleServiceTests
     {
+        private sealed class TestCombatRuntime : ICombatRuntime
+        {
+            private readonly Func<Random> _getRng;
+
+            public TestCombatRuntime(Func<Random> getRng)
+            {
+                _getRng = getRng;
+            }
+
+            public bool IsAutoBattleMode => false;
+            public bool UseBuiltInAI => false;
+            public SceneTreeTimer CreateTimer(double seconds) => null;
+            public Random GetRandom() => _getRng();
+            public IReadOnlyList<Combatant> GetCombatants() => Array.Empty<Combatant>();
+        }
+
+        private sealed class NoOpArenaCallbacks : ITurnDriver, ICameraCoordinator, IActionBarCoordinator, IRuleWindowDispatcher
+        {
+            public void ExecuteAITurn(Combatant combatant) { }
+            public void ResumeDecisionStateIfExecuting(string reason) { }
+            public void CenterCameraOnCombatant(Combatant combatant) { }
+            public void SelectCombatant(string combatantId) { }
+            public void PopulateActionBar(string combatantId) { }
+            public void Dispatch(RuleWindow window, Combatant source, Combatant target) { }
+        }
+
         private sealed class FixedRandom : Random
         {
             private readonly Queue<int> _values;
@@ -35,6 +62,8 @@ namespace QDND.Tests.Unit
             StatusManager statusManager,
             RulesEngine rulesEngine)
         {
+            var callbacks = new NoOpArenaCallbacks();
+
             return new TurnLifecycleService(
                 turnQueue: null,
                 stateMachine: null,
@@ -50,17 +79,11 @@ namespace QDND.Tests.Unit
                 resourceBarModel: null,
                 combatantVisuals: new Dictionary<string, CombatantVisual>(),
                 defaultMovePoints: 30f,
-                getCombatants: () => Array.Empty<Combatant>(),
-                getRng: getRng,
-                executeAITurn: _ => { },
-                selectCombatant: _ => { },
-                centerCameraOnCombatant: _ => { },
-                populateActionBar: _ => { },
-                dispatchRuleWindow: (_, _, _) => { },
-                resumeDecisionStateIfExecuting: _ => { },
-                createTimer: _ => null,
-                isAutoBattleMode: () => false,
-                useBuiltInAI: () => false,
+                combatRuntime: new TestCombatRuntime(getRng),
+                turnDriver: callbacks,
+                cameraCoordinator: callbacks,
+                actionBarCoordinator: callbacks,
+                ruleWindowDispatcher: callbacks,
                 log: _ => { });
         }
 

@@ -659,7 +659,7 @@ namespace QDND.Combat.Arena
             if (!string.IsNullOrEmpty(Arena.SelectedAbilityId))
             {
                 var actor = Arena.Context.GetCombatant(Arena.SelectedCombatantId);
-                var effectPipeline = Arena.Context.GetService<EffectPipeline>();
+                var effectPipeline = Arena.EffectPipeline;
                 var action = effectPipeline?.GetAction(Arena.SelectedAbilityId);
 
                 if (actor != null && action != null)
@@ -718,7 +718,7 @@ namespace QDND.Combat.Arena
             if (!string.IsNullOrEmpty(Arena.SelectedAbilityId))
             {
                 var actor = Arena.Context.GetCombatant(Arena.SelectedCombatantId);
-                var effectPipeline = Arena.Context.GetService<EffectPipeline>();
+                var effectPipeline = Arena.EffectPipeline;
                 var action = effectPipeline?.GetAction(Arena.SelectedAbilityId);
 
                 if (actor != null && action != null)
@@ -756,8 +756,8 @@ namespace QDND.Combat.Arena
                     {
                         // Check if valid target
                         var combatants = Arena.GetCombatants().ToList();
-                        var targetValidator = Arena.Context.GetService<QDND.Combat.Targeting.TargetValidator>();
-                        var effectPipeline = Arena.Context.GetService<EffectPipeline>();
+                        var targetValidator = Arena.TargetValidator;
+                        var effectPipeline = Arena.EffectPipeline;
                         var action = effectPipeline?.GetAction(Arena.SelectedAbilityId);
 
                         if (action != null && targetValidator != null)

@@ -31,6 +31,7 @@ namespace QDND.Combat.Actions
         private QDND.Combat.Services.IAbilityTestPolicy _testPolicy = QDND.Combat.Services.NoOpAbilityTestPolicy.Instance;
         private QDND.Combat.Services.ICombatContext _combatContext;
         private Func<IEnumerable<Combatant>> _getCombatants;
+        private CharacterDataRegistry _characterDataRegistry;
 
         public RulesEngine Rules { get; set; }
         public StatusManager Statuses
@@ -190,6 +191,26 @@ namespace QDND.Combat.Actions
         public QDND.Data.DataRegistry DataRegistry { get; set; }
 
         /// <summary>
+        /// Optional inventory service for effects that manipulate items.
+        /// </summary>
+        // No cascade needed — flows into EffectContext at execution time, not used by sub-components at construction
+        public QDND.Combat.Services.InventoryService InventoryService { get; set; }
+
+        /// <summary>
+        /// Optional character registry for spellcasting ability lookups in roll resolution.
+        /// </summary>
+        public CharacterDataRegistry CharacterDataRegistry
+        {
+            get => _characterDataRegistry;
+            set
+            {
+                _characterDataRegistry = value;
+                if (Rolls != null)
+                    Rolls.CharacterDataRegistry = value;
+            }
+        }
+
+        /// <summary>
         /// All combatants in combat (for reaction eligibility checking).
         /// </summary>
         public Func<IEnumerable<Combatant>> GetCombatants
@@ -339,6 +360,7 @@ namespace QDND.Combat.Actions
             Builder = new EffectBuilder();
             Resources = new ResourceCostEngine();
             Rolls = new CombatRollResolver(CombatContext, Statuses, GetCombatants);
+            Rolls.CharacterDataRegistry = CharacterDataRegistry;
             Validator = new ActionValidator();
             Validator.GetAction = GetAction;
             Validator.Cooldowns = Cooldowns;
@@ -608,7 +630,7 @@ namespace QDND.Combat.Actions
             var effectiveEffects = Builder.BuildEffectiveEffects(action.Effects, variant, options.UpcastLevel, action.UpcastScaling);
             
             // Issue 1: Resolve dynamic formulas in effects (SpellcastingAbilityModifier, MainMeleeWeapon, etc.)
-            var charRegistry = CombatContext?.GetService<CharacterDataRegistry>();
+            var charRegistry = CharacterDataRegistry;
             foreach (var effect in effectiveEffects)
             {
                 if (!string.IsNullOrEmpty(effect.DiceFormula))
@@ -661,6 +683,7 @@ namespace QDND.Combat.Actions
                 ForcedMovement = ForcedMovement,
                 Rng = Rng ?? new Random(),
                 CombatContext = CombatContext,
+                InventoryService = InventoryService,
                 TurnQueue = TurnQueue,
                 DataRegistry = DataRegistry,
                 OnHitTriggerService = OnHitTriggerService,
@@ -1310,6 +1333,7 @@ namespace QDND.Combat.Actions
                     ForcedMovement = baseContext.ForcedMovement,
                     Rng = baseContext.Rng,
                     CombatContext = baseContext.CombatContext,
+                    InventoryService = baseContext.InventoryService,
                     TurnQueue = baseContext.TurnQueue,
                     DataRegistry = baseContext.DataRegistry,
                     OnHitTriggerService = baseContext.OnHitTriggerService,

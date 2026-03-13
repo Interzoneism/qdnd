@@ -49,27 +49,19 @@ namespace QDND.Combat.Services
         private readonly CombatLog _combatLog;
 
         private readonly ICombatantRegistry _combatants;
+        private readonly InventoryService _inventoryService;
 
         // Shared dict — same reference as CombatArena._pendingJumpWorldPaths
         private readonly Dictionary<string, List<Vector3>> _pendingJumpWorldPaths;
 
         private readonly float _tileSize;
 
-        // ── Delegates for CombatArena-owned behaviour ────────────────────────
-        private readonly Action _clearSelection;
+        // ── Bridges for CombatArena-owned behaviour ─────────────────────────
         private readonly Action<string, Vector3, bool> _faceCombatantTowardsGridPoint;
-        private readonly Action<string> _refreshActionBarUsability;
-        private readonly Action<Combatant> _updateResourceModelFromCombatant;
-        private readonly Func<bool> _isPlayerTurn;
-        private readonly Func<string, bool> _canPlayerControl;
-        /// <summary>calls ShouldAllowVictory() &amp;&amp; ShouldEndCombat() → EndCombat() on the arena side.</summary>
-        private readonly Action _checkAndEndCombat;
-        private readonly Func<Combatant, Vector3, JumpPathResult> _buildJumpPath;
-        private readonly Func<Combatant, float> _getJumpDistanceLimit;
-        private readonly Func<Combatant, AIAction, List<AIAction>, bool> _executeAIMovementWithFallback;
-        private readonly Func<Combatant, bool> _executeDash;
-        private readonly Func<Combatant, bool> _executeDisengage;
-        private readonly Func<float, SceneTreeTimer> _createTimer;
+        private readonly ISelectionFeedback _selectionFeedback;
+        private readonly IInputState _inputState;
+        private readonly IActionExecutionRuntime _actionExecutionRuntime;
+        private readonly IAIMovementBridge _aiMovementBridge;
         private readonly Action<string> _log;
 
         public ActionExecutionService(
@@ -86,21 +78,14 @@ namespace QDND.Combat.Services
             RulesEngine rulesEngine,
             CombatLog combatLog,
             ICombatantRegistry combatants,
+            InventoryService inventoryService,
             Dictionary<string, List<Vector3>> pendingJumpWorldPaths,
             float tileSize,
-            Action clearSelection,
             Action<string, Vector3, bool> faceCombatantTowardsGridPoint,
-            Action<string> refreshActionBarUsability,
-            Action<Combatant> updateResourceModelFromCombatant,
-            Func<bool> isPlayerTurn,
-            Func<string, bool> canPlayerControl,
-            Action checkAndEndCombat,
-            Func<Combatant, Vector3, JumpPathResult> buildJumpPath,
-            Func<Combatant, float> getJumpDistanceLimit,
-            Func<Combatant, AIAction, List<AIAction>, bool> executeAIMovementWithFallback,
-            Func<Combatant, bool> executeDash,
-            Func<Combatant, bool> executeDisengage,
-            Func<float, SceneTreeTimer> createTimer,
+            ISelectionFeedback selectionFeedback,
+            IInputState inputState,
+            IActionExecutionRuntime actionExecutionRuntime,
+            IAIMovementBridge aiMovementBridge,
             Action<string> log)
         {
             _effectPipeline = effectPipeline;
@@ -116,21 +101,14 @@ namespace QDND.Combat.Services
             _rulesEngine = rulesEngine;
             _combatLog = combatLog;
             _combatants = combatants;
+            _inventoryService = inventoryService;
             _pendingJumpWorldPaths = pendingJumpWorldPaths;
             _tileSize = tileSize;
-            _clearSelection = clearSelection;
             _faceCombatantTowardsGridPoint = faceCombatantTowardsGridPoint;
-            _refreshActionBarUsability = refreshActionBarUsability;
-            _updateResourceModelFromCombatant = updateResourceModelFromCombatant;
-            _isPlayerTurn = isPlayerTurn;
-            _canPlayerControl = canPlayerControl;
-            _checkAndEndCombat = checkAndEndCombat;
-            _buildJumpPath = buildJumpPath;
-            _getJumpDistanceLimit = getJumpDistanceLimit;
-            _executeAIMovementWithFallback = executeAIMovementWithFallback;
-            _executeDash = executeDash;
-            _executeDisengage = executeDisengage;
-            _createTimer = createTimer;
+            _selectionFeedback = selectionFeedback;
+            _inputState = inputState;
+            _actionExecutionRuntime = actionExecutionRuntime;
+            _aiMovementBridge = aiMovementBridge;
             _log = log;
         }
 
@@ -207,14 +185,14 @@ namespace QDND.Combat.Services
                 case AIActionType.Move:
                 case AIActionType.Jump:
                     if (action.TargetPosition.HasValue)
-                        return _executeAIMovementWithFallback(actor, action, allCandidates);
+                        return _aiMovementBridge.ExecuteAIMovementWithFallback(actor, action, allCandidates);
                     return false;
 
                 case AIActionType.Dash:
-                    return _executeDash(actor);
+                    return _aiMovementBridge.ExecuteDash(actor);
 
                 case AIActionType.Disengage:
-                    return _executeDisengage(actor);
+                    return _aiMovementBridge.ExecuteDisengage(actor);
 
                 case AIActionType.Attack:
                 case AIActionType.UseAbility:
@@ -292,7 +270,7 @@ namespace QDND.Combat.Services
                 case AIActionType.UseItem:
                     if (!string.IsNullOrEmpty(action.ActionId))
                     {
-                        var invService = _combatContext.GetService<InventoryService>();
+                        var invService = _inventoryService;
                         if (invService == null) return false;
 
                         var usableItems = invService.GetUsableItems(actor.Id);
@@ -334,7 +312,7 @@ namespace QDND.Combat.Services
             var actor = _combatContext.GetCombatant(actorId);
             if (actor == null) { _log("UseItem: invalid actor"); return; }
 
-            var inventoryService = _combatContext.GetService<InventoryService>();
+            var inventoryService = _inventoryService;
             if (inventoryService == null) { _log("UseItem: no InventoryService"); return; }
 
             var (canUse, reason) = inventoryService.CanUseItem(actor, itemInstanceId);
@@ -385,7 +363,7 @@ namespace QDND.Combat.Services
             var target = _combatContext.GetCombatant(targetId);
             if (target == null) { _log("UseItemOnTarget: invalid target"); return; }
 
-            var inventoryService = _combatContext.GetService<InventoryService>();
+            var inventoryService = _inventoryService;
             if (inventoryService == null) { _log("UseItemOnTarget: no InventoryService"); return; }
 
             var (canUse, reason) = inventoryService.CanUseItem(actor, itemInstanceId);
@@ -411,7 +389,7 @@ namespace QDND.Combat.Services
             var actor = _combatContext.GetCombatant(actorId);
             if (actor == null) { _log("UseItemAtPosition: invalid actor"); return; }
 
-            var inventoryService = _combatContext.GetService<InventoryService>();
+            var inventoryService = _inventoryService;
             if (inventoryService == null) { _log("UseItemAtPosition: no InventoryService"); return; }
 
             var (canUse, reason) = inventoryService.CanUseItem(actor, itemInstanceId);
@@ -449,7 +427,7 @@ namespace QDND.Combat.Services
             _log($"ExecuteAction: {actorId} -> {actionId} -> {targetId}");
 
             var actor = _combatContext.GetCombatant(actorId);
-            if (actor?.IsPlayerControlled == true && !_canPlayerControl(actorId))
+            if (actor?.IsPlayerControlled == true && !_inputState.CanPlayerControl(actorId))
             {
                 _log($"Cannot execute ability: player cannot control {actorId}");
                 return;
@@ -525,7 +503,7 @@ namespace QDND.Combat.Services
             _log($"ExecuteAction (multi-target): {actorId} -> {actionId} -> [{string.Join(", ", targetIds)}]");
 
             var actor = _combatContext.GetCombatant(actorId);
-            if (actor?.IsPlayerControlled == true && !_canPlayerControl(actorId))
+            if (actor?.IsPlayerControlled == true && !_inputState.CanPlayerControl(actorId))
             {
                 _log($"Cannot execute ability: player cannot control {actorId}");
                 return;
@@ -591,7 +569,7 @@ namespace QDND.Combat.Services
             _log($"ExecuteAction (auto-target): {actorId} -> {actionId}");
 
             var actor = _combatContext.GetCombatant(actorId);
-            if (actor?.IsPlayerControlled == true && !_canPlayerControl(actorId))
+            if (actor?.IsPlayerControlled == true && !_inputState.CanPlayerControl(actorId))
             {
                 _log($"Cannot execute ability: player cannot control {actorId}");
                 return;
@@ -664,7 +642,7 @@ namespace QDND.Combat.Services
             _log($"ExecuteAbilityAtPosition: {actorId} -> {actionId} @ {targetPosition}");
 
             var actor = _combatContext.GetCombatant(actorId);
-            if (actor?.IsPlayerControlled == true && !_canPlayerControl(actorId))
+            if (actor?.IsPlayerControlled == true && !_inputState.CanPlayerControl(actorId))
             {
                 _log($"Cannot execute ability: player cannot control {actorId}");
                 return;
@@ -705,14 +683,14 @@ namespace QDND.Combat.Services
 
             if (isJumpAction)
             {
-                var jumpPath = _buildJumpPath(actor, targetPosition);
+                var jumpPath = _aiMovementBridge.BuildJumpPath(actor, targetPosition);
                 if (!jumpPath.Success || jumpPath.Waypoints.Count < 2)
                 {
                     _log($"Jump path blocked: {jumpPath.FailureReason ?? "No valid arc"}");
                     return;
                 }
 
-                float jumpDistanceLimit = _getJumpDistanceLimit(actor);
+                float jumpDistanceLimit = _aiMovementBridge.GetJumpDistanceLimit(actor);
                 if (jumpPath.TotalLength > jumpDistanceLimit + 0.001f)
                 {
                     _log($"Jump distance exceeded: {jumpPath.TotalLength:F2} > {jumpDistanceLimit:F2}");
@@ -849,8 +827,8 @@ namespace QDND.Combat.Services
                     if (action.Cost?.UsesBonusAction == true)
                         _resourceBarModel?.ModifyCurrent("bonus_action", -1);
                     if (actor.ActionBudget != null)
-                        _updateResourceModelFromCombatant(actor);
-                    _refreshActionBarUsability(actor.Id);
+                        _selectionFeedback.UpdateResourceModel(actor);
+                    _selectionFeedback.RefreshActionBarUsability(actor.Id);
 
                     _effectPipeline?.NotifyAbilityExecuted(
                         new ActionExecutionResult { Success = true, ActionId = action.Id, SourceId = actor.Id });
@@ -860,7 +838,7 @@ namespace QDND.Combat.Services
                     _effectPipeline?.NotifyAbilityExecuted(
                         ActionExecutionResult.Failure(action.Id, actor.Id, "No dippable surface in range"));
                 }
-                _clearSelection();
+                _selectionFeedback.ClearSelection();
                 ResumeDecisionStateIfExecuting(dipSuccess ? "Dip completed" : "Dip failed");
                 return;
             }
@@ -881,8 +859,8 @@ namespace QDND.Combat.Services
                     if (action.Cost?.UsesBonusAction == true)
                         _resourceBarModel?.ModifyCurrent("bonus_action", -1);
                     if (actor.ActionBudget != null)
-                        _updateResourceModelFromCombatant(actor);
-                    _refreshActionBarUsability(actor.Id);
+                        _selectionFeedback.UpdateResourceModel(actor);
+                    _selectionFeedback.RefreshActionBarUsability(actor.Id);
 
                     _effectPipeline?.NotifyAbilityExecuted(
                         new ActionExecutionResult
@@ -912,7 +890,7 @@ namespace QDND.Combat.Services
                     _effectPipeline?.NotifyAbilityExecuted(
                         ActionExecutionResult.Failure(action.Id, actor.Id, "Hide failed"));
                 }
-                _clearSelection();
+                _selectionFeedback.ClearSelection();
                 ResumeDecisionStateIfExecuting(hideSuccess ? "Hide completed" : "Hide failed");
                 return;
             }
@@ -926,8 +904,8 @@ namespace QDND.Combat.Services
                 {
                     _actionBarModel?.UseAction(action.Id);
                     if (actor.ActionBudget != null)
-                        _updateResourceModelFromCombatant(actor);
-                    _refreshActionBarUsability(actor.Id);
+                        _selectionFeedback.UpdateResourceModel(actor);
+                    _selectionFeedback.RefreshActionBarUsability(actor.Id);
 
                     _effectPipeline?.NotifyAbilityExecuted(
                         new ActionExecutionResult { Success = true, ActionId = action.Id, SourceId = actor.Id,
@@ -938,7 +916,7 @@ namespace QDND.Combat.Services
                     _effectPipeline?.NotifyAbilityExecuted(
                         ActionExecutionResult.Failure(action.Id, actor.Id, "Help failed — no valid ally target"));
                 }
-                _clearSelection();
+                _selectionFeedback.ClearSelection();
                 ResumeDecisionStateIfExecuting(helpSuccess ? "Help completed" : "Help failed");
                 return;
             }
@@ -989,7 +967,7 @@ namespace QDND.Combat.Services
                     if (attackIndex == 0)
                     {
                         _log($"Action failed: {result.ErrorMessage}");
-                        _clearSelection();
+                        _selectionFeedback.ClearSelection();
                         ResumeDecisionStateIfExecuting("Action execution failed");
                         return;
                     }
@@ -1023,7 +1001,7 @@ namespace QDND.Combat.Services
             if (allResults.Count == 0)
             {
                 _log("No attacks succeeded");
-                _clearSelection();
+                _selectionFeedback.ClearSelection();
                 ResumeDecisionStateIfExecuting("All attacks failed");
                 return;
             }
@@ -1036,20 +1014,20 @@ namespace QDND.Combat.Services
                 _resourceBarModel?.ModifyCurrent("action", -1);
             if (action.Cost?.UsesBonusAction == true)
                 _resourceBarModel?.ModifyCurrent("bonus_action", -1);
-            if (_isPlayerTurn() && actor.ActionBudget != null)
-                _updateResourceModelFromCombatant(actor);
+            if (_inputState.IsPlayerTurn && actor.ActionBudget != null)
+                _selectionFeedback.UpdateResourceModel(actor);
 
-            _refreshActionBarUsability(actor.Id);
+            _selectionFeedback.RefreshActionBarUsability(actor.Id);
 
             // Headless/non-full-fidelity path: resolve combat end immediately to avoid
             // SkipAnimations timeline race conditions.
             if (DebugFlags.SkipAnimations)
             {
-                _checkAndEndCombat();
+                _actionExecutionRuntime.CheckAndEndCombat();
                 if (_stateMachine.CurrentState == CombatState.CombatEnd)
                 {
                     _executingActionId = -1;
-                    _clearSelection();
+                    _selectionFeedback.ClearSelection();
                     return;
                 }
             }
@@ -1068,11 +1046,11 @@ namespace QDND.Combat.Services
             // Safety fallback: if timeline processing is stalled, do not leave combat stuck in ActionExecution.
             if (!DebugFlags.SkipAnimations)
             {
-                _createTimer(Mathf.Max(0.5f, timeline.Duration + 0.5f)).Timeout +=
+                _actionExecutionRuntime.CreateTimer(Mathf.Max(0.5f, timeline.Duration + 0.5f)).Timeout +=
                     () => ResumeDecisionStateIfExecuting("Ability timeline timeout fallback", thisActionId);
             }
 
-            _clearSelection();
+            _selectionFeedback.ClearSelection();
         }
 
         // ────────────────────────────────────────────────────────────────────
@@ -1115,7 +1093,7 @@ namespace QDND.Combat.Services
             _executingActionId = -1;
 
             // Full-fidelity path: combat end is evaluated after timeline presentation completes.
-            _checkAndEndCombat();
+            _actionExecutionRuntime.CheckAndEndCombat();
             if (_stateMachine.CurrentState == CombatState.CombatEnd)
             {
                 return;
@@ -1125,7 +1103,7 @@ namespace QDND.Combat.Services
 
             if (currentCombatant == null)
             {
-                _checkAndEndCombat();
+                _actionExecutionRuntime.CheckAndEndCombat();
                 if (_stateMachine.CurrentState != CombatState.CombatEnd)
                 {
                     _stateMachine.TryTransition(CombatState.TurnEnd, "No current combatant - advancing");
@@ -1256,7 +1234,7 @@ namespace QDND.Combat.Services
                 return;
             }
 
-            var invService = _combatContext.GetService<InventoryService>();
+            var invService = _inventoryService;
             if (invService == null)
             {
                 _log("SwitchWeaponSet: InventoryService not available");
@@ -1264,7 +1242,7 @@ namespace QDND.Combat.Services
             }
 
             invService.SwitchWeaponSet(actor);
-            _refreshActionBarUsability(actor.Id);
+            _selectionFeedback.RefreshActionBarUsability(actor.Id);
             _log($"{actor.Name} switched to weapon set {actor.ActiveWeaponSet} ({(actor.ActiveWeaponSet == 0 ? "Melee" : "Ranged")})");
         }
 

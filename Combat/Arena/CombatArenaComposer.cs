@@ -103,6 +103,7 @@ namespace QDND.Combat.Arena
             composition.FunctorExecutor = registries.FunctorExecutor;
             HudIcons.SetIconService(registries.IconService);
             var charRegistry = registries.CharRegistry;
+            composition.CharacterDataRegistry = charRegistry;
 
             composition.BG3AiRegistry = new BG3AIRegistry();
             var bg3AiPath = Path.Combine(ProjectSettings.GlobalizePath("res://BG3_Data"), "AI");
@@ -148,6 +149,11 @@ namespace QDND.Combat.Arena
                 return canUse;
             };
 
+            var bg3ReactionIntegration = new BG3ReactionIntegration(composition.ReactionSystem, composition.InterruptRegistry);
+            bg3ReactionIntegration.RegisterCoreInterrupts();
+            args.CombatContext.RegisterService(bg3ReactionIntegration);
+            args.Log("BG3 Reaction Integration wired (OpportunityAttack, Shield, Counterspell, UncannyDodge)");
+
             composition.ResolutionStack = new ResolutionStack();
             composition.ReactionCoordinator = new ReactionCoordinator(
                 composition.ReactionSystem,
@@ -158,6 +164,8 @@ namespace QDND.Combat.Arena
                 composition.TargetValidator,
                 composition.TurnQueue,
                 composition.CombatantRegistry,
+                bg3ReactionIntegration,
+                composition.CombatLog,
                 args.IsAutoBattleMode,
                 args.GetRandom,
                 args.Log);
@@ -186,11 +194,6 @@ namespace QDND.Combat.Arena
                 }
             });
 
-            var bg3ReactionIntegration = new BG3ReactionIntegration(composition.ReactionSystem, composition.InterruptRegistry);
-            bg3ReactionIntegration.RegisterCoreInterrupts();
-            args.CombatContext.RegisterService(bg3ReactionIntegration);
-            args.Log("BG3 Reaction Integration wired (OpportunityAttack, Shield, Counterspell, UncannyDodge)");
-
             composition.ReactionSystem.OnPromptCreated += composition.ReactionCoordinator.OnReactionPrompt;
             composition.ReactionSystem.OnReactionUsed += composition.ReactionCoordinator.OnReactionUsed;
 
@@ -200,6 +203,7 @@ namespace QDND.Combat.Arena
             composition.EffectPipeline.CombatContext = args.CombatContext;
             composition.EffectPipeline.TurnQueue = composition.TurnQueue;
             composition.EffectPipeline.DataRegistry = composition.DataRegistry;
+            composition.EffectPipeline.CharacterDataRegistry = charRegistry;
 
             composition.SurfaceManager = new SurfaceManager(composition.RulesEngine.Events, composition.StatusManager);
             composition.SurfaceManager.Rules = composition.RulesEngine;
@@ -269,8 +273,10 @@ namespace QDND.Combat.Arena
             composition.RestService = new RestService(composition.ResourceManager);
             args.CombatContext.RegisterService(composition.RestService);
 
-            var inventoryService = new InventoryService(charRegistry, composition.StatsRegistry, args.CombatContext);
+            var inventoryService = new InventoryService(charRegistry, composition.StatsRegistry, args.CombatContext, registries.ItemDefinitionRegistry);
             args.CombatContext.RegisterService(inventoryService);
+            composition.InventoryService = inventoryService;
+            composition.EffectPipeline.InventoryService = inventoryService;
             Action<string, EquipSlot> onEquipmentChanged = (combatantId, _) =>
             {
                 if (string.Equals(combatantId, args.GetActiveCombatantId(), StringComparison.Ordinal))
@@ -311,9 +317,6 @@ namespace QDND.Combat.Arena
             args.CombatContext.RegisterService(losService);
             args.CombatContext.RegisterService(heightService);
 
-            composition.AIPipeline = new AIDecisionPipeline(args.CombatContext);
-            args.CombatContext.RegisterService(composition.AIPipeline);
-
             composition.MovementService = new MovementService(
                 composition.RulesEngine.Events,
                 composition.SurfaceManager,
@@ -325,6 +328,28 @@ namespace QDND.Combat.Arena
             composition.MovementService.PathNodeSpacing = 0.75f;
             composition.MovementService.IsWorldPositionBlocked = args.IsWorldPositionBlocked;
             args.CombatContext.RegisterService(composition.MovementService);
+
+            composition.AIPipeline = new AIDecisionPipeline(
+                composition.CombatantRegistry,
+                composition.RulesEngine,
+                composition.EffectPipeline,
+                composition.TargetValidator,
+                losService,
+                composition.SurfaceManager,
+                composition.MovementService,
+                composition.DataRegistry,
+                composition.StatusManager,
+                composition.ReactionSystem,
+                inventoryService,
+                composition.ConcentrationSystem,
+                composition.TurnQueue,
+                heightService,
+                null,
+                args.SpecialMovementService,
+                composition.ForcedMovementService,
+                charRegistry,
+                composition.BG3StatusRegistry);
+            args.CombatContext.RegisterService(composition.AIPipeline);
 
             composition.MovementCoordinator = new CombatMovementCoordinator(
                 composition.MovementService,
@@ -355,17 +380,19 @@ namespace QDND.Combat.Arena
                 args.Log);
 
             composition.EffectPipeline.Surfaces = composition.SurfaceManager;
-            composition.AIPipeline.LateInitialize();
 
             args.CombatContext.RegisterService(args.CameraService.CameraHooks);
 
             composition.ActionBarModel = new ActionBarModel();
             composition.ActionBarService = new ActionBarService(
-                args.CombatContext,
+                composition.CombatantRegistry,
                 composition.ActionRegistry,
                 composition.ActionBarModel,
                 composition.PassiveRegistry,
                 composition.EffectPipeline,
+                inventoryService,
+                composition.ConcentrationSystem,
+                charRegistry,
                 args.LogOnce);
 
             composition.SelectionService = new SelectionService(
@@ -430,17 +457,11 @@ namespace QDND.Combat.Arena
                 composition.ResourceBarModel,
                 args.CombatantVisuals,
                 args.DefaultMovePoints,
-                () => composition.CombatantRegistry.GetAll(),
-                args.GetRandom,
-                args.ExecuteAITurn,
-                args.SelectCombatant,
-                args.CenterCameraOnCombatant,
-                args.PopulateActionBar,
-                args.DispatchRuleWindow,
-                reason => composition.ActionExecutionService.ResumeDecisionStateIfExecuting(reason),
-                args.CreateDoubleTimer,
-                args.IsAutoBattleMode,
-                args.UseBuiltInAI,
+                args.ArenaScene,
+                args.ArenaScene,
+                args.ArenaScene,
+                args.ArenaScene,
+                args.ArenaScene,
                 args.Log,
                 auraSystem);
             composition.TurnLifecycleService.AllowVictoryHook = args.ShouldAllowVictory;
@@ -459,21 +480,14 @@ namespace QDND.Combat.Arena
                 composition.RulesEngine,
                 composition.CombatLog,
                 composition.CombatantRegistry,
+                inventoryService,
                 args.PendingJumpWorldPaths,
                 args.TileSize,
-                args.ClearSelection,
                 args.FaceCombatantTowardsGridPoint,
-                args.RefreshActionBarUsability,
-                combatant => composition.TurnLifecycleService.UpdateResourceModelFromCombatant(combatant),
-                args.GetIsPlayerTurn,
-                args.CanPlayerControl,
-                args.CheckAndEndCombat,
-                args.BuildJumpPath,
-                args.GetJumpDistanceLimit,
-                args.ExecuteAIMovementWithFallback,
-                args.ExecuteDash,
-                args.ExecuteDisengage,
-                args.CreateFloatTimer,
+                args.ArenaScene,
+                args.ArenaScene,
+                args.ArenaScene,
+                args.ArenaScene,
                 args.Log);
             composition.EffectPipeline.OnAbilityExecuted += composition.ActionExecutionService.OnAbilityExecuted;
             composition.ActionExecutionService.OnAIAbilityNotify = args.NotifyAIAbilityUsed;
@@ -502,6 +516,18 @@ namespace QDND.Combat.Arena
                 args.CombatContext,
                 composition.FunctorExecutor,
                 composition.ForcedMovementService,
+                charRegistry,
+                composition.ActionRegistry,
+                composition.EffectPipeline,
+                composition.AIPipeline,
+                composition.ScenarioLoader,
+                composition.TurnQueue,
+                composition.PassiveRegistry,
+                composition.MetamagicService,
+                composition.StatusManager,
+                composition.CombatLog,
+                inventoryService,
+                losService,
                 composition.MovementCoordinator.ApplyDefaultMovementToCombatants,
                 composition.ReactionCoordinator.GrantBaselineReactions,
                 args.Log,
